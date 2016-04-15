@@ -1,13 +1,13 @@
 import sys
 from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget,
                              QLabel, QCheckBox, QPushButton, QMainWindow, QMenuBar, QComboBox,
-                             QLineEdit, QTextEdit, QGridLayout, QFileDialog, QAction, qApp, QHBoxLayout)
+                             QLineEdit, QTextEdit, QGridLayout, QFileDialog, QAction, qApp, QHBoxLayout, QVBoxLayout)
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtGui import (QColor, QPainter, QFont)
 from PyQt5.QtWidgets import (QWidget, QPushButton,
-                             QFrame, QApplication)
+                             QFrame, QApplication, QSizePolicy)
 import shelve
 import numpy as np
 
@@ -25,12 +25,19 @@ class MainWindow(QMainWindow):
         menubar.addMenu('File')
 
         grid = QGridLayout()
-        grid.setSpacing(10)
+        grid.setSpacing(1)
 
         self.painter = Canvas()
-        grid.addWidget(self.painter, 1, 0)
+        grid.addWidget(self.painter, 0, 1)
 
-        centralWidget.setLayout(grid)
+        self.heading = QLabel("Contacts")
+        grid.addWidget(self.heading, 0, 0)
+
+        mainLayout = QVBoxLayout(centralWidget)
+        mainLayout.addLayout(grid)
+        # mainLayout.addStretch()
+
+        # centralWidget.setLayout(grid)
         self.setCentralWidget(centralWidget)
 
         openFile = QAction(QIcon("open.png"), "Open", self)
@@ -152,7 +159,7 @@ class Canvas(QWidget):
 
     def drawContact(self, event, qp):
 
-        startx = 100
+        startx = 80
         orig_startx = startx
         start_text = 10
         textoffset = 13
@@ -160,7 +167,7 @@ class Canvas(QWidget):
         offset = 10
         color = QColor(0, 0, 0)
         if self.contacts:
-            row = 5
+            row = 0
             for c in self.contacts:
                 for x in c.scoreArray:
                     qp.setPen(color)
@@ -170,7 +177,7 @@ class Canvas(QWidget):
                     startx += (offset)
                     qp.setFont(QFont('Arial', 9))
                     string = c.resA + c.residA + "-" + c.resB + c.residB
-                # qp.drawText(start_text, row+textoffset ,string)
+                    qp.drawText(start_text, row+textoffset ,string)
                 startx = orig_startx
                 row += rowheight
 
