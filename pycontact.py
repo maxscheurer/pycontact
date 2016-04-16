@@ -1,13 +1,13 @@
 import sys
 from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget,
-                             QLabel, QCheckBox, QPushButton, QMainWindow, QMenuBar, QComboBox,
-                             QLineEdit, QTextEdit, QGridLayout, QFileDialog, QAction, qApp, QHBoxLayout, QVBoxLayout)
+							 QLabel, QCheckBox, QPushButton, QMainWindow, QMenuBar, QComboBox,
+							 QLineEdit, QTextEdit, QGridLayout, QFileDialog, QAction, qApp, QHBoxLayout, QVBoxLayout)
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtGui import (QColor, QPainter, QFont)
 from PyQt5.QtWidgets import (QWidget, QPushButton,
-                             QFrame, QApplication, QSizePolicy)
+							 QFrame, QApplication, QSizePolicy)
 import shelve
 import numpy as np
 import gui
@@ -22,7 +22,6 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
 
 		self.painter = Canvas()
 		self.scrollArea.setWidget(self.painter)
-
 		self.actionOpen.triggered.connect(self.pushOpen)
 
 	def pushOpen(self):
@@ -110,7 +109,6 @@ class Canvas(QWidget):
 		self.pixmap = QPixmap(QSize(self.sizeX, self.sizeY))
 		p = QPainter()
 		p.begin(self.pixmap)
-
 		p.fillRect(0, 0, self.sizeX, self.sizeY, whiteColor)
 
 		row = 0
@@ -137,46 +135,48 @@ class Canvas(QWidget):
 
 
 class AnalysisView(QWidget):
-    """docstring for AnalysisView"""
+	"""docstring for AnalysisView"""
 
-    def __init__(self):
-        super().__init__()
-        self.initUI()
+	def __init__(self):
+		super().__init__()
+		self.initUI()
 
-    def initUI(self):
-        self.contacts = 0
+	def initUI(self):
+		self.contacts = 0
 
 
 class Contact:
-    def __init__(self, resA, residA, resB, residB, scoreArray):
-        self.resA = resA
-        self.resB = resB
-        self.residA = residA
-        self.residB = residB
-        self.scoreArray = scoreArray
-        self.type = determine_ctype(self.resA, self.resB)
+	def __init__(self, resA, residA, resB, residB, scoreArray):
+		self.resA = resA
+		self.resB = resB
+		self.residA = residA
+		self.residB = residB
+		self.scoreArray = scoreArray
+		self.type = determine_ctype(self.resA, self.resB)
 
-    def framenumber(self):
-        return len(self.scoreArray)
+	def framenumber(self):
+		return len(self.scoreArray)
 
-    def total_time(self, ns_per_frame, threshold):
-        time = 0
-        for score in self.scoreArray:
-            if score > threshold:
-                time += ns_per_frame
-        self.ttime = time
-        return self.ttime
+	def total_time(self, ns_per_frame, threshold):
+		time = 0
+		for score in self.scoreArray:
+			if score > threshold:
+				time += ns_per_frame
+		self.ttime = time
+		return self.ttime
 
 def determine_ctype(resA, resB):
-    return 0
+	return 0
 
 
 def main():
-    app = QApplication(sys.argv)
-    window = MainWindow()
-    window.show()
-    app.exec_()
+	app = QApplication(sys.argv)
+	window = MainWindow()
+	window.show()
+	app.exec_()
 
+class ContactType:
+    hbond, saltbr, hydrophobic = range(3)
 
 if __name__ == '__main__':
-    main()
+	main()
