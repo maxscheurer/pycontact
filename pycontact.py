@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import (QWidget, QPushButton,
 import shelve
 import numpy as np
 import gui
+from functools import partial
 
 
 class MainWindow(QMainWindow, gui.Ui_MainWindow):
@@ -97,11 +98,12 @@ class Canvas(QWidget):
         startx = 80
         orig_startx = startx
         start_text = 10
-        textoffset = 13
+        textoffset = 5
         rowheight = 22
         offset = 10
         blackColor = QColor(0, 0, 0)
         whiteColor = QColor(255, 255, 255)
+
 
         self.sizeX = (len(self.contacts[0].scoreArray) + startx) * offset
         self.sizeY = len(self.contacts) * rowheight
@@ -121,14 +123,16 @@ class Canvas(QWidget):
                 # qp.setBrush(QColor(((1-x)*50), x*50,0))
                 p.drawRect(startx, row, offset, 20)
                 startx += (offset)
-                p.setFont(QFont('Arial', 9))
-                string = c.resA + c.residA + "-" + c.resB + c.residB
-                p.drawText(start_text, row+textoffset ,string)
+                # p.setFont(QFont('Arial', 9))
+                # p.drawText(start_text, row+textoffset ,string)
             startx = orig_startx
             row += rowheight
 
         p.end()
         self.pixmap.save("test", 'png', 100)
+        self.analysis = AnalysisView(self.contacts)
+        self.analysis.setParent(self)
+        self.analysis.show()
 
     def drawRenderedContact(self, event, qp):
         qp.drawPixmap(0, 0, self.sizeX, self.sizeY, self.pixmap)
@@ -137,12 +141,36 @@ class Canvas(QWidget):
 class AnalysisView(QWidget):
     """docstring for AnalysisView"""
 
-    def __init__(self):
+    def __init__(self, contacts):
         super().__init__()
+        self.contacts = contacts
         self.initUI()
 
     def initUI(self):
-        self.contacts = 0
+        startx = 80
+        orig_startx = startx
+        start_text = 10
+        textoffset = 5
+        rowheight = 22
+        row = 0
+        self.buttons = []
+        for c in self.contacts:
+            cindex = self.contacts.index(c)
+            string = c.resA +c.residA + "-" + c.resB + c.residB
+            self.buttons.append(QPushButton(string))
+            self.buttons[-1].setStyleSheet("border: 0px solid #222222")
+            self.buttons[-1].clicked.connect(partial(self.handleButton, data=cindex))
+            self.buttons[-1].setParent(self)
+            self.buttons[-1].move(start_text, row + textoffset)
+            self.buttons[-1].setFont(QFont('Arial', 9))
+            self.buttons[-1].show()
+            startx = orig_startx
+            row += rowheight
+
+    def handleButton(self, data):
+        print('index clicked: '+ str(data))
+
+
 
 
 class Contact:
@@ -180,6 +208,8 @@ class ContactType:
 
 class ResidueType:
     positive, negative, unpolar, polar = range(4)
+
+
 
 if __name__ == '__main__':
     main()
