@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget,
+from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget, QDialog,
                              QLabel, QCheckBox, QPushButton, QMainWindow, QMenuBar, QComboBox,
                              QLineEdit, QTextEdit, QGridLayout, QFileDialog, QAction, qApp, QHBoxLayout, QVBoxLayout)
 
@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import (QWidget, QPushButton,
 import shelve
 import numpy as np
 import gui
+from biochemistry import *
 from functools import partial
 
 
@@ -60,12 +61,6 @@ class Canvas(QWidget):
         self.initUI()
 
     def initUI(self):
-
-        # self.col = QColor(0, 0, 0)
-        # self.square = QFrame(self)
-        # self.square.setGeometry(0, 0, 1, 100)
-        # self.square.setStyleSheet("QWidget { background-color: %s }" %
-        # self.col.name())
         self.contacts = 0
         self.sizeX = 0
         self.sizeY = 0
@@ -115,30 +110,25 @@ class Canvas(QWidget):
 
         row = 0
         for c in self.contacts:
-            # print total time of contact in nanoseconds
-            #print(c.total_time(1, 0.5))
             for x in c.scoreArray:
                 p.setPen(blackColor)
                 p.setBrush(QColor(0, 200, 0, x * 50))
-                # qp.setBrush(QColor(((1-x)*50), x*50,0))
                 p.drawRect(startx, row, offset, 20)
                 startx += (offset)
-                # p.setFont(QFont('Arial', 9))
-                # p.drawText(start_text, row+textoffset ,string)
             startx = orig_startx
             row += rowheight
 
         p.end()
         self.pixmap.save("test", 'png', 100)
-        self.analysis = AnalysisView(self.contacts)
-        self.analysis.setParent(self)
-        self.analysis.show()
+        self.labelView = LabelView(self.contacts)
+        self.labelView.setParent(self)
+        self.labelView.show()
 
     def drawRenderedContact(self, event, qp):
         qp.drawPixmap(0, 0, self.sizeX, self.sizeY, self.pixmap)
 
 
-class AnalysisView(QWidget):
+class LabelView(QWidget):
     """docstring for AnalysisView"""
 
     def __init__(self, contacts):
@@ -156,8 +146,7 @@ class AnalysisView(QWidget):
         self.buttons = []
         for c in self.contacts:
             cindex = self.contacts.index(c)
-            string = c.resA +c.residA + "-" + c.resB + c.residB
-            self.buttons.append(QPushButton(string))
+            self.buttons.append(QPushButton(c.title))
             self.buttons[-1].setStyleSheet("border: 0px solid #222222")
             self.buttons[-1].clicked.connect(partial(self.handleButton, data=cindex))
             self.buttons[-1].setParent(self)
@@ -169,32 +158,20 @@ class AnalysisView(QWidget):
 
     def handleButton(self, data):
         print('index clicked: '+ str(data))
-
-
-
-
-class Contact:
-    def __init__(self, resA, residA, resB, residB, scoreArray):
-        self.resA = resA
-        self.resB = resB
-        self.residA = residA
-        self.residB = residB
-        self.scoreArray = scoreArray
-        self.type = determine_ctype(self.resA, self.resB)
-
-    def framenumber(self):
-        return len(self.scoreArray)
-
-    def total_time(self, ns_per_frame, threshold):
-        time = 0
-        for score in self.scoreArray:
-            if score > threshold:
-                time += ns_per_frame
-        self.ttime = time
-        return self.ttime
-
-def determine_ctype(resA, resB):
-    return 0
+        d = QDialog()
+        grid = QGridLayout()
+        d.setLayout(grid)
+        # b1 = QPushButton("ok", d)
+        # b1.move(50, 50)
+        contact = self.contacts[data]
+        timeLabel = QLabel(str(contact.total_time(1,0)))
+        timeTitleLabel = QLabel("total time [ns]:")
+        grid.addWidget(timeTitleLabel, 0,0)
+        grid.addWidget(timeLabel,0,1)
+        d.setWindowTitle(contact.title)
+        d.resize(200,100)
+        d.setWindowModality(Qt.ApplicationModal)
+        d.exec_()
 
 
 def main():
@@ -202,13 +179,6 @@ def main():
     window = MainWindow()
     window.show()
     app.exec_()
-
-class ContactType:
-    hbond, saltbr, hydrophobic = range(3)
-
-class ResidueType:
-    positive, negative, unpolar, polar = range(4)
-
 
 
 if __name__ == '__main__':
