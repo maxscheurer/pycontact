@@ -169,6 +169,8 @@ class Canvas(QWidget):
         if self.contacts:
             row = 0
             for c in self.contacts:
+                # print total time of contact in nanoseconds
+                print(c.total_time(1, 0.5))
                 for x in c.scoreArray:
                     qp.setPen(color)
                     qp.setBrush(QColor(0, 200, 0, x * 50))
@@ -204,6 +206,14 @@ class Contact:
 
     def framenumber(self):
         return len(self.scoreArray)
+
+    def total_time(self, ns_per_frame, threshold):
+        time = 0
+        for score in self.scoreArray:
+            if score > threshold:
+                time += ns_per_frame
+        self.ttime = time
+        return self.ttime
 
 def determine_ctype(resA, resB):
     return 0
