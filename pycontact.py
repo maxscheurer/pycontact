@@ -52,6 +52,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.painter.merge = self.mergeSlider.value()
         self.painter.rendered = False
         self.painter.update()
+        self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
 
 
 class Canvas(QWidget):
