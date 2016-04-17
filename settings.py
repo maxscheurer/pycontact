@@ -8,28 +8,24 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-class Ui_TabWidget(object):
-    def setupUi(self, TabWidget):
-        TabWidget.setObjectName("TabWidget")
-        TabWidget.resize(574, 447)
-        self.tab = QtWidgets.QWidget()
-        self.tab.setObjectName("tab")
-        TabWidget.addTab(self.tab, "")
-        self.tab1 = QtWidgets.QWidget()
-        self.tab1.setObjectName("tab1")
-        TabWidget.addTab(self.tab1, "")
+class Ui_settingsWidget(object):
+    def setupUi(self, settingsWidget):
+        settingsWidget.setObjectName("settingsWidget")
+        settingsWidget.resize(574, 447)
+        self.filterTab = QtWidgets.QWidget()
+        self.filterTab.setObjectName("filterTab")
+        settingsWidget.addTab(self.filterTab, "")
+        self.settingsTab = QtWidgets.QWidget()
+        self.settingsTab.setObjectName("settingsTab")
+        settingsWidget.addTab(self.settingsTab, "")
 
-        self.retranslateUi(TabWidget)
-        TabWidget.setCurrentIndex(0)
-        QtCore.QMetaObject.connectSlotsByName(TabWidget)
+        self.retranslateUi(settingsWidget)
+        settingsWidget.setCurrentIndex(1)
+        QtCore.QMetaObject.connectSlotsByName(settingsWidget)
 
-    def retranslateUi(self, TabWidget):
+    def retranslateUi(self, settingsWidget):
         _translate = QtCore.QCoreApplication.translate
-        TabWidget.setWindowTitle(_translate("TabWidget", "TabWidget"))
-        TabWidget.setTabText(TabWidget.indexOf(self.tab), _translate("TabWidget", "Tab 1"))
-        TabWidget.setTabText(TabWidget.indexOf(self.tab1), _translate("TabWidget", "Tab 2"))
+        settingsWidget.setWindowTitle(_translate("settingsWidget", "Filters and Settings"))
+        settingsWidget.setTabText(settingsWidget.indexOf(self.filterTab), _translate("settingsWidget", "Filters"))
+        settingsWidget.setTabText(settingsWidget.indexOf(self.settingsTab), _translate("settingsWidget", "Settings"))
 
-class SettingsTabWidget(QtWidgets.QTabWidget, Ui_TabWidget):
-    def __init__(self, parent=None):
-        super(QtWidgets.QTabWidget, self).__init__(parent)
-        self.setupUi(self)

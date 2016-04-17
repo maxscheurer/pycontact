@@ -59,6 +59,11 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.painter.update()
         self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
 
+class SettingsTabWidget(QTabWidget, Ui_settingsWidget):
+    def __init__(self, parent=None):
+        super(QtWidgets.QTabWidget, self).__init__(parent)
+        self.setupUi(self)
+
 
 class Canvas(QWidget):
     def __init__(self):

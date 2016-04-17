@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>TabWidget</class>
- <widget class="QTabWidget" name="TabWidget">
+ <class>settingsWidget</class>
+ <widget class="QTabWidget" name="settingsWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,19 +11,19 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>TabWidget</string>
+   <string>Filters and Settings</string>
   </property>
   <property name="currentIndex">
-   <number>0</number>
+   <number>1</number>
   </property>
-  <widget class="QWidget" name="tab">
+  <widget class="QWidget" name="filterTab">
    <attribute name="title">
-    <string>Tab 1</string>
+    <string>Filters</string>
    </attribute>
   </widget>
-  <widget class="QWidget" name="tab">
+  <widget class="QWidget" name="settingsTab">
    <attribute name="title">
-    <string>Tab 2</string>
+    <string>Settings</string>
    </attribute>
   </widget>
  </widget>
