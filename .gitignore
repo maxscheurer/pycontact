@@ -41,3 +41,5 @@ Thumbs.db
 ######
 
 .idea
+__pycache__/*
+__pycache__/gui.cpython-35.pyc
