@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import (QWidget, QPushButton,
 import shelve
 import numpy as np
 import gui
+from inputreader import *
 from biochemistry import *
 from functools import partial
 
@@ -36,19 +37,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         with open(self.file, "r") as f:
             for line in f.readlines():
                 lines.append(line)
-        self.makeContactFromLines(lines)
-
-    def makeContactFromLines(self, lines):
-        self.contacts = []
-        for l in lines:
-            single_elements = l.split()
-            resA = single_elements[0]
-            residA = single_elements[1]
-            resB = single_elements[2]
-            residB = single_elements[3]
-            frame_info = np.array(single_elements[4:], dtype=float)
-            newContact = Contact(resA, residA, resB, residB, frame_info)
-            self.contacts.append(newContact)
+        self.contacts = makeContactFromLines(lines)
         print("new contacts: " + str(len(self.contacts)))
         self.painter.contacts = self.contacts
         self.painter.update()
