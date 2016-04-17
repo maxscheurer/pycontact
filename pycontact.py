@@ -8,7 +8,6 @@ from PyQt5.QtGui import *
 from PyQt5.QtGui import (QColor, QPainter, QFont)
 from PyQt5.QtWidgets import (QWidget, QPushButton,
                              QFrame, QApplication, QSizePolicy)
-import shelve
 import numpy as np
 import gui
 from biochemistry import *
