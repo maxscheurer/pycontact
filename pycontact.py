@@ -36,8 +36,10 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
 
     def updateSettings(self):
         self.painter.nsPerFrame = float(self.settingsView.nsPerFrameField.text())
+        self.painter.threshold = float(self.settingsView.thresholdField.text())
         self.painter.rendered = False
         self.painter.update()
+        self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
 
     def updateFilters(self):
         print("filter update")
@@ -202,9 +204,13 @@ class LabelView(QWidget):
         # b1.move(50, 50)
         contact = self.contacts[data]
         timeLabel = QLabel(str(contact.total_time(self.nsPerFrame,self.threshold)))
+        thresholdLabel = QLabel(str(self.threshold))
         timeTitleLabel = QLabel("total time [ns]:")
+        thresholdTitleLabel = QLabel("current threshold:")
         grid.addWidget(timeTitleLabel, 0,0)
         grid.addWidget(timeLabel,0,1)
+        grid.addWidget(thresholdTitleLabel,1,0)
+        grid.addWidget(thresholdLabel, 1, 1)
         d.setWindowTitle(contact.title)
         d.resize(200,100)
         d.setWindowModality(Qt.ApplicationModal)
