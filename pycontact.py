@@ -25,6 +25,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.setupUi(self)
 
         self.setWindowTitle("pyContact")
+        self.mergeSlider.valueChanged.connect(self.mergeValueChanged)
 
         self.painter = Canvas()
         self.scrollArea.setWidget(self.painter)
@@ -44,7 +45,13 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         print("new contacts: " + str(len(self.contacts)))
         self.painter.contacts = self.contacts
         self.painter.update()
+        # set max slider value to frame number!
+        self.mergeSlider.setMaximum(len(self.contacts[0].scoreArray)/2)
 
+    def mergeValueChanged(self):
+        self.painter.merge = self.mergeSlider.value()
+        self.painter.rendered = False
+        self.painter.update()
 
 class Canvas(QWidget):
     def __init__(self):
@@ -58,6 +65,7 @@ class Canvas(QWidget):
         self.sizeY = 0
         self.rendered = False
         self.pixmap = 0
+        self.merge = 1
 
     def paintEvent(self, event):
 
@@ -101,17 +109,27 @@ class Canvas(QWidget):
         p.fillRect(0, 0, self.sizeX, self.sizeY, whiteColor)
 
         row = 0
+        merge = self.merge
         for c in self.contacts:
-            for x in c.scoreArray:
+            i = 0
+            while i < len(c.scoreArray):
                 p.setPen(blackColor)
-                p.setBrush(QColor(0, 200, 0, x * 80))
-                p.drawRect(startx, row, offset, 20)
-                startx += (offset)
+                merged_score = 0
+                for j in range(merge):
+                    if (i+j) >= len(c.scoreArray):
+                        break
+                    x = c.scoreArray[i+j]
+                    merged_score += x
+                merged_score = merged_score / merge
+                p.setBrush(QColor(0, 200, 0, merged_score * 80))
+                p.drawRect(startx, row, offset*merge, 20)
+                startx += (offset*merge)
+                i += merge
             startx = orig_startx
             row += rowheight
 
         p.end()
-        self.pixmap.save("test", 'png', 100)
+        # self.pixmap.save("test", 'png', 100)
         self.labelView = LabelView(self.contacts)
         self.labelView.setParent(self)
         self.labelView.show()
