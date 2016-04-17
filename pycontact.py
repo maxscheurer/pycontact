@@ -191,8 +191,5 @@ def main():
     window.show()
     app.exec_()
 
-class ContactType:
-	hbond, saltbr, hydrophobic = range(3)
-
 if __name__ == '__main__':
     main()
