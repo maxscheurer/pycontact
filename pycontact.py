@@ -21,6 +21,7 @@ from functools import partial
 class MainWindow(QMainWindow, gui.Ui_MainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
+        self.contacts = []
         self.setupUi(self)
 
         self.setWindowTitle("pyContact")
@@ -37,6 +38,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.alphaSlider.setValue(50)
         self.alphaSlider.valueChanged.connect(self.alphaValueChanged)
         self.updateSettings()
+        self.updateFilters()
         self.openPreferencesButton.clicked.connect(self.openPrefs)
 
     def updateSettings(self):
@@ -83,10 +85,11 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.contacts = makeContactFromLines(lines)
         print("new contacts: " + str(len(self.contacts)))
         self.painter.contacts = self.contacts
-        self.painter.update()
+        # self.painter.update()
         # set max slider value to frame number!
         self.mergeSlider.setMaximum(len(self.contacts[0].scoreArray)/2)
         self.updateSettings()
+        self.updateFilters()
 
     def mergeValueChanged(self):
         self.painter.merge = self.mergeSlider.value()
@@ -192,8 +195,6 @@ class Canvas(QWidget):
         self.labelView.nsPerFrame = self.nsPerFrame
         self.labelView.threshold = self.threshold
         self.labelView.show()
-
-
 
     def drawRenderedContact(self, event, qp):
         qp.drawPixmap(0, 0, self.sizeX, self.sizeY, self.pixmap)
