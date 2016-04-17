@@ -9,6 +9,8 @@ from PyQt5.QtGui import (QColor, QPainter, QFont)
 from PyQt5.QtWidgets import (QWidget, QPushButton,
                              QFrame, QApplication, QSizePolicy)
 import numpy as np
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
 import gui
 from settings import *
 from biochemistry import *
@@ -211,10 +213,46 @@ class LabelView(QWidget):
         grid.addWidget(timeLabel,0,1)
         grid.addWidget(thresholdTitleLabel,1,0)
         grid.addWidget(thresholdLabel, 1, 1)
+        contactPlot = ContactPlotter(None, width=4, height=2, dpi=80)
+        contactPlot.plot_contact_figure(contact)
+        grid.addWidget(contactPlot,2,0,1,2)
         d.setWindowTitle(contact.title)
-        d.resize(200,100)
+        d.resize(600,450)
         d.setWindowModality(Qt.ApplicationModal)
         d.exec_()
+
+
+class MplPlotter(FigureCanvas):
+    """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
+
+    def __init__(self, parent=None, width=5, height=4, dpi=100):
+        fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes = fig.add_subplot(111)
+        # We want the axes cleared every time plot() is called
+        self.axes.hold(False)
+
+        self.compute_initial_figure()
+
+        #
+        FigureCanvas.__init__(self, fig)
+        self.setParent(parent)
+
+        FigureCanvas.setSizePolicy(self,
+                                   QSizePolicy.Expanding,
+                                   QSizePolicy.Expanding)
+        FigureCanvas.updateGeometry(self)
+
+    def compute_initial_figure(self):
+        pass
+
+
+class ContactPlotter(MplPlotter):
+    """Simple canvas with a sine plot."""
+
+    def plot_contact_figure(self, contact):
+        self.axes.plot(contact.scoreArray)
+        self.axes.set_xlabel("frame")
+        self.axes.set_ylabel("score")
 
 
 def main():
