@@ -1,4 +1,4 @@
-import sys
+import sys, sip
 from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget, QDialog, QTabWidget,
                              QLabel, QCheckBox, QPushButton, QMainWindow, QMenuBar, QComboBox,
                              QLineEdit, QTextEdit, QGridLayout, QFileDialog, QAction, qApp, QHBoxLayout, QVBoxLayout)
@@ -15,6 +15,7 @@ import gui
 from settings import *
 from biochemistry import *
 from inputreader import *
+from filters import *
 from functools import partial
 
 class MainWindow(QMainWindow, gui.Ui_MainWindow):
@@ -47,6 +48,23 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
 
     def updateFilters(self):
         print("filter update")
+        # total time filter
+        if self.settingsView.activeTotalTimeCheckbox.isChecked():
+            operator = self.settingsView.compareTotalTimeDropdown.currentText()
+            value = float(self.settingsView.totalTimeField.text())
+            if len(self.painter.contacts) > 0:
+                filter = TotalTimeFilter("tottime", operator, value)
+                filteredContacts = filter.filterContacts(self.contacts)
+                self.painter.contacts = filteredContacts
+                self.painter.rendered = False
+                self.painter.update()
+                self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
+        else:
+            self.painter.contacts = self.contacts
+            self.painter.rendered = False
+            self.painter.update()
+            self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
+
 
     def openPrefs(self):
         self.settingsView.show()
@@ -103,6 +121,7 @@ class Canvas(QWidget):
         self.merge = 1
         self.labelView = LabelView([])
         self.alphaFactor = 50
+        self.contacts = []
     def paintEvent(self, event):
 
         qp = QPainter()

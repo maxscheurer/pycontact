@@ -14,7 +14,7 @@
    <string>Preferences</string>
   </property>
   <property name="currentIndex">
-   <number>1</number>
+   <number>0</number>
   </property>
   <widget class="QWidget" name="filterTab">
    <attribute name="title">
@@ -107,6 +107,56 @@
      </item>
      <item row="0" column="3">
       <widget class="QCheckBox" name="activeTotalTimeCheckbox">
+       <property name="text">
+        <string>active</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="scoreLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>score:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QLineEdit" name="scoreField">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="compareScoreDropdown">
+       <property name="currentText">
+        <string>greater</string>
+       </property>
+       <item>
+        <property name="text">
+         <string>greater</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>smaller</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="QCheckBox" name="activeScoreCheckbox">
        <property name="text">
         <string>active</string>
        </property>
