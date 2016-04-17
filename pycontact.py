@@ -33,6 +33,8 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.settingsView.applySettingsButton.clicked.connect(self.updateSettings)
         self.settingsView.applyFilterButton.clicked.connect(self.updateFilters)
 
+        self.alphaSlider.setValue(50)
+        self.alphaSlider.valueChanged.connect(self.alphaValueChanged)
         self.updateSettings()
         self.openPreferencesButton.clicked.connect(self.openPrefs)
 
@@ -74,6 +76,12 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.painter.update()
         self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
 
+    def alphaValueChanged(self):
+        self.painter.alphaFactor = self.alphaSlider.value()
+        self.painter.rendered = False
+        self.painter.update()
+        self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
+
 class SettingsTabWidget(QTabWidget, Ui_settingsWindowWidget):
     def __init__(self, parent=None):
         super(QtWidgets.QTabWidget, self).__init__(parent)
@@ -94,6 +102,7 @@ class Canvas(QWidget):
         self.pixmap = 0
         self.merge = 1
         self.labelView = LabelView([])
+        self.alphaFactor = 50
     def paintEvent(self, event):
 
         qp = QPainter()
@@ -147,7 +156,10 @@ class Canvas(QWidget):
                     x = c.scoreArray[i+j]
                     merged_score += x
                 merged_score = merged_score / merge
-                p.setBrush(QColor(0, 200, 0, merged_score * 80))
+                alpha = merged_score * self.alphaFactor
+                if alpha > 255:
+                    alpha = 255
+                p.setBrush(QColor(0, 200, 0, alpha))
                 p.drawRect(startx, row, offset*merge, 20)
                 startx += (offset*merge)
                 i += merge
