@@ -15,11 +15,6 @@ from biochemistry import *
 from inputreader import *
 from functools import partial
 
-# threshold: contact counted or not
-threshold = 1
-# nanoseconds per frame
-nsperframe = 1
-
 class MainWindow(QMainWindow, gui.Ui_MainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
@@ -33,6 +28,21 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.actionOpen.triggered.connect(self.pushOpen)
 
         self.settingsView = SettingsTabWidget()
+        self.settingsView.applySettingsButton.clicked.connect(self.updateSettings)
+        self.settingsView.applyFilterButton.clicked.connect(self.updateFilters)
+
+        self.updateSettings()
+        self.openPreferencesButton.clicked.connect(self.openPrefs)
+
+    def updateSettings(self):
+        self.painter.nsPerFrame = float(self.settingsView.nsPerFrameField.text())
+        self.painter.rendered = False
+        self.painter.update()
+
+    def updateFilters(self):
+        print("filter update")
+
+    def openPrefs(self):
         self.settingsView.show()
 
 
@@ -52,6 +62,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.painter.update()
         # set max slider value to frame number!
         self.mergeSlider.setMaximum(len(self.contacts[0].scoreArray)/2)
+        self.updateSettings()
 
     def mergeValueChanged(self):
         self.painter.merge = self.mergeSlider.value()
@@ -59,7 +70,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.painter.update()
         self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
 
-class SettingsTabWidget(QTabWidget, Ui_settingsWidget):
+class SettingsTabWidget(QTabWidget, Ui_settingsWindowWidget):
     def __init__(self, parent=None):
         super(QtWidgets.QTabWidget, self).__init__(parent)
         self.setupUi(self)
@@ -78,7 +89,7 @@ class Canvas(QWidget):
         self.rendered = False
         self.pixmap = 0
         self.merge = 1
-
+        self.labelView = LabelView([])
     def paintEvent(self, event):
 
         qp = QPainter()
@@ -143,7 +154,11 @@ class Canvas(QWidget):
         # self.pixmap.save("test", 'png', 100)
         self.labelView = LabelView(self.contacts)
         self.labelView.setParent(self)
+        self.labelView.nsPerFrame = self.nsPerFrame
+        self.labelView.threshold = self.threshold
         self.labelView.show()
+
+
 
     def drawRenderedContact(self, event, qp):
         qp.drawPixmap(0, 0, self.sizeX, self.sizeY, self.pixmap)
@@ -186,7 +201,7 @@ class LabelView(QWidget):
         # b1 = QPushButton("ok", d)
         # b1.move(50, 50)
         contact = self.contacts[data]
-        timeLabel = QLabel(str(contact.total_time(nsperframe,threshold)))
+        timeLabel = QLabel(str(contact.total_time(self.nsPerFrame,self.threshold)))
         timeTitleLabel = QLabel("total time [ns]:")
         grid.addWidget(timeTitleLabel, 0,0)
         grid.addWidget(timeLabel,0,1)
