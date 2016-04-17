@@ -53,6 +53,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.painter.rendered = False
         self.painter.update()
 
+
 class Canvas(QWidget):
     def __init__(self):
         super().__init__()
@@ -98,7 +99,6 @@ class Canvas(QWidget):
         offset = 10
         blackColor = QColor(0, 0, 0)
         whiteColor = QColor(255, 255, 255)
-
 
         self.sizeX = (len(self.contacts[0].scoreArray) + startx) * offset
         self.sizeY = len(self.contacts) * rowheight
