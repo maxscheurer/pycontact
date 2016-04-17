@@ -11,10 +11,14 @@ from PyQt5.QtWidgets import (QWidget, QPushButton,
 import shelve
 import numpy as np
 import gui
-from inputreader import *
 from biochemistry import *
+from inputreader import *
 from functools import partial
 
+# threshold: contact counted or not
+threshold = 1
+# nanoseconds per frame
+nsperframe = 1
 
 class MainWindow(QMainWindow, gui.Ui_MainWindow):
     def __init__(self, parent=None):
@@ -101,7 +105,7 @@ class Canvas(QWidget):
         for c in self.contacts:
             for x in c.scoreArray:
                 p.setPen(blackColor)
-                p.setBrush(QColor(0, 200, 0, x * 50))
+                p.setBrush(QColor(0, 200, 0, x * 80))
                 p.drawRect(startx, row, offset, 20)
                 startx += (offset)
             startx = orig_startx
@@ -137,7 +141,6 @@ class LabelView(QWidget):
             cindex = self.contacts.index(c)
             self.buttons.append(QPushButton(c.title))
             stylesheet = "border: 0px solid #222222; background-color: "+ ContactType.colors[c.type] + " ;"
-            print(stylesheet)
             self.buttons[-1].setStyleSheet(stylesheet)
             self.buttons[-1].clicked.connect(partial(self.handleButton, data=cindex))
             self.buttons[-1].setParent(self)
@@ -155,7 +158,7 @@ class LabelView(QWidget):
         # b1 = QPushButton("ok", d)
         # b1.move(50, 50)
         contact = self.contacts[data]
-        timeLabel = QLabel(str(contact.total_time(1,0)))
+        timeLabel = QLabel(str(contact.total_time(nsperframe,threshold)))
         timeTitleLabel = QLabel("total time [ns]:")
         grid.addWidget(timeTitleLabel, 0,0)
         grid.addWidget(timeLabel,0,1)

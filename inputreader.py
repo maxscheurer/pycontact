@@ -1,5 +1,6 @@
 import numpy as np
 from biochemistry import *
+
 def makeContactFromLines(lines):
     contacts = []
     for l in lines:
