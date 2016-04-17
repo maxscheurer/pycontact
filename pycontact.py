@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget, QDialog,
+from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget, QDialog, QTabWidget,
                              QLabel, QCheckBox, QPushButton, QMainWindow, QMenuBar, QComboBox,
                              QLineEdit, QTextEdit, QGridLayout, QFileDialog, QAction, qApp, QHBoxLayout, QVBoxLayout)
 
@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import (QWidget, QPushButton,
                              QFrame, QApplication, QSizePolicy)
 import numpy as np
 import gui
+from settings import *
 from biochemistry import *
 from inputreader import *
 from functools import partial
@@ -30,6 +31,10 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.painter = Canvas()
         self.scrollArea.setWidget(self.painter)
         self.actionOpen.triggered.connect(self.pushOpen)
+
+        self.settingsView = SettingsTabWidget()
+        self.settingsView.show()
+
 
     def pushOpen(self):
         fnames = QFileDialog.getOpenFileNames(self, "Open file")
