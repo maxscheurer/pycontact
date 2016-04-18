@@ -87,3 +87,5 @@ class Sorting:
                 con.total_time(self.nspf,self.threshold)
             sortedContacts = sorted(contacts, key=lambda c: c.ttime, reverse=self.descending)
         return sortedContacts
+
+

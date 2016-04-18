@@ -58,37 +58,46 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         scoreActive = self.settingsView.activeScoreCheckbox.isChecked()
         sortingActive = self.settingsView.activeSortingBox.isChecked()
         filterActive = (totalTimeActive or scoreActive or sortingActive)
-        if  filterActive:
-            print("filter act.")
-            if len(self.contacts) > 0:
-                filteredContacts = self.contacts
-                if totalTimeActive:
-                    operator = self.settingsView.compareTotalTimeDropdown.currentText()
-                    value = float(self.settingsView.totalTimeField.text())
-                    filter = TotalTimeFilter("tottime", operator, value)
-                    filteredContacts = filter.filterContacts(filteredContacts)
-                if scoreActive:
-                    operator = self.settingsView.compareScoreDropdown.currentText()
-                    value = float(self.settingsView.scoreField.text())
-                    filter = ScoreFilter("score", operator, value, self.settingsView.meanDropdown.currentText())
-                    filteredContacts = filter.filterContacts(filteredContacts)
-                if sortingActive:
-                    key = self.settingsView.sortingKeyDropdown.currentText()
-                    descending = SortingOrder.mapping[self.settingsView.sortingOrderDropdown.currentText()]
-                    sorter = Sorting("sorting", key, descending)
-                    sorter.setThresholdAndNsPerFrame(float(self.settingsView.thresholdField.text()),float(self.settingsView.nsPerFrameField.text()))
-                    filteredContacts = sorter.sortContacts(filteredContacts)
-                self.painter.contacts = filteredContacts
+        if len(self.contacts) > 0:
+            lower = int(self.settingsView.lowerRangeField.text()) - 1
+            upper = self.settingsView.upperRangeField.text()
+            if upper == "end":
+                upper = len(self.contacts[0].scoreArray)
+            else:
+                upper = int(upper)
+
+            if lower < 0:
+                lower = 0
+            self.painter.range = [lower, upper]
+            filteredContacts = self.contacts
+            if  filterActive:
+                    if totalTimeActive:
+                        operator = self.settingsView.compareTotalTimeDropdown.currentText()
+                        value = float(self.settingsView.totalTimeField.text())
+                        filter = TotalTimeFilter("tottime", operator, value)
+                        filteredContacts = filter.filterContacts(filteredContacts)
+                    if scoreActive:
+                        operator = self.settingsView.compareScoreDropdown.currentText()
+                        value = float(self.settingsView.scoreField.text())
+                        filter = ScoreFilter("score", operator, value, self.settingsView.meanDropdown.currentText())
+                        filteredContacts = filter.filterContacts(filteredContacts)
+                    if sortingActive:
+                        key = self.settingsView.sortingKeyDropdown.currentText()
+                        descending = SortingOrder.mapping[self.settingsView.sortingOrderDropdown.currentText()]
+                        sorter = Sorting("sorting", key, descending)
+                        sorter.setThresholdAndNsPerFrame(float(self.settingsView.thresholdField.text()),float(self.settingsView.nsPerFrameField.text()))
+                        filteredContacts = sorter.sortContacts(filteredContacts)
+                    self.painter.contacts = filteredContacts
+                    self.painter.rendered = False
+                    self.painter.update()
+                    self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
+                    if len(filteredContacts) == 0:
+                        self.painter.labelView.clean()
+            else:
+                self.painter.contacts = self.contacts
                 self.painter.rendered = False
                 self.painter.update()
                 self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
-                if len(filteredContacts) == 0:
-                    self.painter.labelView.clean()
-        else:
-            self.painter.contacts = self.contacts
-            self.painter.rendered = False
-            self.painter.update()
-            self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
 
 
     def openPrefs(self):
@@ -142,6 +151,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.contacts = makeContactFromLines(lines)
         print("new contacts: " + str(len(self.contacts)))
         self.painter.contacts = self.contacts
+        self.painter.range = [0,len(self.contacts[0].scoreArray)]
         # self.painter.update()
         # set max slider value to frame number!
         self.mergeSlider.setMaximum(len(self.contacts[0].scoreArray)/12)
@@ -182,6 +192,7 @@ class Canvas(QWidget):
         self.labelView = LabelView([])
         self.alphaFactor = 50
         self.contacts = []
+        self.range = [0,0]
     def paintEvent(self, event):
 
         qp = QPainter()
@@ -228,13 +239,14 @@ class Canvas(QWidget):
         for c in self.contacts:
             bbScColor = BackboneSidechainContactType.colors[c.backboneSideChainType]
             i = 0
-            while i < len(c.scoreArray):
+            rangedScores = c.scoreArray[self.range[0]:self.range[1]]
+            while i < len(rangedScores):
                 p.setPen(blackColor)
                 merged_score = 0
                 for j in range(merge):
-                    if (i+j) >= len(c.scoreArray):
+                    if (i+j) >= len(rangedScores):
                         break
-                    x = c.scoreArray[i+j]
+                    x = rangedScores[i+j]
                     merged_score += x
                 merged_score = merged_score / merge
                 alpha = merged_score * self.alphaFactor
