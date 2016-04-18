@@ -37,6 +37,9 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
 
         self.alphaSlider.setValue(50)
         self.alphaSlider.valueChanged.connect(self.alphaValueChanged)
+
+        self.statisticsButton.clicked.connect(self.showStatistics)
+
         self.updateSettings()
         self.updateFilters()
         self.openPreferencesButton.clicked.connect(self.openPrefs)
@@ -51,16 +54,29 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
     def updateFilters(self):
         print("filter update")
         # total time filter
-        if self.settingsView.activeTotalTimeCheckbox.isChecked():
-            operator = self.settingsView.compareTotalTimeDropdown.currentText()
-            value = float(self.settingsView.totalTimeField.text())
-            if len(self.painter.contacts) > 0:
-                filter = TotalTimeFilter("tottime", operator, value)
-                filteredContacts = filter.filterContacts(self.contacts)
+        totalTimeActive = self.settingsView.activeTotalTimeCheckbox.isChecked()
+        scoreActive = self.settingsView.activeScoreCheckbox.isChecked()
+        filterActive = (totalTimeActive or scoreActive)
+        if  filterActive:
+            print("filter act.")
+            if len(self.contacts) > 0:
+                filteredContacts = self.contacts
+                if totalTimeActive:
+                    operator = self.settingsView.compareTotalTimeDropdown.currentText()
+                    value = float(self.settingsView.totalTimeField.text())
+                    filter = TotalTimeFilter("tottime", operator, value)
+                    filteredContacts = filter.filterContacts(filteredContacts)
+                if scoreActive:
+                    operator = self.settingsView.compareScoreDropdown.currentText()
+                    value = float(self.settingsView.scoreField.text())
+                    filter = ScoreFilter("score", operator, value)
+                    filteredContacts = filter.filterContacts(filteredContacts)
                 self.painter.contacts = filteredContacts
                 self.painter.rendered = False
                 self.painter.update()
                 self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
+                if len(filteredContacts) == 0:
+                    self.painter.labelView.clean()
         else:
             self.painter.contacts = self.contacts
             self.painter.rendered = False
@@ -71,6 +87,33 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
     def openPrefs(self):
         self.settingsView.show()
 
+    def showStatistics(self):
+        d = QDialog()
+        grid = QGridLayout()
+        d.setLayout(grid)
+
+        numberTitleLabel = QLabel("total number of contacts:")
+        numberLabel = QLabel(str(len(self.contacts)))
+
+        numberFramesTitleLabel = QLabel("number of frames:")
+        numberFramesLabel = QLabel(str(len(self.contacts[0].scoreArray)))
+
+        meanTitleLabel = QLabel("mean contact score:")
+        meanLabel = QLabel(str(mean_score_of_contactArray(self.contacts)))
+
+        grid.addWidget(numberTitleLabel, 0, 0)
+        grid.addWidget(numberLabel, 0, 1)
+        grid.addWidget(numberFramesTitleLabel, 1, 0)
+        grid.addWidget(numberFramesLabel, 1, 1)
+        grid.addWidget(meanTitleLabel, 2, 0)
+        grid.addWidget(meanLabel, 2, 1)
+        # contactPlot = ContactPlotter(None, width=4, height=2, dpi=80)
+        # contactPlot.plot_contact_figure(contact)
+        # grid.addWidget(contactPlot, 2, 0, 1, 2)
+        d.setWindowTitle("Statistics")
+        d.resize(600, 450)
+        d.setWindowModality(Qt.ApplicationModal)
+        d.exec_()
 
     def pushOpen(self):
         fnames = QFileDialog.getOpenFileNames(self, "Open file")
@@ -87,7 +130,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.painter.contacts = self.contacts
         # self.painter.update()
         # set max slider value to frame number!
-        self.mergeSlider.setMaximum(len(self.contacts[0].scoreArray)/2)
+        self.mergeSlider.setMaximum(len(self.contacts[0].scoreArray)/12)
         self.updateSettings()
         self.updateFilters()
 
@@ -153,9 +196,11 @@ class Canvas(QWidget):
         start_text = 10
         textoffset = 5
         rowheight = 22
-        offset = 10
         blackColor = QColor(0, 0, 0)
         whiteColor = QColor(255, 255, 255)
+
+        merge = self.merge
+        offset = 10 / merge
 
         self.sizeX = (len(self.contacts[0].scoreArray) + startx) * offset
         self.sizeY = len(self.contacts) * rowheight
@@ -166,7 +211,6 @@ class Canvas(QWidget):
         p.fillRect(0, 0, self.sizeX, self.sizeY, whiteColor)
 
         row = 0
-        merge = self.merge
         for c in self.contacts:
             i = 0
             while i < len(c.scoreArray):
@@ -247,13 +291,18 @@ class LabelView(QWidget):
         thresholdLabel = QLabel(str(self.threshold))
         timeTitleLabel = QLabel("total time [ns]:")
         thresholdTitleLabel = QLabel("current threshold:")
+
+        meanTitleLabel = QLabel("mean score:")
+        meanLabel = QLabel(str(contact.mean_score()))
         grid.addWidget(timeTitleLabel, 0,0)
         grid.addWidget(timeLabel,0,1)
         grid.addWidget(thresholdTitleLabel,1,0)
         grid.addWidget(thresholdLabel, 1, 1)
+        grid.addWidget(meanTitleLabel, 2, 0)
+        grid.addWidget(meanLabel, 2, 1)
         contactPlot = ContactPlotter(None, width=4, height=2, dpi=80)
         contactPlot.plot_contact_figure(contact)
-        grid.addWidget(contactPlot,2,0,1,2)
+        grid.addWidget(contactPlot,3,0,1,2)
         d.setWindowTitle(contact.title)
         d.resize(600,450)
         d.setWindowModality(Qt.ApplicationModal)

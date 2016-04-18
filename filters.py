@@ -38,3 +38,18 @@ class TotalTimeFilter(BinaryFilter):
                 filtered.append(c)
         print(str(len(filtered)))
         return filtered
+
+# filter compares contact score of every frame, only adds contact if true for all frames
+class ScoreFilter(BinaryFilter):
+    def __init__(self, name, operator, value):
+        super(ScoreFilter, self).__init__(name, operator, value)
+
+    def filterContacts(self, contacts):
+        filtered = []
+        op = Operator()
+        for c in contacts:
+            mean = np.mean(c.scoreArray)
+            if op.compare(mean, self.value, self.operator):
+                filtered.append(c)
+        return filtered
+

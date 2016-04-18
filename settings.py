@@ -130,7 +130,7 @@ class Ui_settingsWindowWidget(object):
         self.compareTotalTimeDropdown.setItemText(1, _translate("settingsWindowWidget", "smaller"))
         self.totalTimeField.setText(_translate("settingsWindowWidget", "0"))
         self.activeTotalTimeCheckbox.setText(_translate("settingsWindowWidget", "active"))
-        self.scoreLabel.setText(_translate("settingsWindowWidget", "scores:"))
+        self.scoreLabel.setText(_translate("settingsWindowWidget", "mean score:"))
         self.scoreField.setText(_translate("settingsWindowWidget", "0"))
         self.compareScoreDropdown.setCurrentText(_translate("settingsWindowWidget", "greater"))
         self.compareScoreDropdown.setItemText(0, _translate("settingsWindowWidget", "greater"))

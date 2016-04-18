@@ -121,7 +121,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>scores:</string>
+        <string>mean score:</string>
        </property>
       </widget>
      </item>

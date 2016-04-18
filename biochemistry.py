@@ -41,9 +41,24 @@ class Contact:
         self.ttime = time
         return self.ttime
 
+    def mean_score(self):
+        mean = 0
+        for score in self.scoreArray:
+            mean += score
+        mean = mean / len(self.scoreArray)
+        self.meanScore = mean
+        return mean
+
 def determine_ctype(resA, resB):
     if compare([resA.type,resB.type],ContactType.mapping[ContactType.saltbr]):
         return ContactType.saltbr
     else:
         return ContactType.other
 
+
+def mean_score_of_contactArray(contacts):
+    all_mean = 0
+    for c in contacts:
+        all_mean += c.mean_score()
+    all_mean = all_mean / len(contacts)
+    return all_mean
