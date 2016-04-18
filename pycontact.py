@@ -299,8 +299,6 @@ class LabelView(QWidget):
         d = QDialog()
         grid = QGridLayout()
         d.setLayout(grid)
-        # b1 = QPushButton("ok", d)
-        # b1.move(50, 50)
         contact = self.contacts[data]
         timeLabel = QLabel(str(contact.total_time(self.nsPerFrame,self.threshold)))
         thresholdLabel = QLabel(str(self.threshold))

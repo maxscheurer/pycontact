@@ -6,7 +6,7 @@ Tools for contact analysis of biomolecules
 * Python 3.5
     * Modules:
         * PyQt5
-        * SciPy
+        * SciPy (numpy and matplotlib)
 
 ## About
 Authors: Maximilian Scheurer and Peter Rodenkirch
