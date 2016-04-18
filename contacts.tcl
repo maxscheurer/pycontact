@@ -49,6 +49,29 @@ proc contacts {frame} \
 		set res1 [atomselect top "index $a1"]
 		set res2 [atomselect top "index $a2"]
 
+		set res1backbone [lindex [$res1 get backbone] 0]
+		set res2backbone [lindex [$res2 get backbone] 0]
+
+		set res1backboneScore 0
+		set res1sidechainScore 0
+
+		if {$res1backbone != 0} {
+			set res1backboneScore $weight
+		} else {
+			set res1sidechainScore $weight
+		}
+
+		set res2backboneScore 0
+		set res2sidechainScore 0
+
+		if {$res2backbone != 0} {
+			set res2backboneScore $weight
+		} else {
+			set res2sidechainScore $weight
+		}
+
+		set ss_bb_list [list $res1backboneScore $res1sidechainScore $res2backboneScore $res2sidechainScore]
+
 		#!!! here, one could define more general selections, e.g. for protein-membrane interactions !!!
 		set r1 [$res1 get resid]
 		set n1 [$res1 get resname]
@@ -64,7 +87,7 @@ proc contacts {frame} \
 		} else {
 			set current_res_weights []
 		}
-		lappend current_res_weights [list $frame $weight]
+		lappend current_res_weights [list $frame $weight $ss_bb_list]
 		set residScores($key) $current_res_weights
 	}
 	# lappend results [list $frame $current_results]
@@ -137,19 +160,32 @@ set pyout [open "pyout.dat" w]
 foreach key [array names residScores] {
 	set list $residScores($key)
 	set keystring ""
+	set framestring ""
 	append keystring "$key "
+
+	set res1backboneScore 0
+	set res1sidechainScore 0
+	set res2backboneScore 0
+	set res2sidechainScore 0
+
 	for {set i 0} {$i < $nframes} {incr i} {
 		set search [lsearch -all -index 0 $list $i]
 		if {$search == -1} {
-			append keystring "0 "
+			append framestring "0 "
 		} else {
 			set framesum 0
 			foreach idc $search {
 				set framesum [expr $framesum + [lindex $list $idc 1]]
+				set res1backboneScore [expr $res1backboneScore + [lindex [lindex $list $idc 2] 0]] ;# maybe change, seems to look complicated
+				set res1sidechainScore [expr $res1sidechainScore + [lindex [lindex $list $idc 2] 1]]
+				set res2backboneScore [expr $res2backboneScore + [lindex [lindex $list $idc 2] 2]]
+				set res2sidechainScore [expr $res2sidechainScore + [lindex [lindex $list $idc 2] 3]]
 			}
-			append keystring "$framesum "
+			append framestring "$framesum "
 		}
 	}
+	append keystring "$res1backboneScore $res1sidechainScore $res2backboneScore $res2sidechainScore "
+	append keystring $framestring
 	puts $pyout $keystring
 }
 close $pyout
