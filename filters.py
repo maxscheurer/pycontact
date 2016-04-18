@@ -41,15 +41,22 @@ class TotalTimeFilter(BinaryFilter):
 
 # filter compares contact score of every frame, only adds contact if true for all frames
 class ScoreFilter(BinaryFilter):
-    def __init__(self, name, operator, value):
+    def __init__(self, name, operator, value, ftype):
         super(ScoreFilter, self).__init__(name, operator, value)
+        self.ftype = ftype
 
     def filterContacts(self, contacts):
         filtered = []
         op = Operator()
-        for c in contacts:
-            mean = np.mean(c.scoreArray)
-            if op.compare(mean, self.value, self.operator):
-                filtered.append(c)
+        if self.ftype == "mean":
+            for c in contacts:
+                mean = c.mean_score()
+                if op.compare(mean, self.value, self.operator):
+                    filtered.append(c)
+        elif self.ftype == "median":
+            for c in contacts:
+                med = c.median_score()
+                if op.compare(med, self.value, self.operator):
+                    filtered.append(c)
         return filtered
 

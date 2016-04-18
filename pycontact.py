@@ -69,7 +69,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
                 if scoreActive:
                     operator = self.settingsView.compareScoreDropdown.currentText()
                     value = float(self.settingsView.scoreField.text())
-                    filter = ScoreFilter("score", operator, value)
+                    filter = ScoreFilter("score", operator, value, self.settingsView.meanDropdown.currentText())
                     filteredContacts = filter.filterContacts(filteredContacts)
                 self.painter.contacts = filteredContacts
                 self.painter.rendered = False
@@ -101,15 +101,22 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         meanTitleLabel = QLabel("mean contact score:")
         meanLabel = QLabel(str(mean_score_of_contactArray(self.contacts)))
 
+        medianTitleLabel = QLabel("median score:")
+        medianLabel = QLabel(str(median_score_of_contactArray(self.contacts)))
+
         grid.addWidget(numberTitleLabel, 0, 0)
         grid.addWidget(numberLabel, 0, 1)
         grid.addWidget(numberFramesTitleLabel, 1, 0)
         grid.addWidget(numberFramesLabel, 1, 1)
         grid.addWidget(meanTitleLabel, 2, 0)
         grid.addWidget(meanLabel, 2, 1)
+
+        grid.addWidget(medianTitleLabel, 2, 2)
+        grid.addWidget(medianLabel, 2, 3)
+
         allContactPlot = ContactPlotter(None, width=4, height=2, dpi=80)
         allContactPlot.plot_all_contacts_figure(self.contacts)
-        grid.addWidget(allContactPlot, 3, 0, 1, 2)
+        grid.addWidget(allContactPlot, 3, 0, 1, 4)
         d.setWindowTitle("Statistics")
         d.resize(600, 450)
         d.setWindowModality(Qt.ApplicationModal)
@@ -302,19 +309,27 @@ class LabelView(QWidget):
 
         meanTitleLabel = QLabel("mean score:")
         meanLabel = QLabel(str(contact.mean_score()))
+
+        medianTitleLabel = QLabel("median score:")
+        medianLabel = QLabel(str(contact.median_score()))
+
         grid.addWidget(timeTitleLabel, 0,0)
         grid.addWidget(timeLabel,0,1)
         grid.addWidget(thresholdTitleLabel,1,0)
         grid.addWidget(thresholdLabel, 1, 1)
         grid.addWidget(meanTitleLabel, 2, 0)
         grid.addWidget(meanLabel, 2, 1)
+
+        grid.addWidget(medianTitleLabel, 2, 2)
+        grid.addWidget(medianLabel, 2, 3)
+
         grid.addWidget(backboneSidechainTitleLabel, 3, 0)
         grid.addWidget(backboneSidechainLabel, 3, 1)
         grid.addWidget(backboneSidechainTitleLabel2, 4, 0)
         grid.addWidget(backboneSidechainLabel2, 4, 1)
         contactPlot = ContactPlotter(None, width=4, height=2, dpi=80)
         contactPlot.plot_contact_figure(contact)
-        grid.addWidget(contactPlot,5,0,1,2)
+        grid.addWidget(contactPlot,5,0,1,4)
         d.setWindowTitle(contact.title)
         d.resize(650,700)
         d.setWindowModality(Qt.ApplicationModal)

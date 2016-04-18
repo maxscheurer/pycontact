@@ -1,4 +1,5 @@
 import collections
+import numpy as np
 compare = lambda x, y: collections.Counter(x) == collections.Counter(y)
 
 class ResidueType:
@@ -76,6 +77,11 @@ class Contact:
         self.meanScore = mean
         return mean
 
+    def median_score(self):
+        med = np.median(self.scoreArray)
+        self.medianScore = med
+        return med
+
 def determine_ctype(resA, resB):
     if compare([resA.type,resB.type],ContactType.mapping[ContactType.saltbr]):
         return ContactType.saltbr
@@ -84,8 +90,13 @@ def determine_ctype(resA, resB):
 
 
 def mean_score_of_contactArray(contacts):
-    all_mean = 0
+    meanList = []
     for c in contacts:
-        all_mean += c.mean_score()
-    all_mean = all_mean / len(contacts)
-    return all_mean
+        meanList = np.concatenate((meanList, c.scoreArray), axis=0)
+    return np.mean(meanList)
+
+def median_score_of_contactArray(contacts):
+    medianList = []
+    for c in contacts:
+        medianList = np.concatenate((medianList,c.scoreArray),axis=0)
+    return np.median(medianList)
