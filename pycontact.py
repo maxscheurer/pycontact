@@ -107,9 +107,9 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         grid.addWidget(numberFramesLabel, 1, 1)
         grid.addWidget(meanTitleLabel, 2, 0)
         grid.addWidget(meanLabel, 2, 1)
-        # contactPlot = ContactPlotter(None, width=4, height=2, dpi=80)
-        # contactPlot.plot_contact_figure(contact)
-        # grid.addWidget(contactPlot, 2, 0, 1, 2)
+        allContactPlot = ContactPlotter(None, width=4, height=2, dpi=80)
+        allContactPlot.plot_all_contacts_figure(self.contacts)
+        grid.addWidget(allContactPlot, 3, 0, 1, 2)
         d.setWindowTitle("Statistics")
         d.resize(600, 450)
         d.setWindowModality(Qt.ApplicationModal)
@@ -316,7 +316,7 @@ class LabelView(QWidget):
         contactPlot.plot_contact_figure(contact)
         grid.addWidget(contactPlot,5,0,1,2)
         d.setWindowTitle(contact.title)
-        d.resize(600,450)
+        d.resize(650,700)
         d.setWindowModality(Qt.ApplicationModal)
         d.exec_()
 
@@ -350,6 +350,18 @@ class ContactPlotter(MplPlotter):
 
     def plot_contact_figure(self, contact):
         self.axes.plot(contact.scoreArray)
+        self.axes.set_xlabel("frame")
+        self.axes.set_ylabel("score")
+
+    def plot_all_contacts_figure(self, contacts):
+        values = []
+
+        for frame in range(len(contacts[0].scoreArray)):
+            current = 0
+            for c in contacts:
+                current += c.scoreArray[frame]
+            values.append(current)
+        self.axes.plot(values)
         self.axes.set_xlabel("frame")
         self.axes.set_ylabel("score")
 
