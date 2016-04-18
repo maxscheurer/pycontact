@@ -10,25 +10,52 @@ class ContactType:
     mapping = [[ResidueType.positive, ResidueType.negative],[ResidueType.nonpolar, ResidueType.nonpolar]]
     colors = ["rgb(255, 0,0)", "rgb(0, 0,255)", "rgb(255, 255 ,255)"]
 
+
+class BackboneSidechainType:
+    contactsBb, contactsSc = range(2)
+
+
+class BackboneSidechainContactType:
+    bb_only, sc_only, both = range(3)
+    mapping = [[BackboneSidechainType.contactsBb, BackboneSidechainType.contactsBb],[BackboneSidechainType.contactsBb, BackboneSidechainType.contactsSc], [BackboneSidechainType.contactsSc, BackboneSidechainType.contactsSc]]
+    colors = [[0,200,200],[200,200,0],[0,200,0]]
+
+
 class Residue:
-    def __init__(self, name):
+    def __init__(self, name, bb, sc):
         self.name = name.lower()
+        self.bb = float(bb)
+        self.sc = float(sc)
+        if self.bb > self.sc:
+            self.contactsBy = BackboneSidechainType.contactsBb
+        else:
+            self.contactsBy = BackboneSidechainType.contactsSc
+        # self.bbScRatio = self.bb/self.sc
         if self.name in ResidueType.mapping:
             self.type = ResidueType.mapping[self.name]
         else:
             self.type = ResidueType.other
 
 class Contact:
-    def __init__(self, resA, residA, resB, residB, scoreArray):
+    def __init__(self, resA, residA, resB, residB, bb1, sc1, bb2, sc2, scoreArray):
         self.resA = resA
         self.resB = resB
         self.residA = residA
         self.residB = residB
         self.scoreArray = scoreArray
         self.title = self.resA + self.residA + "-" + self.resB + self.residB
-        self.residueA = Residue(self.resA)
-        self.residueB = Residue(self.resB)
+        self.residueA = Residue(self.resA,bb1,sc1)
+        self.residueB = Residue(self.resB,bb2,sc2)
         self.type = determine_ctype(self.residueA, self.residueB)
+        self.determineBackboneSidechainType()
+
+    def determineBackboneSidechainType(self):
+        if compare([self.residueA.contactsBy, self.residueB.contactsBy], BackboneSidechainContactType.mapping[BackboneSidechainContactType.bb_only]):
+            self.backboneSideChainType =  BackboneSidechainContactType.bb_only
+        elif compare([self.residueA.contactsBy, self.residueB.contactsBy], BackboneSidechainContactType.mapping[BackboneSidechainContactType.sc_only]):
+            self.backboneSideChainType = BackboneSidechainContactType.sc_only
+        else:
+            self.backboneSideChainType = BackboneSidechainContactType.both
 
     def framenumber(self):
         return len(self.scoreArray)

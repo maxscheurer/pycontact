@@ -113,7 +113,7 @@ array set scorerB {}
 
 array set residScores {}
 
-set cutoff 3.0
+set cutoff 5.0
 
 bigdcd contacts auto $traj.dcd
 vwait bigdcd_running

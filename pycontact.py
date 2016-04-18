@@ -212,6 +212,7 @@ class Canvas(QWidget):
 
         row = 0
         for c in self.contacts:
+            bbScColor = BackboneSidechainContactType.colors[c.backboneSideChainType]
             i = 0
             while i < len(c.scoreArray):
                 p.setPen(blackColor)
@@ -225,7 +226,7 @@ class Canvas(QWidget):
                 alpha = merged_score * self.alphaFactor
                 if alpha > 255:
                     alpha = 255
-                p.setBrush(QColor(0, 200, 0, alpha))
+                p.setBrush(QColor(bbScColor[0], bbScColor[1], bbScColor[2], alpha))
                 p.drawRect(startx, row, offset*merge, 20)
                 startx += (offset*merge)
                 i += merge
@@ -292,6 +293,13 @@ class LabelView(QWidget):
         timeTitleLabel = QLabel("total time [ns]:")
         thresholdTitleLabel = QLabel("current threshold:")
 
+        backboneSidechainTitleLabel = QLabel("bb/sc score (A)")
+        backboneSidechainTitleLabel2 = QLabel("bb/sc score (B)")
+
+        backboneSidechainLabel = QLabel("%.2f/%.2f" % (contact.residueA.bb, contact.residueA.sc))
+        backboneSidechainLabel2 = QLabel("%.2f/%.2f" % (contact.residueB.bb, contact.residueB.sc))
+
+
         meanTitleLabel = QLabel("mean score:")
         meanLabel = QLabel(str(contact.mean_score()))
         grid.addWidget(timeTitleLabel, 0,0)
@@ -300,9 +308,13 @@ class LabelView(QWidget):
         grid.addWidget(thresholdLabel, 1, 1)
         grid.addWidget(meanTitleLabel, 2, 0)
         grid.addWidget(meanLabel, 2, 1)
+        grid.addWidget(backboneSidechainTitleLabel, 3, 0)
+        grid.addWidget(backboneSidechainLabel, 3, 1)
+        grid.addWidget(backboneSidechainTitleLabel2, 4, 0)
+        grid.addWidget(backboneSidechainLabel2, 4, 1)
         contactPlot = ContactPlotter(None, width=4, height=2, dpi=80)
         contactPlot.plot_contact_figure(contact)
-        grid.addWidget(contactPlot,3,0,1,2)
+        grid.addWidget(contactPlot,5,0,1,2)
         d.setWindowTitle(contact.title)
         d.resize(600,450)
         d.setWindowModality(Qt.ApplicationModal)
