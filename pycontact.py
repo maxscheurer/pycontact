@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import (QWidget, QPushButton,
 import numpy as np
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
 import gui
 from settings import *
 from biochemistry import *
@@ -20,6 +21,10 @@ from functools import partial
 
 class MainWindow(QMainWindow, gui.Ui_MainWindow):
     def __init__(self, parent=None):
+        # Test
+        # sig = SigmoidWeightFunction("sig",np.arange(0,50,0.1),25,1,0.2)
+        # sig.previewFunction()
+        ######
         super(MainWindow, self).__init__(parent)
         self.contacts = []
         self.setupUi(self)
@@ -70,6 +75,17 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
                 lower = 0
             self.painter.range = [lower, upper]
             filteredContacts = self.contacts
+            # TEST: SIGMOID
+            # sig = SigmoidWeightFunction("sig", np.arange(0, len(self.contacts[0].scoreArray), 1), len(self.contacts[0].scoreArray)/2, 1, 0.1)
+            # plt.plot(sig.previewFunction())
+            # plt.show()
+            # filteredContacts = sig.weightContactFrames(filteredContacts)
+            # TEST: RECT
+            # rect = RectangularWeightFunction("rect", np.arange(0,len(self.contacts[0].scoreArray), 1), 10, 31, 2)
+            # plt.plot(rect.previewFunction())
+            # plt.show()
+            # filteredContacts = rect.weightContactFrames(filteredContacts)
+            ####
             if  filterActive:
                     if totalTimeActive:
                         operator = self.settingsView.compareTotalTimeDropdown.currentText()

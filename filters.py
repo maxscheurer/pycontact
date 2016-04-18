@@ -1,5 +1,6 @@
 import numpy as np
 from biochemistry import *
+import numpy as np
 
 class Operator:
     greater, smaller, equal, nequal = range(4)
@@ -88,4 +89,56 @@ class Sorting:
             sortedContacts = sorted(contacts, key=lambda c: c.ttime, reverse=self.descending)
         return sortedContacts
 
+class WeightFunction:
+    def __init__(self, name, x):
+        self.name = name
+        self.x = x
+
+    def weightContactFrames(self, contacts):
+        for c in contacts:
+            weighted = self.function(self.x) * c.scoreArray
+            c.scoreArray = weighted
+            print(weighted)
+        return contacts
+
+    def previewFunction(self):
+        return self.function(self.x)
+
+    def function(self, x):
+        pass
+
+class SigmoidWeightFunction(WeightFunction):
+    # x: x values
+    # x0: turning point
+    # L: upper limit
+    # k: "slope"
+    def __init__(self, name, x, x0, L, k):
+        super(SigmoidWeightFunction, self).__init__(name, x)
+        self.x0 = x0
+        self.L = L
+        self.k = k
+
+    def function(self,x):
+        y = (self.L)/(1+np.exp(-self.k*(x-self.x0)))
+        return y
+
+    def previewFunction(self):
+        return self.function(self.x)
+
+
+class RectangularWeightFunction(WeightFunction):
+    #x: x values
+    #x0: lower rect limit x value
+    #x1: upper rect limit x value
+    #h: rectangle height
+    def __init__(self, name, x, x0, x1,h):
+        super(RectangularWeightFunction, self).__init__(name, x)
+        self.x0 = x0
+        self.x1 = x1
+        self.h = h
+
+    def function(self, x):
+        y = np.zeros(len(self.x))
+        y[self.x0:self.x1] = self.h
+        return y
 
