@@ -49,6 +49,8 @@ class Contact:
         self.residueB = Residue(self.resB,bb2,sc2)
         self.type = determine_ctype(self.residueA, self.residueB)
         self.determineBackboneSidechainType()
+        self.mean_score()
+        self.median_score()
 
     def determineBackboneSidechainType(self):
         if compare([self.residueA.contactsBy, self.residueB.contactsBy], BackboneSidechainContactType.mapping[BackboneSidechainContactType.bb_only]):

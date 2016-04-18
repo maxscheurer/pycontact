@@ -60,3 +60,30 @@ class ScoreFilter(BinaryFilter):
                     filtered.append(c)
         return filtered
 
+class SortingOrder:
+    ascending, descending = range(2)
+    mapping = {"asc": ascending, "desc": descending}
+
+class Sorting:
+    def __init__(self, name, key, descending):
+        self.name = name
+        self. key = key
+        self.descending = descending
+
+    def setThresholdAndNsPerFrame(self,threshold,nspf):
+        self.threshold = threshold
+        self.nspf = nspf
+
+    def sortContacts(self, contacts):
+        sortedContacts = []
+        if self.key == "mean":
+            sortedContacts = sorted(contacts, key=lambda c: c.meanScore, reverse=self.descending)
+        elif self.key == "median":
+            sortedContacts = sorted(contacts, key=lambda c: c.medianScore, reverse=self.descending)
+        elif self.key == "bb/sc type":
+            sortedContacts = sorted(contacts, key=lambda c: c.backboneSideChainType, reverse=self.descending)
+        elif self.key == "total time":
+            for con in contacts:
+                con.total_time(self.nspf,self.threshold)
+            sortedContacts = sorted(contacts, key=lambda c: c.ttime, reverse=self.descending)
+        return sortedContacts

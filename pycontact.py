@@ -56,7 +56,8 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         # total time filter
         totalTimeActive = self.settingsView.activeTotalTimeCheckbox.isChecked()
         scoreActive = self.settingsView.activeScoreCheckbox.isChecked()
-        filterActive = (totalTimeActive or scoreActive)
+        sortingActive = self.settingsView.activeSortingBox.isChecked()
+        filterActive = (totalTimeActive or scoreActive or sortingActive)
         if  filterActive:
             print("filter act.")
             if len(self.contacts) > 0:
@@ -71,6 +72,12 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
                     value = float(self.settingsView.scoreField.text())
                     filter = ScoreFilter("score", operator, value, self.settingsView.meanDropdown.currentText())
                     filteredContacts = filter.filterContacts(filteredContacts)
+                if sortingActive:
+                    key = self.settingsView.sortingKeyDropdown.currentText()
+                    descending = SortingOrder.mapping[self.settingsView.sortingOrderDropdown.currentText()]
+                    sorter = Sorting("sorting", key, descending)
+                    sorter.setThresholdAndNsPerFrame(float(self.settingsView.thresholdField.text()),float(self.settingsView.nsPerFrameField.text()))
+                    filteredContacts = sorter.sortContacts(filteredContacts)
                 self.painter.contacts = filteredContacts
                 self.painter.rendered = False
                 self.painter.update()
