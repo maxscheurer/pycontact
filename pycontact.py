@@ -190,6 +190,7 @@ class Canvas(QWidget):
 
         p.end()
         # self.pixmap.save("test", 'png', 100)
+        self.labelView.clean()
         self.labelView = LabelView(self.contacts)
         self.labelView.setParent(self)
         self.labelView.nsPerFrame = self.nsPerFrame
@@ -207,6 +208,11 @@ class LabelView(QWidget):
         super().__init__()
         self.contacts = contacts
         self.initUI()
+
+    def clean(self):
+        allLabels = self.findChildren(QPushButton)
+        for child in allLabels:
+            sip.delete(child)
 
     def initUI(self):
         startx = 80
