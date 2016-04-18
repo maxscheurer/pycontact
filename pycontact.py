@@ -1,5 +1,5 @@
 import sys, sip
-from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget, QDialog, QTabWidget,
+from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget, QDialog, QTabWidget, QButtonGroup,
                              QLabel, QCheckBox, QPushButton, QMainWindow, QMenuBar, QComboBox,
                              QLineEdit, QTextEdit, QGridLayout, QFileDialog, QAction, qApp, QHBoxLayout, QVBoxLayout)
 
@@ -49,6 +49,43 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.updateFilters()
         self.openPreferencesButton.clicked.connect(self.openPrefs)
 
+        self.functionButtonGroup = QButtonGroup()
+        self.currentFunctionType = FunctionType.sigmoid
+        self.functionButtonGroup.buttonClicked[int].connect(self.showFunctionSettings)
+        self.functionButtonGroup.addButton(self.settingsView.sigmoidRadioButton,0)
+        self.functionButtonGroup.addButton(self.settingsView.rectRadioButton,1)
+        self.functionButtonGroup.addButton(self.settingsView.linRadioButton,2)
+
+        self.setupFunctionBox()
+
+    def setupFunctionBox(self):
+        # sig
+        self.sigX0Label = QLabel("x0: ", self.settingsView)
+        self.sigX0Field = QLineEdit(self.settingsView)
+        self.settingsView.functionGridLayout.addWidget(self.sigX0Label, 1, 0)
+        self.settingsView.functionGridLayout.addWidget(self.sigX0Field, 1, 1)
+
+        self.sigLLabel = QLabel("L: ", self.settingsView)
+        self.sigLField = QLineEdit(self.settingsView)
+        self.settingsView.functionGridLayout.addWidget(self.sigLLabel, 1, 2)
+        self.settingsView.functionGridLayout.addWidget(self.sigLField, 1, 3)
+
+        self.sigKLabel = QLabel("k: ", self.settingsView)
+        self.sigKField = QLineEdit(self.settingsView)
+        self.settingsView.functionGridLayout.addWidget(self.sigKLabel, 1, 4)
+        self.settingsView.functionGridLayout.addWidget(self.sigKField, 1, 5)
+
+        #rect
+
+        #lin
+
+        # preview
+        self.previewPlot = SimplePlotter(None, width=5, height=2, dpi=60)
+        self.settingsView.functionGridLayout.addWidget(self.previewPlot, 2, 0, 1, 6)
+
+        self.settingsView.previewButton.clicked.connect(self.previewFunction)
+
+
     def updateSettings(self):
         self.painter.nsPerFrame = float(self.settingsView.nsPerFrameField.text())
         self.painter.threshold = float(self.settingsView.thresholdField.text())
@@ -81,10 +118,15 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             # plt.show()
             # filteredContacts = sig.weightContactFrames(filteredContacts)
             # TEST: RECT
-            # rect = RectangularWeightFunction("rect", np.arange(0,len(self.contacts[0].scoreArray), 1), 10, 31, 2)
+            # rect = RectangularWeightFunction("rect", np.arange(0,len(self.contacts[0].scoreArray), 1), 10, 50, 2)
             # plt.plot(rect.previewFunction())
             # plt.show()
             # filteredContacts = rect.weightContactFrames(filteredContacts)
+            # TEST: LINEAR
+            # lin = LinearWeightFunction("lin", np.arange(0,len(self.contacts[0].scoreArray), 1), 0.5,1)
+            # plt.plot(lin.previewFunction())
+            # plt.show()
+            # filteredContacts = lin.weightContactFrames(filteredContacts)
             ####
             if  filterActive:
                     if totalTimeActive:
@@ -115,6 +157,27 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
                 self.painter.update()
                 self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
 
+    def showFunctionSettings(self, radiobutton):
+        print(str(radiobutton))
+
+
+    def previewFunction(self):
+        x = []
+        y = []
+        if self.currentFunctionType == FunctionType.sigmoid:
+            x0 = float(self.sigX0Field.text())
+            L = float(self.sigLField.text())
+            k = float(self.sigKField.text())
+            if len(self.contacts) > 0:
+                sig = SigmoidWeightFunction("sig", np.arange(0, len(self.contacts[0].scoreArray), 1), x0, L, k)
+                x = np.arange(0,len(self.contacts[0].scoreArray),1)
+                y = sig.previewFunction()
+
+        sip.delete(self.previewPlot)
+        self.previewPlot = SimplePlotter(None, width=5, height=2, dpi=60)
+        self.settingsView.functionGridLayout.addWidget(self.previewPlot, 2, 0, 1, 6)
+        self.previewPlot.plot(x, y)
+        self.previewPlot.update()
 
     def openPrefs(self):
         self.settingsView.show()
@@ -146,7 +209,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         grid.addWidget(medianTitleLabel, 2, 2)
         grid.addWidget(medianLabel, 2, 3)
 
-        allContactPlot = ContactPlotter(None, width=4, height=2, dpi=80)
+        allContactPlot = SimplePlotter(None, width=4, height=2, dpi=80)
         allContactPlot.plot_all_contacts_figure(self.contacts)
         grid.addWidget(allContactPlot, 3, 0, 1, 4)
         d.setWindowTitle("Statistics")
@@ -412,6 +475,14 @@ class ContactPlotter(MplPlotter):
         self.axes.plot(values)
         self.axes.set_xlabel("frame")
         self.axes.set_ylabel("score")
+
+class SimplePlotter(MplPlotter):
+    """Simple canvas with a sine plot."""
+    def plot(self, x,y):
+        self.axes.plot(x,y)
+        self.axes.set_xlabel("x")
+        self.axes.set_ylabel("f(x)")
+
 
 
 def main():

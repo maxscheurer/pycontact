@@ -96,9 +96,10 @@ class WeightFunction:
 
     def weightContactFrames(self, contacts):
         for c in contacts:
+            print(c.scoreArray)
             weighted = self.function(self.x) * c.scoreArray
             c.scoreArray = weighted
-            print(weighted)
+            print(c.scoreArray)
         return contacts
 
     def previewFunction(self):
@@ -138,7 +139,24 @@ class RectangularWeightFunction(WeightFunction):
         self.h = h
 
     def function(self, x):
-        y = np.zeros(len(self.x))
+        y = np.zeros(len(x))
         y[self.x0:self.x1] = self.h
         return y
 
+class LinearWeightFunction(WeightFunction):
+    #x: x values
+    #x0: lower rect limit x value
+    #x1: upper rect limit x value
+    #h: rectangle height
+    def __init__(self, name, x, f0, f1):
+        super(LinearWeightFunction, self).__init__(name, x)
+        self.f0 = f0
+        self.f1 = f1
+
+    def function(self, x):
+        a = (self.f1-self.f0)/x[-1]
+        y = a * x + self.f0
+        return y
+
+class FunctionType:
+    sigmoid, rect, linear = range(3)
