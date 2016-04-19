@@ -113,14 +113,15 @@ class SigmoidWeightFunction(WeightFunction):
     # x0: turning point
     # L: upper limit
     # k: "slope"
-    def __init__(self, name, x, x0, L, k):
+    def __init__(self, name, x, x0, L, k, y0):
         super(SigmoidWeightFunction, self).__init__(name, x)
         self.x0 = x0
         self.L = L
         self.k = k
+        self.y0 = y0
 
     def function(self,x):
-        y = (self.L)/(1+np.exp(-self.k*(x-self.x0)))
+        y = (self.L)/(1+np.exp(-self.k*(x-self.x0))) + self.y0
         return y
 
     def previewFunction(self):
@@ -132,14 +133,16 @@ class RectangularWeightFunction(WeightFunction):
     #x0: lower rect limit x value
     #x1: upper rect limit x value
     #h: rectangle height
-    def __init__(self, name, x, x0, x1,h):
+    def __init__(self, name, x, x0, x1,h, y0):
         super(RectangularWeightFunction, self).__init__(name, x)
         self.x0 = x0
         self.x1 = x1
         self.h = h
+        self.y0 = y0
 
     def function(self, x):
         y = np.zeros(len(x))
+        y.fill(self.y0)
         y[self.x0:self.x1] = self.h
         return y
 

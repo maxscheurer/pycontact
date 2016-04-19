@@ -55,8 +55,8 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.functionButtonGroup.addButton(self.settingsView.sigmoidRadioButton,0)
         self.functionButtonGroup.addButton(self.settingsView.rectRadioButton,1)
         self.functionButtonGroup.addButton(self.settingsView.linRadioButton,2)
-
         self.setupFunctionBox()
+        self.showFunctionSettings(FunctionType.sigmoid)
 
     def setupFunctionBox(self):
         # sig
@@ -72,19 +72,32 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
 
         self.sigKLabel = QLabel("k: ", self.settingsView)
         self.sigKField = QLineEdit(self.settingsView)
-        self.settingsView.functionGridLayout.addWidget(self.sigKLabel, 1, 4)
-        self.settingsView.functionGridLayout.addWidget(self.sigKField, 1, 5)
+        self.settingsView.functionGridLayout.addWidget(self.sigKLabel, 2, 0)
+        self.settingsView.functionGridLayout.addWidget(self.sigKField, 2, 1)
+
+        self.sigY0Label = QLabel("y0: ", self.settingsView)
+        self.sigY0Field = QLineEdit(self.settingsView)
+        self.settingsView.functionGridLayout.addWidget(self.sigY0Label, 2, 2)
+        self.settingsView.functionGridLayout.addWidget(self.sigY0Field, 2, 3)
 
         #rect
+        self.rectX0Label = QLabel("x0: ",self.settingsView)
+        self.rectX0Field = QLineEdit(self.settingsView)
+        self.settingsView.functionGridLayout.addWidget(self.rectX0Label, 1, 0)
+        self.settingsView.functionGridLayout.addWidget(self.rectX0Field, 1, 1)
+
+        self.rectX1Label = QLabel("x1: ", self.settingsView)
+        self.rectX1Field = QLineEdit(self.settingsView)
+        self.settingsView.functionGridLayout.addWidget(self.rectX1Label, 1, 2)
+        self.settingsView.functionGridLayout.addWidget(self.rectX1Field, 1, 3)
 
         #lin
 
         # preview
         self.previewPlot = SimplePlotter(None, width=5, height=2, dpi=60)
-        self.settingsView.functionGridLayout.addWidget(self.previewPlot, 2, 0, 1, 6)
+        self.settingsView.functionGridLayout.addWidget(self.previewPlot, 3, 0, 1, 4)
 
         self.settingsView.previewButton.clicked.connect(self.previewFunction)
-
 
     def updateSettings(self):
         self.painter.nsPerFrame = float(self.settingsView.nsPerFrameField.text())
@@ -112,11 +125,6 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
                 lower = 0
             self.painter.range = [lower, upper]
             filteredContacts = self.contacts
-            # TEST: SIGMOID
-            # sig = SigmoidWeightFunction("sig", np.arange(0, len(self.contacts[0].scoreArray), 1), len(self.contacts[0].scoreArray)/2, 1, 0.1)
-            # plt.plot(sig.previewFunction())
-            # plt.show()
-            # filteredContacts = sig.weightContactFrames(filteredContacts)
             # TEST: RECT
             # rect = RectangularWeightFunction("rect", np.arange(0,len(self.contacts[0].scoreArray), 1), 10, 50, 2)
             # plt.plot(rect.previewFunction())
@@ -158,7 +166,27 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
                 self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
 
     def showFunctionSettings(self, radiobutton):
-        print(str(radiobutton))
+        self.currentFunctionType = radiobutton
+        if radiobutton == FunctionType.sigmoid:
+            self.showHide(False,True,True)
+        elif radiobutton == FunctionType.rect:
+            self.showHide(True, False, True)
+        elif radiobutton == FunctionType.linear:
+            self.showHide(True, True, False)
+
+    def showHide(self,first,second,third):
+        self.sigX0Label.setHidden(first)
+        self.sigX0Field.setHidden(first)
+        self.sigLLabel.setHidden(first)
+        self.sigLField.setHidden(first)
+        self.sigKLabel.setHidden(first)
+        self.sigKField.setHidden(first)
+        self.rectX0Label.setHidden(second)
+        self.rectX0Field.setHidden(second)
+        self.rectX1Label.setHidden(second)
+        self.rectX1Field.setHidden(second)
+
+
 
 
     def previewFunction(self):
@@ -168,14 +196,15 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             x0 = float(self.sigX0Field.text())
             L = float(self.sigLField.text())
             k = float(self.sigKField.text())
+            y0 = float(self.sigY0Field.text())
             if len(self.contacts) > 0:
-                sig = SigmoidWeightFunction("sig", np.arange(0, len(self.contacts[0].scoreArray), 1), x0, L, k)
+                sig = SigmoidWeightFunction("sig", np.arange(0, len(self.contacts[0].scoreArray), 1), x0, L, k, y0)
                 x = np.arange(0,len(self.contacts[0].scoreArray),1)
                 y = sig.previewFunction()
 
         sip.delete(self.previewPlot)
         self.previewPlot = SimplePlotter(None, width=5, height=2, dpi=60)
-        self.settingsView.functionGridLayout.addWidget(self.previewPlot, 2, 0, 1, 6)
+        self.settingsView.functionGridLayout.addWidget(self.previewPlot, 3, 0, 1, 4)
         self.previewPlot.plot(x, y)
         self.previewPlot.update()
 
@@ -482,6 +511,7 @@ class SimplePlotter(MplPlotter):
         self.axes.plot(x,y)
         self.axes.set_xlabel("x")
         self.axes.set_ylabel("f(x)")
+        self.axes.xaxis.set_label_position('top')
 
 
 
