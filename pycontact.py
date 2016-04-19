@@ -61,35 +61,45 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
     def setupFunctionBox(self):
         # sig
         self.sigX0Label = QLabel("x0: ", self.settingsView)
-        self.sigX0Field = QLineEdit(self.settingsView)
+        self.sigX0Field = QLineEdit("1",self.settingsView)
         self.settingsView.functionGridLayout.addWidget(self.sigX0Label, 1, 0)
         self.settingsView.functionGridLayout.addWidget(self.sigX0Field, 1, 1)
 
         self.sigLLabel = QLabel("L: ", self.settingsView)
-        self.sigLField = QLineEdit(self.settingsView)
+        self.sigLField = QLineEdit("1",self.settingsView)
         self.settingsView.functionGridLayout.addWidget(self.sigLLabel, 1, 2)
         self.settingsView.functionGridLayout.addWidget(self.sigLField, 1, 3)
 
         self.sigKLabel = QLabel("k: ", self.settingsView)
-        self.sigKField = QLineEdit(self.settingsView)
+        self.sigKField = QLineEdit("1",self.settingsView)
         self.settingsView.functionGridLayout.addWidget(self.sigKLabel, 2, 0)
         self.settingsView.functionGridLayout.addWidget(self.sigKField, 2, 1)
 
         self.sigY0Label = QLabel("y0: ", self.settingsView)
-        self.sigY0Field = QLineEdit(self.settingsView)
+        self.sigY0Field = QLineEdit("0",self.settingsView)
         self.settingsView.functionGridLayout.addWidget(self.sigY0Label, 2, 2)
         self.settingsView.functionGridLayout.addWidget(self.sigY0Field, 2, 3)
 
         #rect
         self.rectX0Label = QLabel("x0: ",self.settingsView)
-        self.rectX0Field = QLineEdit(self.settingsView)
+        self.rectX0Field = QLineEdit("1",self.settingsView)
         self.settingsView.functionGridLayout.addWidget(self.rectX0Label, 1, 0)
         self.settingsView.functionGridLayout.addWidget(self.rectX0Field, 1, 1)
 
         self.rectX1Label = QLabel("x1: ", self.settingsView)
-        self.rectX1Field = QLineEdit(self.settingsView)
+        self.rectX1Field = QLineEdit("2",self.settingsView)
         self.settingsView.functionGridLayout.addWidget(self.rectX1Label, 1, 2)
         self.settingsView.functionGridLayout.addWidget(self.rectX1Field, 1, 3)
+
+        self.rectHLabel = QLabel("h: ", self.settingsView)
+        self.rectHField = QLineEdit("1", self.settingsView)
+        self.settingsView.functionGridLayout.addWidget(self.rectHLabel, 2, 0)
+        self.settingsView.functionGridLayout.addWidget(self.rectHField, 2, 1)
+
+        self.rectY0Label = QLabel("y0: ", self.settingsView)
+        self.rectY0Field = QLineEdit("0", self.settingsView)
+        self.settingsView.functionGridLayout.addWidget(self.rectY0Label, 2, 2)
+        self.settingsView.functionGridLayout.addWidget(self.rectY0Field, 2, 3)
 
         #lin
 
@@ -181,10 +191,16 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.sigLField.setHidden(first)
         self.sigKLabel.setHidden(first)
         self.sigKField.setHidden(first)
+        self.sigY0Label.setHidden(first)
+        self.sigY0Field.setHidden(first)
         self.rectX0Label.setHidden(second)
         self.rectX0Field.setHidden(second)
         self.rectX1Label.setHidden(second)
         self.rectX1Field.setHidden(second)
+        self.rectHLabel.setHidden(second)
+        self.rectHField.setHidden(second)
+        self.rectY0Label.setHidden(second)
+        self.rectY0Field.setHidden(second)
 
 
 
@@ -201,7 +217,15 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
                 sig = SigmoidWeightFunction("sig", np.arange(0, len(self.contacts[0].scoreArray), 1), x0, L, k, y0)
                 x = np.arange(0,len(self.contacts[0].scoreArray),1)
                 y = sig.previewFunction()
-
+        elif self.currentFunctionType == FunctionType.rect:
+            x0 = float(self.rectX0Field.text())
+            x1 = float(self.rectX1Field.text())
+            h = float(self.rectHField.text())
+            y0 = float(self.rectY0Field.text())
+            if len(self.contacts) > 0:
+                rect = RectangularWeightFunction("rect", np.arange(0, len(self.contacts[0].scoreArray), 1), x0, x1, h,y0)
+                x = np.arange(0, len(self.contacts[0].scoreArray), 1)
+                y = rect.previewFunction()
         sip.delete(self.previewPlot)
         self.previewPlot = SimplePlotter(None, width=5, height=2, dpi=60)
         self.settingsView.functionGridLayout.addWidget(self.previewPlot, 3, 0, 1, 4)

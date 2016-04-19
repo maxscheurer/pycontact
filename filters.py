@@ -133,7 +133,7 @@ class RectangularWeightFunction(WeightFunction):
     #x0: lower rect limit x value
     #x1: upper rect limit x value
     #h: rectangle height
-    def __init__(self, name, x, x0, x1,h, y0):
+    def __init__(self, name, x, x0, x1, h, y0):
         super(RectangularWeightFunction, self).__init__(name, x)
         self.x0 = x0
         self.x1 = x1
