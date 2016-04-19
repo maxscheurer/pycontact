@@ -96,10 +96,8 @@ class WeightFunction:
 
     def weightContactFrames(self, contacts):
         for c in contacts:
-            print(c.scoreArray)
             weighted = self.function(self.x) * c.scoreArray
             c.scoreArray = weighted
-            print(c.scoreArray)
         return contacts
 
     def previewFunction(self):

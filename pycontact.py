@@ -1,4 +1,4 @@
-import sys, sip
+import sys, sip, copy
 from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget, QDialog, QTabWidget, QButtonGroup,
                              QLabel, QCheckBox, QPushButton, QMainWindow, QMenuBar, QComboBox,
                              QLineEdit, QTextEdit, QGridLayout, QFileDialog, QAction, qApp, QHBoxLayout, QVBoxLayout)
@@ -123,6 +123,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         scoreActive = self.settingsView.activeScoreCheckbox.isChecked()
         sortingActive = self.settingsView.activeSortingBox.isChecked()
         filterActive = (totalTimeActive or scoreActive or sortingActive)
+        weightActive = self.settingsView.functionActiveCheckbox.isChecked()
         if len(self.contacts) > 0:
             lower = int(self.settingsView.lowerRangeField.text()) - 1
             upper = self.settingsView.upperRangeField.text()
@@ -134,18 +135,24 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             if lower < 0:
                 lower = 0
             self.painter.range = [lower, upper]
-            filteredContacts = self.contacts
-            # TEST: RECT
-            # rect = RectangularWeightFunction("rect", np.arange(0,len(self.contacts[0].scoreArray), 1), 10, 50, 2)
-            # plt.plot(rect.previewFunction())
-            # plt.show()
-            # filteredContacts = rect.weightContactFrames(filteredContacts)
-            # TEST: LINEAR
-            # lin = LinearWeightFunction("lin", np.arange(0,len(self.contacts[0].scoreArray), 1), 0.5,1)
-            # plt.plot(lin.previewFunction())
-            # plt.show()
-            # filteredContacts = lin.weightContactFrames(filteredContacts)
-            ####
+            filteredContacts = copy.deepcopy(self.contacts)
+            if weightActive:
+                if self.currentFunctionType == FunctionType.sigmoid:
+                    print("sig weight")
+                    x0 = float(self.sigX0Field.text())
+                    L = float(self.sigLField.text())
+                    k = float(self.sigKField.text())
+                    y0 = float(self.sigY0Field.text())
+                    sig = SigmoidWeightFunction("sig", np.arange(0, len(self.contacts[0].scoreArray), 1), x0, L, k, y0)
+                    filteredContacts = sig.weightContactFrames(filteredContacts)
+                elif self.currentFunctionType == FunctionType.rect:
+                    x0 = float(self.rectX0Field.text())
+                    x1 = float(self.rectX1Field.text())
+                    h = float(self.rectHField.text())
+                    y0 = float(self.rectY0Field.text())
+                    rect = RectangularWeightFunction("rect", np.arange(0, len(self.contacts[0].scoreArray), 1), x0, x1, h, y0)
+                    filteredContacts = rect.weightContactFrames(filteredContacts)
+
             if  filterActive:
                     if totalTimeActive:
                         operator = self.settingsView.compareTotalTimeDropdown.currentText()
@@ -170,7 +177,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
                     if len(filteredContacts) == 0:
                         self.painter.labelView.clean()
             else:
-                self.painter.contacts = self.contacts
+                self.painter.contacts = filteredContacts
                 self.painter.rendered = False
                 self.painter.update()
                 self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
@@ -262,7 +269,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         grid.addWidget(medianTitleLabel, 2, 2)
         grid.addWidget(medianLabel, 2, 3)
 
-        allContactPlot = SimplePlotter(None, width=4, height=2, dpi=80)
+        allContactPlot = ContactPlotter(None, width=4, height=2, dpi=80)
         allContactPlot.plot_all_contacts_figure(self.contacts)
         grid.addWidget(allContactPlot, 3, 0, 1, 4)
         d.setWindowTitle("Statistics")
