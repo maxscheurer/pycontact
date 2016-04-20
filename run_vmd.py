@@ -26,6 +26,6 @@ for line in iter(process.stdout.readline, b''):
                 print(i)
                 i += 1
     else:
-        print(line)
+        print(line.decode("utf-8"))
 
 print("VMD finished")
