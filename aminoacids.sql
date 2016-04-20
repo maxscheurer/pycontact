@@ -22,9 +22,9 @@ insert into residues(name, scpolarity, hbondtype) values("his","polar","both");
 insert into residues(name, scpolarity, hbondtype) values("hsd","polar","both");
 insert into residues(name, scpolarity, hbondtype) values("hse","polar","both");
 
-insert into residues(name, scpolarity, hbondtype) values("cys","polar","donor");
+insert into residues(name, scpolarity, hbondtype) values("cys","polar","don");
 insert into residues(name, scpolarity, hbondtype) values("ser","polar","both");
 insert into residues(name, scpolarity, hbondtype) values("thr","polar","both");
 /* special */
-insert into residues(name, scpolarity, hbondtype) values("tyr","nonpolar","donor");
-insert into residues(name, scpolarity, hbondtype) values("trp","nonpolar","donor");
+insert into residues(name, scpolarity, hbondtype) values("tyr","nonpolar","don");
+insert into residues(name, scpolarity, hbondtype) values("trp","nonpolar","don");
