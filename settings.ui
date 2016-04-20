@@ -76,6 +76,11 @@
        </item>
        <item>
         <property name="text">
+         <string>contact type</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
          <string>total time</string>
         </property>
        </item>

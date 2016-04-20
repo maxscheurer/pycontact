@@ -83,6 +83,8 @@ class Sorting:
             sortedContacts = sorted(contacts, key=lambda c: c.medianScore, reverse=self.descending)
         elif self.key == "bb/sc type":
             sortedContacts = sorted(contacts, key=lambda c: c.backboneSideChainType, reverse=self.descending)
+        elif self.key == "contact type":
+            sortedContacts = sorted(contacts, key=lambda c: c.contactType, reverse=self.descending)
         elif self.key == "total time":
             for con in contacts:
                 con.total_time(self.nspf,self.threshold)

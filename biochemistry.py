@@ -1,16 +1,24 @@
 import collections
 import numpy as np
+from read_db import *
 compare = lambda x, y: collections.Counter(x) == collections.Counter(y)
 
+# TODO: remove, deprecated
 class ResidueType:
     positive, negative, nonpolar, polar, other = range(5)
     mapping = {"asp": negative, "arg": positive, "lys": positive, "glu": negative}
 
 class ContactType:
-    saltbr, hydrophobic, other = range(3)
-    mapping = [[ResidueType.positive, ResidueType.negative],[ResidueType.nonpolar, ResidueType.nonpolar]]
-    colors = ["rgb(255, 0,0)", "rgb(0, 0,255)", "rgb(255, 255 ,255)"]
+    saltbr, hydrophobic, hbond, other = range(4)
+    colors = ["rgba(255, 0,0, 50)", "rgba(0, 0,255, 50)", "rgba(255, 0 ,255, 50)", "rgba(255, 255 ,255, 50)"]
 
+class HBondType:
+    none, donor, acceptor, both = range(4)
+    mapping = {"none": none, "don": donor, "acc": acceptor, "both": both}
+
+class SideChainPolarity:
+    nonpolar, positive, negative, polar = range(4)
+    mapping = {"nonpolar": nonpolar, "positive": positive, "negative": negative, "polar": polar}
 
 class BackboneSidechainType:
     contactsBb, contactsSc = range(2)
@@ -31,11 +39,17 @@ class Residue:
             self.contactsBy = BackboneSidechainType.contactsBb
         else:
             self.contactsBy = BackboneSidechainType.contactsSc
-        # self.bbScRatio = self.bb/self.sc
-        if self.name in ResidueType.mapping:
-            self.type = ResidueType.mapping[self.name]
-        else:
-            self.type = ResidueType.other
+        # TODO: propably init db first and just call select (speed up)
+        #sidechain polarity
+        scpol = str(read_residue_db("scpolarity","name",self.name)[0]["scpolarity"])
+        self.scpolarity = SideChainPolarity.mapping[scpol]
+        #hydrogen bonds: donor, acceptor, both
+        hbond = str(read_residue_db("hbondtype", "name", self.name)[0]["hbondtype"])
+        self.hbondtype = HBondType.mapping[hbond]
+        # self.printself()
+
+    def printself(self):
+        print(self.name + " " + str(self.contactsBy) + " " + str(self.scpolarity) + " " + str(self.hbondtype))
 
 class Contact:
     def __init__(self, resA, residA, resB, residB, bb1, sc1, bb2, sc2, scoreArray):
@@ -47,7 +61,7 @@ class Contact:
         self.title = self.resA + self.residA + " - " + self.resB + self.residB
         self.residueA = Residue(self.resA,bb1,sc1)
         self.residueB = Residue(self.resB,bb2,sc2)
-        self.type = determine_ctype(self.residueA, self.residueB)
+        self.contactType = self.determine_ctype()
         self.determineBackboneSidechainType()
         self.mean_score()
         self.median_score()
@@ -84,12 +98,50 @@ class Contact:
         self.medianScore = med
         return med
 
-def determine_ctype(resA, resB):
-    if compare([resA.type,resB.type],ContactType.mapping[ContactType.saltbr]):
-        return ContactType.saltbr
-    else:
-        return ContactType.other
+    def determine_ctype(self):
+        a = self.residueA
+        b = self.residueB
+        # check if both residues contact by backbone
+        if a.contactsBy == BackboneSidechainType.contactsBb and b.contactsBy == BackboneSidechainType.contactsBb:
+            return ContactType.hbond
 
+        # check if contact by sidechain and backbone
+        if (a.contactsBy == BackboneSidechainType.contactsBb and b.contactsBy == BackboneSidechainType.contactsSc):
+            # sc contact by residue B
+            if b.hbondtype != HBondType.none:
+                return ContactType.hbond
+            else:
+                return ContactType.other
+        elif (a.contactsBy == BackboneSidechainType.contactsSc and b.contactsBy == BackboneSidechainType.contactsBb):
+            # sc contact by residue A
+            if a.hbondtype != HBondType.none:
+                return ContactType.hbond
+            else:
+                return ContactType.other
+
+        if a.contactsBy == BackboneSidechainType.contactsSc and b.contactsBy == BackboneSidechainType.contactsSc:
+            # check for saltbridge
+            if (a.scpolarity == SideChainPolarity.positive and b.scpolarity == SideChainPolarity.negative) or \
+                (b.scpolarity == SideChainPolarity.positive and a.scpolarity == SideChainPolarity.negative):
+                return ContactType.saltbr
+
+            # check for hydrophobic contact
+            if a.scpolarity == SideChainPolarity.nonpolar and b.scpolarity == SideChainPolarity.nonpolar:
+                if a.hbondtype == HBondType.none or b.hbondtype == HBondType.none:
+                    return ContactType.hydrophobic
+
+            # final hbond scan
+
+            if (a.hbondtype == HBondType.donor and b.hbondtype == HBondType.acceptor) or \
+                (a.hbondtype == HBondType.acceptor and b.hbondtype == HBondType.donor) or \
+                (a.hbondtype == HBondType.both and b.hbondtype == HBondType.both) or \
+                (a.hbondtype == HBondType.donor and b.hbondtype == HBondType.both) or \
+                (a.hbondtype == HBondType.both and b.hbondtype == HBondType.donor) or \
+                (a.hbondtype == HBondType.acceptor and b.hbondtype == HBondType.both) or \
+                (a.hbondtype == HBondType.both and b.hbondtype == HBondType.acceptor):
+                    return ContactType.hbond
+
+            return ContactType.other
 
 def mean_score_of_contactArray(contacts):
     meanList = []

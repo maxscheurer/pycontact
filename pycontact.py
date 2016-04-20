@@ -355,7 +355,7 @@ class Canvas(QWidget):
         p.save(filename, 'png', 100)
 
     def renderContact(self):
-        startx = 80
+        startx = 90
         orig_startx = startx
         start_text = 10
         textoffset = 5
@@ -425,8 +425,6 @@ class LabelView(QWidget):
             sip.delete(child)
 
     def initUI(self):
-        startx = 80
-        orig_startx = startx
         start_text = 10
         textoffset = 5
         rowheight = 22
@@ -435,14 +433,13 @@ class LabelView(QWidget):
         for c in self.contacts:
             cindex = self.contacts.index(c)
             self.buttons.append(QPushButton(c.title))
-            stylesheet = "border: 0px solid #222222; background-color: "+ ContactType.colors[c.type] + " ;"
+            stylesheet = "border: 0px solid #222222; background-color: "+ ContactType.colors[c.contactType] + " ;"
             self.buttons[-1].setStyleSheet(stylesheet)
             self.buttons[-1].clicked.connect(partial(self.handleButton, data=cindex))
             self.buttons[-1].setParent(self)
             self.buttons[-1].move(start_text, row + textoffset)
             self.buttons[-1].setFont(QFont('Arial', 9))
             self.buttons[-1].show()
-            startx = orig_startx
             row += rowheight
 
     def handleButton(self, data):
