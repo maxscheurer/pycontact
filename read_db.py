@@ -7,7 +7,6 @@ def dict_factory(cursor, row):
     return d
 
 def read_residue_db(selection, key, value):
-    print("wurstgas")
     connection = sqlite3.connect("/Users/mscheurer/Projects/pycontact/pycontact/aa.db")
     connection.row_factory = dict_factory
     cursor = connection.cursor()
