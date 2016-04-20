@@ -44,7 +44,7 @@ class Contact:
         self.residA = residA
         self.residB = residB
         self.scoreArray = scoreArray
-        self.title = self.resA + self.residA + "-" + self.resB + self.residB
+        self.title = self.resA + self.residA + " - " + self.resB + self.residB
         self.residueA = Residue(self.resA,bb1,sc1)
         self.residueB = Residue(self.resB,bb2,sc2)
         self.type = determine_ctype(self.residueA, self.residueB)
