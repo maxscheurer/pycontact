@@ -443,7 +443,7 @@ class LabelView(QWidget):
             row += rowheight
 
     def handleButton(self, data):
-        print('index clicked: '+ str(data))
+        # print('index clicked: '+ str(data))
         d = QDialog()
         grid = QGridLayout()
         d.setLayout(grid)

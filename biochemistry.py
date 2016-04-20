@@ -131,7 +131,6 @@ class Contact:
                     return ContactType.hydrophobic
 
             # final hbond scan
-
             if (a.hbondtype == HBondType.donor and b.hbondtype == HBondType.acceptor) or \
                 (a.hbondtype == HBondType.acceptor and b.hbondtype == HBondType.donor) or \
                 (a.hbondtype == HBondType.both and b.hbondtype == HBondType.both) or \
