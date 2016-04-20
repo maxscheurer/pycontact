@@ -293,7 +293,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.painter.range = [0,len(self.contacts[0].scoreArray)]
         # self.painter.update()
         # set max slider value to frame number!
-        self.mergeSlider.setMaximum(len(self.contacts[0].scoreArray)/12)
+        self.mergeSlider.setMaximum(len(self.contacts[0].scoreArray)/15)
         self.updateSettings()
         self.updateFilters()
 
@@ -364,9 +364,11 @@ class Canvas(QWidget):
         whiteColor = QColor(255, 255, 255)
 
         merge = self.merge
-        offset = 10 / merge
+        offset = 10
 
-        self.sizeX = (len(self.contacts[0].scoreArray) + startx) * offset
+        # self.sizeX = (len(self.contacts[0].scoreArray) + startx) * offset
+        # self.sizeY = len(self.contacts) * rowheight
+        self.sizeX = startx + (len(self.contacts[0].scoreArray[self.range[0]:self.range[1]]) + merge * 2) * offset/merge
         self.sizeY = len(self.contacts) * rowheight
 
         self.pixmap = QPixmap(QSize(self.sizeX, self.sizeY))
@@ -392,8 +394,8 @@ class Canvas(QWidget):
                 if alpha > 255:
                     alpha = 255
                 p.setBrush(QColor(bbScColor[0], bbScColor[1], bbScColor[2], alpha))
-                p.drawRect(startx, row, offset*merge, 20)
-                startx += (offset*merge)
+                p.drawRect(startx, row, offset, 20)
+                startx += offset
                 i += merge
             startx = orig_startx
             row += rowheight
