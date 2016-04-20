@@ -26,7 +26,7 @@ proc contacts {frame} \
 	set list2 [lindex $contactList 1]
 
 	# set current_results []
-	puts [llength $list1]
+	#puts [llength $list1]
 	foreach a1 $list1 a2 $list2 {
 		set length [measure bond [list $a1 $a2] frame $frame]
 		set weight [weight_distance $length]
@@ -113,8 +113,8 @@ array set scorerB {}
 
 array set residScores {}
 
-set cutoff 5.0
-
+set cutoff 3.0
+puts "starting contacts"
 bigdcd contacts auto $traj.dcd
 vwait bigdcd_running
 
