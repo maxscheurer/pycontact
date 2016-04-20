@@ -77,10 +77,43 @@
        </property>
       </widget>
      </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="sortingLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>sorting:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="3">
+      <widget class="QCheckBox" name="activeScoreCheckbox">
+       <property name="text">
+        <string>active</string>
+       </property>
+      </widget>
+     </item>
      <item row="8" column="1">
       <widget class="QLabel" name="residARangeLabel">
        <property name="text">
         <string>range A:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="2">
+      <widget class="QLineEdit" name="totalTimeField">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>0</string>
        </property>
       </widget>
      </item>
@@ -98,18 +131,11 @@
        </property>
       </widget>
      </item>
-     <item row="6" column="2">
-      <widget class="QComboBox" name="sortingOrderDropdown">
-       <item>
-        <property name="text">
-         <string>asc</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>desc</string>
-        </property>
-       </item>
+     <item row="7" column="0" colspan="5">
+      <widget class="Line" name="line_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
       </widget>
      </item>
      <item row="2" column="0" colspan="5">
@@ -117,35 +143,6 @@
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
-      </widget>
-     </item>
-     <item row="6" column="1">
-      <widget class="QComboBox" name="sortingKeyDropdown">
-       <item>
-        <property name="text">
-         <string>mean</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>median</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>bb/sc type</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>contact type</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>total time</string>
-        </property>
-       </item>
       </widget>
      </item>
      <item row="0" column="1">
@@ -189,6 +186,13 @@
        </property>
       </widget>
      </item>
+     <item row="4" column="3">
+      <widget class="QCheckBox" name="activeTotalTimeCheckbox">
+       <property name="text">
+        <string>active</string>
+       </property>
+      </widget>
+     </item>
      <item row="5" column="1">
       <widget class="QComboBox" name="compareScoreDropdown">
        <property name="currentText">
@@ -204,113 +208,6 @@
          <string>smaller</string>
         </property>
        </item>
-      </widget>
-     </item>
-     <item row="8" column="2">
-      <widget class="QLineEdit" name="residARangeField">
-       <property name="text">
-        <string>all</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="3">
-      <widget class="QCheckBox" name="activeScoreCheckbox">
-       <property name="text">
-        <string>active</string>
-       </property>
-      </widget>
-     </item>
-     <item row="13" column="4">
-      <spacer name="verticalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item row="6" column="0">
-      <widget class="QLabel" name="sortingLabel">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>sorting:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="3">
-      <widget class="QCheckBox" name="activeSortingBox">
-       <property name="text">
-        <string>active</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0">
-      <widget class="QComboBox" name="meanDropdown">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <item>
-        <property name="text">
-         <string>mean</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>median</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item row="5" column="2">
-      <widget class="QLineEdit" name="scoreField">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>0</string>
-       </property>
-      </widget>
-     </item>
-     <item row="8" column="0">
-      <widget class="QLabel" name="residuesLabel">
-       <property name="text">
-        <string>residues:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="2">
-      <widget class="QLineEdit" name="totalTimeField">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>0</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="3">
-      <widget class="QCheckBox" name="activeTotalTimeCheckbox">
-       <property name="text">
-        <string>active</string>
-       </property>
       </widget>
      </item>
      <item row="4" column="0">
@@ -341,6 +238,109 @@
          <string>smaller</string>
         </property>
        </item>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QComboBox" name="meanDropdown">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <item>
+        <property name="text">
+         <string>mean</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>median</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QComboBox" name="sortingKeyDropdown">
+       <item>
+        <property name="text">
+         <string>mean</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>median</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>bb/sc type</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>contact type</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>total time</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="5" column="2">
+      <widget class="QLineEdit" name="scoreField">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="2">
+      <widget class="QComboBox" name="sortingOrderDropdown">
+       <item>
+        <property name="text">
+         <string>asc</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>desc</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="8" column="2">
+      <widget class="QLineEdit" name="residARangeField">
+       <property name="text">
+        <string>all</string>
+       </property>
+      </widget>
+     </item>
+     <item row="13" column="4">
+      <spacer name="verticalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="8" column="0">
+      <widget class="QLabel" name="residuesLabel">
+       <property name="text">
+        <string>residues:</string>
+       </property>
       </widget>
      </item>
      <item row="12" column="0" rowspan="3" colspan="4">
@@ -422,10 +422,10 @@
        </property>
       </widget>
      </item>
-     <item row="7" column="0" colspan="5">
-      <widget class="Line" name="line_3">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+     <item row="6" column="3">
+      <widget class="QCheckBox" name="activeSortingBox">
+       <property name="text">
+        <string>active</string>
        </property>
       </widget>
      </item>

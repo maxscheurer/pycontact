@@ -16,6 +16,19 @@ class Operator:
         elif operator == self.nequal:
             return (value1 != value2)
 
+class FrameFilter:
+    def __init__(self,name):
+        self.name = name
+
+    def extractFrameRange(self, contacts, range):
+        lower = range[0]
+        upper = range[1]
+        for c in contacts:
+            newScores = c.scoreArray[lower:upper]
+            c.scoreArray = newScores
+        return contacts
+
+
 
 class BinaryFilter:
     def __init__(self, name, operator, value):

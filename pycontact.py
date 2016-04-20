@@ -124,6 +124,8 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         sortingActive = self.settingsView.activeSortingBox.isChecked()
         filterActive = (totalTimeActive or scoreActive or sortingActive)
         weightActive = self.settingsView.functionActiveCheckbox.isChecked()
+        # only filter given range
+        rangeFilterActive = self.settingsView.filterRangeCheckbox.isChecked()
         if len(self.contacts) > 0:
             lower = int(self.settingsView.lowerRangeField.text()) - 1
             upper = self.settingsView.upperRangeField.text()
@@ -135,7 +137,12 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             if lower < 0:
                 lower = 0
             self.painter.range = [lower, upper]
+            self.painter.rangeFilterActive = False
             filteredContacts = copy.deepcopy(self.contacts)
+            if rangeFilterActive:
+                self.painter.rangeFilterActive = True
+                frameRangeFilter = FrameFilter("framer")
+                filteredContacts = frameRangeFilter.extractFrameRange(filteredContacts,[lower, upper])
             if weightActive:
                 if self.currentFunctionType == FunctionType.sigmoid:
                     print("sig weight")
@@ -332,6 +339,7 @@ class Canvas(QWidget):
         self.alphaFactor = 50
         self.contacts = []
         self.range = [0,0]
+        self.rangeFilterActive = False
     def paintEvent(self, event):
 
         qp = QPainter()
@@ -368,7 +376,11 @@ class Canvas(QWidget):
 
         # self.sizeX = (len(self.contacts[0].scoreArray) + startx) * offset
         # self.sizeY = len(self.contacts) * rowheight
-        self.sizeX = startx + (len(self.contacts[0].scoreArray[self.range[0]:self.range[1]]) + merge * 2) * offset/merge
+        if self.rangeFilterActive:
+            self.sizeX = startx + (len(self.contacts[0].scoreArray) + merge * 2) * offset / merge
+        else:
+            self.sizeX = startx + (len(self.contacts[0].scoreArray[self.range[0]:self.range[1]]) + merge * 2) * offset / merge
+
         self.sizeY = len(self.contacts) * rowheight
 
         self.pixmap = QPixmap(QSize(self.sizeX, self.sizeY))
@@ -380,7 +392,10 @@ class Canvas(QWidget):
         for c in self.contacts:
             bbScColor = BackboneSidechainContactType.colors[c.backboneSideChainType]
             i = 0
-            rangedScores = c.scoreArray[self.range[0]:self.range[1]]
+            if self.rangeFilterActive:
+                rangedScores = c.scoreArray
+            else:
+                rangedScores = c.scoreArray[self.range[0]:self.range[1]]
             while i < len(rangedScores):
                 p.setPen(blackColor)
                 merged_score = 0
