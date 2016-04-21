@@ -118,6 +118,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
 
     def updateFilters(self):
         print("filter update")
+        self.painter.labelView.clean()
         # total time filter
         totalTimeActive = self.settingsView.activeTotalTimeCheckbox.isChecked()
         scoreActive = self.settingsView.activeScoreCheckbox.isChecked()
@@ -139,10 +140,15 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             self.painter.range = [lower, upper]
             self.painter.rangeFilterActive = False
             filteredContacts = copy.deepcopy(self.contacts)
+            # aminoacids filter
+            aaFilter = NameFilter("name")
+            filteredContacts = aaFilter.filterResiduesByName(filteredContacts, self.settingsView.residANameField.text(), self.settingsView.residBNameField.text())
+            # range filter
             if rangeFilterActive:
                 self.painter.rangeFilterActive = True
                 frameRangeFilter = FrameFilter("framer")
                 filteredContacts = frameRangeFilter.extractFrameRange(filteredContacts,[lower, upper])
+            # weight functions
             if weightActive:
                 if self.currentFunctionType == FunctionType.sigmoid:
                     print("sig weight")
@@ -159,7 +165,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
                     y0 = float(self.rectY0Field.text())
                     rect = RectangularWeightFunction("rect", np.arange(0, len(self.contacts[0].scoreArray), 1), x0, x1, h, y0)
                     filteredContacts = rect.weightContactFrames(filteredContacts)
-
+            # other filters
             if  filterActive:
                     if totalTimeActive:
                         operator = self.settingsView.compareTotalTimeDropdown.currentText()

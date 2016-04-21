@@ -28,6 +28,35 @@ class FrameFilter:
             c.scoreArray = newScores
         return contacts
 
+class NameFilter:
+    def __init__(self, name):
+        self.name = name
+
+    def filterResiduesByName(self, contacts, resnameA, resnameB):
+        filtered = []
+        for c in contacts:
+            add = False
+            if resnameA.lower() != 'all' and resnameB.lower() != 'all':
+                splitA = resnameA.split(",")
+                splitB = resnameB.split(",")
+                if c.residueA.name in splitA and c.residueB.name in splitB:
+                    add = True
+            elif resnameA.lower() != 'all' and resnameB.lower() == 'all':
+                splitA = resnameA.split(",")
+                if c.residueA.name in splitA:
+                    add = True
+            elif resnameA.lower() == 'all' and resnameB.lower() != 'all':
+                splitB = resnameB.split(",")
+                if c.residueB.name in splitB:
+                    add = True
+            else:
+                add = True
+
+            if add:
+                filtered.append(c)
+        return filtered
+
+
 
 
 class BinaryFilter:
