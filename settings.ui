@@ -287,6 +287,16 @@
          <string>total time</string>
         </property>
        </item>
+       <item>
+        <property name="text">
+         <string>resid A</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>resid B</string>
+        </property>
+       </item>
       </widget>
      </item>
      <item row="5" column="2">

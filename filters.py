@@ -61,10 +61,10 @@ class ResidueRangeFilter:
         self.name = name
 
     def numberInRanges(self,number,ranges):
-        result = True
+        result = False
         for r in ranges:
-            if not int(number) in r:
-                result = False
+            if number in r:
+                result = True
         return result
 
     def filterResiduesByRange(self, contacts, residRangeA, residRangeB):
@@ -173,6 +173,10 @@ class Sorting:
             sortedContacts = sorted(contacts, key=lambda c: c.backboneSideChainType, reverse=self.descending)
         elif self.key == "contact type":
             sortedContacts = sorted(contacts, key=lambda c: c.contactType, reverse=self.descending)
+        elif self.key == "resid A":
+            sortedContacts = sorted(contacts, key=lambda c: c.residueA.ident, reverse=self.descending)
+        elif self.key == "resid B":
+            sortedContacts = sorted(contacts, key=lambda c: c.residueB.ident, reverse=self.descending)
         elif self.key == "total time":
             for con in contacts:
                 con.total_time(self.nspf,self.threshold)
