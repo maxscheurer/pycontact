@@ -140,7 +140,10 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             self.painter.range = [lower, upper]
             self.painter.rangeFilterActive = False
             filteredContacts = copy.deepcopy(self.contacts)
-            # aminoacids filter
+            # residue range filter
+            resrangeFilter = ResidueRangeFilter("resrange")
+            filteredContacts = resrangeFilter.filterResiduesByRange(filteredContacts, self.settingsView.residARangeField.text(), self.settingsView.residBRangeField.text())
+            # aminoacids name filter
             aaFilter = NameFilter("name")
             filteredContacts = aaFilter.filterResiduesByName(filteredContacts, self.settingsView.residANameField.text(), self.settingsView.residBNameField.text())
             # range filter

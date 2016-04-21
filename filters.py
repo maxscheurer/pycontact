@@ -56,8 +56,54 @@ class NameFilter:
                 filtered.append(c)
         return filtered
 
+class ResidueRangeFilter:
+    def __init__(self, name):
+        self.name = name
 
+    def numberInRanges(self,number,ranges):
+        result = True
+        for r in ranges:
+            if not int(number) in r:
+                result = False
+        return result
 
+    def filterResiduesByRange(self, contacts, residRangeA, residRangeB):
+        splitA = residRangeA.split(",")
+        splitB = residRangeB.split(",")
+
+        notAllA = residRangeA.lower() != 'all'
+        notAllB = residRangeB.lower() != 'all'
+
+        if notAllA:
+            aRanges = []
+            for ran in splitA:
+                r = ran.split("-")
+                aRanges.append(range(int(r[0]),int(r[1])+1))
+        if notAllB:
+            bRanges =[]
+            for ran in splitB:
+                r = ran.split("-")
+                print(r)
+                bRanges.append(range(int(r[0]), int(r[1]) + 1))
+
+        filtered = []
+        for c in contacts:
+            add = False
+            if notAllA and notAllB:
+                if self.numberInRanges(c.residueA.ident, aRanges) and self.numberInRanges(c.residueB.ident,bRanges):
+                    add = True
+            elif notAllA and not notAllB:
+                if self.numberInRanges(c.residueA.ident, aRanges):
+                    add = True
+            elif not notAllA and notAllB:
+                if self.numberInRanges(c.residueB.ident,bRanges):
+                    add = True
+            else:
+                add = True
+
+            if add:
+                filtered.append(c)
+        return filtered
 
 class BinaryFilter:
     def __init__(self, name, operator, value):

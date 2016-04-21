@@ -31,10 +31,11 @@ class BackboneSidechainContactType:
 
 
 class Residue:
-    def __init__(self, name, bb, sc):
+    def __init__(self, name, bb, sc, ident):
         self.name = name.lower()
         self.bb = float(bb)
         self.sc = float(sc)
+        self.ident = ident
         if self.bb > self.sc:
             self.contactsBy = BackboneSidechainType.contactsBb
         else:
@@ -59,8 +60,8 @@ class Contact:
         self.residB = residB
         self.scoreArray = scoreArray
         self.title = self.resA + self.residA + " - " + self.resB + self.residB
-        self.residueA = Residue(self.resA,bb1,sc1)
-        self.residueB = Residue(self.resB,bb2,sc2)
+        self.residueA = Residue(self.resA,bb1,sc1,residA)
+        self.residueB = Residue(self.resB,bb2,sc2,residB)
         self.contactType = self.determine_ctype()
         self.determineBackboneSidechainType()
         self.mean_score()
