@@ -86,6 +86,34 @@ class Contact:
         self.ttime = time
         return self.ttime
 
+
+
+    def life_time(self, ns_per_frame, threshold):
+        lifeTimes = []
+        contactActive = False
+        contactTime = 0
+        for score in self.scoreArray:
+            if contactActive == False and score > threshold:
+                contactActive = True
+                contactTime += ns_per_frame
+            elif contactActive == True and score > threshold:
+                contactTime += ns_per_frame
+            elif contactActive == True and score <= threshold:
+                contactActive = False
+                lifeTimes.append(contactTime)
+                contactTime = 0
+
+        return lifeTimes
+
+    def mean_life_time(self, ns_per_frame, threshold):
+        self.meanLifeTime = np.mean(self.life_time(ns_per_frame, threshold))
+        return self.meanLifeTime
+
+    def median_life_time(self, ns_per_frame, threshold):
+        self.medianLifeTime = np.median(self.life_time(ns_per_frame, threshold))
+        return self.medianLifeTime
+
+
     def mean_score(self):
         mean = 0
         for score in self.scoreArray:

@@ -511,6 +511,11 @@ class LabelView(QWidget):
         backboneSidechainLabel = QLabel("%.2f/%.2f" % (contact.residueA.bb, contact.residueA.sc))
         backboneSidechainLabel2 = QLabel("%.2f/%.2f" % (contact.residueB.bb, contact.residueB.sc))
 
+        meanLifeTimeTitleLabel = QLabel("mean lifetime:")
+        meanLifeTimeLabel = QLabel(str(contact.mean_life_time(self.nsPerFrame, self.threshold)))
+
+        medianLifeTimeTitleLabel = QLabel("median lifetime:")
+        medianLifeTimeLabel = QLabel(str(contact.median_life_time(self.nsPerFrame, self.threshold)))
 
         meanTitleLabel = QLabel("mean score:")
         meanLabel = QLabel(str(contact.mean_score()))
@@ -532,9 +537,15 @@ class LabelView(QWidget):
         grid.addWidget(backboneSidechainLabel, 3, 1)
         grid.addWidget(backboneSidechainTitleLabel2, 4, 0)
         grid.addWidget(backboneSidechainLabel2, 4, 1)
+
+        grid.addWidget(meanLifeTimeTitleLabel, 5, 0)
+        grid.addWidget(meanLifeTimeLabel, 5, 1)
+        grid.addWidget(medianLifeTimeTitleLabel, 5, 2)
+        grid.addWidget(medianLifeTimeLabel, 5, 3)
+        
         contactPlot = ContactPlotter(None, width=4, height=2, dpi=80)
         contactPlot.plot_contact_figure(contact)
-        grid.addWidget(contactPlot,5,0,1,4)
+        grid.addWidget(contactPlot,6,0,1,4)
         d.setWindowTitle(contact.title)
         d.resize(650,700)
         d.setWindowModality(Qt.ApplicationModal)
