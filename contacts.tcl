@@ -17,9 +17,12 @@ proc contacts {frame} \
 	global scorerA
 	global scorerB
 	global residScores
+	global sasas
+	global sasa_on
 
 	set selection1 [atomselect top $sel1]
 	set selection2 [atomselect top $sel2]
+	set all [atomselect top "$sel1 or $sel2"]
 
 	set contactList [measure contacts $cutoff $selection1 $selection2]
 	set list1 [lindex $contactList 0]
@@ -79,6 +82,24 @@ proc contacts {frame} \
 		set n2 [$res2 get resname]
 		set key "$n1 $r1 $n2 $r2"
 
+		#SASA
+		#more massive speed problems
+		if {![info exists sasas($key,$frame)] && $sasa_on} {
+			# puts "$key, $frame"
+			set residues [atomselect top "$sel1 and resid $r1 or $sel2 and resid $r2"]
+			set contact_sasa [measure sasa 1.4 $all -restrict $residues]
+
+			set singleA [atomselect top "$sel1 and resid $r1"]
+			set singleB [atomselect top "$sel2 and resid $r2"]
+
+			set singleSasaA [measure sasa 1.4 $selection1 -restrict $singleA]
+			set singleSasaB [measure sasa 1.4 $selection2 -restrict $singleB]
+			set sasas($key,$frame) [list $contact_sasa [expr $singleSasaA + $singleSasaB]]
+			$residues delete
+			$singleA delete
+			$singleB delete
+		}
+
 		$res1 delete
 		$res2 delete
 
@@ -87,12 +108,14 @@ proc contacts {frame} \
 		} else {
 			set current_res_weights []
 		}
+
 		lappend current_res_weights [list $frame $weight $ss_bb_list]
 		set residScores($key) $current_res_weights
 	}
 	# lappend results [list $frame $current_results]
 	$selection1 delete
 	$selection2 delete
+	$all delete
 }
 
 source bigdcd.tcl
@@ -112,8 +135,10 @@ array set scorerA {}
 array set scorerB {}
 
 array set residScores {}
+array set sasas {}
 
-set cutoff 3.0
+set cutoff 5.0
+set sasa_on 0
 puts "starting contacts"
 bigdcd contacts auto $traj.dcd
 vwait bigdcd_running
@@ -157,6 +182,7 @@ close $outputB
 
 set nframes 50
 set pyout [open "pyout.dat" w]
+puts [array get sasas]
 foreach key [array names residScores] {
 	set list $residScores($key)
 	set keystring ""

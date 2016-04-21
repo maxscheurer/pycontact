@@ -102,6 +102,16 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.settingsView.functionGridLayout.addWidget(self.rectY0Field, 2, 3)
 
         #lin
+        self.linY0Label = QLabel("y0: ", self.settingsView)
+        self.linY0Field = QLineEdit("0", self.settingsView)
+        self.settingsView.functionGridLayout.addWidget(self.linY0Label, 1, 0)
+        self.settingsView.functionGridLayout.addWidget(self.linY0Field, 1, 1)
+
+        self.linY1Label = QLabel("y1: ", self.settingsView)
+        self.linY1Field = QLineEdit("1", self.settingsView)
+        self.settingsView.functionGridLayout.addWidget(self.linY1Label, 1, 2)
+        self.settingsView.functionGridLayout.addWidget(self.linY1Field, 1, 3)
+
 
         # preview
         self.previewPlot = SimplePlotter(None, width=5, height=2, dpi=60)
@@ -168,6 +178,11 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
                     y0 = float(self.rectY0Field.text())
                     rect = RectangularWeightFunction("rect", np.arange(0, len(self.contacts[0].scoreArray), 1), x0, x1, h, y0)
                     filteredContacts = rect.weightContactFrames(filteredContacts)
+                elif self.currentFunctionType == FunctionType.linear:
+                    y0 = float(self.linY0Field.text())
+                    y1 = float(self.linY1Field.text())
+                    lin = LinearWeightFunction("rect", np.arange(0, len(self.contacts[0].scoreArray), 1), y0, y1)
+                    filteredContacts = lin.weightContactFrames(filteredContacts)
             # other filters
             if  filterActive:
                     if totalTimeActive:
@@ -224,6 +239,10 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.rectHField.setHidden(second)
         self.rectY0Label.setHidden(second)
         self.rectY0Field.setHidden(second)
+        self.linY0Label.setHidden(third)
+        self.linY0Field.setHidden(third)
+        self.linY1Label.setHidden(third)
+        self.linY1Field.setHidden(third)
 
 
 
@@ -249,6 +268,13 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
                 rect = RectangularWeightFunction("rect", np.arange(0, len(self.contacts[0].scoreArray), 1), x0, x1, h,y0)
                 x = np.arange(0, len(self.contacts[0].scoreArray), 1)
                 y = rect.previewFunction()
+        elif self.currentFunctionType == FunctionType.linear:
+            y0 = float(self.linY0Field.text())
+            y1 = float(self.linY1Field.text())
+            if len(self.contacts) > 0:
+                lin = LinearWeightFunction("rect", np.arange(0, len(self.contacts[0].scoreArray), 1), y0, y1)
+                x = np.arange(0, len(self.contacts[0].scoreArray), 1)
+                y = lin.previewFunction()
         sip.delete(self.previewPlot)
         self.previewPlot = SimplePlotter(None, width=5, height=2, dpi=60)
         self.settingsView.functionGridLayout.addWidget(self.previewPlot, 3, 0, 1, 4)
