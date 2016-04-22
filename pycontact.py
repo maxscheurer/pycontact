@@ -393,9 +393,12 @@ class Canvas(QWidget):
 
     def take_screenshot(self, filename):
         print(filename)
-        p = QPixmap(self.size())
-        self.render(p)
-        p.save(filename, 'png', 100)
+        # p = QPainter()
+        # pixmap = QPixmap(self.size())
+        # self.render(pixmap)
+        # p.begin(self.pixmap)
+        # p.drawPixmap(self.rect(),pixmap)
+        # pixmap.save(filename, 'png', 100)
 
     def renderContact(self):
         startx = 90
@@ -458,6 +461,7 @@ class Canvas(QWidget):
         self.labelView.nsPerFrame = self.nsPerFrame
         self.labelView.threshold = self.threshold
         self.labelView.show()
+        self.take_screenshot("test")
 
     def drawRenderedContact(self, event, qp):
         qp.drawPixmap(0, 0, self.sizeX, self.sizeY, self.pixmap)

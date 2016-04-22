@@ -92,6 +92,7 @@ class Contact:
         lifeTimes = []
         contactActive = False
         contactTime = 0
+        i = 0
         for score in self.scoreArray:
             if contactActive == False and score > threshold:
                 contactActive = True
@@ -102,6 +103,9 @@ class Contact:
                 contactActive = False
                 lifeTimes.append(contactTime)
                 contactTime = 0
+            if  i == (len(self.scoreArray) - 1):
+                lifeTimes.append(contactTime)
+            i += 1
 
         return lifeTimes
 
