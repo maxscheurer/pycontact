@@ -181,6 +181,14 @@ class Sorting:
             for con in contacts:
                 con.total_time(self.nspf,self.threshold)
             sortedContacts = sorted(contacts, key=lambda c: c.ttime, reverse=self.descending)
+        elif self.key == "mean lifetime":
+            for con in contacts:
+                con.mean_life_time(self.nspf, self.threshold)
+            sortedContacts = sorted(contacts, key=lambda c: c.meanLifeTime, reverse=self.descending)
+        elif self.key == "median lifetime":
+            for con in contacts:
+                con.median_life_time(self.nspf, self.threshold)
+            sortedContacts = sorted(contacts, key=lambda c: c.medianLifeTime, reverse=self.descending)
         return sortedContacts
 
 class WeightFunction:

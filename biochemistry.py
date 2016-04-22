@@ -106,7 +106,6 @@ class Contact:
             if  i == (len(self.scoreArray) - 1):
                 lifeTimes.append(contactTime)
             i += 1
-
         return lifeTimes
 
     def mean_life_time(self, ns_per_frame, threshold):

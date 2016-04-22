@@ -289,6 +289,16 @@
        </item>
        <item>
         <property name="text">
+         <string>mean lifetime</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>median lifetime</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
          <string>resid A</string>
         </property>
        </item>
