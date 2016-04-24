@@ -338,7 +338,30 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.updateFilters()
 
     def pushExport(self):
-        pass
+        d = QDialog()
+        grid = QGridLayout()
+        d.setLayout(grid)
+
+        self.exportLabel = QLabel("Export current view as png: ")
+
+        self.saveButton = QPushButton("Export")
+        self.saveButton.setAutoDefault(False)
+        self.saveButton.clicked.connect(self.pushSave)
+
+        grid.addWidget(self.exportLabel, 0, 0)
+        grid.addWidget(self.saveButton, 0, 1)
+
+        d.setWindowTitle("Export")
+        # d.resize(200, 200)
+        d.setWindowModality(Qt.ApplicationModal)
+        d.exec_()
+
+    def pushSave(self):
+        fileName = QFileDialog.getSaveFileName(self, 'Export Path')
+        if len(fileName[0]) > 0:
+            print("Saving current view to ", fileName[0])
+            currentView = self.painter.grab()
+            currentView.save(fileName[0])
 
     def mergeValueChanged(self):
         self.painter.merge = self.mergeSlider.value()
