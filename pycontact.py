@@ -417,15 +417,6 @@ class Canvas(QWidget):
 
         qp.end()
 
-    def take_screenshot(self, filename):
-        print(filename)
-        # p = QPainter()
-        # pixmap = QPixmap(self.size())
-        # self.render(pixmap)
-        # p.begin(self.pixmap)
-        # p.drawPixmap(self.rect(),pixmap)
-        # pixmap.save(filename, 'png', 100)
-
     def renderContact(self):
         startx = 90
         orig_startx = startx
