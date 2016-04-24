@@ -19,6 +19,7 @@ from inputreader import *
 from filters import *
 from functools import partial
 
+
 class MainWindow(QMainWindow, gui.Ui_MainWindow):
     def __init__(self, parent=None):
         # Test
@@ -35,6 +36,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.painter = Canvas()
         self.scrollArea.setWidget(self.painter)
         self.actionOpen.triggered.connect(self.pushOpen)
+        self.actionExport.triggered.connect(self.pushExport)
 
         self.settingsView = SettingsTabWidget()
         self.settingsView.applySettingsButton.clicked.connect(self.updateSettings)
@@ -52,42 +54,42 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.functionButtonGroup = QButtonGroup()
         self.currentFunctionType = FunctionType.sigmoid
         self.functionButtonGroup.buttonClicked[int].connect(self.showFunctionSettings)
-        self.functionButtonGroup.addButton(self.settingsView.sigmoidRadioButton,0)
-        self.functionButtonGroup.addButton(self.settingsView.rectRadioButton,1)
-        self.functionButtonGroup.addButton(self.settingsView.linRadioButton,2)
+        self.functionButtonGroup.addButton(self.settingsView.sigmoidRadioButton, 0)
+        self.functionButtonGroup.addButton(self.settingsView.rectRadioButton, 1)
+        self.functionButtonGroup.addButton(self.settingsView.linRadioButton, 2)
         self.setupFunctionBox()
         self.showFunctionSettings(FunctionType.sigmoid)
 
     def setupFunctionBox(self):
         # sig
         self.sigX0Label = QLabel("x0: ", self.settingsView)
-        self.sigX0Field = QLineEdit("1",self.settingsView)
+        self.sigX0Field = QLineEdit("1", self.settingsView)
         self.settingsView.functionGridLayout.addWidget(self.sigX0Label, 1, 0)
         self.settingsView.functionGridLayout.addWidget(self.sigX0Field, 1, 1)
 
         self.sigLLabel = QLabel("L: ", self.settingsView)
-        self.sigLField = QLineEdit("1",self.settingsView)
+        self.sigLField = QLineEdit("1", self.settingsView)
         self.settingsView.functionGridLayout.addWidget(self.sigLLabel, 1, 2)
         self.settingsView.functionGridLayout.addWidget(self.sigLField, 1, 3)
 
         self.sigKLabel = QLabel("k: ", self.settingsView)
-        self.sigKField = QLineEdit("1",self.settingsView)
+        self.sigKField = QLineEdit("1", self.settingsView)
         self.settingsView.functionGridLayout.addWidget(self.sigKLabel, 2, 0)
         self.settingsView.functionGridLayout.addWidget(self.sigKField, 2, 1)
 
         self.sigY0Label = QLabel("y0: ", self.settingsView)
-        self.sigY0Field = QLineEdit("0",self.settingsView)
+        self.sigY0Field = QLineEdit("0", self.settingsView)
         self.settingsView.functionGridLayout.addWidget(self.sigY0Label, 2, 2)
         self.settingsView.functionGridLayout.addWidget(self.sigY0Field, 2, 3)
 
-        #rect
-        self.rectX0Label = QLabel("x0: ",self.settingsView)
-        self.rectX0Field = QLineEdit("1",self.settingsView)
+        # rect
+        self.rectX0Label = QLabel("x0: ", self.settingsView)
+        self.rectX0Field = QLineEdit("1", self.settingsView)
         self.settingsView.functionGridLayout.addWidget(self.rectX0Label, 1, 0)
         self.settingsView.functionGridLayout.addWidget(self.rectX0Field, 1, 1)
 
         self.rectX1Label = QLabel("x1: ", self.settingsView)
-        self.rectX1Field = QLineEdit("2",self.settingsView)
+        self.rectX1Field = QLineEdit("2", self.settingsView)
         self.settingsView.functionGridLayout.addWidget(self.rectX1Label, 1, 2)
         self.settingsView.functionGridLayout.addWidget(self.rectX1Field, 1, 3)
 
@@ -101,7 +103,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.settingsView.functionGridLayout.addWidget(self.rectY0Label, 2, 2)
         self.settingsView.functionGridLayout.addWidget(self.rectY0Field, 2, 3)
 
-        #lin
+        # lin
         self.linY0Label = QLabel("y0: ", self.settingsView)
         self.linY0Field = QLineEdit("0", self.settingsView)
         self.settingsView.functionGridLayout.addWidget(self.linY0Label, 1, 0)
@@ -111,7 +113,6 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.linY1Field = QLineEdit("1", self.settingsView)
         self.settingsView.functionGridLayout.addWidget(self.linY1Label, 1, 2)
         self.settingsView.functionGridLayout.addWidget(self.linY1Field, 1, 3)
-
 
         # preview
         self.previewPlot = SimplePlotter(None, width=5, height=2, dpi=60)
@@ -160,7 +161,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             if rangeFilterActive:
                 self.painter.rangeFilterActive = True
                 frameRangeFilter = FrameFilter("framer")
-                filteredContacts = frameRangeFilter.extractFrameRange(filteredContacts,[lower, upper])
+                filteredContacts = frameRangeFilter.extractFrameRange(filteredContacts, [lower, upper])
             # weight functions
             if weightActive:
                 if self.currentFunctionType == FunctionType.sigmoid:
@@ -184,7 +185,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
                     lin = LinearWeightFunction("rect", np.arange(0, len(self.contacts[0].scoreArray), 1), y0, y1)
                     filteredContacts = lin.weightContactFrames(filteredContacts)
             # other filters
-            if  filterActive:
+            if filterActive:
                     if totalTimeActive:
                         operator = self.settingsView.compareTotalTimeDropdown.currentText()
                         value = float(self.settingsView.totalTimeField.text())
@@ -199,7 +200,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
                         key = self.settingsView.sortingKeyDropdown.currentText()
                         descending = SortingOrder.mapping[self.settingsView.sortingOrderDropdown.currentText()]
                         sorter = Sorting("sorting", key, descending)
-                        sorter.setThresholdAndNsPerFrame(float(self.settingsView.thresholdField.text()),float(self.settingsView.nsPerFrameField.text()))
+                        sorter.setThresholdAndNsPerFrame(float(self.settingsView.thresholdField.text()), float(self.settingsView.nsPerFrameField.text()))
                         filteredContacts = sorter.sortContacts(filteredContacts)
                     self.painter.contacts = filteredContacts
                     self.painter.rendered = False
@@ -216,13 +217,13 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
     def showFunctionSettings(self, radiobutton):
         self.currentFunctionType = radiobutton
         if radiobutton == FunctionType.sigmoid:
-            self.showHide(False,True,True)
+            self.showHide(False, True, True)
         elif radiobutton == FunctionType.rect:
             self.showHide(True, False, True)
         elif radiobutton == FunctionType.linear:
             self.showHide(True, True, False)
 
-    def showHide(self,first,second,third):
+    def showHide(self, first, second, third):
         self.sigX0Label.setHidden(first)
         self.sigX0Field.setHidden(first)
         self.sigLLabel.setHidden(first)
@@ -244,9 +245,6 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.linY1Label.setHidden(third)
         self.linY1Field.setHidden(third)
 
-
-
-
     def previewFunction(self):
         x = []
         y = []
@@ -257,7 +255,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             y0 = float(self.sigY0Field.text())
             if len(self.contacts) > 0:
                 sig = SigmoidWeightFunction("sig", np.arange(0, len(self.contacts[0].scoreArray), 1), x0, L, k, y0)
-                x = np.arange(0,len(self.contacts[0].scoreArray),1)
+                x = np.arange(0, len(self.contacts[0].scoreArray), 1)
                 y = sig.previewFunction()
         elif self.currentFunctionType == FunctionType.rect:
             x0 = float(self.rectX0Field.text())
@@ -265,7 +263,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             h = float(self.rectHField.text())
             y0 = float(self.rectY0Field.text())
             if len(self.contacts) > 0:
-                rect = RectangularWeightFunction("rect", np.arange(0, len(self.contacts[0].scoreArray), 1), x0, x1, h,y0)
+                rect = RectangularWeightFunction("rect", np.arange(0, len(self.contacts[0].scoreArray), 1), x0, x1, h, y0)
                 x = np.arange(0, len(self.contacts[0].scoreArray), 1)
                 y = rect.previewFunction()
         elif self.currentFunctionType == FunctionType.linear:
@@ -332,12 +330,15 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.contacts = makeContactFromLines(lines)
         print("new contacts: " + str(len(self.contacts)))
         self.painter.contacts = self.contacts
-        self.painter.range = [0,len(self.contacts[0].scoreArray)]
+        self.painter.range = [0, len(self.contacts[0].scoreArray)]
         # self.painter.update()
         # set max slider value to frame number!
-        self.mergeSlider.setMaximum(len(self.contacts[0].scoreArray)/15)
+        self.mergeSlider.setMaximum(len(self.contacts[0].scoreArray) / 15)
         self.updateSettings()
         self.updateFilters()
+
+    def pushExport(self):
+        pass
 
     def mergeValueChanged(self):
         self.painter.merge = self.mergeSlider.value()
@@ -350,6 +351,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.painter.rendered = False
         self.painter.update()
         self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
+
 
 class SettingsTabWidget(QTabWidget, Ui_settingsWindowWidget):
     def __init__(self, parent=None):
@@ -373,14 +375,15 @@ class Canvas(QWidget):
         self.labelView = LabelView([])
         self.alphaFactor = 50
         self.contacts = []
-        self.range = [0,0]
+        self.range = [0, 0]
         self.rangeFilterActive = False
+
     def paintEvent(self, event):
 
         qp = QPainter()
         qp.begin(self)
 
-        #render pixmap to resolve performance issues
+        # render pixmap to resolve performance issues
         if self.rendered:
             self.drawRenderedContact(event, qp)
         elif self.rendered == False and self.contacts:
@@ -403,8 +406,8 @@ class Canvas(QWidget):
     def renderContact(self):
         startx = 90
         orig_startx = startx
-        start_text = 10
-        textoffset = 5
+        # start_text = 10
+        # textoffset = 5
         rowheight = 22
         blackColor = QColor(0, 0, 0)
         whiteColor = QColor(255, 255, 255)
@@ -438,9 +441,9 @@ class Canvas(QWidget):
                 p.setPen(blackColor)
                 merged_score = 0
                 for j in range(merge):
-                    if (i+j) >= len(rangedScores):
+                    if (i + j) >= len(rangedScores):
                         break
-                    x = rangedScores[i+j]
+                    x = rangedScores[i + j]
                     merged_score += x
                 merged_score = merged_score / merge
                 alpha = merged_score * self.alphaFactor
@@ -489,7 +492,7 @@ class LabelView(QWidget):
         for c in self.contacts:
             cindex = self.contacts.index(c)
             self.buttons.append(QPushButton(c.title))
-            stylesheet = "border: 0px solid #222222; background-color: "+ ContactType.colors[c.contactType] + " ;"
+            stylesheet = "border: 0px solid #222222; background-color: " + ContactType.colors[c.contactType] + " ;"
             self.buttons[-1].setStyleSheet(stylesheet)
             self.buttons[-1].clicked.connect(partial(self.handleButton, data=cindex))
             self.buttons[-1].setParent(self)
@@ -504,7 +507,7 @@ class LabelView(QWidget):
         grid = QGridLayout()
         d.setLayout(grid)
         contact = self.contacts[data]
-        timeLabel = QLabel(str(contact.total_time(self.nsPerFrame,self.threshold)))
+        timeLabel = QLabel(str(contact.total_time(self.nsPerFrame, self.threshold)))
         thresholdLabel = QLabel(str(self.threshold))
         timeTitleLabel = QLabel("total time [ns]:")
         thresholdTitleLabel = QLabel("current threshold:")
@@ -527,9 +530,9 @@ class LabelView(QWidget):
         medianTitleLabel = QLabel("median score:")
         medianLabel = QLabel(str(contact.median_score()))
 
-        grid.addWidget(timeTitleLabel, 0,0)
-        grid.addWidget(timeLabel,0,1)
-        grid.addWidget(thresholdTitleLabel,1,0)
+        grid.addWidget(timeTitleLabel, 0, 0)
+        grid.addWidget(timeLabel, 0, 1)
+        grid.addWidget(thresholdTitleLabel, 1, 0)
         grid.addWidget(thresholdLabel, 1, 1)
         grid.addWidget(meanTitleLabel, 2, 0)
         grid.addWidget(meanLabel, 2, 1)
@@ -546,12 +549,12 @@ class LabelView(QWidget):
         grid.addWidget(meanLifeTimeLabel, 5, 1)
         grid.addWidget(medianLifeTimeTitleLabel, 5, 2)
         grid.addWidget(medianLifeTimeLabel, 5, 3)
-        
+
         contactPlot = ContactPlotter(None, width=4, height=2, dpi=80)
         contactPlot.plot_contact_figure(contact)
-        grid.addWidget(contactPlot,6,0,1,4)
+        grid.addWidget(contactPlot, 6, 0, 1, 4)
         d.setWindowTitle(contact.title)
-        d.resize(650,700)
+        d.resize(650, 700)
         d.setWindowModality(Qt.ApplicationModal)
         d.exec_()
 
@@ -600,14 +603,14 @@ class ContactPlotter(MplPlotter):
         self.axes.set_xlabel("frame")
         self.axes.set_ylabel("score")
 
+
 class SimplePlotter(MplPlotter):
     """Simple canvas with a sine plot."""
-    def plot(self, x,y):
-        self.axes.plot(x,y)
+    def plot(self, x, y):
+        self.axes.plot(x, y)
         self.axes.set_xlabel("x")
         self.axes.set_ylabel("f(x)")
         self.axes.xaxis.set_label_position('top')
-
 
 
 def main():
