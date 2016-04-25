@@ -478,7 +478,6 @@ class Canvas(QWidget):
         self.labelView.nsPerFrame = self.nsPerFrame
         self.labelView.threshold = self.threshold
         self.labelView.show()
-        self.take_screenshot("test")
 
     def drawRenderedContact(self, event, qp):
         qp.drawPixmap(0, 0, self.sizeX, self.sizeY, self.pixmap)
