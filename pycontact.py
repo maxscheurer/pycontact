@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget, QDialog, QTa
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtGui import (QColor, QPainter, QFont)
-from PyQt5.QtWidgets import (QWidget, QPushButton,
+from PyQt5.QtWidgets import (QWidget, QPushButton, QRadioButton,
                              QFrame, QApplication, QSizePolicy)
 from PyQt5.QtSvg import QSvgGenerator
 import numpy as np
@@ -343,43 +343,41 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         grid = QGridLayout()
         d.setLayout(grid)
 
-        self.exportPngLabel = QLabel("Export current view as png: ")
-        self.exportSvgLabel = QLabel("Export current view as svg: ")
+        self.exportLabel = QLabel("Export current view: ")
 
-        self.savePngButton = QPushButton("Export as PNG")
-        self.savePngButton.setAutoDefault(False)
-        self.savePngButton.clicked.connect(self.pushSaveAsPng)
+        self.saveButton = QPushButton("Export")
+        self.saveButton.setAutoDefault(False)
+        self.saveButton.clicked.connect(self.pushSave)
 
-        self.saveSvgButton = QPushButton("Export as SVG")
-        self.saveSvgButton.setAutoDefault(False)
-        self.saveSvgButton.clicked.connect(self.pushSaveAsSvg)
+        self.formatBox = QComboBox()
+        self.formatBox.addItem("PNG")
+        self.formatBox.addItem("SVG")
 
-        grid.addWidget(self.exportPngLabel, 0, 0)
-        grid.addWidget(self.savePngButton, 0, 1)
+        grid.addWidget(self.exportLabel, 0, 0)
+        grid.addWidget(self.saveButton, 0, 1)
 
-        grid.addWidget(self.exportSvgLabel, 1, 0)
-        grid.addWidget(self.saveSvgButton, 1, 1)
+        grid.addWidget(self.formatBox, 2, 0)
 
         d.setWindowTitle("Export")
         d.setWindowModality(Qt.ApplicationModal)
         d.exec_()
 
-    def pushSaveAsPng(self):
+    def pushSave(self):
         fileName = QFileDialog.getSaveFileName(self, 'Export Path')
-        if len(fileName[0]) > 0:
-            print("Saving current view to ", fileName[0])
-            currentView = self.painter.grab()
-            currentView.save(fileName[0])
-
-    def pushSaveAsSvg(self):
-        fileName = QFileDialog.getSaveFileName(self, 'Export Path')
-        if len(fileName[0]) > 0:
-            print("Saving current view to ", fileName[0])
-            generator = QSvgGenerator()
-            generator.setFileName(fileName[0])
-            generator.setSize(self.painter.size())
-            generator.setViewBox(self.painter.rect())
-            self.painter.render(generator)
+        print(self.formatBox.currentText())
+        if self.formatBox.currentText() == "PNG":
+            if len(fileName[0]) > 0:
+                print("Saving current view to ", fileName[0])
+                currentView = self.painter.grab()
+                currentView.save(fileName[0])
+        elif self.formatBox.currentText() == "SVG":
+            if len(fileName[0]) > 0:
+                print("Saving current view to ", fileName[0])
+                generator = QSvgGenerator()
+                generator.setFileName(fileName[0])
+                generator.setSize(self.painter.size())
+                generator.setViewBox(self.painter.rect())
+                self.painter.render(generator)
 
     def mergeValueChanged(self):
         self.painter.merge = self.mergeSlider.value()
