@@ -437,8 +437,8 @@ class Canvas(QWidget):
         startx = 90
         orig_startx = startx
         start_text = 10
-        textoffset = 5
         rowheight = 22
+        textoffset = 12
         blackColor = QColor(0, 0, 0)
         whiteColor = QColor(255, 255, 255)
 
@@ -500,17 +500,13 @@ class Canvas(QWidget):
         self.labelView.show()
 
         if generator:
+            row = 0
             for c in self.contacts:
-                p.drawText(start_text, row + textoffset, c.title)
-                # cindex = self.contacts.index(c)
-                # self.buttons.append(QPushButton(c.title))
-                # stylesheet = "border: 0px solid #222222; background-color: " + ContactType.colors[c.contactType] + " ;"
-                # self.buttons[-1].setStyleSheet(stylesheet)
-                # self.buttons[-1].clicked.connect(partial(self.handleButton, data=cindex))
-                # self.buttons[-1].setParent(self)
-                # self.buttons[-1].move(start_text, row + textoffset)
-                # self.buttons[-1].setFont(QFont('Arial', 9))
-                # self.buttons[-1].show()
+                # print(ContactType.colors[c.contactType])
+                # p.drawRect(start_text, row + textoffset, 100, 20)
+                p.setFont(QFont('Arial', 9))
+                string = c.resA + c.residA + "-" + c.resB + c.residB
+                p.drawText(start_text, row + textoffset, string)
                 row += rowheight
 
         p.end()
