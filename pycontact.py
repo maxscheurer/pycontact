@@ -377,7 +377,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
                 generator.setFileName(fileName[0])
                 generator.setSize(self.painter.size())
                 generator.setViewBox(self.painter.rect())
-                self.painter.render(generator)
+                self.painter.renderContact(generator)
 
     def mergeValueChanged(self):
         self.painter.merge = self.mergeSlider.value()
@@ -426,18 +426,18 @@ class Canvas(QWidget):
         if self.rendered:
             self.drawRenderedContact(event, qp)
         elif self.rendered == False and self.contacts:
-            self.renderContact()
+            self.renderContact(False)
             self.rendered = True
 
         self.setMinimumSize(QSize(self.sizeX, self.sizeY))
 
         qp.end()
 
-    def renderContact(self):
+    def renderContact(self, generator):
         startx = 90
         orig_startx = startx
-        # start_text = 10
-        # textoffset = 5
+        start_text = 10
+        textoffset = 5
         rowheight = 22
         blackColor = QColor(0, 0, 0)
         whiteColor = QColor(255, 255, 255)
@@ -456,7 +456,12 @@ class Canvas(QWidget):
 
         self.pixmap = QPixmap(QSize(self.sizeX, self.sizeY))
         p = QPainter()
-        p.begin(self.pixmap)
+
+        if generator:
+            p.begin(generator)
+        else:
+            p.begin(self.pixmap)
+
         p.fillRect(0, 0, self.sizeX, self.sizeY, whiteColor)
 
         row = 0
@@ -486,7 +491,6 @@ class Canvas(QWidget):
             startx = orig_startx
             row += rowheight
 
-        p.end()
         # self.pixmap.save("test", 'png', 100)
         self.labelView.clean()
         self.labelView = LabelView(self.contacts)
@@ -494,6 +498,22 @@ class Canvas(QWidget):
         self.labelView.nsPerFrame = self.nsPerFrame
         self.labelView.threshold = self.threshold
         self.labelView.show()
+
+        if generator:
+            for c in self.contacts:
+                p.drawText(start_text, row + textoffset, c.title)
+                # cindex = self.contacts.index(c)
+                # self.buttons.append(QPushButton(c.title))
+                # stylesheet = "border: 0px solid #222222; background-color: " + ContactType.colors[c.contactType] + " ;"
+                # self.buttons[-1].setStyleSheet(stylesheet)
+                # self.buttons[-1].clicked.connect(partial(self.handleButton, data=cindex))
+                # self.buttons[-1].setParent(self)
+                # self.buttons[-1].move(start_text, row + textoffset)
+                # self.buttons[-1].setFont(QFont('Arial', 9))
+                # self.buttons[-1].show()
+                row += rowheight
+
+        p.end()
 
     def drawRenderedContact(self, event, qp):
         qp.drawPixmap(0, 0, self.sizeX, self.sizeY, self.pixmap)
