@@ -1,6 +1,7 @@
 import collections
 import numpy as np
 from read_db import *
+from PyQt5.QtGui import QColor
 compare = lambda x, y: collections.Counter(x) == collections.Counter(y)
 
 # TODO: remove, deprecated
@@ -11,6 +12,7 @@ class ResidueType:
 class ContactType:
     saltbr, hydrophobic, hbond, other = range(4)
     colors = ["rgba(255, 0,0, 50)", "rgba(0, 0,255, 50)", "rgba(255, 0 ,255, 50)", "rgba(255, 255 ,255, 50)"]
+    qcolors = [QColor(255, 0, 0, 50), QColor(0, 0, 255, 50), QColor(255, 0, 255, 50), QColor(255, 255, 255, 50)]
 
 class HBondType:
     none, donor, acceptor, both = range(4)

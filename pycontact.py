@@ -378,6 +378,9 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
                 generator.setSize(self.painter.size())
                 generator.setViewBox(self.painter.rect())
                 self.painter.renderContact(generator)
+        self.painter.rendered = False
+        self.painter.update()
+        self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
 
     def mergeValueChanged(self):
         self.painter.merge = self.mergeSlider.value()
@@ -502,10 +505,13 @@ class Canvas(QWidget):
         if generator:
             row = 0
             for c in self.contacts:
+                p.setPen(0)
                 # print(ContactType.colors[c.contactType])
-                # p.drawRect(start_text, row + textoffset, 100, 20)
                 p.setFont(QFont('Arial', 9))
                 string = c.resA + c.residA + "-" + c.resB + c.residB
+                p.setBrush(ContactType.qcolors[c.contactType])
+                p.drawRect(0, row+3, 90, rowheight-10)
+                p.setPen(1)
                 p.drawText(start_text, row + textoffset, string)
                 row += rowheight
 
