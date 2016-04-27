@@ -19,10 +19,16 @@ proc contacts {frame} \
 	global residScores
 	global sasas
 	global sasa_on
+	global fnumber
+	set fnumber [expr $fnumber + 1]
 
 	set selection1 [atomselect top $sel1]
 	set selection2 [atomselect top $sel2]
 	set all [atomselect top "$sel1 or $sel2"]
+	set really_all [atomselect top "all"]
+	set bb_list [$really_all get backbone]
+	set resname_list [$really_all get resname]
+	set resid_list [$really_all get resid]
 
 	set contactList [measure contacts $cutoff $selection1 $selection2]
 	set list1 [lindex $contactList 0]
@@ -34,26 +40,28 @@ proc contacts {frame} \
 		set length [measure bond [list $a1 $a2] frame $frame]
 		set weight [weight_distance $length]
 		# lappend current_results [list $a1 $a2 $length $weight]
-		if {[info exists scorerA($a1)]} {
-			set current_a1weight $scorerA($a1)
-		} else {
-			set current_a1weight 0.0
-		}
+		# if {[info exists scorerA($a1)]} {
+		# 	set current_a1weight $scorerA($a1)
+		# } else {
+		# 	set current_a1weight 0.0
+		# }
 
-		if {[info exists scorerB($a2)]} {
-			set current_a2weight $scorerB($a2)
-		} else {
-			set current_a2weight 0.0
-		}
-		set scorerA($a1) [expr $weight + $current_a1weight]
-		set scorerB($a2) [expr $weight + $current_a2weight]
+		# if {[info exists scorerB($a2)]} {
+		# 	set current_a2weight $scorerB($a2)
+		# } else {
+		# 	set current_a2weight 0.0
+		# }
+		# set scorerA($a1) [expr $weight + $current_a1weight]
+		# set scorerB($a2) [expr $weight + $current_a2weight]
 
 		#massive speed problems here...
-		set res1 [atomselect top "index $a1"]
-		set res2 [atomselect top "index $a2"]
+		#set res1 [atomselect top "index $a1"]
+		#set res2 [atomselect top "index $a2"]
 
-		set res1backbone [lindex [$res1 get backbone] 0]
-		set res2backbone [lindex [$res2 get backbone] 0]
+		#set res1backbone [lindex [$res1 get backbone] 0]
+		#set res2backbone [lindex [$res2 get backbone] 0]
+		set res1backbone [lindex $bb_list $a1]
+		set res2backbone [lindex $bb_list $a2]
 
 		set res1backboneScore 0
 		set res1sidechainScore 0
@@ -76,10 +84,15 @@ proc contacts {frame} \
 		set ss_bb_list [list $res1backboneScore $res1sidechainScore $res2backboneScore $res2sidechainScore]
 
 		#!!! here, one could define more general selections, e.g. for protein-membrane interactions !!!
-		set r1 [$res1 get resid]
-		set n1 [$res1 get resname]
-		set r2 [$res2 get resid]
-		set n2 [$res2 get resname]
+		# set r1 [$res1 get resid]
+		# set n1 [$res1 get resname]
+		# set r2 [$res2 get resid]
+		# set n2 [$res2 get resname]
+
+		set r1 [lindex $resid_list $a1]
+		set n1 [lindex $resname_list $a1]
+		set r2 [lindex $resid_list $a2]
+		set n2 [lindex $resname_list $a2]
 		set key "$n1 $r1 $n2 $r2"
 
 		#SASA
@@ -100,8 +113,8 @@ proc contacts {frame} \
 			$singleB delete
 		}
 
-		$res1 delete
-		$res2 delete
+		# $res1 delete
+		# $res2 delete
 
 		if {[info exists residScores($key)]} {
 			set current_res_weights $residScores($key)
@@ -116,6 +129,7 @@ proc contacts {frame} \
 	$selection1 delete
 	$selection2 delete
 	$all delete
+	$really_all delete
 }
 
 source bigdcd.tcl
@@ -140,19 +154,20 @@ array set sasas {}
 set cutoff 5.0
 set sasa_on 0
 puts "starting contacts"
+set fnumber 0
 bigdcd contacts auto $traj.dcd
 vwait bigdcd_running
 
-$groupA set beta -5.0
-foreach key [array names scorerA] {
-	[atomselect top "index $key"] set beta [expr $scorerA($key)/2500.0]
-}
-$groupA writepdb groupA_beta.pdb
+# $groupA set beta -5.0
+# foreach key [array names scorerA] {
+# 	[atomselect top "index $key"] set beta [expr $scorerA($key)/2500.0]
+# }
+# $groupA writepdb groupA_beta.pdb
 
-foreach key [array names scorerB] {
-	[atomselect top "index $key"] set beta [expr $scorerB($key)/2500.0]
-}
-$groupB writepdb groupB_beta.pdb
+# foreach key [array names scorerB] {
+# 	[atomselect top "index $key"] set beta [expr $scorerB($key)/2500.0]
+# }
+# $groupB writepdb groupB_beta.pdb
 
 # set groupA_idx [[atomselect $mol "$sel1"] get index]
 # set sumA 0
@@ -160,27 +175,27 @@ $groupB writepdb groupB_beta.pdb
 	
 # }
 
-set outputB [open "outB.dat" w]
-set groupB_res [lsort -unique -integer [[atomselect $mol "$sel2"] get resid]]
+# set outputB [open "outB.dat" w]
+# set groupB_res [lsort -unique -integer [[atomselect $mol "$sel2"] get resid]]
 
 
-foreach resB $groupB_res {
-	set ressel [atomselect $mol "resid $resB and $sel2"]
-	set atoms [$ressel get index]
-	set sumB 0
-	foreach idx $atoms {
-		if {[info exists scorerB($idx)]} {
-			set current $scorerB($idx)
-		} else {
-			set current 0.0
-		}
-		set sumB [expr $sumB + $current]
-	}	
-	puts $outputB "$resB $sumB"
-}
-close $outputB
+# foreach resB $groupB_res {
+# 	set ressel [atomselect $mol "resid $resB and $sel2"]
+# 	set atoms [$ressel get index]
+# 	set sumB 0
+# 	foreach idx $atoms {
+# 		if {[info exists scorerB($idx)]} {
+# 			set current $scorerB($idx)
+# 		} else {
+# 			set current 0.0
+# 		}
+# 		set sumB [expr $sumB + $current]
+# 	}	
+# 	puts $outputB "$resB $sumB"
+# }
+# close $outputB
 
-set nframes 50
+set nframes $fnumber
 set pyout [open "pyout.dat" w]
 puts [array get sasas]
 foreach key [array names residScores] {
