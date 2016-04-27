@@ -2,12 +2,18 @@
 # Author: Maximilian Scheurer, mail: mscheurer@ks.uiuc.edu
 # April 2016
 
-proc weight_distance {dist} \
+namespace eval ::Contacts {
+	set version 0.1
+}
+package provide Contacts $Contacts::version
+
+
+proc ::Contacts::weight_distance {dist} \
 {
 	return [expr (1.0)/(1.0 + exp(5.0*($dist-4.0)))]
 }
 
-proc contacts {frame} \
+proc ::Contacts::contacts {frame} \
 {
 	puts $frame
 	global cutoff
@@ -38,7 +44,7 @@ proc contacts {frame} \
 	#puts [llength $list1]
 	foreach a1 $list1 a2 $list2 {
 		set length [measure bond [list $a1 $a2] frame $frame]
-		set weight [weight_distance $length]
+		set weight [::Contacts::weight_distance $length]
 		# lappend current_results [list $a1 $a2 $length $weight]
 		# if {[info exists scorerA($a1)]} {
 		# 	set current_a1weight $scorerA($a1)
@@ -96,7 +102,7 @@ proc contacts {frame} \
 		set key "$n1 $r1 $n2 $r2"
 
 		#SASA
-		#more massive speed problems
+		#massive speed issues
 		if {![info exists sasas($key,$frame)] && $sasa_on} {
 			# puts "$key, $frame"
 			set residues [atomselect top "$sel1 and resid $r1 or $sel2 and resid $r2"]
@@ -131,8 +137,8 @@ proc contacts {frame} \
 	$all delete
 	$really_all delete
 }
-
-source bigdcd.tcl
+lappend ::auto_path [pwd]
+package require BigDCD
 
 set psf rpn11_ubq_interface-ionized
 set traj short
@@ -155,7 +161,7 @@ set cutoff 5.0
 set sasa_on 0
 puts "starting contacts"
 set fnumber 0
-bigdcd contacts auto $traj.dcd
+bigdcd ::Contacts::contacts auto $traj.dcd
 vwait bigdcd_running
 
 # $groupA set beta -5.0

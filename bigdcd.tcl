@@ -57,8 +57,36 @@
 # bigdcd myrmsd xyz eq01.xyz eq02.xyz eq03.xyz
 # bigdcd_wait
 # quit
+namespace eval ::BigDCD {
+    namespace export bigdcd
+    namespace export bigdcd_callback
+    namespace export bigdcd_done
+    namespace export bigdcd_wait
+    set version 2.0
+}
+package provide BigDCD $BigDCD::version
 
-proc bigdcd { script type args } {
+proc bigdcd {args} \
+{
+    return [eval ::BigDCD::bigdcd $args]
+}
+
+proc bigdcd_callback {args} \
+{
+    return [eval ::BigDCD::bigdcd_callback $args]
+}
+
+proc bigdcd_done {args} \
+{
+    return [eval ::BigDCD::bigdcd_done $args]
+}
+
+proc bigdcd_wait {args} \
+{
+    return [eval ::BigDCD::bigdcd_done $args]
+}
+
+proc ::BigDCD::bigdcd { script type args } {
     global bigdcd_frame bigdcd_proc bigdcd_firstframe vmd_frame bigdcd_running
   
     set bigdcd_running 1
@@ -72,7 +100,7 @@ proc bigdcd { script type args } {
         set type auto
     }
   
-    uplevel #0 trace variable vmd_frame w bigdcd_callback
+    uplevel #0 trace variable vmd_frame w ::BigDCD::bigdcd_callback
     foreach dcd $args {
         if { $type == "auto" } {
             mol addfile $dcd waitfor 0
@@ -80,10 +108,10 @@ proc bigdcd { script type args } {
             mol addfile $dcd type $type waitfor 0
         }
     }
-    after idle bigdcd_wait
+    after idle ::BigDCD::bigdcd_wait
 }
 
-proc bigdcd_callback { tracedvar mol op } {
+proc ::BigDCD::bigdcd_callback { tracedvar mol op } {
     global bigdcd_frame bigdcd_proc bigdcd_firstframe vmd_frame
     set msg {}
  
@@ -92,31 +120,31 @@ proc bigdcd_callback { tracedvar mol op } {
     set thisframe $vmd_frame($mol)
     if { $thisframe < $bigdcd_firstframe } {
         puts "end of frames"
-        bigdcd_done
+        ::BigDCD::bigdcd_done
         return
     }
  
     incr bigdcd_frame
     if { [catch {uplevel #0 $bigdcd_proc $bigdcd_frame} msg] } { 
         puts stderr "bigdcd aborting at frame $bigdcd_frame\n$msg"
-        bigdcd_done
+        ::BigDCD::bigdcd_done
         return
     }
     animate delete beg $thisframe end $thisframe $mol
     return $msg
 }
 
-proc bigdcd_done { } {
+proc ::BigDCD::bigdcd_done { } {
     global bigdcd_running
     
     if {$bigdcd_running > 0} then {
-        uplevel #0 trace vdelete vmd_frame w bigdcd_callback
+        uplevel #0 trace vdelete vmd_frame w ::BigDCD::bigdcd_callback
         puts "bigdcd_done"
         set bigdcd_running 0
     }
 }
 
-proc bigdcd_wait { } {
+proc ::BigDCD::bigdcd_wait { } {
     global bigdcd_running bigdcd_frame
     while {$bigdcd_running > 0} {
         global bigdcd_oldframe
@@ -124,6 +152,6 @@ proc bigdcd_wait { } {
         # run global processing hooks (including loading of scheduled frames)
         display update ui
         # if we have read a new frame during then the two should be different.
-        if { $bigdcd_oldframe == $bigdcd_frame } {bigdcd_done}
+        if { $bigdcd_oldframe == $bigdcd_frame } {::BigDCD::bigdcd_done}
     }
 }
