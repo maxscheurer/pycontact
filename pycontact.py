@@ -19,6 +19,7 @@ from biochemistry import *
 from inputreader import *
 from filters import *
 from functools import partial
+from run_vmd import *
 
 
 class MainWindow(QMainWindow, gui.Ui_MainWindow):
@@ -38,6 +39,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.scrollArea.setWidget(self.painter)
         self.actionOpen.triggered.connect(self.pushOpen)
         self.actionExport.triggered.connect(self.pushExport)
+        self.actionRun_VMD_contact_search.triggered.connect(self.pushRunVMDContactSearch)
 
         self.settingsView = SettingsTabWidget()
         self.settingsView.applySettingsButton.clicked.connect(self.updateSettings)
@@ -381,6 +383,17 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.painter.rendered = False
         self.painter.update()
         self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
+
+    def pushRunVMDContactSearch(self):
+        run_vmd(50, 5)
+        d = QDialog()
+        grid = QGridLayout()
+        d.setLayout(grid)
+
+        d.setWindowTitle("Run VMD")
+        d.resize(650, 700)
+        d.setWindowModality(Qt.ApplicationModal)
+        d.exec_()
 
     def mergeValueChanged(self):
         self.painter.merge = self.mergeSlider.value()

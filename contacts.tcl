@@ -158,6 +158,7 @@ array set residScores {}
 array set sasas {}
 
 set cutoff 5.0
+puts $cutoff
 set sasa_on 0
 puts "starting contacts"
 set fnumber 0

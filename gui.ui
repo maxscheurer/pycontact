@@ -155,7 +155,14 @@
     <addaction name="actionOpen"/>
     <addaction name="actionExport"/>
    </widget>
+   <widget class="QMenu" name="menuVMD">
+    <property name="title">
+     <string>VMD</string>
+    </property>
+    <addaction name="actionRun_VMD_contact_search"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuVMD"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpen">
@@ -172,6 +179,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+E</string>
+   </property>
+  </action>
+  <action name="actionRun_VMD_contact_search">
+   <property name="text">
+    <string>Run VMD contact search</string>
    </property>
   </action>
  </widget>
