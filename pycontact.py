@@ -385,7 +385,9 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
 
     def pushRunVMDContactSearch(self):
-        run_vmd(50, 5)
+        # test execution
+        run_vmd(50, 5, "","")
+        ######
         d = QDialog()
         grid = QGridLayout()
         d.setLayout(grid)
