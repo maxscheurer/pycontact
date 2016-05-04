@@ -13,6 +13,22 @@ proc ::Contacts::weight_distance {dist} \
 	return [expr (1.0)/(1.0 + exp(5.0*($dist-4.0)))]
 }
 
+proc distance_mtx {seltext frame} {
+    set sel [atomselect top "($seltext)" frame $frame]
+
+    set coords [$sel get {x y z}]
+    set list2 [$sel list]
+
+    foreach atom1 $coords id1 [$sel list] {
+	foreach atom2 $coords id2 $list2 {
+	    set dist($id1,$id2) [veclength [vecsub $atom2 $atom1]]
+	    set dist($id2,$id1) $dist($id1,$id2)
+	}
+	lvarpop list2
+	lvarpop coords
+    }
+}
+
 proc ::Contacts::contacts {frame} \
 {
 	puts $frame
@@ -35,6 +51,9 @@ proc ::Contacts::contacts {frame} \
 	set bb_list [$really_all get backbone]
 	set resname_list [$really_all get resname]
 	set resid_list [$really_all get resid]
+
+	#distance matrix
+	# distance_mtx "all" $frame
 
 	set contactList [measure contacts $cutoff $selection1 $selection2]
 	set list1 [lindex $contactList 0]
@@ -122,13 +141,29 @@ proc ::Contacts::contacts {frame} \
 		# $res1 delete
 		# $res2 delete
 
+		#hbond finder
+		set hbonds []
+		if {0} {
+			set within_ab_hydro [atomselect top "(within 3.0 of index $a1 and within 3.0 of index $a2) and hydrogen"]
+			if {[$within_ab_hydro num] != 0} {
+				foreach idx [$within_ab_hydro get index] {
+					set angle [measure angle [list $a1 $idx $a2] frame $frame]	
+					if {$angle >= 120 && $angle <= 180} {
+						# puts "hbond: $a1 $idx $a2, $angle"
+						lappend hbonds [list $a1 $idx $a2 $angle]
+					}
+					# puts $angle
+				}
+			}	
+		}
+
 		if {[info exists residScores($key)]} {
 			set current_res_weights $residScores($key)
 		} else {
 			set current_res_weights []
 		}
 
-		lappend current_res_weights [list $frame $weight $ss_bb_list]
+		lappend current_res_weights [list $frame $weight $ss_bb_list $hbonds]
 		set residScores($key) $current_res_weights
 	}
 	# lappend results [list $frame $current_results]

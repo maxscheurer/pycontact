@@ -15,12 +15,12 @@ class ContactType:
     qcolors = [QColor(255, 0, 0, 50), QColor(0, 0, 255, 50), QColor(255, 0, 255, 50), QColor(255, 255, 255, 50)]
 
 class HBondType:
-    none, donor, acceptor, both = range(4)
-    mapping = {"none": none, "don": donor, "acc": acceptor, "both": both}
+    none, donor, acceptor, both, other = range(5)
+    mapping = {"none": none, "don": donor, "acc": acceptor, "both": both, "other": other}
 
 class SideChainPolarity:
-    nonpolar, positive, negative, polar = range(4)
-    mapping = {"nonpolar": nonpolar, "positive": positive, "negative": negative, "polar": polar}
+    nonpolar, positive, negative, polar, other = range(5)
+    mapping = {"nonpolar": nonpolar, "positive": positive, "negative": negative, "polar": polar, "other": other}
 
 class BackboneSidechainType:
     contactsBb, contactsSc = range(2)
@@ -44,11 +44,19 @@ class Residue:
             self.contactsBy = BackboneSidechainType.contactsSc
         # TODO: propably init db first and just call select (speed up)
         #sidechain polarity
-        scpol = str(read_residue_db("scpolarity","name",self.name)[0]["scpolarity"])
-        self.scpolarity = SideChainPolarity.mapping[scpol]
+        try:
+            scpol = str(read_residue_db("scpolarity","name",self.name)[0]["scpolarity"])
+            self.scpolarity = SideChainPolarity.mapping[scpol]
+        except:
+            self.scpolarity = SideChainPolarity.other
+
         #hydrogen bonds: donor, acceptor, both
-        hbond = str(read_residue_db("hbondtype", "name", self.name)[0]["hbondtype"])
-        self.hbondtype = HBondType.mapping[hbond]
+
+        try:
+            hbond = str(read_residue_db("hbondtype", "name", self.name)[0]["hbondtype"])
+            self.hbondtype = HBondType.mapping[hbond]
+        except:
+            self.hbondtype = HBondType.other
         # self.printself()
 
     def printself(self):
