@@ -6,15 +6,22 @@ from MDAnalysis.analysis.hbonds.hbond_analysis import *
 import itertools
 from timeit import default_timer as timer
 import re
-import cython_utils
 class AtomContact:
-	def __init__(self, frame, distance, weight, idx1, idx2, hbondinfo):
+	def __init__(self, frame, distance, weight, idx1, idx2, hbondinfo, aType1, aType2, resid1, resid2, resname1, resname2, segid1, segid2):
 		self.frame = int(frame)
 		self.distance = float(distance)
 		self.weight = float(weight)
 		self.idx1 = int(idx1)
 		self.idx2 = int(idx2)
 		self.hbondinfo = hbondinfo
+		self.aType1 = aType1
+		self.aType2 = aType2
+		self.resid1 = resid1
+		self.resid2 = resid2
+		self.resname1 = resname1
+		self.resname2 = resname2
+		self.segid1 = segid1
+		self.segid2 = segid2
 	def toString(self):
 		print "frame: %d, dist: %f, weight: %f, idx1: %d, idx2: %d" % (self.frame,self.distance, self.weight, self.idx1, self.idx2)
 
@@ -91,20 +98,22 @@ resid_array = []
 name_array = []
 type_array = []
 bonds = []
+segids = []
 for atom in all_sel.atoms:
 	resname_array.append(atom.resname)
 	resid_array.append(atom.resid)
 	name_array.append(atom.name)
 	type_array.append(atom.type)
 	bonds.append(atom.bonds)
+	segids.append(atom.segid)
 print "trajectory with %d frames loaded" % len(u.trajectory)
 print len(sel1.coordinates()),len(sel2.coordinates())
 start = timer()
 contactResults = []
 #loop over trajectory
 for ts in u.trajectory: 
+	currentFrameContacts = []
 	frame = ts.frame
-	print frame
 	result = np.ndarray(shape=(len(sel1.coordinates()),len(sel2.coordinates())), dtype=float)
 	distarray = distances.distance_array(sel1.coordinates(), sel2.coordinates(), box=None, result=result)
 	contacts = np.where(distarray <= cutoff)
@@ -114,7 +123,6 @@ for ts in u.trajectory:
 		#jump out of loop if hydrogen contacts are found
 		if re.match("H(.*)", type_array[convindex1]) or re.match("H(.*)", type_array[convindex2]):
 			continue  
-		type_array[convindex2]
 		distance = distarray[idx1,idx2]
 		weight = weight_function(distance)
 		type1 = next((x.htype for x in heavyatoms if x.name == type_array[convindex1]), AtomHBondType.none)
@@ -206,29 +214,51 @@ for ts in u.trajectory:
 									# print "hbond found: %d,%d,%d"%(convindex2,global_hatom,heavy1_converted)
 									# print angle
 		#finalize
-		newAtomContact = AtomContact(int(frame), float(distance), float(weight), int(convindex1), int(convindex2),hydrogenBonds)
-		contactResults.append(newAtomContact)
-stop = timer()
-
+		newAtomContact = AtomContact(int(frame), float(distance), float(weight), int(convindex1), int(convindex2),hydrogenBonds, type_array[convindex1], type_array[convindex2], resid_array[convindex1], resid_array[convindex2], resname_array[convindex1], resname_array[convindex2], segids[convindex1], segids[convindex2])
+		currentFrameContacts.append(newAtomContact)
+	contactResults.append(currentFrameContacts)
 #draft & sketch playground
 
 #prototype writer for vmd visualization
-f = open('showHBondsInVMD.tcl', 'w')
-f.write('mol new %s \n'%psf)
-f.write('mol addfile %s \n'%dcd)
-f.write('mol delrep 0 top \n')
-f.write('mol representation NewCartoon \n')
-f.write('mol Color ColorID 3 \n')
-f.write('mol selection {all} \n')
-f.write('mol addrep top \n')
-for contact in contactResults:
-	for hbond in contact.hbondinfo:
-		hbond.toString()
-		f.write('mol representation VDW \n')
-		f.write('mol Color Name \n')
-		f.write('mol selection {index %d %d %d} \n'%(hbond.donorIndex, hbond.acceptorIndex, hbond.hydrogenIndex))
-		f.write('mol addrep top \n')
+# f = open('showHBondsInVMD.tcl', 'w')
+# f.write('mol new %s \n'%psf)
+# f.write('mol addfile %s \n'%dcd)
+# f.write('mol delrep 0 top \n')
+# f.write('mol representation NewCartoon \n')
+# f.write('mol Color ColorID 3 \n')
+# f.write('mol selection {all} \n')
+# f.write('mol addrep top \n')
+# for frame in contactResults:
+# 	for contact in frame:
+# 		for hbond in contact.hbondinfo:
+# 			# hbond.toString()
+# 			f.write('mol representation VDW \n')
+# 			f.write('mol Color Name \n')
+# 			f.write('mol selection {index %d %d %d} \n'%(hbond.donorIndex, hbond.acceptorIndex, hbond.hydrogenIndex))
+			# f.write('mol addrep top \n')
+# f.close()
+
+#frame analysis
+contact_accumulated = []
+allkeys = []
+for frame in contactResults:
+	currentFrameAcc = {}
+	for cont in frame:
+		key = '%s %s %s %s' % (cont.resid1, cont.resname1, cont.resid2, cont.resname2)
+		if key in currentFrameAcc:
+			currentFrameAcc[key]+=cont.weight
+		else:
+			currentFrameAcc[key]=cont.weight
+		if not key in allkeys:
+			allkeys.append(key)
+	contact_accumulated.append(currentFrameAcc)
+
+for key in allkeys:
+	for frame_dict in contact_accumulated:
+		if not key in frame_dict:
+			frame_dict[key] = 0
+		# print frame_dict
 # print analysis time and quit
-f.close()
+stop = timer()
 print (stop - start)
 quit()
