@@ -143,7 +143,7 @@ proc ::Contacts::contacts {frame} \
 
 		#hbond finder
 		set hbonds []
-		if {0} {
+		if {1} {
 			set within_ab_hydro [atomselect top "(within 3.0 of index $a1 and within 3.0 of index $a2) and hydrogen"]
 			if {[$within_ab_hydro num] != 0} {
 				foreach idx [$within_ab_hydro get index] {
@@ -197,8 +197,11 @@ puts $cutoff
 set sasa_on 0
 puts "starting contacts"
 set fnumber 0
+set TIME_start [clock clicks -milliseconds]
 bigdcd ::Contacts::contacts auto $traj.dcd
 vwait bigdcd_running
+set TIME_taken [expr [clock clicks -milliseconds] - $TIME_start]
+puts $TIME_taken
 
 # $groupA set beta -5.0
 # foreach key [array names scorerA] {

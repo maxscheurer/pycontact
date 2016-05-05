@@ -53,7 +53,7 @@ for atomline in heavyatomlines:
 
 ### config
 
-cutoff = 3.5
+cutoff = 5.0
 hbondcutoff = 3.5
 hbondcutangle = 120
 sel1text = "segid RN11"
@@ -183,17 +183,7 @@ for ts in u.trajectory:
 								if angle >= hbondcutangle:
 									print "hbond found: %d,%d,%d"%(convindex2,global_hatom,heavy1_converted)
 									print angle
-
-					# indexcol = distarray[idx1,:]
-					# scan = np.where(indexcol <= hbondcutoff)
-					# for idx in scan[0]:
-					# 	conv = indices2[idx]
-					# 	if re.match("H(.*)", type_array[conv]):
-					# 		b1 = bonds[convindex1].types()
-					# 		b2 = bonds[convindex2].types()
-
-			# print scan
-
+		#finalize
 		newAtomContact = AtomContact(int(frame), float(distance), float(weight), int(convindex1), int(convindex2))
 		contactResults.append(newAtomContact)
 stop = timer()
