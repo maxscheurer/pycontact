@@ -8,14 +8,27 @@ from timeit import default_timer as timer
 import re
 
 class AtomContact:
-	def __init__(self, frame, distance, weight, idx1, idx2):
+	def __init__(self, frame, distance, weight, idx1, idx2, hbondinfo):
 		self.frame = int(frame)
 		self.distance = float(distance)
 		self.weight = float(weight)
 		self.idx1 = int(idx1)
 		self.idx2 = int(idx2)
+		self.hbondinfo = hbondinfo
 	def toString(self):
 		print "frame: %d, dist: %f, weight: %f, idx1: %d, idx2: %d" % (self.frame,self.distance, self.weight, self.idx1, self.idx2)
+
+class HydrogenBond:
+	def __init__(self, donorIndex, acceptorIndex, hydrogenIndex, acceptorHydrogenDistance, angle, usedCutoffDist, usedCutoffAngle):
+		self.donorIndex = donorIndex
+		self.acceptorIndex = acceptorIndex
+		self.hydrogenIndex = hydrogenIndex
+		self.acceptorHydrogenDistance = acceptorHydrogenDistance
+		self.angle = angle
+		self.usedCutoffDist = usedCutoffDist
+		self.usedCutoffAngle = usedCutoffAngle
+	def toString(self):
+		print "donor: %d, acceptor: %d, hydrogen: %d, dist: %f, angle: %f, usedCutoffDist: %f, usedCutoffAngle: %f" % (self.donorIndex, self.acceptorIndex, self.hydrogenIndex, self.acceptorHydrogenDistance, self.angle, self.usedCutoffDist, self.usedCutoffAngle)
 
 def weight_function(value):
 	return (1.0)/(1.0 + np.exp(5.0*(value-4.0)))
@@ -97,6 +110,7 @@ for ts in u.trajectory:
 	for idx1, idx2 in itertools.izip(contacts[0], contacts[1]):
 		convindex1 = indices1[idx1]
 		convindex2 = indices2[idx2]
+		#jump out of loop if hydrogen contacts are found
 		if re.match("H(.*)", type_array[convindex1]) or re.match("H(.*)", type_array[convindex2]):
 			continue  
 		type_array[convindex2]
@@ -104,6 +118,7 @@ for ts in u.trajectory:
 		weight = weight_function(distance)
 		type1 = next((x.htype for x in heavyatoms if x.name == type_array[convindex1]), AtomHBondType.none)
 		type2 = next((x.htype for x in heavyatoms if x.name == type_array[convindex2]), AtomHBondType.none)
+		hydrogenBonds = []
 		if type1 != AtomHBondType.none and type2 != AtomHBondType.none:
 			if (type1 == AtomHBondType.both and type2 == AtomHBondType.both) or \
 				(type1 == AtomHBondType.acc and type2 == AtomHBondType.don) or \
@@ -162,8 +177,11 @@ for ts in u.trajectory:
 								dot = np.dot(v1,v2)
 								angle = np.degrees(np.arccos(dot/(v1norm*v2norm)))
 								if angle >= hbondcutangle:
-									print "hbond found: %d,%d,%d"%(convindex1,global_hatom,heavy2_converted)
-									print angle
+									dist = distarray[conv_hatom,idxheavy]
+									new_hbond = HydrogenBond(convindex1,heavy2_converted,global_hatom, dist, angle, hbondcutoff, hbondcutangle)
+									hydrogenBonds.append(new_hbond)
+									# print "hbond found: %d,%d,%d"%(convindex1,global_hatom,heavy2_converted)
+									# print angle
 					for global_hatom in hydrogenAtomsBoundToAtom2:
 						conv_hatom = indices2.index(global_hatom)
 						scan = np.where(distarray[:,conv_hatom] <= hbondcutoff)
@@ -181,13 +199,17 @@ for ts in u.trajectory:
 								dot = np.dot(v1,v2)
 								angle = np.degrees(np.arccos(dot/(v1norm*v2norm)))
 								if angle >= hbondcutangle:
-									print "hbond found: %d,%d,%d"%(convindex2,global_hatom,heavy1_converted)
-									print angle
+									dist = distarray[idxheavy,conv_hatom]
+									new_hbond = HydrogenBond(convindex2,heavy1_converted,global_hatom, dist, angle, hbondcutoff, hbondcutangle)
+									hydrogenBonds.append(new_hbond)
+									# print "hbond found: %d,%d,%d"%(convindex2,global_hatom,heavy1_converted)
+									# print angle
 		#finalize
-		newAtomContact = AtomContact(int(frame), float(distance), float(weight), int(convindex1), int(convindex2))
+		newAtomContact = AtomContact(int(frame), float(distance), float(weight), int(convindex1), int(convindex2),hydrogenBonds)
 		contactResults.append(newAtomContact)
 stop = timer()
-#for contact in contactResults:
-#	contact.toString()
+for contact in contactResults:
+	for hbond in contact.hbondinfo:
+		hbond.toString()
 print (stop - start)
 quit()
