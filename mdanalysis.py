@@ -6,7 +6,7 @@ from MDAnalysis.analysis.hbonds.hbond_analysis import *
 import itertools
 from timeit import default_timer as timer
 import re
-
+import cython_utils
 class AtomContact:
 	def __init__(self, frame, distance, weight, idx1, idx2, hbondinfo):
 		self.frame = int(frame)
@@ -101,6 +101,7 @@ print "trajectory with %d frames loaded" % len(u.trajectory)
 print len(sel1.coordinates()),len(sel2.coordinates())
 start = timer()
 contactResults = []
+#loop over trajectory
 for ts in u.trajectory: 
 	frame = ts.frame
 	print frame
@@ -208,8 +209,26 @@ for ts in u.trajectory:
 		newAtomContact = AtomContact(int(frame), float(distance), float(weight), int(convindex1), int(convindex2),hydrogenBonds)
 		contactResults.append(newAtomContact)
 stop = timer()
+
+#draft & sketch playground
+
+#prototype writer for vmd visualization
+f = open('showHBondsInVMD.tcl', 'w')
+f.write('mol new %s \n'%psf)
+f.write('mol addfile %s \n'%dcd)
+f.write('mol delrep 0 top \n')
+f.write('mol representation NewCartoon \n')
+f.write('mol Color ColorID 3 \n')
+f.write('mol selection {all} \n')
+f.write('mol addrep top \n')
 for contact in contactResults:
 	for hbond in contact.hbondinfo:
 		hbond.toString()
+		f.write('mol representation VDW \n')
+		f.write('mol Color Name \n')
+		f.write('mol selection {index %d %d %d} \n'%(hbond.donorIndex, hbond.acceptorIndex, hbond.hydrogenIndex))
+		f.write('mol addrep top \n')
+# print analysis time and quit
+f.close()
 print (stop - start)
 quit()
