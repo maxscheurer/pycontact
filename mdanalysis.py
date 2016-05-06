@@ -244,20 +244,29 @@ allkeys = []
 for frame in contactResults:
 	currentFrameAcc = {}
 	for cont in frame:
-		key = '%s %s %s %s' % (cont.resid1, cont.resname1, cont.resid2, cont.resname2)
+		key = '%s %s %s %s' % (cont.resid1, cont.resname1, cont.resid2, cont.resname2) 
 		if key in currentFrameAcc:
-			currentFrameAcc[key]+=cont.weight
+			currentFrameAcc[key][0]+=cont.weight
+			#hbond info
+			currentFrameAcc[key][1].append(cont.hbondinfo)
 		else:
-			currentFrameAcc[key]=cont.weight
+			currentFrameAcc[key] = [0,0]
+			currentFrameAcc[key][0]=cont.weight
+			#hbond info
+			currentFrameAcc[key][1]=[]
+			currentFrameAcc[key][1].append(cont.hbondinfo)
 		if not key in allkeys:
 			allkeys.append(key)
 	contact_accumulated.append(currentFrameAcc)
 
+contact_key_frame_accumulate = {}
 for key in allkeys:
+	contact_key_frame_accumulate[key] = []
 	for frame_dict in contact_accumulated:
 		if not key in frame_dict:
-			frame_dict[key] = 0
-		# print frame_dict
+			frame_dict[key] = [0,0]
+		contact_key_frame_accumulate[key].append(frame_dict[key][0])
+	print key + ":" + str(list(contact_key_frame_accumulate[key]))
 # print analysis time and quit
 stop = timer()
 print (stop - start)
