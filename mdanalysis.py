@@ -248,25 +248,37 @@ for frame in contactResults:
 		if key in currentFrameAcc:
 			currentFrameAcc[key][0]+=cont.weight
 			#hbond info
-			currentFrameAcc[key][1].append(cont.hbondinfo)
+			if len(cont.hbondinfo) > 0:
+				currentFrameAcc[key][1].append(cont.hbondinfo)
 		else:
-			currentFrameAcc[key] = [0,0]
+			currentFrameAcc[key] = [0,[]]
 			currentFrameAcc[key][0]=cont.weight
 			#hbond info
 			currentFrameAcc[key][1]=[]
-			currentFrameAcc[key][1].append(cont.hbondinfo)
+			if len(cont.hbondinfo) > 0:
+				currentFrameAcc[key][1].append(cont.hbondinfo)
 		if not key in allkeys:
 			allkeys.append(key)
 	contact_accumulated.append(currentFrameAcc)
 
 contact_key_frame_accumulate = {}
+hbond_key_frame_accumulate = {}
 for key in allkeys:
 	contact_key_frame_accumulate[key] = []
+	hbond_key_frame_accumulate[key] = []
 	for frame_dict in contact_accumulated:
 		if not key in frame_dict:
-			frame_dict[key] = [0,0]
+			frame_dict[key] = [0,[]]
 		contact_key_frame_accumulate[key].append(frame_dict[key][0])
+		hbond_key_frame_accumulate[key].append(frame_dict[key][1])
 	print key + ":" + str(list(contact_key_frame_accumulate[key]))
+	counter = 0
+	for frame in hbond_key_frame_accumulate[key]:
+		for item in frame:
+			for hbond in item:
+				print counter 
+				hbond.toString()
+		counter += 1
 # print analysis time and quit
 stop = timer()
 print (stop - start)
