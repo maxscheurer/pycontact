@@ -114,6 +114,7 @@ contactResults = []
 for ts in u.trajectory: 
 	currentFrameContacts = []
 	frame = ts.frame
+	print frame
 	result = np.ndarray(shape=(len(sel1.coordinates()),len(sel2.coordinates())), dtype=float)
 	distarray = distances.distance_array(sel1.coordinates(), sel2.coordinates(), box=None, result=result)
 	contacts = np.where(distarray <= cutoff)
@@ -171,47 +172,43 @@ for ts in u.trajectory:
 					# check hbond criteria for hydrogen atoms bound to first atom
 					for global_hatom in hydrogenAtomsBoundToAtom1:
 						conv_hatom = indices1.index(global_hatom)
-						scan = np.where(distarray[conv_hatom,:] <= hbondcutoff)
-						for idxheavy in scan[0]:
-							heavy2_converted = indices2[idxheavy]
-							typeHeavy = next((x.htype for x in heavyatoms if x.name == type_array[heavy2_converted]), AtomHBondType.none)
-							if typeHeavy == AtomHBondType.acc:
-								donorPosition = sel1.coordinates()[idx1]
-								hydrogenPosition = sel1.coordinates()[conv_hatom]
-								acceptorPosition = sel2.coordinates()[idxheavy]
-								v1 = hydrogenPosition - acceptorPosition
-								v2 = hydrogenPosition - donorPosition
-								v1norm = np.linalg.norm(v1)
-								v2norm = np.linalg.norm(v2)
-								dot = np.dot(v1,v2)
-								angle = np.degrees(np.arccos(dot/(v1norm*v2norm)))
-								if angle >= hbondcutangle:
-									dist = distarray[conv_hatom,idxheavy]
-									new_hbond = HydrogenBond(convindex1,heavy2_converted,global_hatom, dist, angle, hbondcutoff, hbondcutangle)
-									hydrogenBonds.append(new_hbond)
-									# print "hbond found: %d,%d,%d"%(convindex1,global_hatom,heavy2_converted)
-									# print angle
+						typeHeavy = next((x.htype for x in heavyatoms if x.name == type_array[convindex2]), AtomHBondType.none)
+						if typeHeavy == AtomHBondType.acc and (distarray[conv_hatom,idx2] <= hbondcutoff):
+							donorPosition = sel1.coordinates()[idx1]
+							hydrogenPosition = sel1.coordinates()[conv_hatom]
+							acceptorPosition = sel2.coordinates()[idx2]
+							v1 = hydrogenPosition - acceptorPosition
+							v2 = hydrogenPosition - donorPosition
+							v1norm = np.linalg.norm(v1)
+							v2norm = np.linalg.norm(v2)
+							dot = np.dot(v1,v2)
+							angle = np.degrees(np.arccos(dot/(v1norm*v2norm)))
+							if angle >= hbondcutangle:
+								dist = distarray[conv_hatom,idx2]
+								new_hbond = HydrogenBond(convindex1,convindex2,global_hatom, dist, angle, hbondcutoff, hbondcutangle)
+								hydrogenBonds.append(new_hbond)
+								print str(convindex1) + " " + str(convindex2)
+								print "hbond found: %d,%d,%d"%(convindex1,global_hatom,convindex2)
+								# print angle
 					for global_hatom in hydrogenAtomsBoundToAtom2:
 						conv_hatom = indices2.index(global_hatom)
-						scan = np.where(distarray[:,conv_hatom] <= hbondcutoff)
-						for idxheavy in scan[0]:
-							heavy1_converted = indices1[idxheavy]
-							typeHeavy = next((x.htype for x in heavyatoms if x.name == type_array[heavy1_converted]), AtomHBondType.none)
-							if typeHeavy == AtomHBondType.acc:
-								donorPosition = sel2.coordinates()[idx2]
-								hydrogenPosition = sel2.coordinates()[conv_hatom]
-								acceptorPosition = sel1.coordinates()[idxheavy]
-								v1 = hydrogenPosition - acceptorPosition
-								v2 = hydrogenPosition - donorPosition
-								v1norm = np.linalg.norm(v1)
-								v2norm = np.linalg.norm(v2)
-								dot = np.dot(v1,v2)
-								angle = np.degrees(np.arccos(dot/(v1norm*v2norm)))
-								if angle >= hbondcutangle:
-									dist = distarray[idxheavy,conv_hatom]
-									new_hbond = HydrogenBond(convindex2,heavy1_converted,global_hatom, dist, angle, hbondcutoff, hbondcutangle)
-									hydrogenBonds.append(new_hbond)
-									# print "hbond found: %d,%d,%d"%(convindex2,global_hatom,heavy1_converted)
+						typeHeavy = next((x.htype for x in heavyatoms if x.name == type_array[convindex1]), AtomHBondType.none)
+						if typeHeavy == AtomHBondType.acc and (distarray[idx1,conv_hatom] <= hbondcutoff):
+							donorPosition = sel2.coordinates()[idx2]
+							hydrogenPosition = sel2.coordinates()[conv_hatom]
+							acceptorPosition = sel1.coordinates()[idx1]
+							v1 = hydrogenPosition - acceptorPosition
+							v2 = hydrogenPosition - donorPosition
+							v1norm = np.linalg.norm(v1)
+							v2norm = np.linalg.norm(v2)
+							dot = np.dot(v1,v2)
+							angle = np.degrees(np.arccos(dot/(v1norm*v2norm)))
+							if angle >= hbondcutangle:
+								dist = distarray[idx1,conv_hatom]
+								new_hbond = HydrogenBond(convindex2,convindex1,global_hatom, dist, angle, hbondcutoff, hbondcutangle)
+								hydrogenBonds.append(new_hbond)
+								print str(convindex1) + " " + str(convindex2)
+								print "hbond found: %d,%d,%d"%(convindex2,global_hatom,convindex1)
 									# print angle
 		#finalize
 		newAtomContact = AtomContact(int(frame), float(distance), float(weight), int(convindex1), int(convindex2),hydrogenBonds, type_array[convindex1], type_array[convindex2], resid_array[convindex1], resid_array[convindex2], resname_array[convindex1], resname_array[convindex2], segids[convindex1], segids[convindex2])
