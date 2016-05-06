@@ -216,24 +216,24 @@ for ts in u.trajectory:
 	contactResults.append(currentFrameContacts)
 #draft & sketch playground
 
-#prototype writer for vmd visualization
-# f = open('showHBondsInVMD.tcl', 'w')
-# f.write('mol new %s \n'%psf)
-# f.write('mol addfile %s \n'%dcd)
-# f.write('mol delrep 0 top \n')
-# f.write('mol representation NewCartoon \n')
-# f.write('mol Color ColorID 3 \n')
-# f.write('mol selection {all} \n')
-# f.write('mol addrep top \n')
-# for frame in contactResults:
-# 	for contact in frame:
-# 		for hbond in contact.hbondinfo:
-# 			# hbond.toString()
-# 			f.write('mol representation VDW \n')
-# 			f.write('mol Color Name \n')
-# 			f.write('mol selection {index %d %d %d} \n'%(hbond.donorIndex, hbond.acceptorIndex, hbond.hydrogenIndex))
-			# f.write('mol addrep top \n')
-# f.close()
+# prototype writer for vmd visualization
+f = open('showHBondsInVMD.tcl', 'w')
+f.write('mol new %s \n'%psf)
+f.write('mol addfile %s \n'%dcd)
+f.write('mol delrep 0 top \n')
+f.write('mol representation NewCartoon \n')
+f.write('mol Color ColorID 3 \n')
+f.write('mol selection {all} \n')
+f.write('mol addrep top \n')
+for frame in contactResults:
+	for contact in frame:
+		for hbond in contact.hbondinfo:
+			# hbond.toString()
+			f.write('mol representation VDW \n')
+			f.write('mol Color Name \n')
+			f.write('mol selection {index %d %d %d} \n'%(hbond.donorIndex, hbond.acceptorIndex, hbond.hydrogenIndex))
+			f.write('mol addrep top \n')
+f.close()
 
 #frame analysis
 contact_accumulated = []
