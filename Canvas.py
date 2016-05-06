@@ -20,7 +20,7 @@ from LabelView import *
 
 class Canvas(QWidget):
     def __init__(self):
-        super().__init__()
+        super(QWidget,self).__init__()
 
         self.initUI()
 

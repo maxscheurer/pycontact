@@ -19,7 +19,7 @@ class LabelView(QWidget):
     """docstring for AnalysisView"""
 
     def __init__(self, contacts):
-        super().__init__()
+        super(QWidget,self).__init__()
         self.contacts = contacts
         self.initUI()
 

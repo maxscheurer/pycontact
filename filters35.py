@@ -1,12 +1,10 @@
-from __future__ import division
-from __future__ import absolute_import
 import numpy as np
 from biochemistry import *
 import numpy as np
 
-class Operator(object):
-    greater, smaller, equal, nequal = xrange(4)
-    mapping = {u"greater": greater, u"smaller": smaller, u"equal": equal, u"not equal": nequal}
+class Operator:
+    greater, smaller, equal, nequal = range(4)
+    mapping = {"greater": greater, "smaller": smaller, "equal": equal, "not equal": nequal}
 
     def compare(self, value1, value2, operator):
         if operator == self.greater:
@@ -18,7 +16,7 @@ class Operator(object):
         elif operator == self.nequal:
             return (value1 != value2)
 
-class FrameFilter(object):
+class FrameFilter:
     def __init__(self,name):
         self.name = name
 
@@ -30,7 +28,7 @@ class FrameFilter(object):
             c.scoreArray = newScores
         return contacts
 
-class NameFilter(object):
+class NameFilter:
     def __init__(self, name):
         self.name = name
 
@@ -38,17 +36,17 @@ class NameFilter(object):
         filtered = []
         for c in contacts:
             add = False
-            if resnameA.lower() != u'all' and resnameB.lower() != u'all':
-                splitA = resnameA.split(u",")
-                splitB = resnameB.split(u",")
+            if resnameA.lower() != 'all' and resnameB.lower() != 'all':
+                splitA = resnameA.split(",")
+                splitB = resnameB.split(",")
                 if c.residueA.name in splitA and c.residueB.name in splitB:
                     add = True
-            elif resnameA.lower() != u'all' and resnameB.lower() == u'all':
-                splitA = resnameA.split(u",")
+            elif resnameA.lower() != 'all' and resnameB.lower() == 'all':
+                splitA = resnameA.split(",")
                 if c.residueA.name in splitA:
                     add = True
-            elif resnameA.lower() == u'all' and resnameB.lower() != u'all':
-                splitB = resnameB.split(u",")
+            elif resnameA.lower() == 'all' and resnameB.lower() != 'all':
+                splitB = resnameB.split(",")
                 if c.residueB.name in splitB:
                     add = True
             else:
@@ -58,7 +56,7 @@ class NameFilter(object):
                 filtered.append(c)
         return filtered
 
-class ResidueRangeFilter(object):
+class ResidueRangeFilter:
     def __init__(self, name):
         self.name = name
 
@@ -70,23 +68,23 @@ class ResidueRangeFilter(object):
         return result
 
     def filterResiduesByRange(self, contacts, residRangeA, residRangeB):
-        splitA = residRangeA.split(u",")
-        splitB = residRangeB.split(u",")
+        splitA = residRangeA.split(",")
+        splitB = residRangeB.split(",")
 
-        notAllA = residRangeA.lower() != u'all'
-        notAllB = residRangeB.lower() != u'all'
+        notAllA = residRangeA.lower() != 'all'
+        notAllB = residRangeB.lower() != 'all'
 
         if notAllA:
             aRanges = []
             for ran in splitA:
-                r = ran.split(u"-")
-                aRanges.append(xrange(int(r[0]),int(r[1])+1))
+                r = ran.split("-")
+                aRanges.append(range(int(r[0]),int(r[1])+1))
         if notAllB:
             bRanges =[]
             for ran in splitB:
-                r = ran.split(u"-")
-                print r
-                bRanges.append(xrange(int(r[0]), int(r[1]) + 1))
+                r = ran.split("-")
+                print(r)
+                bRanges.append(range(int(r[0]), int(r[1]) + 1))
 
         filtered = []
         for c in contacts:
@@ -107,7 +105,7 @@ class ResidueRangeFilter(object):
                 filtered.append(c)
         return filtered
 
-class BinaryFilter(object):
+class BinaryFilter:
     def __init__(self, name, operator, value):
         self.name = name
         self.operator = Operator.mapping[operator]
@@ -127,7 +125,7 @@ class TotalTimeFilter(BinaryFilter):
         for c in contacts:
             if op.compare(c.total_time(1, 0), self.value, self.operator):
                 filtered.append(c)
-        print unicode(len(filtered))
+        print(str(len(filtered)))
         return filtered
 
 # filter compares contact score of every frame, only adds contact if true for all frames
@@ -139,23 +137,23 @@ class ScoreFilter(BinaryFilter):
     def filterContacts(self, contacts):
         filtered = []
         op = Operator()
-        if self.ftype == u"mean":
+        if self.ftype == "mean":
             for c in contacts:
                 mean = c.mean_score()
                 if op.compare(mean, self.value, self.operator):
                     filtered.append(c)
-        elif self.ftype == u"median":
+        elif self.ftype == "median":
             for c in contacts:
                 med = c.median_score()
                 if op.compare(med, self.value, self.operator):
                     filtered.append(c)
         return filtered
 
-class SortingOrder(object):
-    ascending, descending = xrange(2)
-    mapping = {u"asc": ascending, u"desc": descending}
+class SortingOrder:
+    ascending, descending = range(2)
+    mapping = {"asc": ascending, "desc": descending}
 
-class Sorting(object):
+class Sorting:
     def __init__(self, name, key, descending):
         self.name = name
         self. key = key
@@ -167,33 +165,33 @@ class Sorting(object):
 
     def sortContacts(self, contacts):
         sortedContacts = []
-        if self.key == u"mean":
+        if self.key == "mean":
             sortedContacts = sorted(contacts, key=lambda c: c.meanScore, reverse=self.descending)
-        elif self.key == u"median":
+        elif self.key == "median":
             sortedContacts = sorted(contacts, key=lambda c: c.medianScore, reverse=self.descending)
-        elif self.key == u"bb/sc type":
+        elif self.key == "bb/sc type":
             sortedContacts = sorted(contacts, key=lambda c: c.backboneSideChainType, reverse=self.descending)
-        elif self.key == u"contact type":
+        elif self.key == "contact type":
             sortedContacts = sorted(contacts, key=lambda c: c.contactType, reverse=self.descending)
-        elif self.key == u"resid A":
+        elif self.key == "resid A":
             sortedContacts = sorted(contacts, key=lambda c: c.residueA.ident, reverse=self.descending)
-        elif self.key == u"resid B":
+        elif self.key == "resid B":
             sortedContacts = sorted(contacts, key=lambda c: c.residueB.ident, reverse=self.descending)
-        elif self.key == u"total time":
+        elif self.key == "total time":
             for con in contacts:
                 con.total_time(self.nspf,self.threshold)
             sortedContacts = sorted(contacts, key=lambda c: c.ttime, reverse=self.descending)
-        elif self.key == u"mean lifetime":
+        elif self.key == "mean lifetime":
             for con in contacts:
                 con.mean_life_time(self.nspf, self.threshold)
             sortedContacts = sorted(contacts, key=lambda c: c.meanLifeTime, reverse=self.descending)
-        elif self.key == u"median lifetime":
+        elif self.key == "median lifetime":
             for con in contacts:
                 con.median_life_time(self.nspf, self.threshold)
             sortedContacts = sorted(contacts, key=lambda c: c.medianLifeTime, reverse=self.descending)
         return sortedContacts
 
-class WeightFunction(object):
+class WeightFunction:
     def __init__(self, name, x):
         self.name = name
         self.x = x
@@ -263,5 +261,5 @@ class LinearWeightFunction(WeightFunction):
         y = a * x + self.f0
         return y
 
-class FunctionType(object):
-    sigmoid, rect, linear = xrange(3)
+class FunctionType:
+    sigmoid, rect, linear = range(3)
