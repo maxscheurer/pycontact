@@ -313,8 +313,8 @@ for ts in u.trajectory:
 # 				hbond.toString()
 # 		counter += 1
 
-map1 = [0,0,0,0,0,0,1]
-map2 = [0,0,0,0,0,0,1]
+map1 = [0,0,0,1,1,0]
+map2 = [0,0,0,1,1,0]
 frame_contacts_accumulated = []
 allkeys = []
 for frame in contactResults:
@@ -335,12 +335,16 @@ for frame in contactResults:
 
 accumulatedContacts = {}
 for key in allkeys:
-	contact_key_frame_accumulate[key] = []
-	hbond_key_frame_accumulate[key] = []
-	for frame_dict in contact_accumulated:
+	accumulatedContacts[key] = []
+	print key
+	for frame_dict in frame_contacts_accumulated:
 		if not key in frame_dict:
-			frame_dict[key] = [0,[]]
-		contact_key_frame_accumulate[key].append(frame_dict[key][0])
+			emptyCont = TempContactAccumulate()
+			emptyCont.fscore = 0
+			frame_dict[key] = emptyCont
+		accumulatedContacts[key].append(frame_dict[key])
+		print frame_dict[key].fscore ,
+	print "\n------------------"
 # print analysis time and quit
 stop = timer()
 print (stop - start)
