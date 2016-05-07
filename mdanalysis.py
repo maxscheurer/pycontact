@@ -13,6 +13,7 @@ class AtomContact:
 		self.weight = float(weight)
 		self.idx1 = int(idx1)
 		self.idx2 = int(idx2)
+		self.hbondinfo = hbondinfo
 	def toString(self):
 		print "frame: %d, dist: %f, weight: %f, idx1: %d, idx2: %d" % (self.frame,self.distance, self.weight, self.idx1, self.idx2)
 
@@ -51,6 +52,14 @@ class AtomType:
 			htype = "none"
 		tp = AtomType(name,comment, AtomHBondType.mapping[htype])
 		return tp
+
+class AccumulatedContact(object):
+	"""docstring for AccumulatedContact"""
+	def __init__(self):
+		super(AccumulatedContact, self).__init__()
+		self.scoreArray = []
+
+		
 
 class TempContactAccumulate(object):
 	"""docstring for TempContactAccumulate"""
@@ -104,8 +113,21 @@ def makeKeyArraysFromMaps(map1,map2,contact):
 		else:
 			keys2.append("none")		
 		counter += 1
-	print keys1
-	print keys2
+	return [keys1,keys2]
+
+def makeKeyFromKeyArrays(key1,key2):
+	key = ""
+	itemcounter = 0
+	for item in key1:
+		if item != "none":
+			key += AccumulationMapIndex.mapping[itemcounter] + str(item)
+		itemcounter += 1
+	itemcounter = 0
+	for item in key2:
+		if item != "none":
+			key += AccumulationMapIndex.mapping[itemcounter] + str(item)
+		itemcounter += 1
+	return key
 
 heavyatomlines = []
 heavyatoms = []
@@ -160,7 +182,7 @@ contactResults = []
 for ts in u.trajectory: 
 	currentFrameContacts = []
 	frame = ts.frame
-	print frame
+	# print frame
 	result = np.ndarray(shape=(len(sel1.coordinates()),len(sel2.coordinates())), dtype=float)
 	distarray = distances.distance_array(sel1.coordinates(), sel2.coordinates(), box=None, result=result)
 	contacts = np.where(distarray <= cutoff)
@@ -282,56 +304,43 @@ for ts in u.trajectory:
 # 			f.write('mol addrep top \n')
 # f.close()
 
-#frame analysis
-# contact_accumulated = []
-# allkeys = []
-# for frame in contactResults:
-# 	currentFrameAcc = {}
-# 	for cont in frame:
-# 		key = '%s %s %s %s' % (cont.resid1, cont.resname1, cont.resid2, cont.resname2) 
-# 		if key in currentFrameAcc:
-# 			currentFrameAcc[key][0]+=cont.weight
-# 			#hbond info
-# 			if len(cont.hbondinfo) > 0:
-# 				currentFrameAcc[key][1].append(cont.hbondinfo)
-# 		else:
-# 			currentFrameAcc[key] = [0,[]]
-# 			currentFrameAcc[key][0]=cont.weight
-# 			#hbond info
-# 			currentFrameAcc[key][1]=[]
-# 			if len(cont.hbondinfo) > 0:
-# 				currentFrameAcc[key][1].append(cont.hbondinfo)
-# 		if not key in allkeys:
-# 			allkeys.append(key)
-# 	contact_accumulated.append(currentFrameAcc)
-
-# contact_key_frame_accumulate = {}
-# hbond_key_frame_accumulate = {}
-# for key in allkeys:
-# 	contact_key_frame_accumulate[key] = []
-# 	hbond_key_frame_accumulate[key] = []
-# 	for frame_dict in contact_accumulated:
-# 		if not key in frame_dict:
-# 			frame_dict[key] = [0,[]]
-# 		contact_key_frame_accumulate[key].append(frame_dict[key][0])
-# 		hbond_key_frame_accumulate[key].append(frame_dict[key][1])
-# 	print key + ":" + str(list(contact_key_frame_accumulate[key]))
-# 	counter = 0
+#draft, don't delete
+# counter = 0
 # 	for frame in hbond_key_frame_accumulate[key]:
 # 		for item in frame:
 # 			for hbond in item:
 # 				print counter 
 # 				hbond.toString()
 # 		counter += 1
-map1 = [1,1,0,0,1,0,1]
-map2 = [1,1,0,0,1,0,1]
+
+map1 = [0,0,0,0,0,0,1]
+map2 = [0,0,0,0,0,0,1]
 frame_contacts_accumulated = []
+allkeys = []
 for frame in contactResults:
 	currentFrameAcc = {}
 	for cont in frame:
-		keyarray = makeKeyArraysFromMaps(map1,map2,cont)
+		key1, key2 = makeKeyArraysFromMaps(map1,map2,cont)
+		key = makeKeyFromKeyArrays(key1, key2)
+		if key in currentFrameAcc:
+			currentFrameAcc[key].fscore+=cont.weight
+			currentFrameAcc[key].contributingAtomContacts.append(cont)
+		else:
+			currentFrameAcc[key] = TempContactAccumulate()
+			currentFrameAcc[key].fscore+=cont.weight
+			currentFrameAcc[key].contributingAtomContacts.append(cont)
+		if not key in allkeys:
+			allkeys.append(key)
+	frame_contacts_accumulated.append(currentFrameAcc)
 
-
+accumulatedContacts = {}
+for key in allkeys:
+	contact_key_frame_accumulate[key] = []
+	hbond_key_frame_accumulate[key] = []
+	for frame_dict in contact_accumulated:
+		if not key in frame_dict:
+			frame_dict[key] = [0,[]]
+		contact_key_frame_accumulate[key].append(frame_dict[key][0])
 # print analysis time and quit
 stop = timer()
 print (stop - start)
