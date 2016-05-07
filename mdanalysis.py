@@ -7,21 +7,12 @@ import itertools
 from timeit import default_timer as timer
 import re
 class AtomContact:
-	def __init__(self, frame, distance, weight, idx1, idx2, hbondinfo, aType1, aType2, resid1, resid2, resname1, resname2, segid1, segid2):
+	def __init__(self, frame, distance, weight, idx1, idx2, hbondinfo):
 		self.frame = int(frame)
 		self.distance = float(distance)
 		self.weight = float(weight)
 		self.idx1 = int(idx1)
 		self.idx2 = int(idx2)
-		self.hbondinfo = hbondinfo
-		self.aType1 = aType1
-		self.aType2 = aType2
-		self.resid1 = resid1
-		self.resid2 = resid2
-		self.resname1 = resname1
-		self.resname2 = resname2
-		self.segid1 = segid1
-		self.segid2 = segid2
 	def toString(self):
 		print "frame: %d, dist: %f, weight: %f, idx1: %d, idx2: %d" % (self.frame,self.distance, self.weight, self.idx1, self.idx2)
 
@@ -60,6 +51,61 @@ class AtomType:
 			htype = "none"
 		tp = AtomType(name,comment, AtomHBondType.mapping[htype])
 		return tp
+
+class TempContactAccumulate(object):
+	"""docstring for TempContactAccumulate"""
+	def __init__(self):
+		super(TempContactAccumulate, self).__init__()
+		self.fscore = 0
+		self.contributingAtomContacts = []
+		
+class AccumulationMapIndex():
+	index, atype, name, resid, resname, segid = range(6)
+	mapping = ["i.", "t.", "n.", "r.", "rn.", "s."]
+		
+def makeKeyArraysFromMaps(map1,map2,contact):
+	idx1 = contact.idx1
+	idx2 = contact.idx2
+	counter = 0
+	keys1 = []
+	for val in map1:
+		if val == 1:	
+			if counter == AccumulationMapIndex.index:
+				keys1.append(idx1)
+			elif counter == AccumulationMapIndex.atype:
+				keys1.append(type_array[idx1])
+			elif counter == AccumulationMapIndex.name:
+				keys1.append(name_array[idx1])
+			elif counter == AccumulationMapIndex.resid:
+				keys1.append(resid_array[idx1])
+			elif counter == AccumulationMapIndex.resname:
+				keys1.append(resname_array[idx1])
+			elif counter == AccumulationMapIndex.segid:
+				keys1.append(segids[idx1])
+		else:
+			keys1.append("none")		
+		counter += 1
+	counter = 0
+	keys2 = []
+	for val in map2:
+		if val == 1:	
+			if counter == AccumulationMapIndex.index:
+				keys2.append(idx2)
+			elif counter == AccumulationMapIndex.atype:
+				keys2.append(type_array[idx2])
+			elif counter == AccumulationMapIndex.name:
+				keys2.append(name_array[idx2])
+			elif counter == AccumulationMapIndex.resid:
+				keys2.append(resid_array[idx2])
+			elif counter == AccumulationMapIndex.resname:
+				keys2.append(resname_array[idx2])
+			elif counter == AccumulationMapIndex.segid:
+				keys2.append(segids[idx2])
+		else:
+			keys2.append("none")		
+		counter += 1
+	print keys1
+	print keys2
 
 heavyatomlines = []
 heavyatoms = []
@@ -187,8 +233,8 @@ for ts in u.trajectory:
 								dist = distarray[conv_hatom,idx2]
 								new_hbond = HydrogenBond(convindex1,convindex2,global_hatom, dist, angle, hbondcutoff, hbondcutangle)
 								hydrogenBonds.append(new_hbond)
-								print str(convindex1) + " " + str(convindex2)
-								print "hbond found: %d,%d,%d"%(convindex1,global_hatom,convindex2)
+								# print str(convindex1) + " " + str(convindex2)
+								# print "hbond found: %d,%d,%d"%(convindex1,global_hatom,convindex2)
 								# print angle
 					for global_hatom in hydrogenAtomsBoundToAtom2:
 						conv_hatom = indices2.index(global_hatom)
@@ -207,75 +253,85 @@ for ts in u.trajectory:
 								dist = distarray[idx1,conv_hatom]
 								new_hbond = HydrogenBond(convindex2,convindex1,global_hatom, dist, angle, hbondcutoff, hbondcutangle)
 								hydrogenBonds.append(new_hbond)
-								print str(convindex1) + " " + str(convindex2)
-								print "hbond found: %d,%d,%d"%(convindex2,global_hatom,convindex1)
+								# print str(convindex1) + " " + str(convindex2)
+								# print "hbond found: %d,%d,%d"%(convindex2,global_hatom,convindex1)
 									# print angle
 		#finalize
-		newAtomContact = AtomContact(int(frame), float(distance), float(weight), int(convindex1), int(convindex2),hydrogenBonds, type_array[convindex1], type_array[convindex2], resid_array[convindex1], resid_array[convindex2], resname_array[convindex1], resname_array[convindex2], segids[convindex1], segids[convindex2])
+		# , type_array[convindex1], type_array[convindex2], resid_array[convindex1], resid_array[convindex2], resname_array[convindex1], resname_array[convindex2], segids[convindex1], segids[convindex2]
+		newAtomContact = AtomContact(int(frame), float(distance), float(weight), int(convindex1), int(convindex2),hydrogenBonds)
 		currentFrameContacts.append(newAtomContact)
 	contactResults.append(currentFrameContacts)
 #draft & sketch playground
 
 # prototype writer for vmd visualization
-f = open('showHBondsInVMD.tcl', 'w')
-f.write('mol new %s \n'%psf)
-f.write('mol addfile %s \n'%dcd)
-f.write('mol delrep 0 top \n')
-f.write('mol representation NewCartoon \n')
-f.write('mol Color ColorID 3 \n')
-f.write('mol selection {all} \n')
-f.write('mol addrep top \n')
-for frame in contactResults:
-	for contact in frame:
-		for hbond in contact.hbondinfo:
-			# hbond.toString()
-			f.write('mol representation VDW \n')
-			f.write('mol Color Name \n')
-			f.write('mol selection {index %d %d %d} \n'%(hbond.donorIndex, hbond.acceptorIndex, hbond.hydrogenIndex))
-			f.write('mol addrep top \n')
-f.close()
+# f = open('showHBondsInVMD.tcl', 'w')
+# f.write('mol new %s \n'%psf)
+# f.write('mol addfile %s \n'%dcd)
+# f.write('mol delrep 0 top \n')
+# f.write('mol representation NewCartoon \n')
+# f.write('mol Color ColorID 3 \n')
+# f.write('mol selection {all} \n')
+# f.write('mol addrep top \n')
+# for frame in contactResults:
+# 	for contact in frame:
+# 		for hbond in contact.hbondinfo:
+# 			# hbond.toString()
+# 			f.write('mol representation VDW \n')
+# 			f.write('mol Color Name \n')
+# 			f.write('mol selection {index %d %d %d} \n'%(hbond.donorIndex, hbond.acceptorIndex, hbond.hydrogenIndex))
+# 			f.write('mol addrep top \n')
+# f.close()
 
 #frame analysis
-contact_accumulated = []
-allkeys = []
+# contact_accumulated = []
+# allkeys = []
+# for frame in contactResults:
+# 	currentFrameAcc = {}
+# 	for cont in frame:
+# 		key = '%s %s %s %s' % (cont.resid1, cont.resname1, cont.resid2, cont.resname2) 
+# 		if key in currentFrameAcc:
+# 			currentFrameAcc[key][0]+=cont.weight
+# 			#hbond info
+# 			if len(cont.hbondinfo) > 0:
+# 				currentFrameAcc[key][1].append(cont.hbondinfo)
+# 		else:
+# 			currentFrameAcc[key] = [0,[]]
+# 			currentFrameAcc[key][0]=cont.weight
+# 			#hbond info
+# 			currentFrameAcc[key][1]=[]
+# 			if len(cont.hbondinfo) > 0:
+# 				currentFrameAcc[key][1].append(cont.hbondinfo)
+# 		if not key in allkeys:
+# 			allkeys.append(key)
+# 	contact_accumulated.append(currentFrameAcc)
+
+# contact_key_frame_accumulate = {}
+# hbond_key_frame_accumulate = {}
+# for key in allkeys:
+# 	contact_key_frame_accumulate[key] = []
+# 	hbond_key_frame_accumulate[key] = []
+# 	for frame_dict in contact_accumulated:
+# 		if not key in frame_dict:
+# 			frame_dict[key] = [0,[]]
+# 		contact_key_frame_accumulate[key].append(frame_dict[key][0])
+# 		hbond_key_frame_accumulate[key].append(frame_dict[key][1])
+# 	print key + ":" + str(list(contact_key_frame_accumulate[key]))
+# 	counter = 0
+# 	for frame in hbond_key_frame_accumulate[key]:
+# 		for item in frame:
+# 			for hbond in item:
+# 				print counter 
+# 				hbond.toString()
+# 		counter += 1
+map1 = [1,1,0,0,1,0,1]
+map2 = [1,1,0,0,1,0,1]
+frame_contacts_accumulated = []
 for frame in contactResults:
 	currentFrameAcc = {}
 	for cont in frame:
-		key = '%s %s %s %s' % (cont.resid1, cont.resname1, cont.resid2, cont.resname2) 
-		if key in currentFrameAcc:
-			currentFrameAcc[key][0]+=cont.weight
-			#hbond info
-			if len(cont.hbondinfo) > 0:
-				currentFrameAcc[key][1].append(cont.hbondinfo)
-		else:
-			currentFrameAcc[key] = [0,[]]
-			currentFrameAcc[key][0]=cont.weight
-			#hbond info
-			currentFrameAcc[key][1]=[]
-			if len(cont.hbondinfo) > 0:
-				currentFrameAcc[key][1].append(cont.hbondinfo)
-		if not key in allkeys:
-			allkeys.append(key)
-	contact_accumulated.append(currentFrameAcc)
+		keyarray = makeKeyArraysFromMaps(map1,map2,cont)
 
-contact_key_frame_accumulate = {}
-hbond_key_frame_accumulate = {}
-for key in allkeys:
-	contact_key_frame_accumulate[key] = []
-	hbond_key_frame_accumulate[key] = []
-	for frame_dict in contact_accumulated:
-		if not key in frame_dict:
-			frame_dict[key] = [0,[]]
-		contact_key_frame_accumulate[key].append(frame_dict[key][0])
-		hbond_key_frame_accumulate[key].append(frame_dict[key][1])
-	print key + ":" + str(list(contact_key_frame_accumulate[key]))
-	counter = 0
-	for frame in hbond_key_frame_accumulate[key]:
-		for item in frame:
-			for hbond in item:
-				print counter 
-				hbond.toString()
-		counter += 1
+
 # print analysis time and quit
 stop = timer()
 print (stop - start)

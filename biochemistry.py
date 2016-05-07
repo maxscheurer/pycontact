@@ -37,6 +37,7 @@ class Residue:
         self.name = name.lower()
         self.bb = float(bb)
         self.sc = float(sc)
+        # identifier = resid in this case
         self.ident = int(ident)
         if self.bb > self.sc:
             self.contactsBy = BackboneSidechainType.contactsBb
