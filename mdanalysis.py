@@ -55,11 +55,16 @@ class AtomType:
 
 class AccumulatedContact(object):
 	"""docstring for AccumulatedContact"""
-	def __init__(self):
+	def __init__(self, key1,key2):
 		super(AccumulatedContact, self).__init__()
 		self.scoreArray = []
+		self.contributingAtoms = []
+		self.key1 = key1
+		self.key2 = key2
 	def addScore(self,newScore):
 		self.scoreArray.append(newScore)
+	def addContributingAtoms(self, contAtoms):
+		self.contributingAtoms.append(contAtoms)
 
 
 class TempContactAccumulate(object):
@@ -223,7 +228,7 @@ sel2text = "segid UBQ"
 
 psf = "rpn11_ubq_interface-ionized.psf" 
 dcd = "short.dcd"
-
+# dcd = "rpn11_ubq_50ns.dcd"
 ### main tool
 u = MDAnalysis.Universe(psf,dcd) 
 sel1 = u.select_atoms(sel1text)
@@ -256,7 +261,7 @@ contactResults = []
 for ts in u.trajectory: 
 	currentFrameContacts = []
 	frame = ts.frame
-	# print frame
+	print frame
 	result = np.ndarray(shape=(len(sel1.coordinates()),len(sel2.coordinates())), dtype=float)
 	distarray = distances.distance_array(sel1.coordinates(), sel2.coordinates(), box=None, result=result)
 	contacts = np.where(distarray <= cutoff)
@@ -358,38 +363,8 @@ for ts in u.trajectory:
 		currentFrameContacts.append(newAtomContact)
 	contactResults.append(currentFrameContacts)
 
-#draft & sketch playground
-
-# prototype writer for vmd visualization
-# f = open('showHBondsInVMD.tcl', 'w')
-# f.write('mol new %s \n'%psf)
-# f.write('mol addfile %s \n'%dcd)
-# f.write('mol delrep 0 top \n')
-# f.write('mol representation NewCartoon \n')
-# f.write('mol Color ColorID 3 \n')
-# f.write('mol selection {all} \n')
-# f.write('mol addrep top \n')
-# for frame in contactResults:
-# 	for contact in frame:
-# 		for hbond in contact.hbondinfo:
-# 			# hbond.toString()
-# 			f.write('mol representation VDW \n')
-# 			f.write('mol Color Name \n')
-# 			f.write('mol selection {index %d %d %d} \n'%(hbond.donorIndex, hbond.acceptorIndex, hbond.hydrogenIndex))
-# 			f.write('mol addrep top \n')
-# f.close()
-
-#draft, don't delete
-# counter = 0
-# 	for frame in hbond_key_frame_accumulate[key]:
-# 		for item in frame:
-# 			for hbond in item:
-# 				print counter 
-# 				hbond.toString()
-# 		counter += 1
-
-map1 = [1,0,1,1,1,1]
-map2 = [1,1,0,1,0,1]
+map1 = [0,0,0,1,1,0]
+map2 = [0,0,0,1,1,0]
 frame_contacts_accumulated = []
 allkeys = []
 for frame in contactResults:
@@ -411,7 +386,6 @@ for frame in contactResults:
 accumulatedContacts = {}
 for key in allkeys:
 	accumulatedContacts[key] = []
-	# print key
 	for frame_dict in frame_contacts_accumulated:
 		if not key in frame_dict:
 			key1, key2 = makeKeyArraysFromKey(key)
@@ -419,14 +393,16 @@ for key in allkeys:
 			emptyCont.fscore = 0
 			frame_dict[key] = emptyCont
 		accumulatedContacts[key].append(frame_dict[key])
-		# print frame_dict[key].fscore ,
-	# print "\n------------------"
 
 finalAccumulatedContacts = []
 for key in accumulatedContacts:
-	acc = AccumulatedContact()
+	key1, key2 = makeKeyArraysFromKey(key)
+	acc = AccumulatedContact(key1,key2)
 	for tempContact in accumulatedContacts[key]:
 		acc.addScore(tempContact.fscore)
+		acc.addContributingAtoms(tempContact.contributingAtomContacts)
+	finalAccumulatedContacts.append(acc)
+
 # print analysis time and quit
 stop = timer()
 print (stop - start)
