@@ -58,19 +58,22 @@ class AccumulatedContact(object):
 	def __init__(self):
 		super(AccumulatedContact, self).__init__()
 		self.scoreArray = []
+	def addScore(self,newScore):
+		self.scoreArray.append(newScore)
 
-		
 
 class TempContactAccumulate(object):
 	"""docstring for TempContactAccumulate"""
-	def __init__(self):
+	def __init__(self, key1, key2):
 		super(TempContactAccumulate, self).__init__()
 		self.fscore = 0
 		self.contributingAtomContacts = []
+		self.key1 = key1
+		self.key2 = key2
 		
 class AccumulationMapIndex():
 	index, atype, name, resid, resname, segid = range(6)
-	mapping = ["i.", "t.", "n.", "r.", "rn.", "s."]
+	mapping = ["i.", "t.", "nm.", "r.", "rn.", "s."]
 		
 def makeKeyArraysFromMaps(map1,map2,contact):
 	idx1 = contact.idx1
@@ -115,6 +118,68 @@ def makeKeyArraysFromMaps(map1,map2,contact):
 		counter += 1
 	return [keys1,keys2]
 
+def makeKeyArraysFromKey(key):
+	keystring1, keystring2 = key.split("-")
+	mapping = AccumulationMapIndex.mapping
+	maximal = len(mapping)
+	key1 = []
+	for i in range(0, maximal):
+		current = mapping[i]
+		if current not in keystring1:
+			key1.append("none")
+			continue
+		if i == (maximal -1):
+			key1.append(keystring1[keystring1.index(current) + len(current):])
+			break
+		nextCurrent = mapping[i+1]
+		if nextCurrent not in keystring1:
+			nxt = ""
+			for k in mapping[i+1:]:
+				if k in keystring1[keystring1.index(current) + len(current):]:
+					nxt = k
+					break
+			if nxt != "":
+				key1.append(keystring1[keystring1.index(current) + len(current):keystring1.index(nxt)])
+			else:
+				key1.append(keystring1[keystring1.index(current) + len(current):])
+			continue
+		else:
+			currentValue = find_between(keystring1,current,nextCurrent)
+			if currentValue == "":
+				key1.append("none")
+			else:
+				key1.append(currentValue)
+
+	key2 = []
+	for i in range(0, maximal):
+		current = mapping[i]
+		if current not in keystring2:
+			key2.append("none")
+			continue
+		if i == (maximal -1):
+			key2.append(keystring2[keystring2.index(current) + len(current):])
+			break
+		nextCurrent = mapping[i+1]
+		if nextCurrent not in keystring2:
+			nxt = ""
+			for k in mapping[i+1:]:
+				if k in keystring2[keystring2.index(current) + len(current):]:
+					nxt = k
+					break
+			if nxt != "":
+				key2.append(keystring2[keystring2.index(current) + len(current):keystring2.index(nxt)])
+			else:
+				key2.append(keystring2[keystring2.index(current) + len(current):])
+			continue
+		else:
+			currentValue = find_between(keystring2,current,nextCurrent)
+			if currentValue == "":
+				key2.append("none")
+			else:
+				key2.append(currentValue)
+	return [key1,key2]
+
+
 def makeKeyFromKeyArrays(key1,key2):
 	key = ""
 	itemcounter = 0
@@ -122,6 +187,7 @@ def makeKeyFromKeyArrays(key1,key2):
 		if item != "none":
 			key += AccumulationMapIndex.mapping[itemcounter] + str(item)
 		itemcounter += 1
+	key += "-"
 	itemcounter = 0
 	for item in key2:
 		if item != "none":
@@ -138,6 +204,14 @@ for line in pars:
 for atomline in heavyatomlines:
 	atype = AtomType.parseParameterFileString(atomline)
 	heavyatoms.append(atype)
+
+def find_between(s, first, last):
+    try:
+        start = s.index(first) + len( first )
+        end = s.index( last, start )
+        return s[start:end]
+    except ValueError:
+        return ""
 
 ### config
 
@@ -277,12 +351,13 @@ for ts in u.trajectory:
 								hydrogenBonds.append(new_hbond)
 								# print str(convindex1) + " " + str(convindex2)
 								# print "hbond found: %d,%d,%d"%(convindex2,global_hatom,convindex1)
-									# print angle
+								# print angle
 		#finalize
 		# , type_array[convindex1], type_array[convindex2], resid_array[convindex1], resid_array[convindex2], resname_array[convindex1], resname_array[convindex2], segids[convindex1], segids[convindex2]
 		newAtomContact = AtomContact(int(frame), float(distance), float(weight), int(convindex1), int(convindex2),hydrogenBonds)
 		currentFrameContacts.append(newAtomContact)
 	contactResults.append(currentFrameContacts)
+
 #draft & sketch playground
 
 # prototype writer for vmd visualization
@@ -313,8 +388,8 @@ for ts in u.trajectory:
 # 				hbond.toString()
 # 		counter += 1
 
-map1 = [0,0,0,1,1,0]
-map2 = [0,0,0,1,1,0]
+map1 = [1,0,1,1,1,1]
+map2 = [1,1,0,1,0,1]
 frame_contacts_accumulated = []
 allkeys = []
 for frame in contactResults:
@@ -326,7 +401,7 @@ for frame in contactResults:
 			currentFrameAcc[key].fscore+=cont.weight
 			currentFrameAcc[key].contributingAtomContacts.append(cont)
 		else:
-			currentFrameAcc[key] = TempContactAccumulate()
+			currentFrameAcc[key] = TempContactAccumulate(key1, key2)
 			currentFrameAcc[key].fscore+=cont.weight
 			currentFrameAcc[key].contributingAtomContacts.append(cont)
 		if not key in allkeys:
@@ -336,15 +411,22 @@ for frame in contactResults:
 accumulatedContacts = {}
 for key in allkeys:
 	accumulatedContacts[key] = []
-	print key
+	# print key
 	for frame_dict in frame_contacts_accumulated:
 		if not key in frame_dict:
-			emptyCont = TempContactAccumulate()
+			key1, key2 = makeKeyArraysFromKey(key)
+			emptyCont = TempContactAccumulate(key1,key2)
 			emptyCont.fscore = 0
 			frame_dict[key] = emptyCont
 		accumulatedContacts[key].append(frame_dict[key])
-		print frame_dict[key].fscore ,
-	print "\n------------------"
+		# print frame_dict[key].fscore ,
+	# print "\n------------------"
+
+finalAccumulatedContacts = []
+for key in accumulatedContacts:
+	acc = AccumulatedContact()
+	for tempContact in accumulatedContacts[key]:
+		acc.addScore(tempContact.fscore)
 # print analysis time and quit
 stop = timer()
 print (stop - start)
