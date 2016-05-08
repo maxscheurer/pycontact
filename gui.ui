@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>650</width>
-    <height>456</height>
+    <width>846</width>
+    <height>606</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -120,8 +120,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>624</width>
-         <height>349</height>
+         <width>820</width>
+         <height>499</height>
         </rect>
        </property>
       </widget>
@@ -136,12 +136,13 @@
     </item>
    </layout>
   </widget>
+  <widget class="QStatusBar" name="statusbar"/>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>650</width>
+     <width>846</width>
      <height>22</height>
     </rect>
    </property>
@@ -155,16 +156,8 @@
     <addaction name="actionOpen"/>
     <addaction name="actionExport"/>
    </widget>
-   <widget class="QMenu" name="menuVMD">
-    <property name="title">
-     <string>VMD</string>
-    </property>
-    <addaction name="actionRun_VMD_contact_search"/>
-   </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuVMD"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpen">
    <property name="text">
     <string>Open</string>
