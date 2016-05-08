@@ -274,22 +274,33 @@ for atomline in heavyatomlines:
 	atype = AtomType.parseParameterFileString(atomline)
 	heavyatoms.append(atype)
 
-### config
+### config (GUI settings!)
 
+#cutoff for contact measurement
 cutoff = 5.0
+#cutoff for H-A distance, usually 3-3.5?(check in literature again!)
 hbondcutoff = 3.5
+#cutoff angle for hbond, check literature again
 hbondcutangle = 120
+## selection texts (MDAnalysis format, not VMD!)
+# to scan for hydrogen bonds, please do NOT give selections without hydrogen atoms!
+# the computational effort is managed by the algorithm in an appropriate manner!
 sel1text = "segid RN11"
 sel2text = "segid UBQ"
 
+#input psf file (GUI: file picker)
 psf = "rpn11_ubq_interface-ionized.psf" 
+#input dcd file (GUI: file picker)
 # dcd = "short.dcd"
 dcd = "rpn11_ubq_50ns.dcd"
 
+## input maps for contact accumulation
+# boolean values, check AccumulationMapIndex for meaning!
 map1 = [0,0,0,1,1,0]
 map2 = [0,0,0,1,1,0]
 
-### main tool
+####### MAIN ALGORITHM
+######################
 # load psf and dcd file in memory
 u = MDAnalysis.Universe(psf,dcd) 
 # define selections according to sel1text and sel2text
@@ -328,18 +339,27 @@ for ts in u.trajectory:
 	frame = ts.frame
 	print frame
 	result = np.ndarray(shape=(len(sel1.coordinates()),len(sel2.coordinates())), dtype=float)
+	# distarray is the distance matrix between all atoms in sel1 and sel2
+	# row = sel1, column = sel2
 	distarray = distances.distance_array(sel1.coordinates(), sel2.coordinates(), box=None, result=result)
 	contacts = np.where(distarray <= cutoff)
+	#idx1 and idx2 correspond to a row,column in contacts, respectively
+	# they do NOT correspond to a global atom index!
 	for idx1, idx2 in itertools.izip(contacts[0], contacts[1]):
-		convindex1 = indices1[idx1]
-		convindex2 = indices2[idx2]
-		#jump out of loop if hydrogen contacts are found
+		convindex1 = indices1[idx1] #idx1 converted to global atom indexing
+		convindex2 = indices2[idx2] #idx2 converted to global atom indexing
+		#jump out of loop if hydrogen contacts are found, only contacts between heavy atoms are considered, hydrogen bonds can still be detected!
 		if re.match("H(.*)", type_array[convindex1]) or re.match("H(.*)", type_array[convindex2]):
 			continue  
+		#distance between atom1 and atom2
 		distance = distarray[idx1,idx2]
 		weight = weight_function(distance)
+		#read AtomHBondType from heavyatoms list
 		type1 = next((x.htype for x in heavyatoms if x.name == type_array[convindex1]), AtomHBondType.none)
 		type2 = next((x.htype for x in heavyatoms if x.name == type_array[convindex2]), AtomHBondType.none)
+		## HydrogenBondAlgorithm
+		# TODO: outsource to another file?
+		# elongates the current loop a lot...
 		hydrogenBonds = []
 		if type1 != AtomHBondType.none and type2 != AtomHBondType.none:
 			if (type1 == AtomHBondType.both and type2 == AtomHBondType.both) or \
@@ -426,6 +446,11 @@ for ts in u.trajectory:
 		newAtomContact = AtomContact(int(frame), float(distance), float(weight), int(convindex1), int(convindex2),hydrogenBonds)
 		currentFrameContacts.append(newAtomContact)
 	contactResults.append(currentFrameContacts)
+
+### Data structure to process:
+# contactResults (list of frames)
+# ---> frame (list of AtomContacts)
+# --------> AtomContact
 
 frame_contacts_accumulated = []
 allkeys = []
