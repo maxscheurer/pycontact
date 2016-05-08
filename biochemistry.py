@@ -3,6 +3,7 @@ import numpy as np
 from read_db import *
 from PyQt5.QtGui import QColor
 compare = lambda x, y: collections.Counter(x) == collections.Counter(y)
+#testing
 
 # TODO: remove, deprecated
 class ResidueType:
