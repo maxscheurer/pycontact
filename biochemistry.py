@@ -3,12 +3,6 @@ import numpy as np
 from read_db import *
 from PyQt5.QtGui import QColor
 compare = lambda x, y: collections.Counter(x) == collections.Counter(y)
-#testing
-
-# TODO: remove, deprecated
-class ResidueType:
-    positive, negative, nonpolar, polar, other = range(5)
-    mapping = {"asp": negative, "arg": positive, "lys": positive, "glu": negative}
 
 class ContactType:
     saltbr, hydrophobic, hbond, other = range(4)

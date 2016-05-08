@@ -1,27 +1,7 @@
-import sys, sip, copy
-from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget, QDialog, QTabWidget, QButtonGroup,
-                             QLabel, QCheckBox, QPushButton, QMainWindow, QMenuBar, QComboBox,
-                             QLineEdit, QTextEdit, QGridLayout, QFileDialog, QAction, qApp, QHBoxLayout, QVBoxLayout)
-
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtGui import (QColor, QPainter, QFont)
-from PyQt5.QtWidgets import (QWidget, QPushButton, QRadioButton,
-                             QFrame, QApplication, QSizePolicy)
-from PyQt5.QtSvg import QSvgGenerator
-import numpy as np
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.figure import Figure
-import matplotlib.pyplot as plt
-import gui
-from settings import *
-from biochemistry import *
-from inputreader import *
-from filters import *
-from functools import partial
 from run_vmd import *
 from Canvas import *
 from Plotters import *
+from mdanalysis import *
 
 class MainWindow(QMainWindow, gui.Ui_MainWindow):
     def __init__(self, parent=None):
@@ -37,8 +17,6 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.scrollArea.setWidget(self.painter)
         self.actionOpen.triggered.connect(self.pushOpen)
         self.actionExport.triggered.connect(self.pushExport)
-        self.actionRun_VMD_contact_search.triggered.connect(self.pushRunVMDContactSearch)
-
         # settings and filters
         self.settingsView = SettingsTabWidget()
         self.settingsView.applySettingsButton.clicked.connect(self.updateSettings)
@@ -63,6 +41,11 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.functionButtonGroup.addButton(self.settingsView.linRadioButton, 2)
         self.setupFunctionBox()
         self.showFunctionSettings(FunctionType.sigmoid)
+
+        # map1 = [0, 0, 0, 1, 1, 0]
+        # map2 = [0, 0, 0, 1, 1, 0]
+        # contactResults = analyze_psf_dcd("rpn11_ubq_interface-ionized.psf", "short.dcd", 5.0, 2.5, 120, "segid RN11","segid UBQ")
+        # analyze_contactResultsWithMaps(contactResults, map1, map2)
 
     def setupFunctionBox(self):
         # sig
@@ -387,19 +370,6 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.painter.rendered = False
         self.painter.update()
         self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
-
-    def pushRunVMDContactSearch(self):
-        # test execution
-        run_vmd(50, 5, "","")
-        ######
-        d = QDialog()
-        grid = QGridLayout()
-        d.setLayout(grid)
-
-        d.setWindowTitle("Run VMD")
-        d.resize(650, 700)
-        d.setWindowModality(Qt.ApplicationModal)
-        d.exec_()
 
     def mergeValueChanged(self):
         self.painter.merge = self.mergeSlider.value()
