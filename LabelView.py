@@ -36,8 +36,11 @@ class LabelView(QWidget):
         self.buttons = []
         for c in self.contacts:
             cindex = self.contacts.index(c)
+            # TODO: implement title in AccumulatedContact
             self.buttons.append(QPushButton(c.title))
-            stylesheet = "border: 0px solid #222222; background-color: " + ContactType.colors[c.contactType] + " ;"
+            # TODO: implement ContactType in AccumulatedContact
+            # stylesheet = "border: 0px solid #222222; background-color: " + ContactType.colors[c.contactType] + " ;"
+            stylesheet = "border: 0px solid #222222; background-color: " + ContactType.colors[0] + " ;"
             self.buttons[-1].setStyleSheet(stylesheet)
             self.buttons[-1].clicked.connect(partial(self.handleButton, data=cindex))
             self.buttons[-1].setParent(self)
@@ -47,6 +50,7 @@ class LabelView(QWidget):
             row += rowheight
 
     def handleButton(self, data):
+        # TODO: adapt AccumulatedContacts to detailed info etc.
         # print('index clicked: '+ str(data))
         d = QDialog()
         grid = QGridLayout()

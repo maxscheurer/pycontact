@@ -86,7 +86,9 @@ class Canvas(QWidget):
 
         row = 0
         for c in self.contacts:
-            bbScColor = BackboneSidechainContactType.colors[c.backboneSideChainType]
+            # TODO: implement in AccumulatedContact
+            # bbScColor = BackboneSidechainContactType.colors[c.backboneSideChainType]
+            bbScColor = BackboneSidechainContactType.colors[0]
             i = 0
             if self.rangeFilterActive:
                 rangedScores = c.scoreArray
