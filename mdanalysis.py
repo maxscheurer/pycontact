@@ -5,44 +5,76 @@ from MDAnalysis.analysis import distances
 from MDAnalysis.analysis.hbonds.hbond_analysis import *
 import itertools
 from timeit import default_timer as timer
-import re
+import re, sys
+
+#### utilities
+### should be moved to a separate file in the future project...
+
+#utility for memory measurement
+suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
+def humansize(nbytes):
+    if nbytes == 0: return '0 B'
+    i = 0
+    while nbytes >= 1024 and i < len(suffixes)-1:
+        nbytes /= 1024.
+        i += 1
+    f = ('%.2f' % nbytes).rstrip('0').rstrip('.')
+    return '%s %s' % (f, suffixes[i])
+
+#find a string in s between the strings first and last
+def find_between(s, first, last):
+    try:
+        start = s.index(first) + len( first )
+        end = s.index( last, start )
+        return s[start:end]
+    except ValueError:
+        return ""
+
+# contains infos about an atom-atom contact
 class AtomContact:
 	def __init__(self, frame, distance, weight, idx1, idx2, hbondinfo):
-		self.frame = int(frame)
-		self.distance = float(distance)
-		self.weight = float(weight)
-		self.idx1 = int(idx1)
-		self.idx2 = int(idx2)
-		self.hbondinfo = hbondinfo
+		self.frame = int(frame) #frame the contact occured in
+		self.distance = float(distance) #distance between atom1 and atom2
+		self.weight = float(weight) #weighted distance according to applied weight function
+		self.idx1 = int(idx1) #global!!! index of atom1
+		self.idx2 = int(idx2) #global!!! index of atom2
+		self.hbondinfo = hbondinfo #list of HydrogenBonds for frame, empty list if no hbonds occured
 	def toString(self):
+		#print details about contact to console
 		print "frame: %d, dist: %f, weight: %f, idx1: %d, idx2: %d" % (self.frame,self.distance, self.weight, self.idx1, self.idx2)
 
+# contains infos about a hydrogenbond corresponding to a contact between two heavyatoms
 class HydrogenBond:
 	def __init__(self, donorIndex, acceptorIndex, hydrogenIndex, acceptorHydrogenDistance, angle, usedCutoffDist, usedCutoffAngle):
-		self.donorIndex = donorIndex
-		self.acceptorIndex = acceptorIndex
-		self.hydrogenIndex = hydrogenIndex
-		self.acceptorHydrogenDistance = acceptorHydrogenDistance
-		self.angle = angle
-		self.usedCutoffDist = usedCutoffDist
-		self.usedCutoffAngle = usedCutoffAngle
+		self.donorIndex = donorIndex #global! index of hbond donor: D-h ... a
+		self.acceptorIndex = acceptorIndex #global! index of acceptor: d-h ... A
+		self.hydrogenIndex = hydrogenIndex #global! index of hydrogen atom: d-H ... a
+		self.acceptorHydrogenDistance = acceptorHydrogenDistance #distance of H and A: H-(acceptorHydrogenDistance)-A
+		self.angle = angle #angle between D-H-A
+		self.usedCutoffDist = usedCutoffDist #obvious
+		self.usedCutoffAngle = usedCutoffAngle #obvious
 	def toString(self):
+		#print details about hbond to console
 		print "donor: %d, acceptor: %d, hydrogen: %d, dist: %f, angle: %f, usedCutoffDist: %f, usedCutoffAngle: %f" % (self.donorIndex, self.acceptorIndex, self.hydrogenIndex, self.acceptorHydrogenDistance, self.angle, self.usedCutoffDist, self.usedCutoffAngle)
 
+#weight function to score contact distances
 def weight_function(value):
 	return (1.0)/(1.0 + np.exp(5.0*(value-4.0)))
 
+#type of Atom concerning it hbond behavior
 class AtomHBondType:
 	don, acc, both, none = range(4)
 	mapping = {"don":don, "acc":acc, "both":both, "none":none}
 
+#AtomType represents MASS entry for atoms in CHARMM topology and parameter files
 class AtomType:
 	def __init__(self, name, comment, htype):
-		self.name = name
-		self.comment = comment
-		self.htype = htype
+		self.name = name #name = atomtype in CHARMM file
+		self.comment = comment # properties/infos according to CHARMM file 
+		self.htype = htype # AtomHBondType of AtomType, parsed from extra comment in CHARMM file
 	@staticmethod
 	def parseParameterFileString(string):
+		#read charmm parameter/topology file to determine AtomTypes and their AtomHBondType
 		spl = string.split("!")
 		name = spl[0].split()[2]
 		comment = spl[1][1:]
@@ -53,33 +85,52 @@ class AtomType:
 		tp = AtomType(name,comment, AtomHBondType.mapping[htype])
 		return tp
 
+## contains all information of a contact, mapped by key1/key2
+# Main class for future implementation in PyContact
+# will replace the Contact class in PyContact
 class AccumulatedContact(object):
 	"""docstring for AccumulatedContact"""
 	def __init__(self, key1,key2):
 		super(AccumulatedContact, self).__init__()
-		self.scoreArray = []
-		self.contributingAtoms = []
-		self.key1 = key1
-		self.key2 = key2
+		self.scoreArray = [] #score for every frame, summed by settings given in key1,key2
+		self.contributingAtoms = [] #list of list of AtomContacts, contributing to the contact
+		self.key1 = key1 #list of properties of sel1, cf. AccumulationMapIndex
+		self.key2 = key2 #list of properties of sel2, cf. AccumulationMapIndex
 	def addScore(self,newScore):
+		#append a score to the scoreArray, e.g. when a new frame score is added
 		self.scoreArray.append(newScore)
 	def addContributingAtoms(self, contAtoms):
+		#append a list of contributing atom to the contributingAtoms list, e.g. when a new frame is added
 		self.contributingAtoms.append(contAtoms)
 
-
+## used for temporary accumulation of contacts in data analysis
+# stores the frame's score as well as the key
+# many TempContactAccumulated objects are later converted to AccumulatedContact
 class TempContactAccumulate(object):
 	"""docstring for TempContactAccumulate"""
 	def __init__(self, key1, key2):
 		super(TempContactAccumulate, self).__init__()
-		self.fscore = 0
-		self.contributingAtomContacts = []
-		self.key1 = key1
+		self.fscore = 0  #score of current frame
+		self.contributingAtomContacts = [] #contrib. atoms, later appended to AccumulatedContact's contributingAtoms list
+ 		self.key1 = key1 
 		self.key2 = key2
 		
+## enum and mapping for atom properties
+# used to dynamically define keys and have a bijective nomenclature for all properties
 class AccumulationMapIndex():
 	index, atype, name, resid, resname, segid = range(6)
 	mapping = ["i.", "t.", "nm.", "r.", "rn.", "s."]
-		
+
+## maps contain information wether to consider an atom's field for contact accumulation
+# map1 and map2 contain six boolean values each, cf. AccumulationMapIndex
+# for a given contact, the corresponding value to a field is written to keys1 and keys2, respectively
+# example input:
+# map1 = [0,0,0,1,1,0]
+# map2 = [0,0,0,1,1,0], meaning that residue and resname should be used for contact accumulation
+# contact: idx1,idx2
+# results: (example!)
+#	keys1=["none","none","none","14", "VAL", "none"]
+#	keys2=["none","none","none","22", "ILE, "none"]
 def makeKeyArraysFromMaps(map1,map2,contact):
 	idx1 = contact.idx1
 	idx2 = contact.idx2
@@ -123,6 +174,10 @@ def makeKeyArraysFromMaps(map1,map2,contact):
 		counter += 1
 	return [keys1,keys2]
 
+
+#convert a key back to two key arrays
+# cf. comments on makeKeyFromKeyArrays and makeKeyArraysFromMaps
+# "inverse" function of makeKeyFromKeyArrays
 def makeKeyArraysFromKey(key):
 	keystring1, keystring2 = key.split("-")
 	mapping = AccumulationMapIndex.mapping
@@ -184,7 +239,14 @@ def makeKeyArraysFromKey(key):
 				key2.append(currentValue)
 	return [key1,key2]
 
-
+## input two key arrays as explained above
+#	example:
+#	keys1=["none","none","none","14", "VAL", "none"]
+#	keys2=["none","none","none","22", "ILE, "none"]
+#	returns a human readable key with the mapping identifiers in AccumulationMapIndex
+#	in the given example data:
+#	key="r.14rn.VAL-r.22rn.ILE"
+#	key is used to accumulated contacts in a dictionary (= a contact's unique identifier)
 def makeKeyFromKeyArrays(key1,key2):
 	key = ""
 	itemcounter = 0
@@ -200,6 +262,7 @@ def makeKeyFromKeyArrays(key1,key2):
 		itemcounter += 1
 	return key
 
+# reading topology/parameter CHARMM files for setting AtomTypes and AtomHBondTypes
 heavyatomlines = []
 heavyatoms = []
 pars = open('testpar.prm', 'r')
@@ -207,16 +270,9 @@ for line in pars:
     if re.match("MASS", line):
         heavyatomlines.append(line.rstrip())
 for atomline in heavyatomlines:
+	#read new AtomType and its corresponding AtomHBondType from file
 	atype = AtomType.parseParameterFileString(atomline)
 	heavyatoms.append(atype)
-
-def find_between(s, first, last):
-    try:
-        start = s.index(first) + len( first )
-        end = s.index( last, start )
-        return s[start:end]
-    except ValueError:
-        return ""
 
 ### config
 
@@ -227,18 +283,26 @@ sel1text = "segid RN11"
 sel2text = "segid UBQ"
 
 psf = "rpn11_ubq_interface-ionized.psf" 
-dcd = "short.dcd"
-# dcd = "rpn11_ubq_50ns.dcd"
+# dcd = "short.dcd"
+dcd = "rpn11_ubq_50ns.dcd"
+
+map1 = [0,0,0,1,1,0]
+map2 = [0,0,0,1,1,0]
+
 ### main tool
+# load psf and dcd file in memory
 u = MDAnalysis.Universe(psf,dcd) 
+# define selections according to sel1text and sel2text
 sel1 = u.select_atoms(sel1text)
 sel2 = u.select_atoms(sel2text)
+#write atomindices for each selection to list
 indices1 = []
 for at in sel1.atoms:
 	indices1.append(at.index)
 indices2 = []
 for at in sel2.atoms:
 	indices2.append(at.index)
+#write properties of all atoms to lists
 all_sel = u.select_atoms("all")
 resname_array = []
 resid_array = []
@@ -253,6 +317,7 @@ for atom in all_sel.atoms:
 	type_array.append(atom.type)
 	bonds.append(atom.bonds)
 	segids.append(atom.segid)
+# show trajectory information and selection information
 print "trajectory with %d frames loaded" % len(u.trajectory)
 print len(sel1.coordinates()),len(sel2.coordinates())
 start = timer()
@@ -358,13 +423,10 @@ for ts in u.trajectory:
 								# print "hbond found: %d,%d,%d"%(convindex2,global_hatom,convindex1)
 								# print angle
 		#finalize
-		# , type_array[convindex1], type_array[convindex2], resid_array[convindex1], resid_array[convindex2], resname_array[convindex1], resname_array[convindex2], segids[convindex1], segids[convindex2]
 		newAtomContact = AtomContact(int(frame), float(distance), float(weight), int(convindex1), int(convindex2),hydrogenBonds)
 		currentFrameContacts.append(newAtomContact)
 	contactResults.append(currentFrameContacts)
 
-map1 = [0,0,0,1,1,0]
-map2 = [0,0,0,1,1,0]
 frame_contacts_accumulated = []
 allkeys = []
 for frame in contactResults:
@@ -405,5 +467,12 @@ for key in accumulatedContacts:
 
 # print analysis time and quit
 stop = timer()
+#show memory information
+memory = []
+for var, obj in locals().items():
+	memory.append([var,sys.getsizeof(obj)])
+sorted_by_second = sorted(memory, key=lambda data: data[1], reverse=True)
+for item in sorted_by_second:
+	print item[0], humansize(item[1])
 print (stop - start)
 quit()
