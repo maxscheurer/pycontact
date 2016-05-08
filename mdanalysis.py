@@ -447,12 +447,23 @@ for ts in u.trajectory:
 		currentFrameContacts.append(newAtomContact)
 	contactResults.append(currentFrameContacts)
 
+#################################################
+######## contactResults evaluation
+# only depending on map1, map2
+# part can be run without running the contact analysis algorithm again, as it just prepares the results for displaying
+#################################################
+
 ### Data structure to process:
 # contactResults (list of frames)
 # ---> frame (list of AtomContacts)
 # --------> AtomContact
 
 frame_contacts_accumulated = []
+# frame_contacts_accumulated (list of frames)
+# ---> frame_dict (dict)
+# --------> key vs. TempContactAccumulate
+
+# list of all contacts keys (= unique identifiers, determined by the given maps)
 allkeys = []
 for frame in contactResults:
 	currentFrameAcc = {}
@@ -470,18 +481,25 @@ for frame in contactResults:
 			allkeys.append(key)
 	frame_contacts_accumulated.append(currentFrameAcc)
 
-accumulatedContacts = {}
+accumulatedContactsDict = {}
+# accumulatedContactsDict (dict)
+# ---> key vs. list of TempContactAccumulated
+# 
+# loop fills gaps with zero-score TempContactAccumulate of key if key is not occuring in a frame
+# provides clean data!
 for key in allkeys:
-	accumulatedContacts[key] = []
+	accumulatedContactsDict[key] = []
 	for frame_dict in frame_contacts_accumulated:
 		if not key in frame_dict:
 			key1, key2 = makeKeyArraysFromKey(key)
 			emptyCont = TempContactAccumulate(key1,key2)
 			emptyCont.fscore = 0
 			frame_dict[key] = emptyCont
-		accumulatedContacts[key].append(frame_dict[key])
+		accumulatedContactsDict[key].append(frame_dict[key])
 
-finalAccumulatedContacts = []
+#make a list of AccumulatedContacts from accumulatedContactsDict
+# probably, there is a much easier way to do that, but I am too tired at the moment and it works, though... (M)
+finalAccumulatedContacts = [] # list of AccumulatedContacts
 for key in accumulatedContacts:
 	key1, key2 = makeKeyArraysFromKey(key)
 	acc = AccumulatedContact(key1,key2)
