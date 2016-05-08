@@ -1,4 +1,6 @@
 #md analysis implementation for contact search
+# May 2016
+# Author: Maximilian Scheurer, mscheurer@ks.uiuc.edu
 import MDAnalysis
 import numpy as np
 from MDAnalysis.analysis import distances
@@ -291,8 +293,8 @@ sel2text = "segid UBQ"
 #input psf file (GUI: file picker)
 psf = "rpn11_ubq_interface-ionized.psf" 
 #input dcd file (GUI: file picker)
-# dcd = "short.dcd"
-dcd = "rpn11_ubq_50ns.dcd"
+dcd = "short.dcd"
+# dcd = "rpn11_ubq_50ns.dcd"
 
 ## input maps for contact accumulation
 # boolean values, check AccumulationMapIndex for meaning!
@@ -490,7 +492,7 @@ accumulatedContactsDict = {}
 for key in allkeys:
 	accumulatedContactsDict[key] = []
 	for frame_dict in frame_contacts_accumulated:
-		if not key in frame_dict:
+		if not key in frame_dict: # puts empty score TempContactAccumulate in dict
 			key1, key2 = makeKeyArraysFromKey(key)
 			emptyCont = TempContactAccumulate(key1,key2)
 			emptyCont.fscore = 0
@@ -500,10 +502,10 @@ for key in allkeys:
 #make a list of AccumulatedContacts from accumulatedContactsDict
 # probably, there is a much easier way to do that, but I am too tired at the moment and it works, though... (M)
 finalAccumulatedContacts = [] # list of AccumulatedContacts
-for key in accumulatedContacts:
+for key in accumulatedContactsDict:
 	key1, key2 = makeKeyArraysFromKey(key)
 	acc = AccumulatedContact(key1,key2)
-	for tempContact in accumulatedContacts[key]:
+	for tempContact in accumulatedContactsDict[key]:
 		acc.addScore(tempContact.fscore)
 		acc.addContributingAtoms(tempContact.contributingAtomContacts)
 	finalAccumulatedContacts.append(acc)
@@ -511,11 +513,12 @@ for key in accumulatedContacts:
 # print analysis time and quit
 stop = timer()
 #show memory information
-memory = []
-for var, obj in locals().items():
-	memory.append([var,sys.getsizeof(obj)])
-sorted_by_second = sorted(memory, key=lambda data: data[1], reverse=True)
-for item in sorted_by_second:
-	print item[0], humansize(item[1])
+if 0:
+	memory = []
+	for var, obj in locals().items():
+		memory.append([var,sys.getsizeof(obj)])
+	sorted_by_second = sorted(memory, key=lambda data: data[1], reverse=True)
+	for item in sorted_by_second:
+		print item[0], humansize(item[1])
 print (stop - start)
 quit()
