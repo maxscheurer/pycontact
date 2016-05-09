@@ -6,6 +6,7 @@ from MDAnalysis.analysis import distances
 from MDAnalysis.analysis.hbonds.hbond_analysis import *
 import itertools
 import re, sys
+from biochemistry import *
 
 #### utilities
 ### should be moved to a separate file in the future project...
@@ -115,10 +116,33 @@ class AccumulatedContact(object):
         self.key2 = key2  # list of properties of sel2, cf. AccumulationMapIndex
         # TODO:  human readable implementation of key/title
         self.title = makeKeyFromKeyArrays(key1, key2)
+        self.bb1 = 0
+        self.sc1 = 0
+        self.bb2 = 0
+        self.sc2 = 0
 
     def addScore(self, newScore):
         # append a score to the scoreArray, e.g. when a new frame score is added
         self.scoreArray.append(newScore)
+
+    def determineBackboneSidechainType(self):
+        if self.bb1 > self.sc1:
+            self.atom1contactsBy = BackboneSidechainType.contactsBb
+        else:
+            self.atom1contactsBy = BackboneSidechainType.contactsSc
+
+        if self.bb2 > self.sc2:
+            self.atom2contactsBy = BackboneSidechainType.contactsBb
+        else:
+            self.atom2contactsBy = BackboneSidechainType.contactsSc
+
+        if  self.atom1contactsBy == BackboneSidechainType.contactsBb and self.atom2contactsBy == BackboneSidechainType.contactsBb:
+            self.bbSidechainType = BackboneSidechainContactType.bb_only
+        elif self.atom1contactsBy == BackboneSidechainType.contactsSc and self.atom2contactsBy == BackboneSidechainType.contactsSc:
+            self.bbSidechainType = BackboneSidechainContactType.sc_only
+        else:
+            self.bbSidechainType = BackboneSidechainContactType.both
+        return self.bbSidechainType
 
     def addContributingAtoms(self, contAtoms):
         # append a list of contributing atom to the contributingAtoms list, e.g. when a new frame is added
@@ -131,6 +155,48 @@ class AccumulatedContact(object):
                 time += ns_per_frame
         self.ttime = time
         return self.ttime
+
+    def mean_life_time(self, ns_per_frame, threshold):
+        self.meanLifeTime = np.mean(self.life_time(ns_per_frame, threshold))
+        return self.meanLifeTime
+
+    def median_life_time(self, ns_per_frame, threshold):
+        self.medianLifeTime = np.median(self.life_time(ns_per_frame, threshold))
+        return self.medianLifeTime
+
+    def mean_score(self):
+        mean = 0
+        for score in self.scoreArray:
+            mean += score
+        mean = mean / len(self.scoreArray)
+        self.meanScore = mean
+        return mean
+
+    def median_score(self):
+        med = np.median(self.scoreArray)
+        self.medianScore = med
+        return med
+
+    def life_time(self, ns_per_frame, threshold):
+        lifeTimes = []
+        contactActive = False
+        contactTime = 0
+        i = 0
+        for score in self.scoreArray:
+            if contactActive == False and score > threshold:
+                contactActive = True
+                contactTime += ns_per_frame
+            elif contactActive == True and score > threshold:
+                contactTime += ns_per_frame
+            elif contactActive == True and score <= threshold:
+                contactActive = False
+                lifeTimes.append(contactTime)
+                contactTime = 0
+            if i == (len(self.scoreArray) - 1):
+                lifeTimes.append(contactTime)
+            i += 1
+        return lifeTimes
+
 # stores the frame's score as well as the key
 # many TempContactAccumulated objects are later converted to AccumulatedContact
 class TempContactAccumulate(object):
@@ -142,6 +208,10 @@ class TempContactAccumulate(object):
         self.contributingAtomContacts = []  # contrib. atoms, later appended to AccumulatedContact's contributingAtoms list
         self.key1 = key1
         self.key2 = key2
+        self.bb1score = 0
+        self.bb2score = 0
+        self.sc1score = 0
+        self.sc2score = 0
 
 
 ## enum and mapping for atom properties
@@ -348,6 +418,7 @@ def analyze_psf_dcd(psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1text, sel2
         indices2.append(at.index)
         # write properties of all atoms to lists
     all_sel = u.select_atoms("all")
+    backbone_sel = u.select_atoms("backbone")
     global resname_array
     resname_array = []
     global resid_array
@@ -360,6 +431,8 @@ def analyze_psf_dcd(psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1text, sel2
     bonds = []
     global segids
     segids = []
+    global backbone
+    backbone = []
     for atom in all_sel.atoms:
         resname_array.append(atom.resname)
         resid_array.append(atom.resid)
@@ -367,6 +440,8 @@ def analyze_psf_dcd(psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1text, sel2
         type_array.append(atom.type)
         bonds.append(atom.bonds)
         segids.append(atom.segid)
+    for atom in backbone_sel:
+        backbone.append(atom.index)
     # show trajectory information and selection information
     print "trajectory with %d frames loaded" % len(u.trajectory)
     print len(sel1.coordinates()), len(sel2.coordinates())
@@ -519,10 +594,26 @@ def analyze_contactResultsWithMaps(contactResults, map1, map2):
             if key in currentFrameAcc:
                 currentFrameAcc[key].fscore += cont.weight
                 currentFrameAcc[key].contributingAtomContacts.append(cont)
+                if cont.idx1 in backbone:
+                    currentFrameAcc[key].bb1score += cont.weight
+                else:
+                    currentFrameAcc[key].sc1score += cont.weight
+                if cont.idx2 in backbone:
+                    currentFrameAcc[key].bb2score += cont.weight
+                else:
+                    currentFrameAcc[key].sc2score += cont.weight
             else:
                 currentFrameAcc[key] = TempContactAccumulate(key1, key2)
                 currentFrameAcc[key].fscore += cont.weight
                 currentFrameAcc[key].contributingAtomContacts.append(cont)
+                if cont.idx1 in backbone:
+                    currentFrameAcc[key].bb1score += cont.weight
+                else:
+                    currentFrameAcc[key].sc1score += cont.weight
+                if cont.idx2 in backbone:
+                    currentFrameAcc[key].bb2score += cont.weight
+                else:
+                    currentFrameAcc[key].sc2score += cont.weight
             if not key in allkeys:
                 allkeys.append(key)
         frame_contacts_accumulated.append(currentFrameAcc)
@@ -552,7 +643,13 @@ def analyze_contactResultsWithMaps(contactResults, map1, map2):
         for tempContact in accumulatedContactsDict[key]:
             acc.addScore(tempContact.fscore)
             acc.addContributingAtoms(tempContact.contributingAtomContacts)
+            acc.bb1 += tempContact.bb1score
+            acc.bb2 += tempContact.bb2score
+            acc.sc1 += tempContact.sc1score
+            acc.sc2 += tempContact.sc2score
         finalAccumulatedContacts.append(acc)
+        print key, acc.bb1, acc.bb2, acc.sc1, acc.sc2
+        print len(acc.scoreArray)
     return finalAccumulatedContacts
     # show memory information
     if 0:

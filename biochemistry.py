@@ -22,7 +22,7 @@ class BackboneSidechainType:
 
 
 class BackboneSidechainContactType:
-    bb_only, sc_only, both = range(3)
+    bb_only, both, sc_only = range(3)
     mapping = [[BackboneSidechainType.contactsBb, BackboneSidechainType.contactsBb],[BackboneSidechainType.contactsBb, BackboneSidechainType.contactsSc], [BackboneSidechainType.contactsSc, BackboneSidechainType.contactsSc]]
     colors = [[0,200,200],[200,200,0],[0,200,0]]
 

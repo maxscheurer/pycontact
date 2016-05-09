@@ -50,7 +50,6 @@ class LabelView(QWidget):
             row += rowheight
 
     def handleButton(self, data):
-        # TODO: adapt AccumulatedContacts to detailed info etc.
         # print('index clicked: '+ str(data))
         d = QDialog()
         grid = QGridLayout()
@@ -64,8 +63,8 @@ class LabelView(QWidget):
         backboneSidechainTitleLabel = QLabel("bb/sc score (A)")
         backboneSidechainTitleLabel2 = QLabel("bb/sc score (B)")
 
-        backboneSidechainLabel = QLabel("%.2f/%.2f" % (contact.residueA.bb, contact.residueA.sc))
-        backboneSidechainLabel2 = QLabel("%.2f/%.2f" % (contact.residueB.bb, contact.residueB.sc))
+        backboneSidechainLabel = QLabel("%.2f/%.2f" % (contact.bb1, contact.sc1))
+        backboneSidechainLabel2 = QLabel("%.2f/%.2f" % (contact.bb2, contact.sc2))
 
         meanLifeTimeTitleLabel = QLabel("mean lifetime:")
         meanLifeTimeLabel = QLabel(str(contact.mean_life_time(self.nsPerFrame, self.threshold)))
