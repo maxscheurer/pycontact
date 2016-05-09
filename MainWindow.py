@@ -48,8 +48,8 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.setupFunctionBox()
         self.showFunctionSettings(FunctionType.sigmoid)
 
-        map1 = [0, 0, 0, 1, 1, 0]
-        map2 = [0, 0, 0, 1, 1, 0]
+        map1 = [0, 0, 0, 0, 0, 1]
+        map2 = [0, 0, 0, 0, 0, 1]
         contactResults = analyze_psf_dcd("rpn11_ubq_interface-ionized.psf", "short.dcd", 5.0, 2.5, 120, "segid RN11","segid UBQ")
         self.contacts = analyze_contactResultsWithMaps(contactResults, map1, map2)
         self.updateSettings()

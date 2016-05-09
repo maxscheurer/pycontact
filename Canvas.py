@@ -62,8 +62,8 @@ class Canvas(QWidget):
         qp.end()
 
     def renderContact(self, generator):
-        startx = 90
-        orig_startx = startx
+        # startx = 90
+        # orig_startx = startx
         start_text = 10
         rowheight = 22
         textoffset = 12
@@ -73,12 +73,24 @@ class Canvas(QWidget):
         merge = self.merge
         offset = 10
 
+
+        self.labelView.clean()
+        self.labelView = LabelView(self.contacts)
+        self.labelView.setParent(self)
+        self.labelView.nsPerFrame = self.nsPerFrame
+        self.labelView.threshold = self.threshold
+        self.labelView.show()
+        # startx has to be set according to maximum button length in labelview
+        startx = np.max(self.labelView.buttonWidths) + 10
+        orig_startx = startx
+
         # self.sizeX = (len(self.contacts[0].scoreArray) + startx) * offset
         # self.sizeY = len(self.contacts) * rowheight
         if self.rangeFilterActive:
             self.sizeX = startx + (len(self.contacts[0].scoreArray) + merge * 2) * offset / merge
         else:
-            self.sizeX = startx + (len(self.contacts[0].scoreArray[self.range[0]:self.range[1]]) + merge * 2) * offset / merge
+            self.sizeX = startx + (len(
+                self.contacts[0].scoreArray[self.range[0]:self.range[1]]) + merge * 2) * offset / merge
 
         self.sizeY = len(self.contacts) * rowheight
 
@@ -118,14 +130,6 @@ class Canvas(QWidget):
                 i += merge
             startx = orig_startx
             row += rowheight
-
-        # self.pixmap.save("test", 'png', 100)
-        self.labelView.clean()
-        self.labelView = LabelView(self.contacts)
-        self.labelView.setParent(self)
-        self.labelView.nsPerFrame = self.nsPerFrame
-        self.labelView.threshold = self.threshold
-        self.labelView.show()
 
         if generator:
             row = 0

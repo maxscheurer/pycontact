@@ -41,19 +41,21 @@ class LabelView(QWidget):
         rowheight = 22
         row = 0
         self.buttons = []
+        self.buttonWidths = []
         for c in self.contacts:
             cindex = self.contacts.index(c)
             # TODO: implement title in AccumulatedContact
             self.buttons.append(QPushButton(c.title))
             # TODO: implement ContactType in AccumulatedContact
             # stylesheet = "border: 0px solid #222222; background-color: " + ContactType.colors[c.contactType] + " ;"
-            stylesheet = "border: 0px solid #222222; background-color: " + ContactType.colors[0] + " ;"
+            stylesheet = "border: 0px solid #222222; background-color: " + ContactType.colors[3] + " ;"
             self.buttons[-1].setStyleSheet(stylesheet)
             self.buttons[-1].clicked.connect(partial(self.handleButton, data=cindex))
             self.buttons[-1].setParent(self)
             self.buttons[-1].move(start_text, row + textoffset)
             self.buttons[-1].setFont(QFont('Arial', 9))
             self.buttons[-1].show()
+            self.buttonWidths.append(self.buttons[-1].width())
             row += rowheight
 
     def handleButton(self, data):
