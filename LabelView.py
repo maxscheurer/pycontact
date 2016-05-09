@@ -1,3 +1,10 @@
+'''
+    Authors: Maximilian Scheurer, Peter Rodenkirch
+    Date created: May 2016
+    Python Version: 2.7
+    Version: 0.1a
+    Status: Development
+'''
 import sys, sip, copy
 from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget, QDialog, QTabWidget, QButtonGroup,
                              QLabel, QCheckBox, QPushButton, QMainWindow, QMenuBar, QComboBox,

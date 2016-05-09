@@ -1,4 +1,10 @@
-from run_vmd import *
+'''
+    Authors: Maximilian Scheurer, Peter Rodenkirch
+    Date created: May 2016
+    Python Version: 2.7
+    Version: 0.1a
+    Status: Development
+'''
 from Canvas import *
 from Plotters import *
 from mdanalysis import *

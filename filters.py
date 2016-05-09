@@ -1,6 +1,12 @@
+'''
+    Authors: Maximilian Scheurer, Peter Rodenkirch
+    Date created: May 2016
+    Python Version: 2.7
+    Version: 0.1a
+    Status: Development
+'''
 from __future__ import division
 from __future__ import absolute_import
-import numpy as np
 from biochemistry import *
 import numpy as np
 
