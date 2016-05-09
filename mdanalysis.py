@@ -144,12 +144,12 @@ class AccumulatedContact(object):
             self.atom2contactsBy = BackboneSidechainType.contactsSc
 
         if  self.atom1contactsBy == BackboneSidechainType.contactsBb and self.atom2contactsBy == BackboneSidechainType.contactsBb:
-            self.bbSidechainType = BackboneSidechainContactType.bb_only
+            self.backboneSideChainType = BackboneSidechainContactType.bb_only
         elif self.atom1contactsBy == BackboneSidechainType.contactsSc and self.atom2contactsBy == BackboneSidechainType.contactsSc:
-            self.bbSidechainType = BackboneSidechainContactType.sc_only
+            self.backboneSideChainType = BackboneSidechainContactType.sc_only
         else:
-            self.bbSidechainType = BackboneSidechainContactType.both
-        return self.bbSidechainType
+            self.backboneSideChainType = BackboneSidechainContactType.both
+        return self.backboneSideChainType
 
     def addContributingAtoms(self, contAtoms):
         # append a list of contributing atom to the contributingAtoms list, e.g. when a new frame is added
