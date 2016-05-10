@@ -81,7 +81,6 @@ class HydrogenBond:
 def weight_function(value):
     return (1.0) / (1.0 + np.exp(5.0 * (value - 4.0)))
 
-
 # type of Atom concerning it hbond behavior
 class AtomHBondType:
     don, acc, both, none = range(4)

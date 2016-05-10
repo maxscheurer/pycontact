@@ -8,6 +8,12 @@
 from Canvas import *
 from Plotters import *
 from mdanalysis import *
+import matplotlib.pyplot as plt
+
+import numpy as np
+from matplotlib import pyplot as plt
+from matplotlib.mlab import bivariate_normal
+from mpl_toolkits.mplot3d import Axes3D
 
 class MainWindow(QMainWindow, gui.Ui_MainWindow):
     def __init__(self, parent=None):
@@ -51,9 +57,30 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         map1 = [0, 0, 0, 1, 1, 0]
         map2 = [0, 0, 0, 1, 1, 0]
         contactResults = analyze_psf_dcd("rpn11_ubq_interface-ionized.psf", "short.dcd", 5.0, 2.5, 120, "segid RN11","segid UBQ")
-        self.contacts = analyze_contactResultsWithMaps(contactResults, map1, map2)
+        self.contacts= analyze_contactResultsWithMaps(contactResults, map1, map2)
+
+        maxresids1 = []
+        maxresids2 = []
         for cont in self.contacts:
             cont.determineBackboneSidechainType()
+            maxresids1.append(int(cont.key1[AccumulationMapIndex.resid]))
+            maxresids2.append(int(cont.key2[AccumulationMapIndex.resid]))
+
+        # Generate some test data
+        x = np.arange(1,np.max(maxresids1)+2)
+        y = np.arange(1,np.max(maxresids2)+2)
+        data = np.zeros((len(x), len(y)))
+        for cont in self.contacts:
+            r1 = int(cont.key1[AccumulationMapIndex.resid])
+            r2 = int(cont.key2[AccumulationMapIndex.resid])
+            # data[r1,r2] = cont.total_time(1, 0)
+            data[r1, r2] = cont.mean_score()
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+
+        cax = ax.matshow(data)
+        fig.colorbar(cax)
+        # plt.show()
         self.updateSettings()
         self.updateFilters()
 
