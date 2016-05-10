@@ -59,6 +59,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         contactResults = analyze_psf_dcd("rpn11_ubq_interface-ionized.psf", "short.dcd", 5.0, 2.5, 120, "segid RN11","segid UBQ")
         self.contacts= analyze_contactResultsWithMaps(contactResults, map1, map2)
 
+        # testing shit
         maxresids1 = []
         maxresids2 = []
         for cont in self.contacts:
