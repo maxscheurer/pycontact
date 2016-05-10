@@ -8,10 +8,12 @@
 from Canvas import *
 from Plotters import *
 from mdanalysis import *
+from PyQt5.QtWidgets import *
 import matplotlib.pyplot as plt
 
 import numpy as np
 from matplotlib import pyplot as plt
+from matplotlib import cm
 from matplotlib.mlab import bivariate_normal
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -40,9 +42,12 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
 
         self.statisticsButton.clicked.connect(self.showStatistics)
 
-        self.updateSettings()
-        self.updateFilters()
         self.openPreferencesButton.clicked.connect(self.openPrefs)
+
+        #color picker
+        self.settingsView.pickColorButton.clicked.connect(self.showColorPicker)
+        self.customColor = QColor(255, 0, 0)
+        self.settingsView.pickColorButton.setStyleSheet("QWidget { background-color: %s }" % self.customColor.name())
 
         #button group for weight functions
         self.functionButtonGroup = QButtonGroup()
@@ -54,10 +59,19 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.setupFunctionBox()
         self.showFunctionSettings(FunctionType.sigmoid)
 
+        #apply color button
+        self.settingsView.applyColorButton.clicked.connect(self.updateColors)
+        self.colorScheme = ColorScheme.bbsc
+
         map1 = [0, 0, 0, 1, 1, 0]
         map2 = [0, 0, 0, 1, 1, 0]
         contactResults = analyze_psf_dcd("rpn11_ubq_interface-ionized.psf", "short.dcd", 5.0, 2.5, 120, "segid RN11","segid UBQ")
         self.contacts= analyze_contactResultsWithMaps(contactResults, map1, map2)
+
+        # map1 = [0, 0, 0, 1, 1, 0]
+        # map2 = [0, 0, 0, 1, 1, 0]
+        # contactResults = analyze_psf_dcd("membraneAligned-helixZ90X0-ionized.psf", "arf_hmmm_100ns_100f_comet.dcd", 5.0, 2.5, 120, "segid PROT","segid MEMB")
+        # self.contacts= analyze_contactResultsWithMaps(contactResults, map1, map2)
 
         # testing shit
         maxresids1 = []
@@ -74,12 +88,17 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         for cont in self.contacts:
             r1 = int(cont.key1[AccumulationMapIndex.resid])
             r2 = int(cont.key2[AccumulationMapIndex.resid])
+            hbonds = cont.hbondFramesScan()
+            count = np.count_nonzero(hbonds)
+            if count > 0:
+                print cont.title + " contains " + str(count) + " hbonds in total"
             # data[r1,r2] = cont.total_time(1, 0)
             data[r1, r2] = cont.mean_score()
         fig = plt.figure()
         ax = fig.add_subplot(111)
 
-        cax = ax.matshow(data)
+        cax = ax.matshow(data, cmap=cm.coolwarm, aspect='equal')
+        fig.tight_layout()
         fig.colorbar(cax)
         # plt.show()
         self.updateSettings()
@@ -149,6 +168,8 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.painter.nsPerFrame = float(self.settingsView.nsPerFrameField.text())
         self.painter.threshold = float(self.settingsView.thresholdField.text())
         self.painter.rendered = False
+        self.painter.colorScheme = self.colorScheme
+        self.painter.customColor = self.customColor
         self.painter.update()
         self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
 
@@ -421,8 +442,27 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.painter.update()
         self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
 
+    def showColorPicker(self):
+        col = QColorDialog.getColor()
+        self.customColor = col
+        if col.isValid():
+            self.settingsView.pickColorButton.setStyleSheet("QWidget { background-color: %s }"
+                                   % self.customColor.name())
+
+    def updateColors(self):
+        if self.settingsView.bbscScoreRadioButton.isChecked():
+            self.colorScheme = ColorScheme.bbsc
+        elif self.settingsView.customColorRadioButton.isChecked():
+            self.colorScheme = ColorScheme.custom
+        self.updateSettings()
+        self.updateFilters()
+
 
 class SettingsTabWidget(QTabWidget, Ui_settingsWindowWidget):
     def __init__(self, parent=None):
         super(QtWidgets.QTabWidget, self).__init__(parent)
         self.setupUi(self)
+
+
+class ColorScheme:
+    custom, bbsc = range(2)

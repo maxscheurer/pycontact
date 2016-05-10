@@ -203,6 +203,18 @@ class AccumulatedContact(object):
             i += 1
         return lifeTimes
 
+    def hbondFramesScan(self):
+        self.hbondFrames = []
+        for frameList in self.contributingAtoms:
+            currentFrame = 0
+            for contAtoms in frameList:
+                length = len(contAtoms.hbondinfo)
+                if  length > 0:
+                    currentFrame += length
+            self.hbondFrames.append(currentFrame)
+        return self.hbondFrames
+
+
 # stores the frame's score as well as the key
 # many TempContactAccumulated objects are later converted to AccumulatedContact
 class TempContactAccumulate(object):

@@ -26,6 +26,9 @@ from filters import *
 from functools import partial
 from LabelView import *
 
+class ColorScheme:
+    custom, bbsc = range(2)
+
 class Canvas(QWidget):
     def __init__(self):
         super(QWidget,self).__init__()
@@ -124,7 +127,12 @@ class Canvas(QWidget):
                 alpha = merged_score * self.alphaFactor
                 if alpha > 255:
                     alpha = 255
-                p.setBrush(QColor(bbScColor[0], bbScColor[1], bbScColor[2], alpha))
+                if self.colorScheme == ColorScheme.bbsc:
+                    p.setBrush(QColor(bbScColor[0], bbScColor[1], bbScColor[2], alpha))
+                elif self.colorScheme == ColorScheme.custom:
+                    color = QColor(self.customColor)
+                    color.setAlpha(alpha)
+                    p.setBrush(color)
                 p.drawRect(startx, row, offset, 20)
                 startx += offset
                 i += merge
@@ -137,9 +145,10 @@ class Canvas(QWidget):
                 p.setPen(0)
                 # print(ContactType.colors[c.contactType])
                 p.setFont(QFont('Arial', 9))
-                string = c.resA + c.residA + "-" + c.resB + c.residB
-                p.setBrush(ContactType.qcolors[c.contactType])
-                p.drawRect(0, row+3, 90, rowheight-10)
+                # string = c.resA + c.residA + "-" + c.resB + c.residB
+                string = c.title
+                # p.setBrush(ContactType.qcolors[c.contactType])
+                # p.drawRect(0, row+3, 90, rowheight-10)
                 p.setPen(1)
                 p.drawText(start_text, row + textoffset, string)
                 row += rowheight
