@@ -84,7 +84,7 @@ class Canvas(QWidget):
         self.labelView.threshold = self.threshold
         self.labelView.show()
         # startx has to be set according to maximum button length in labelview
-        startx = np.max(self.labelView.buttonWidths) + 10
+        startx = np.max(self.labelView.buttonWidths) + 15
         orig_startx = startx
 
         # self.sizeX = (len(self.contacts[0].scoreArray) + startx) * offset

@@ -73,8 +73,9 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.map2 = map2
         self.psf = "rpn11_ubq_interface-ionized.psf"
         self.dcd = "short.dcd"
-        contactResults = analyze_psf_dcd(self.psf, self.dcd, 5.0, 2.5, 120, "segid RN11","segid UBQ")
-        self.contacts= analyze_contactResultsWithMaps(contactResults, map1, map2)
+        analysis = Analyzer(self.psf,self.dcd, 5.0,2.5,120,"segid RN11","segid UBQ")
+        analysis.runFrameScan()
+        self.contacts= analysis.runContactAnalysis(map1, map2)
 
         # map1 = [0, 0, 0, 1, 1, 0]
         # map2 = [0, 0, 0, 1, 1, 0]
