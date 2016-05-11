@@ -237,6 +237,7 @@ class TempContactAccumulate(object):
 class AccumulationMapIndex():
     index, atype, name, resid, resname, segid = range(6)
     mapping = ["i.", "t.", "nm.", "r.", "rn.", "s."]
+    vmdsel = ["index", "type", "name", "resid" , "resname", "segname"]
 
 
 ## maps contain information wether to consider an atom's field for contact accumulation

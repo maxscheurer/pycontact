@@ -46,8 +46,11 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
 
         #color picker
         self.settingsView.pickColorButton.clicked.connect(self.showColorPicker)
-        self.customColor = QColor(255, 0, 0)
+        self.customColor = QColor(230, 50, 0)
         self.settingsView.pickColorButton.setStyleSheet("QWidget { background-color: %s }" % self.customColor.name())
+
+        #visualize button
+        self.visButton.clicked.connect(self.visualize)
 
         #button group for weight functions
         self.functionButtonGroup = QButtonGroup()
@@ -65,7 +68,11 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
 
         map1 = [0, 0, 0, 1, 1, 0]
         map2 = [0, 0, 0, 1, 1, 0]
-        contactResults = analyze_psf_dcd("rpn11_ubq_interface-ionized.psf", "short.dcd", 5.0, 2.5, 120, "segid RN11","segid UBQ")
+        self.map1 = map1
+        self.map2 = map2
+        self.psf = "rpn11_ubq_interface-ionized.psf"
+        self.dcd = "short.dcd"
+        contactResults = analyze_psf_dcd(self.psf, self.dcd, 5.0, 2.5, 120, "segid RN11","segid UBQ")
         self.contacts= analyze_contactResultsWithMaps(contactResults, map1, map2)
 
         # map1 = [0, 0, 0, 1, 1, 0]
@@ -196,18 +203,18 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
                 lower = 0
             self.painter.range = [lower, upper]
             self.painter.rangeFilterActive = False
-            filteredContacts = copy.deepcopy(self.contacts)
+            self.filteredContacts = copy.deepcopy(self.contacts)
             # residue range filter
             resrangeFilter = ResidueRangeFilter("resrange")
-            filteredContacts = resrangeFilter.filterResiduesByRange(filteredContacts, self.settingsView.residARangeField.text(), self.settingsView.residBRangeField.text())
+            self.filteredContacts = resrangeFilter.filterResiduesByRange(self.filteredContacts, self.settingsView.residARangeField.text(), self.settingsView.residBRangeField.text())
             # aminoacids name filter
             aaFilter = NameFilter("name")
-            filteredContacts = aaFilter.filterResiduesByName(filteredContacts, self.settingsView.residANameField.text(), self.settingsView.residBNameField.text())
+            self.filteredContacts = aaFilter.filterResiduesByName(self.filteredContacts, self.settingsView.residANameField.text(), self.settingsView.residBNameField.text())
             # range filter
             if rangeFilterActive:
                 self.painter.rangeFilterActive = True
                 frameRangeFilter = FrameFilter("framer")
-                filteredContacts = frameRangeFilter.extractFrameRange(filteredContacts, [lower, upper])
+                self.filteredContacts = frameRangeFilter.extractFrameRange(self.filteredContacts, [lower, upper])
             # weight functions
             if weightActive:
                 if self.currentFunctionType == FunctionType.sigmoid:
@@ -217,46 +224,46 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
                     k = float(self.sigKField.text())
                     y0 = float(self.sigY0Field.text())
                     sig = SigmoidWeightFunction("sig", np.arange(0, len(self.contacts[0].scoreArray), 1), x0, L, k, y0)
-                    filteredContacts = sig.weightContactFrames(filteredContacts)
+                    self.filteredContacts = sig.weightContactFrames(self.filteredContacts)
                 elif self.currentFunctionType == FunctionType.rect:
                     x0 = float(self.rectX0Field.text())
                     x1 = float(self.rectX1Field.text())
                     h = float(self.rectHField.text())
                     y0 = float(self.rectY0Field.text())
                     rect = RectangularWeightFunction("rect", np.arange(0, len(self.contacts[0].scoreArray), 1), x0, x1, h, y0)
-                    filteredContacts = rect.weightContactFrames(filteredContacts)
+                    self.filteredContacts = rect.weightContactFrames(self.filteredContacts)
                 elif self.currentFunctionType == FunctionType.linear:
                     y0 = float(self.linY0Field.text())
                     y1 = float(self.linY1Field.text())
                     lin = LinearWeightFunction("rect", np.arange(0, len(self.contacts[0].scoreArray), 1), y0, y1)
-                    filteredContacts = lin.weightContactFrames(filteredContacts)
+                    self.filteredContacts = lin.weightContactFrames(self.filteredContacts)
             # other filters
             if filterActive:
                     if totalTimeActive:
                         operator = self.settingsView.compareTotalTimeDropdown.currentText()
                         value = float(self.settingsView.totalTimeField.text())
                         filter = TotalTimeFilter("tottime", operator, value)
-                        filteredContacts = filter.filterContacts(filteredContacts)
+                        self.filteredContacts = filter.filterContacts(self.filteredContacts)
                     if scoreActive:
                         operator = self.settingsView.compareScoreDropdown.currentText()
                         value = float(self.settingsView.scoreField.text())
                         filter = ScoreFilter("score", operator, value, self.settingsView.meanDropdown.currentText())
-                        filteredContacts = filter.filterContacts(filteredContacts)
+                        self.filteredContacts = filter.filterContacts(self.filteredContacts)
                     if sortingActive:
                         key = self.settingsView.sortingKeyDropdown.currentText()
                         descending = SortingOrder.mapping[self.settingsView.sortingOrderDropdown.currentText()]
                         sorter = Sorting("sorting", key, descending)
                         sorter.setThresholdAndNsPerFrame(float(self.settingsView.thresholdField.text()), float(self.settingsView.nsPerFrameField.text()))
-                        filteredContacts = sorter.sortContacts(filteredContacts)
-                    self.painter.contacts = filteredContacts
+                        self.filteredContacts = sorter.sortContacts(self.filteredContacts)
+                    self.painter.contacts = self.filteredContacts
                     self.painter.rendered = False
                     self.painter.update()
                     self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
-                    if len(filteredContacts) == 0:
+                    if len(self.filteredContacts) == 0:
                         self.painter.labelView.clean()
             else:
                 #no weight or filters
-                self.painter.contacts = filteredContacts
+                self.painter.contacts = self.filteredContacts
                 self.painter.rendered = False
                 self.painter.update()
                 self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
@@ -456,6 +463,97 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             self.colorScheme = ColorScheme.custom
         self.updateSettings()
         self.updateFilters()
+
+    def visualize(self):
+        d = QDialog()
+        grid = QGridLayout()
+        d.setLayout(grid)
+
+        label = QLabel("Split selections for each contact")
+        self.splitVisCheckbox = QCheckBox()
+        grid.addWidget(label, 0, 0)
+        grid.addWidget(self.splitVisCheckbox, 0, 1)
+
+        self.additionalText1 = QLineEdit()
+        self.additionalText2 = QLineEdit()
+        additionalTextLabel1 = QLabel("Additional seltext for selection 1")
+        additionalTextLabel2 = QLabel("Additional seltext for selection 2")
+
+        button = QPushButton("Create tcl script")
+        button.clicked.connect(self.createTclScriptVis)
+        grid.addWidget(button,3,0,1,2)
+
+        grid.addWidget(additionalTextLabel1, 1, 0)
+        grid.addWidget(additionalTextLabel2, 2, 0)
+        grid.addWidget(self.additionalText1, 1, 1)
+        grid.addWidget(self.additionalText2, 2, 1)
+
+        d.setWindowTitle("Visualize in VMD")
+        d.resize(200, 300)
+        d.setWindowModality(Qt.ApplicationModal)
+        d.exec_()
+
+    def createTclScriptVis(self):
+        f = open('vis.tcl', 'w')
+        f.write('mol new %s \n' % self.psf)
+        f.write('mol addfile %s \n' % self.dcd)
+        f.write('mol delrep 0 top \n')
+        f.write('mol representation NewCartoon \n')
+        f.write('mol Color ColorID 3 \n')
+        f.write('mol selection {all} \n')
+        f.write('mol addrep top \n')
+
+        if self.splitVisCheckbox.isChecked():
+            for cont in self.filteredContacts:
+                currentSel1 = []
+                index = 0
+                for item in cont.key1:
+                    if item != "none":
+                        currentSel1.append(AccumulationMapIndex.vmdsel[index] + " " + item)
+                    index += 1
+                currentSel1String = "and".join(currentSel1)
+                currentSel2 = []
+                index = 0
+                for item in cont.key2:
+                    if item != "none":
+                        currentSel2.append(AccumulationMapIndex.vmdsel[index] + " " + item)
+                    index += 1
+                currentSel2String = " and ".join(currentSel2)
+                add1 = ("" if self.additionalText1.text()=="" else (" and " + self.additionalText1.text()))
+                add2 = ("" if self.additionalText2.text() == "" else (" and " + self.additionalText2.text()))
+                sel = "("+currentSel1String + add1 + ") or (" + currentSel2String + add2 + ")"
+                f.write('mol representation Licorice \n')
+                f.write('mol Color Name \n')
+                f.write('mol selection {%s} \n'%sel)
+                f.write('mol addrep top \n')
+        else:
+            total = []
+            for cont in self.filteredContacts:
+                currentSel1 = []
+                index = 0
+                for item in cont.key1:
+                    if item != "none":
+                        currentSel1.append(AccumulationMapIndex.vmdsel[index] + " " + item)
+                    index += 1
+                currentSel1String = "and".join(currentSel1)
+                currentSel2 = []
+                index = 0
+                for item in cont.key2:
+                    if item != "none":
+                        currentSel2.append(AccumulationMapIndex.vmdsel[index] + " " + item)
+                    index += 1
+                currentSel2String = " and ".join(currentSel2)
+                add1 = ("" if self.additionalText1.text() == "" else (" and " + self.additionalText1.text()))
+                add2 = ("" if self.additionalText2.text() == "" else (" and " + self.additionalText2.text()))
+                sel = "(" + currentSel1String + add1 + ") or (" + currentSel2String + add2 + ")"
+                total.append(sel)
+            seltext = " or ".join(total)
+            f.write('mol representation Licorice \n')
+            f.write('mol Color Name \n')
+            f.write('mol selection {%s} \n' % seltext)
+            f.write('mol addrep top \n')
+        f.close()
+
 
 
 class SettingsTabWidget(QTabWidget, Ui_settingsWindowWidget):

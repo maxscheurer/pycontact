@@ -15,16 +15,16 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="5">
-     <widget class="QPushButton" name="openPreferencesButton">
+    <item row="0" column="0">
+     <widget class="QLabel" name="zoomSliderLabel">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
       <property name="text">
-       <string>Preferences</string>
+       <string>Zoom:</string>
       </property>
      </widget>
     </item>
@@ -38,41 +38,6 @@
       </property>
       <property name="text">
        <string>Alpha:</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="3">
-     <widget class="QSlider" name="alphaSlider">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>100</number>
-      </property>
-      <property name="sliderPosition">
-       <number>50</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="0">
-     <widget class="QLabel" name="zoomSliderLabel">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>Zoom:</string>
       </property>
      </widget>
     </item>
@@ -107,7 +72,56 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="0" colspan="6">
+    <item row="0" column="6">
+     <widget class="QPushButton" name="openPreferencesButton">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Preferences</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="4">
+     <widget class="QPushButton" name="statisticsButton">
+      <property name="text">
+       <string>Statistics</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="3">
+     <widget class="QSlider" name="alphaSlider">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimum">
+       <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="sliderPosition">
+       <number>50</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="7">
+     <widget class="QPushButton" name="visButton">
+      <property name="text">
+       <string>Visualize</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0" colspan="8">
      <widget class="QScrollArea" name="scrollArea">
       <property name="sizeAdjustPolicy">
        <enum>QAbstractScrollArea::AdjustIgnored</enum>
@@ -125,13 +139,6 @@
         </rect>
        </property>
       </widget>
-     </widget>
-    </item>
-    <item row="0" column="4">
-     <widget class="QPushButton" name="statisticsButton">
-      <property name="text">
-       <string>Statistics</string>
-      </property>
      </widget>
     </item>
    </layout>
