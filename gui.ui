@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>846</width>
+    <width>987</width>
     <height>606</height>
    </rect>
   </property>
@@ -72,7 +72,7 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="6">
+    <item row="0" column="7">
      <widget class="QPushButton" name="openPreferencesButton">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -85,7 +85,7 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="4">
+    <item row="0" column="5">
      <widget class="QPushButton" name="statisticsButton">
       <property name="text">
        <string>Statistics</string>
@@ -114,14 +114,14 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="7">
+    <item row="0" column="8">
      <widget class="QPushButton" name="visButton">
       <property name="text">
        <string>Visualize</string>
       </property>
      </widget>
     </item>
-    <item row="3" column="0" colspan="8">
+    <item row="3" column="0" colspan="9">
      <widget class="QScrollArea" name="scrollArea">
       <property name="sizeAdjustPolicy">
        <enum>QAbstractScrollArea::AdjustIgnored</enum>
@@ -134,11 +134,18 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>820</width>
+         <width>961</width>
          <height>499</height>
         </rect>
        </property>
       </widget>
+     </widget>
+    </item>
+    <item row="0" column="4">
+     <widget class="QPushButton" name="analysisButton">
+      <property name="text">
+       <string>Analyze</string>
+      </property>
      </widget>
     </item>
    </layout>
@@ -149,7 +156,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>846</width>
+     <width>987</width>
      <height>22</height>
     </rect>
    </property>
@@ -160,6 +167,7 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionLoad_Data"/>
     <addaction name="actionExport"/>
    </widget>
    <addaction name="menuFile"/>
@@ -183,6 +191,14 @@
   <action name="actionRun_VMD_contact_search">
    <property name="text">
     <string>Run VMD contact search</string>
+   </property>
+  </action>
+  <action name="actionLoad_Data">
+   <property name="text">
+    <string>Load Data</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+I</string>
    </property>
   </action>
  </widget>

@@ -32,6 +32,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         # deprecated
         # self.actionOpen.triggered.connect(self.pushOpen)
         self.actionExport.triggered.connect(self.pushExport)
+        self.actionLoad_Data.triggered.connect(self.loadDataPushed)
         # settings and filters
         self.settingsView = SettingsTabWidget()
         self.settingsView.applySettingsButton.clicked.connect(self.updateSettings)
@@ -50,6 +51,10 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.customColor = QColor(230, 50, 0)
         self.settingsView.pickColorButton.setStyleSheet("QWidget { background-color: %s }" % self.customColor.name())
 
+        #analysis button
+        self.analysisButton.clicked.connect(self.analyzeDataPushed)
+
+
         #visualize button
         self.visButton.clicked.connect(self.visualize)
 
@@ -67,15 +72,14 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.settingsView.applyColorButton.clicked.connect(self.updateColors)
         self.colorScheme = ColorScheme.bbsc
 
-        map1 = [0, 0, 0, 1, 1, 0]
-        map2 = [0, 0, 0, 1, 1, 0]
-        self.map1 = map1
-        self.map2 = map2
-        self.psf = "rpn11_ubq_interface-ionized.psf"
-        self.dcd = "short.dcd"
-        analysis = Analyzer(self.psf,self.dcd, 5.0,2.5,120,"segid RN11","segid UBQ")
-        analysis.runFrameScan()
-        self.contacts= analysis.runContactAnalysis(map1, map2)
+        # map1 = [0, 0, 0, 1, 1, 0]
+        # map2 = [0, 0, 0, 1, 1, 0]
+        # self.map1 = map1
+        # self.map2 = map2
+        # self.psf = "rpn11_ubq_interface-ionized.psf"
+        # self.dcd = "short.dcd"
+        # analysis.runFrameScan()
+        # self.contacts= analysis.runContactAnalysis(map1, map2)
 
         # map1 = [0, 0, 0, 1, 1, 0]
         # map2 = [0, 0, 0, 1, 1, 0]
@@ -83,35 +87,62 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         # self.contacts= analyze_contactResultsWithMaps(contactResults, map1, map2)
 
         # testing shit
-        maxresids1 = []
-        maxresids2 = []
-        for cont in self.contacts:
-            cont.determineBackboneSidechainType()
-            maxresids1.append(int(cont.key1[AccumulationMapIndex.resid]))
-            maxresids2.append(int(cont.key2[AccumulationMapIndex.resid]))
+        # maxresids1 = []
+        # maxresids2 = []
+        # for cont in self.contacts:
+        #     cont.determineBackboneSidechainType()
+        #     maxresids1.append(int(cont.key1[AccumulationMapIndex.resid]))
+        #     maxresids2.append(int(cont.key2[AccumulationMapIndex.resid]))
 
-        # Generate some test data
-        x = np.arange(1,np.max(maxresids1)+2)
-        y = np.arange(1,np.max(maxresids2)+2)
-        data = np.zeros((len(x), len(y)))
-        for cont in self.contacts:
-            r1 = int(cont.key1[AccumulationMapIndex.resid])
-            r2 = int(cont.key2[AccumulationMapIndex.resid])
-            hbonds = cont.hbondFramesScan()
-            count = np.count_nonzero(hbonds)
-            if count > 0:
-                print cont.title + " contains " + str(count) + " hbonds in total"
-            # data[r1,r2] = cont.total_time(1, 0)
-            data[r1, r2] = cont.mean_score()
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
+        # # Generate some test data
+        # x = np.arange(1,np.max(maxresids1)+2)
+        # y = np.arange(1,np.max(maxresids2)+2)
+        # data = np.zeros((len(x), len(y)))
+        # for cont in self.contacts:
+        #     r1 = int(cont.key1[AccumulationMapIndex.resid])
+        #     r2 = int(cont.key2[AccumulationMapIndex.resid])
+        #     hbonds = cont.hbondFramesScan()
+        #     count = np.count_nonzero(hbonds)
+        #     if count > 0:
+        #         print cont.title + " contains " + str(count) + " hbonds in total"
+        #     # data[r1,r2] = cont.total_time(1, 0)
+        #     data[r1, r2] = cont.mean_score()
+        # fig = plt.figure()
+        # ax = fig.add_subplot(111)
 
-        cax = ax.matshow(data, cmap=cm.coolwarm, aspect='equal')
-        fig.tight_layout()
-        fig.colorbar(cax)
+        # cax = ax.matshow(data, cmap=cm.coolwarm, aspect='equal')
+        # fig.tight_layout()
+        # fig.colorbar(cax)
         # plt.show()
+
         self.updateSettings()
         self.updateFilters()
+
+    def loadDataPushed(self):
+        self.config,result = FileLoaderDialog.getConfig()
+        if result == 1:
+            attrs = vars(self.config)
+            print ', '.join("%s: %s" % item for item in attrs.items())
+            self.analysis = Analyzer(self.config.psf,self.config.dcd, self.config.cutoff,self.config.hbondcutoff,self.config.hbondcutangle,self.config.sel1text,self.config.sel2text)
+            self.analysis.runFrameScan()
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Information)
+            msg.setText("Data loaded: %f frames scanned." % len(self.analysis.contactResults))
+            msg.setInformativeText("")
+            msg.setWindowTitle("Data loaded")
+            msg.setDetailedText("Now click on Analysis to proceed")
+            msg.exec_()
+
+    def analyzeDataPushed(self):
+        self.maps, result = AnalysisDialog.getMapping()
+        if result == 1:
+            map1 = self.maps[0]
+            map2 = self.maps[1]
+            self.contacts = self.analysis.runContactAnalysis(map1, map2)
+            self.updateSettings()
+            self.updateFilters()
+
+        
 
     def setupFunctionBox(self):
         # sig
@@ -558,6 +589,162 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         f.close()
 
 
+class FileLoaderDialog(QDialog):
+    def __init__(self, parent = None):
+        super(FileLoaderDialog, self).__init__(parent)
+
+        self.psf = ""
+        self.dcd = ""
+
+        grid = QGridLayout(self)
+
+        buttonPsf = QPushButton("PSF")
+        buttonPsf.clicked.connect(self.pick_psf)
+
+        buttonDcd = QPushButton("DCD")
+        buttonDcd.clicked.connect(self.pick_dcd)
+
+        grid.addWidget(buttonPsf,0,0)
+        grid.addWidget(buttonDcd,0,1)
+
+        cutoffLabel = QLabel("distance cutoff: ")
+        cutoffAngleLabel = QLabel("angle cutoff: ")
+        cutoffHbondLabel = QLabel("acc-h cutoff: ")
+        selection1Label = QLabel("selection 1: ")
+        selection2Label = QLabel("selection 2: ")
+
+        self.cutoffField = QLineEdit("5.0")
+        self.cutoffAngleField = QLineEdit("120")
+        self.cutoffHbondField = QLineEdit("2.0")
+        self.selection1Field = QLineEdit("segid RN11")
+        self.selection2Field = QLineEdit("segid UBQ")
+
+        grid.addWidget(cutoffLabel,1,0)
+        grid.addWidget(cutoffAngleLabel,2,0)
+        grid.addWidget(cutoffHbondLabel,3,0)
+        grid.addWidget(selection1Label,4,0)
+        grid.addWidget(selection2Label,5,0)
+
+        grid.addWidget(self.cutoffField,1,1)
+        grid.addWidget(self.cutoffAngleField,2,1)
+        grid.addWidget(self.cutoffHbondField,3,1)
+        grid.addWidget(self.selection1Field,4,1)
+        grid.addWidget(self.selection2Field,5,1)
+
+
+        # OK and Cancel buttons
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
+            Qt.Horizontal, self)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        grid.addWidget(buttons,6,0)
+
+    def pick_psf(self):
+        psfname = QFileDialog.getOpenFileNames(self, "Open psf")
+        for file in psfname[0]:
+            self.psf = file
+            break
+    def pick_dcd(self):
+        dcdname = QFileDialog.getOpenFileNames(self, "Open dcd")
+        for file in dcdname[0]:
+            self.dcd = file
+            break
+
+    def configuration(self):
+        config = Configuration(self.psf,self.dcd, float(self.cutoffField.text()),float(self.cutoffHbondField.text()),float(self.cutoffAngleField.text()),self.selection1Field.text(),self.selection2Field.text())
+        return config
+
+    # static method to create the dialog and return (date, time, accepted)
+    @staticmethod
+    def getConfig(parent = None):
+        dialog = FileLoaderDialog(parent)
+        result = dialog.exec_()
+        config = dialog.configuration()
+        return (config, result == QDialog.Accepted)
+
+class AnalysisDialog(QDialog):
+    def __init__(self, parent = None):
+        super(AnalysisDialog, self).__init__(parent)
+
+        grid = QGridLayout(self)
+        
+        title1 = QLabel("selection 1")
+        title2 = QLabel("selection 2")
+        indexLabel = QLabel("index: ")
+        nameLabel = QLabel("atom name: ")
+        residLabel = QLabel("resid: ")
+        resnameLabel = QLabel("resname: ")
+        segidLabel = QLabel("segid: ")
+
+        self.index1Checkbox = QCheckBox()
+        self.name1Checkbox = QCheckBox()
+        self.resid1Checkbox = QCheckBox()
+        self.resname1Checkbox = QCheckBox()
+        self.segid1Checkbox = QCheckBox()
+
+        self.index2Checkbox = QCheckBox()
+        self.name2Checkbox = QCheckBox()
+        self.resid2Checkbox = QCheckBox()
+        self.resname2Checkbox = QCheckBox()
+        self.segid2Checkbox = QCheckBox()
+
+        grid.addWidget(title1,0,1)
+        grid.addWidget(title2,0,2)
+        grid.addWidget(indexLabel,1,0)
+        grid.addWidget(nameLabel,2,0)
+        grid.addWidget(residLabel,3,0)
+        grid.addWidget(resnameLabel,4,0)
+        grid.addWidget(segidLabel,5,0)
+
+        grid.addWidget(self.index1Checkbox,1,1)
+        grid.addWidget(self.name1Checkbox,2,1)
+        grid.addWidget(self.resid1Checkbox,3,1)
+        grid.addWidget(self.resname1Checkbox,4,1)
+        grid.addWidget(self.segid1Checkbox,5,1)
+
+        grid.addWidget(self.index2Checkbox,1,2)
+        grid.addWidget(self.name2Checkbox,2,2)
+        grid.addWidget(self.resid2Checkbox,3,2)
+        grid.addWidget(self.resname2Checkbox,4,2)
+        grid.addWidget(self.segid2Checkbox,5,2)
+
+        # OK and Cancel buttons
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
+            Qt.Horizontal, self)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        grid.addWidget(buttons,6,0)
+
+
+    def mapping(self):
+        # atom types will not be supported in the future
+        map1 = [self.index1Checkbox.isChecked(),0,self.name1Checkbox.isChecked(),self.resid1Checkbox.isChecked(),self.resname1Checkbox.isChecked(),self.segid1Checkbox.isChecked()]
+        map2 = [self.index2Checkbox.isChecked(),0,self.name2Checkbox.isChecked(),self.resid2Checkbox.isChecked(),self.resname2Checkbox.isChecked(),self.segid2Checkbox.isChecked()]
+        print map1, map2
+        return [map1,map2]
+
+    # static method to create the dialog and return (date, time, accepted)
+    @staticmethod
+    def getMapping(parent = None):
+        dialog = AnalysisDialog(parent)
+        result = dialog.exec_()
+        mapping = dialog.mapping()
+        return (mapping, result == QDialog.Accepted)
+
+class Configuration(object):
+    """docstring for Configuration"""
+    def __init__(self, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1text, sel2text):
+        super(Configuration, self).__init__()
+        self.psf = psf
+        self.dcd = dcd
+        self.cutoff = cutoff
+        self.hbondcutoff = hbondcutoff
+        self.hbondcutangle = hbondcutangle
+        self.sel1text = sel1text
+        self.sel2text = sel2text
+        
 
 class SettingsTabWidget(QTabWidget, Ui_settingsWindowWidget):
     def __init__(self, parent=None):

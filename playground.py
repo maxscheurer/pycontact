@@ -27,3 +27,12 @@
 # 				print counter 
 # 				hbond.toString()
 # 		counter += 1
+
+# show memory information
+	    if 0:
+	        memory = []
+	        for var, obj in locals().items():
+	            memory.append([var, sys.getsizeof(obj)])
+	        sorted_by_second = sorted(memory, key=lambda data: data[1], reverse=True)
+	        for item in sorted_by_second:
+	            print item[0], humansize(item[1])
