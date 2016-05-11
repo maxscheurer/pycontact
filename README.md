@@ -2,11 +2,12 @@
 Tools for contact analysis of biomolecules
 
 ## Software requirements
-* latest version of [VMD](http://www.ks.uiuc.edu/Development/Download/download.cgi?PackageName=VMD)
-* Python 3.5
+* Python 2.7
     * Modules:
         * PyQt5
         * SciPy (numpy and matplotlib)
+        * [MDAnalysis](http://www.mdanalysis.org)
+* for visualization: latest version of [VMD](http://www.ks.uiuc.edu/Development/Download/download.cgi?PackageName=VMD)
 
 ## About
 Authors: Maximilian Scheurer and Peter Rodenkirch
