@@ -29,7 +29,8 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         # painter contains both labels and frame boxes for drawing
         self.painter = Canvas()
         self.scrollArea.setWidget(self.painter)
-        self.actionOpen.triggered.connect(self.pushOpen)
+        # deprecated
+        # self.actionOpen.triggered.connect(self.pushOpen)
         self.actionExport.triggered.connect(self.pushExport)
         # settings and filters
         self.settingsView = SettingsTabWidget()
@@ -373,25 +374,26 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         d.setWindowModality(Qt.ApplicationModal)
         d.exec_()
 
-    def pushOpen(self):
-        fnames = QFileDialog.getOpenFileNames(self, "Open file")
-        for file in fnames[0]:
-            self.file = file
-            break
-        lines = []
-        print(self.file)
-        with open(self.file, "r") as f:
-            for line in f.readlines():
-                lines.append(line)
-        self.contacts = makeContactFromLines(lines)
-        print("new contacts: " + str(len(self.contacts)))
-        self.painter.contacts = self.contacts
-        self.painter.range = [0, len(self.contacts[0].scoreArray)]
-        # self.painter.update()
-        # set max slider value to frame number!
-        self.mergeSlider.setMaximum(len(self.contacts[0].scoreArray) / 15)
-        self.updateSettings()
-        self.updateFilters()
+    # deprecated!
+    # def pushOpen(self):
+    #     fnames = QFileDialog.getOpenFileNames(self, "Open file")
+    #     for file in fnames[0]:
+    #         self.file = file
+    #         break
+    #     lines = []
+    #     print(self.file)
+    #     with open(self.file, "r") as f:
+    #         for line in f.readlines():
+    #             lines.append(line)
+    #     self.contacts = makeContactFromLines(lines)
+    #     print("new contacts: " + str(len(self.contacts)))
+    #     self.painter.contacts = self.contacts
+    #     self.painter.range = [0, len(self.contacts[0].scoreArray)]
+    #     # self.painter.update()
+    #     # set max slider value to frame number!
+    #     self.mergeSlider.setMaximum(len(self.contacts[0].scoreArray) / 15)
+    #     self.updateSettings()
+    #     self.updateFilters()
 
     def pushExport(self):
         d = QDialog()
@@ -489,7 +491,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         grid.addWidget(self.additionalText2, 2, 1)
 
         d.setWindowTitle("Visualize in VMD")
-        d.resize(200, 300)
+        d.resize(300, 150)
         d.setWindowModality(Qt.ApplicationModal)
         d.exec_()
 

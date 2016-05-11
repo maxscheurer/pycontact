@@ -99,7 +99,6 @@ class Ui_MainWindow(object):
         self.actionExport.setObjectName("actionExport")
         self.actionRun_VMD_contact_search = QtWidgets.QAction(MainWindow)
         self.actionRun_VMD_contact_search.setObjectName("actionRun_VMD_contact_search")
-        self.menuFile.addAction(self.actionOpen)
         self.menuFile.addAction(self.actionExport)
         self.menubar.addAction(self.menuFile.menuAction())
 

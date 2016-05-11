@@ -361,7 +361,7 @@ class Ui_settingsWindowWidget(object):
         settingsWindowWidget.addTab(self.settingsTab, "")
 
         self.retranslateUi(settingsWindowWidget)
-        settingsWindowWidget.setCurrentIndex(1)
+        settingsWindowWidget.setCurrentIndex(0)
         self.filterAtomsResTabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(settingsWindowWidget)
 
