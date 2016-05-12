@@ -119,6 +119,10 @@ class AccumulatedContact(object):
         # append a list of contributing atom to the contributingAtoms list, e.g. when a new frame is added
         self.contributingAtoms.append(contAtoms)  ## used for temporary accumulation of contacts in data analysis
 
+    def setScores(self):
+    	self.mean_score()
+    	self.median_score()
+
     def total_time(self, ns_per_frame, threshold):
         time = 0
         for score in self.scoreArray:

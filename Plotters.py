@@ -12,7 +12,10 @@ from PyQt5.QtSvg import QSvgGenerator
 import numpy as np
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-import matplotlib.pyplot as plt
+import warnings
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore"); 
+    import matplotlib.pyplot as plt
 import gui
 from settings import *
 from biochemistry import *

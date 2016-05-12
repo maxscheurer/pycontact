@@ -9,7 +9,10 @@ from Canvas import *
 from Plotters import *
 from mdanalysis import *
 from PyQt5.QtWidgets import *
-import matplotlib.pyplot as plt
+import warnings
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore"); 
+    import matplotlib.pyplot as plt
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -139,6 +142,8 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             map1 = self.maps[0]
             map2 = self.maps[1]
             self.contacts = self.analysis.runContactAnalysis(map1, map2)
+            # for cont in self.contacts:
+                # cont.setScores()
             self.updateSettings()
             self.updateFilters()
 
@@ -529,8 +534,8 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
 
     def createTclScriptVis(self):
         f = open('vis.tcl', 'w')
-        f.write('mol new %s \n' % self.psf)
-        f.write('mol addfile %s \n' % self.dcd)
+        f.write('mol new %s \n' % self.config.psf)
+        f.write('mol addfile %s \n' % self.config.dcd)
         f.write('mol delrep 0 top \n')
         f.write('mol representation NewCartoon \n')
         f.write('mol Color ColorID 3 \n')
