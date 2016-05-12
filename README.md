@@ -11,3 +11,4 @@ Tools for contact analysis of biomolecules
 
 ## About
 Authors: Maximilian Scheurer and Peter Rodenkirch
+Please give a reference for this website if you use the software in research.
