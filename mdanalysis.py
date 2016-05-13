@@ -16,6 +16,8 @@ import re, sys
 from biochemistry import *
 from copy import deepcopy
 
+MDAnalysis.core.flags['use_periodic_selections'] = True
+MDAnalysis.core.flags['use_KDTree_routines'] = False
 
 # type of Atom concerning it hbond behavior
 class AtomHBondType:
