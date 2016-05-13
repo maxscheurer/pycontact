@@ -576,7 +576,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
                     if item != "none":
                         currentSel1.append(AccumulationMapIndex.vmdsel[index] + " " + item)
                     index += 1
-                currentSel1String = "and".join(currentSel1)
+                currentSel1String = " and ".join(currentSel1)
                 currentSel2 = []
                 index = 0
                 for item in cont.key2:
@@ -600,7 +600,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
                     if item != "none":
                         currentSel1.append(AccumulationMapIndex.vmdsel[index] + " " + item)
                     index += 1
-                currentSel1String = "and".join(currentSel1)
+                currentSel1String = " and ".join(currentSel1)
                 currentSel2 = []
                 index = 0
                 for item in cont.key2:
