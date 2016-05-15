@@ -9,6 +9,7 @@ from Canvas import *
 from Plotters import *
 from mdanalysis import *
 from PyQt5.QtWidgets import *
+from PyQt5.QtCore import pyqtSignal, pyqtSlot
 import warnings
 with warnings.catch_warnings():
     warnings.simplefilter("ignore"); 
@@ -459,28 +460,29 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
     #     self.updateFilters()
 
     def pushExport(self):
-        d = QDialog()
-        grid = QGridLayout()
-        d.setLayout(grid)
+        self.exportWidget = ExportTabWidget()
+        self.exportWidget.valueUpdated.connect(self.handleExportUpdate)
+        self.exportWidget.show()
 
-        self.exportLabel = QLabel("Export current view: ")
-
-        self.saveButton = QPushButton("Export")
-        self.saveButton.setAutoDefault(False)
-        self.saveButton.clicked.connect(self.pushSave)
-
-        self.formatBox = QComboBox()
-        self.formatBox.addItem("PNG")
-        self.formatBox.addItem("SVG")
-
-        grid.addWidget(self.exportLabel, 0, 0)
-        grid.addWidget(self.saveButton, 0, 1)
-
-        grid.addWidget(self.formatBox, 2, 0)
-
-        d.setWindowTitle("Export")
-        d.setWindowModality(Qt.ApplicationModal)
-        d.exec_()
+    @QtCore.Slot(str, str)
+    def handleExportUpdate(self, fileName, fileType):
+        if fileType == "PNG":
+            if len(fileName) > 0:
+                print("Saving current view to ", fileName)
+                currentView = self.painter.grab()
+                currentView.save(fileName)
+        elif fileType == "SVG":
+            if len(fileName) > 0:
+                print("Saving current view to ", fileName)
+                generator = QSvgGenerator()
+                generator.setFileName(fileName)
+                generator.setSize(self.painter.size())
+                generator.setViewBox(self.painter.rect())
+                self.painter.renderContact(generator)
+        self.painter.rendered = False
+        self.painter.update()
+        self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
+            
 
     def pushSave(self):
         fileName = QFileDialog.getSaveFileName(self, 'Export Path')
@@ -618,6 +620,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             f.write('mol selection {%s} \n' % seltext)
             f.write('mol addrep top \n')
         f.close()
+
 
 
 class FileLoaderDialog(QDialog):
@@ -775,6 +778,52 @@ class Configuration(object):
         self.hbondcutangle = hbondcutangle
         self.sel1text = sel1text
         self.sel2text = sel2text
+
+class ExportTabWidget(QTabWidget):
+
+    valueUpdated = pyqtSignal(str, str)
+
+    def __init__(self, parent = None):
+       super(ExportTabWidget, self).__init__(parent)
+
+       self.tab1 = QWidget()
+       self.tab2 = QWidget()
+        
+       self.addTab(self.tab1, "View")
+       self.addTab(self.tab2, "Histogram")
+       self.tab1UI()
+       self.tab2UI()
+       self.setWindowTitle("Export")
+
+        
+    def tab1UI(self):
+        grid = QGridLayout()
+        self.tab1.setLayout(grid)
+
+        self.tab1.exportLabel = QLabel("Export current view: ")
+
+        self.tab1.saveButton = QPushButton("Export")
+        self.tab1.saveButton.setAutoDefault(False)
+        self.tab1.saveButton.clicked.connect(self.pushSave)
+
+        self.tab1.formatBox = QComboBox()
+        self.tab1.formatBox.addItem("PNG")
+        self.tab1.formatBox.addItem("SVG")
+
+        grid.addWidget(self.tab1.exportLabel, 0, 0)
+        grid.addWidget(self.tab1.saveButton, 0, 1)
+
+        grid.addWidget(self.tab1.formatBox, 2, 0)
+
+        
+    def tab2UI(self):
+        pass
+
+    def pushSave(self):
+        fileName = QFileDialog.getSaveFileName(self, 'Export Path')
+        self.valueUpdated.emit(fileName[0], self.tab1.formatBox.currentText())
+
+        
         
 
 class SettingsTabWidget(QTabWidget, Ui_settingsWindowWidget):
