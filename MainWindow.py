@@ -280,6 +280,8 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
                 self.painter.rangeFilterActive = True
                 frameRangeFilter = FrameFilter("framer")
                 self.filteredContacts = frameRangeFilter.extractFrameRange(self.filteredContacts, [lower, upper])
+            for c in self.filteredContacts:
+                c.setScores()
             # weight functions
             if weightActive:
                 if self.currentFunctionType == FunctionType.sigmoid:
