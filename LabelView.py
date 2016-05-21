@@ -47,8 +47,8 @@ class LabelView(QWidget):
             # TODO: implement title in AccumulatedContact
             self.buttons.append(QPushButton(c.title))
             # TODO: implement ContactType in AccumulatedContact
-            # stylesheet = "border: 0px solid #222222; background-color: " + ContactType.colors[c.contactType] + " ;"
-            stylesheet = "border: 0px solid #222222; background-color: " + ContactType.colors[3] + " ;"
+            stylesheet = "border: 0px solid #222222; background-color: " + ContactType.colors[c.determine_ctype()] + " ;"
+            # stylesheet = "border: 0px solid #222222; background-color: " + ContactType.colors[3] + " ;"
             self.buttons[-1].setStyleSheet(stylesheet)
             self.buttons[-1].clicked.connect(partial(self.handleButton, data=cindex))
             self.buttons[-1].setParent(self)

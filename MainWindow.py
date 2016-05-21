@@ -190,12 +190,12 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             self.updateSettings()
             self.updateFilters()
             # testing shit
-            maxresids1 = []
-            maxresids2 = []
-            for cont in self.contacts:
-                cont.determineBackboneSidechainType()
-                maxresids1.append(int(cont.key1[AccumulationMapIndex.resid]))
-                maxresids2.append(int(cont.key2[AccumulationMapIndex.resid]))
+            # maxresids1 = []
+            # maxresids2 = []
+            # for cont in self.contacts:
+            #     cont.determineBackboneSidechainType()
+            #     maxresids1.append(int(cont.key1[AccumulationMapIndex.resid]))
+            #     maxresids2.append(int(cont.key2[AccumulationMapIndex.resid]))
             # Generate some test data
             # x = np.arange(1,np.max(maxresids1)+2)
             # y = np.arange(1,np.max(maxresids2)+2)
