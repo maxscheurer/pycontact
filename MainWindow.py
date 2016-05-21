@@ -18,6 +18,7 @@ with warnings.catch_warnings():
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import cm
+import pickle
 from matplotlib.mlab import bivariate_normal
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -38,6 +39,8 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         # self.actionOpen.triggered.connect(self.pushOpen)
         self.actionExport.triggered.connect(self.pushExport)
         self.actionLoad_Data.triggered.connect(self.loadDataPushed)
+        self.actionExport_Session.triggered.connect(self.exportSession)
+        self.actionImport_Session.triggered.connect(self.importSession)
         # settings and filters
         self.settingsView = SettingsTabWidget()
         self.settingsView.applySettingsButton.clicked.connect(self.updateSettings)
@@ -123,6 +126,24 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.updateSettings()
         self.updateFilters()
 
+    def importSession(self):
+        importDict = pickle.load(open("save.p", "rb"))
+        self.contacts = importDict["contacts"]
+        arguments = importDict["analyzer"][0:-1]
+        trajArgs = importDict["trajectory"]
+        self.analysis = Analyzer(*arguments)
+        self.analysis.contactResults = importDict["analyzer"][-1]
+        self.analysis.setTrajectoryData(*trajArgs)
+        self.updateSettings()
+        self.updateFilters()
+
+    def exportSession(self):
+        if self.contacts is not None and self.analysis is not None:
+            analyzerArgs = [self.analysis.psf, self.analysis.dcd, self.analysis.cutoff, self.analysis.hbondcutoff, self.analysis.hbondcutangle, self.analysis.sel1text, self.analysis.sel2text,self.analysis.contactResults]
+            trajArgs = self.analysis.getTrajectoryData()
+            exportDict = {"contacts":self.contacts,"analyzer":analyzerArgs,"trajectory":trajArgs}
+            pickle.dump(exportDict, open("save.p", "wb"))
+
     def loadDataPushed(self):
         self.config,result = FileLoaderDialog.getConfig()
         if result == 1:
@@ -156,24 +177,24 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
                 maxresids1.append(int(cont.key1[AccumulationMapIndex.resid]))
                 maxresids2.append(int(cont.key2[AccumulationMapIndex.resid]))
             # Generate some test data
-            x = np.arange(1,np.max(maxresids1)+2)
-            y = np.arange(1,np.max(maxresids2)+2)
-            data = np.zeros((len(x), len(y)))
-            for cont in self.contacts:
-                r1 = int(cont.key1[AccumulationMapIndex.resid])
-                r2 = int(cont.key2[AccumulationMapIndex.resid])
-                hbonds = cont.hbondFramesScan()
-                count = np.count_nonzero(hbonds)
-                if count > 0:
-                    print cont.title + " contains " + str(count) + " hbonds in total"
-                # data[r1,r2] = cont.total_time(1, 0)
-                data[r1, r2] = cont.mean_score()
-            fig = plt.figure()
-            ax = fig.add_subplot(111)
-            cax = ax.matshow(data, cmap=cm.coolwarm, aspect='equal')
-            fig.tight_layout()
-            fig.colorbar(cax)
-            plt.savefig("contactmap.png")
+            # x = np.arange(1,np.max(maxresids1)+2)
+            # y = np.arange(1,np.max(maxresids2)+2)
+            # data = np.zeros((len(x), len(y)))
+            # for cont in self.contacts:
+            #     r1 = int(cont.key1[AccumulationMapIndex.resid])
+            #     r2 = int(cont.key2[AccumulationMapIndex.resid])
+            #     hbonds = cont.hbondFramesScan()
+            #     count = np.count_nonzero(hbonds)
+            #     if count > 0:
+            #         print cont.title + " contains " + str(count) + " hbonds in total"
+            #     # data[r1,r2] = cont.total_time(1, 0)
+            #     data[r1, r2] = cont.mean_score()
+            # fig = plt.figure()
+            # ax = fig.add_subplot(111)
+            # cax = ax.matshow(data, cmap=cm.coolwarm, aspect='equal')
+            # fig.tight_layout()
+            # fig.colorbar(cax)
+            # plt.savefig("contactmap.png")
 
         
 
@@ -281,6 +302,8 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
                 self.painter.rangeFilterActive = True
                 frameRangeFilter = FrameFilter("framer")
                 self.filteredContacts = frameRangeFilter.extractFrameRange(self.filteredContacts, [lower, upper])
+            for c in self.filteredContacts:
+                c.setScores()
             # weight functions
             if weightActive:
                 if self.currentFunctionType == FunctionType.sigmoid:

@@ -104,8 +104,14 @@ class Ui_MainWindow(object):
         self.actionRun_VMD_contact_search.setObjectName("actionRun_VMD_contact_search")
         self.actionLoad_Data = QtWidgets.QAction(MainWindow)
         self.actionLoad_Data.setObjectName("actionLoad_Data")
+        self.actionImport_Session = QtWidgets.QAction(MainWindow)
+        self.actionImport_Session.setObjectName("actionImport_Session")
+        self.actionExport_Session = QtWidgets.QAction(MainWindow)
+        self.actionExport_Session.setObjectName("actionExport_Session")
         self.menuFile.addAction(self.actionLoad_Data)
         self.menuFile.addAction(self.actionExport)
+        self.menuFile.addAction(self.actionImport_Session)
+        self.menuFile.addAction(self.actionExport_Session)
         self.menubar.addAction(self.menuFile.menuAction())
 
         self.retranslateUi(MainWindow)
@@ -128,4 +134,8 @@ class Ui_MainWindow(object):
         self.actionRun_VMD_contact_search.setText(_translate("MainWindow", "Run VMD contact search"))
         self.actionLoad_Data.setText(_translate("MainWindow", "Load Data"))
         self.actionLoad_Data.setShortcut(_translate("MainWindow", "Ctrl+I"))
+        self.actionImport_Session.setText(_translate("MainWindow", "Import Session"))
+        self.actionImport_Session.setShortcut(_translate("MainWindow", "Ctrl+Shift+I"))
+        self.actionExport_Session.setText(_translate("MainWindow", "Export Session"))
+        self.actionExport_Session.setShortcut(_translate("MainWindow", "Ctrl+Shift+E"))
 
