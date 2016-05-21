@@ -25,6 +25,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
         self.contacts = []
+        self.filteredContacts = []
         self.setupUi(self)
 
         self.setWindowTitle("pyContact")
@@ -462,6 +463,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
     def pushExport(self):
         self.exportWidget = ExportTabWidget()
         self.exportWidget.valueUpdated.connect(self.handleExportUpdate)
+        self.exportWidget.setContacts(self.filteredContacts)
         self.exportWidget.show()
 
     @QtCore.Slot(str, str)
@@ -794,7 +796,7 @@ class ExportTabWidget(QTabWidget):
        self.tab1UI()
        self.tab2UI()
        self.setWindowTitle("Export")
-
+       self.contacts = []
         
     def tab1UI(self):
         grid = QGridLayout()
@@ -817,13 +819,33 @@ class ExportTabWidget(QTabWidget):
 
         
     def tab2UI(self):
-        pass
+        grid = QGridLayout()
+        self.tab2.setLayout(grid)
+
+        self.tab2.histPlot = HistPlotter(None, width=8, height=5, dpi=60)
+        grid.addWidget(self.tab2.histPlot, 0, 0)
+
+        self.tab2.plotButton = QPushButton("Plot Histogram")
+        self.tab2.plotButton.setAutoDefault(False)
+        self.tab2.plotButton.clicked.connect(self.pushPlot)
+        grid.addWidget(self.tab2.plotButton, 0, 1)
+
+    def pushPlot(self):
+        self.plotHist()
+
+    def plotHist(self):
+        meanValues = []
+        for c in self.contacts:
+            np.append(meanValues, c.mean_score())
+        self.tab2.histPlot.hist(meanValues)
+        self.tab2.histPlot.update()
 
     def pushSave(self):
         fileName = QFileDialog.getSaveFileName(self, 'Export Path')
         self.valueUpdated.emit(fileName[0], self.tab1.formatBox.currentText())
 
-        
+    def setContacts(self, currentContacts):
+        self.contacts = currentContacts
         
 
 class SettingsTabWidget(QTabWidget, Ui_settingsWindowWidget):

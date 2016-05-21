@@ -68,6 +68,12 @@ class ContactPlotter(MplPlotter):
         self.axes.set_ylabel("score")
 
 
+class HistPlotter(MplPlotter):
+    """Simple canvas with an histogram plot."""
+
+    def compute_initial_figure(self, currentContacts):
+        self.axes.hist(currentContacts)
+
 class SimplePlotter(MplPlotter):
     """Simple canvas with a sine plot."""
     def plot(self, x, y):
