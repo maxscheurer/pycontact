@@ -511,7 +511,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
 
         info = QLabel("Developers: Maximilian Scheurer and Peter Rodenkirch")
         info2 = QLabel("Departments: TCBG, University of Illinois at Urbana-Champaign; BZH Heidelberg University")
-        mail = QLabel("Contact: mscheurer@ks.uiuc.edu, p.rodenkirch@gmail.com")
+        mail = QLabel("Contact: mscheurer@ks.uiuc.edu, rodenkirch@stud.uni-heidelberg.de")
         copyright = QLabel("Version 0.1a, May 2016")
 
         grid.addWidget(info, 0, 0)
