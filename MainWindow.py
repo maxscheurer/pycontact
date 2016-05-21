@@ -840,7 +840,7 @@ class ExportTabWidget(QTabWidget):
        self.tab2UI()
        self.setWindowTitle("Export")
        self.contacts = []
-        
+
     def tab1UI(self):
         grid = QGridLayout()
         self.tab1.setLayout(grid)
@@ -862,28 +862,34 @@ class ExportTabWidget(QTabWidget):
 
         
     def tab2UI(self):
-        grid = QGridLayout()
-        self.tab2.setLayout(grid)
+        self.grid1 = QGridLayout()
+        self.tab2.setLayout(self.grid1)
 
         self.tab2.histPlot = HistPlotter(None, width=8, height=5, dpi=60)
-        grid.addWidget(self.tab2.histPlot, 0, 0)
+        self.grid1.addWidget(self.tab2.histPlot, 0, 0)
 
         self.tab2.plotButton = QPushButton("Plot Histogram")
         self.tab2.plotButton.setAutoDefault(False)
         self.tab2.plotButton.clicked.connect(self.pushPlot)
-        grid.addWidget(self.tab2.plotButton, 0, 1)
+        self.grid1.addWidget(self.tab2.plotButton, 0, 1)
 
     def pushPlot(self):
         self.plotHist()
 
     def plotHist(self):
+        # meanValues = np.array(pythonList, dtype = float)
         meanValues = []
+
         for c in self.contacts:
-            np.append(meanValues, c.mean_score())
-            print(c.mean_score)
-        self.tab2.histPlot.plotHist(meanValues)
-        for x in meanValues:
-            print(x)
+            meanValues.append(c.mean_score())
+
+        meanValuesNp = np.array(meanValues, dtype = float)
+
+        sip.delete(self.tab2.histPlot)
+        self.tab2.histPlot = HistPlotter(None, width=8, height=5, dpi=60)
+        self.grid1.addWidget(self.tab2.histPlot, 0, 0)
+
+        self.tab2.histPlot.plotHist(meanValuesNp)
         self.tab2.histPlot.update()
 
     def pushSave(self):

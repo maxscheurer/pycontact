@@ -72,7 +72,7 @@ class HistPlotter(MplPlotter):
     """Simple canvas with an histogram plot."""
 
     def plotHist(self, currentContacts):
-        self.axes.plot(currentContacts)
+        self.axes.hist(currentContacts, bins=20)
 
 
 class SimplePlotter(MplPlotter):
