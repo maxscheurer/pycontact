@@ -267,6 +267,16 @@ class Analyzer(object):
         self.finalAccumulatedContacts = self.analyze_contactResultsWithMaps(self.contactResults, map1, map2)
         return deepcopy(self.finalAccumulatedContacts)
 
+    def setTrajectoryData(self,resname_array,resid_array,name_array,type_array,segids,backbone):
+        self.resname_array = resname_array
+        self.resid_array = resid_array
+        self.name_array = name_array
+        self.type_array = type_array
+        self.segids = segids
+        self.backbone = backbone
+
+    def getTrajectoryData(self):
+        return [self.resname_array,self.resid_array,self.name_array,self.type_array,self.segids,self.backbone]
     # utility for memory measurement
     suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
 

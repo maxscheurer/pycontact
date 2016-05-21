@@ -169,6 +169,8 @@
     </property>
     <addaction name="actionLoad_Data"/>
     <addaction name="actionExport"/>
+    <addaction name="actionImport_Session"/>
+    <addaction name="actionExport_Session"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -199,6 +201,22 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+I</string>
+   </property>
+  </action>
+  <action name="actionImport_Session">
+   <property name="text">
+    <string>Import Session</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+I</string>
+   </property>
+  </action>
+  <action name="actionExport_Session">
+   <property name="text">
+    <string>Export Session</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+E</string>
    </property>
   </action>
  </widget>
