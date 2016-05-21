@@ -80,6 +80,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.settingsView.applyColorButton.clicked.connect(self.updateColors)
         self.colorScheme = ColorScheme.bbsc
 
+        self.actionDefault.triggered.connect(self.loadDefault)
         # map1 = [0, 0, 0, 1, 1, 0]
         # map2 = [0, 0, 0, 1, 1, 0]
         # self.map1 = map1
@@ -127,7 +128,12 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.updateFilters()
 
     def importSession(self):
-        importDict = pickle.load(open("save.p", "rb"))
+        fnames = QFileDialog.getOpenFileNames(self, "Open file")
+        importfile = ""
+        for file in fnames[0]:
+            importfile = file
+            break
+        importDict = pickle.load(open(importfile, "rb"))
         self.contacts = importDict["contacts"]
         arguments = importDict["analyzer"][0:-1]
         trajArgs = importDict["trajectory"]
@@ -138,11 +144,25 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.updateFilters()
 
     def exportSession(self):
+        fileName = QFileDialog.getSaveFileName(self, 'Export file')
+        exportfile = ""
+        filestring = fileName[0]
         if self.contacts is not None and self.analysis is not None:
             analyzerArgs = [self.analysis.psf, self.analysis.dcd, self.analysis.cutoff, self.analysis.hbondcutoff, self.analysis.hbondcutangle, self.analysis.sel1text, self.analysis.sel2text,self.analysis.contactResults]
             trajArgs = self.analysis.getTrajectoryData()
             exportDict = {"contacts":self.contacts,"analyzer":analyzerArgs,"trajectory":trajArgs}
-            pickle.dump(exportDict, open("save.p", "wb"))
+            pickle.dump(exportDict, open(filestring, "wb"))
+
+    def loadDefault(self):
+        importDict = pickle.load(open("defaultsession", "rb"))
+        self.contacts = importDict["contacts"]
+        arguments = importDict["analyzer"][0:-1]
+        trajArgs = importDict["trajectory"]
+        self.analysis = Analyzer(*arguments)
+        self.analysis.contactResults = importDict["analyzer"][-1]
+        self.analysis.setTrajectoryData(*trajArgs)
+        self.updateSettings()
+        self.updateFilters()
 
     def loadDataPushed(self):
         self.config,result = FileLoaderDialog.getConfig()

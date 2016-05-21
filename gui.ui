@@ -171,6 +171,7 @@
     <addaction name="actionExport"/>
     <addaction name="actionImport_Session"/>
     <addaction name="actionExport_Session"/>
+    <addaction name="actionDefault"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -217,6 +218,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+E</string>
+   </property>
+  </action>
+  <action name="actionDefault">
+   <property name="text">
+    <string>Default</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+D</string>
    </property>
   </action>
  </widget>

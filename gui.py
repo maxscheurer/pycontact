@@ -108,10 +108,13 @@ class Ui_MainWindow(object):
         self.actionImport_Session.setObjectName("actionImport_Session")
         self.actionExport_Session = QtWidgets.QAction(MainWindow)
         self.actionExport_Session.setObjectName("actionExport_Session")
+        self.actionDefault = QtWidgets.QAction(MainWindow)
+        self.actionDefault.setObjectName("actionDefault")
         self.menuFile.addAction(self.actionLoad_Data)
         self.menuFile.addAction(self.actionExport)
         self.menuFile.addAction(self.actionImport_Session)
         self.menuFile.addAction(self.actionExport_Session)
+        self.menuFile.addAction(self.actionDefault)
         self.menubar.addAction(self.menuFile.menuAction())
 
         self.retranslateUi(MainWindow)
@@ -138,4 +141,6 @@ class Ui_MainWindow(object):
         self.actionImport_Session.setShortcut(_translate("MainWindow", "Ctrl+Shift+I"))
         self.actionExport_Session.setText(_translate("MainWindow", "Export Session"))
         self.actionExport_Session.setShortcut(_translate("MainWindow", "Ctrl+Shift+E"))
+        self.actionDefault.setText(_translate("MainWindow", "Default"))
+        self.actionDefault.setShortcut(_translate("MainWindow", "Ctrl+Shift+D"))
 
