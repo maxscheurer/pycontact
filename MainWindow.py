@@ -41,6 +41,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.actionLoad_Data.triggered.connect(self.loadDataPushed)
         self.actionExport_Session.triggered.connect(self.exportSession)
         self.actionImport_Session.triggered.connect(self.importSession)
+        self.actionShow_Info.triggered.connect(self.showDeveloperInfo)
         # settings and filters
         self.settingsView = SettingsTabWidget()
         self.settingsView.applySettingsButton.clicked.connect(self.updateSettings)
@@ -502,6 +503,26 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
     #     self.mergeSlider.setMaximum(len(self.contacts[0].scoreArray) / 15)
     #     self.updateSettings()
     #     self.updateFilters()
+
+    def showDeveloperInfo(self):
+        d = QDialog()
+        grid = QGridLayout()
+        d.setLayout(grid)
+
+        info = QLabel("Developers: Maximilian Scheurer and Peter Rodenkirch")
+        info2 = QLabel("Departments: TCBG, University of Illinois at Urbana-Champaign; BZH Heidelberg University")
+        mail = QLabel("Contact: mscheurer@ks.uiuc.edu, p.rodenkirch@gmail.com")
+        copyright = QLabel("Version 0.1a, May 2016")
+
+        grid.addWidget(info, 0, 0)
+        grid.addWidget(info2, 1, 0)
+        grid.addWidget(mail, 2, 0)
+        grid.addWidget(copyright, 3, 0)
+
+        d.setWindowTitle("Developer Info")
+        d.resize(150, 80)
+        d.setWindowModality(Qt.ApplicationModal)
+        d.exec_()
 
     def pushExport(self):
         self.exportWidget = ExportTabWidget()

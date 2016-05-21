@@ -173,7 +173,14 @@
     <addaction name="actionExport_Session"/>
     <addaction name="actionDefault"/>
    </widget>
+   <widget class="QMenu" name="menuAbout">
+    <property name="title">
+     <string>About</string>
+    </property>
+    <addaction name="actionShow_Info"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuAbout"/>
   </widget>
   <action name="actionOpen">
    <property name="text">
@@ -226,6 +233,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+D</string>
+   </property>
+  </action>
+  <action name="actionShow_Info">
+   <property name="text">
+    <string>Show Info</string>
    </property>
   </action>
  </widget>
