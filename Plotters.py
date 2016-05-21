@@ -71,8 +71,9 @@ class ContactPlotter(MplPlotter):
 class HistPlotter(MplPlotter):
     """Simple canvas with an histogram plot."""
 
-    def compute_initial_figure(self, currentContacts):
-        self.axes.hist(currentContacts)
+    def plotHist(self, currentContacts):
+        self.axes.plot(currentContacts)
+
 
 class SimplePlotter(MplPlotter):
     """Simple canvas with a sine plot."""

@@ -860,7 +860,10 @@ class ExportTabWidget(QTabWidget):
         meanValues = []
         for c in self.contacts:
             np.append(meanValues, c.mean_score())
-        self.tab2.histPlot.hist(meanValues)
+            print(c.mean_score)
+        self.tab2.histPlot.plotHist(meanValues)
+        for x in meanValues:
+            print(x)
         self.tab2.histPlot.update()
 
     def pushSave(self):
