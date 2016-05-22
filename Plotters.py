@@ -71,8 +71,28 @@ class ContactPlotter(MplPlotter):
 class HistPlotter(MplPlotter):
     """Simple canvas with an histogram plot."""
 
-    def plotHist(self, currentContacts):
-        self.axes.hist(currentContacts, bins=20)
+    def plotGeneralHist(self, currentContacts):
+        meanValues = []
+        for c in currentContacts:
+            meanValues.append(c.mean_score())
+
+        meanValuesNp = np.array(meanValues, dtype = float)
+        self.axes.hist(meanValuesNp, bins=20)
+
+    def plotContactHist(self, currentContacts):
+        meanValues = []
+        titles = []
+        for c in currentContacts:
+            meanValues.append(c.mean_score())
+            titles.append(c.title)
+
+        meanValuesNp = np.array(meanValues, dtype = float)
+        titlesNp = np.array(titles, dtype = str)
+
+        x = range(len(currentContacts))
+        self.axes.bar(x, meanValuesNp, color="red")
+        self.axes.set_xticks(x)
+        self.axes.set_xticklabels(titlesNp, rotation=90)
 
 
 class SimplePlotter(MplPlotter):
