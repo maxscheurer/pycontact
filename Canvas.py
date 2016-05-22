@@ -147,8 +147,8 @@ class Canvas(QWidget):
                 p.setFont(QFont('Arial', 9))
                 # string = c.resA + c.residA + "-" + c.resB + c.residB
                 string = c.title
-                # p.setBrush(ContactType.qcolors[c.contactType])
-                # p.drawRect(0, row+3, 90, rowheight-10)
+                p.setBrush(ContactType.qcolors[c.determine_ctype()])
+                p.drawRect(0, row+3, orig_startx, rowheight-10)
                 p.setPen(1)
                 p.drawText(start_text, row + textoffset, string)
                 row += rowheight
