@@ -887,30 +887,32 @@ class ExportTabWidget(QTabWidget):
         self.tab2.setLayout(self.grid1)
 
         self.tab2.histPlot = HistPlotter(None, width=8, height=5, dpi=60)
-        self.grid1.addWidget(self.tab2.histPlot, 0, 0)
+        self.grid1.addWidget(self.tab2.histPlot, 1, 0)
 
-        self.tab2.plotButton = QPushButton("Plot Histogram")
+        self.tab2.histTypeBox = QComboBox()
+        self.tab2.histTypeBox.addItem("General Histogram")
+        self.tab2.histTypeBox.addItem("Bin per Contact")
+
+        self.grid1.addWidget(self.tab2.histTypeBox, 0, 1)
+
+        self.tab2.plotButton = QPushButton("Show Preview")
         self.tab2.plotButton.setAutoDefault(False)
         self.tab2.plotButton.clicked.connect(self.pushPlot)
-        self.grid1.addWidget(self.tab2.plotButton, 0, 1)
+        self.grid1.addWidget(self.tab2.plotButton, 0, 0)
 
     def pushPlot(self):
         self.plotHist()
 
     def plotHist(self):
-        # meanValues = np.array(pythonList, dtype = float)
-        meanValues = []
-
-        for c in self.contacts:
-            meanValues.append(c.mean_score())
-
-        meanValuesNp = np.array(meanValues, dtype = float)
-
         sip.delete(self.tab2.histPlot)
         self.tab2.histPlot = HistPlotter(None, width=8, height=5, dpi=60)
-        self.grid1.addWidget(self.tab2.histPlot, 0, 0)
+        self.grid1.addWidget(self.tab2.histPlot, 1, 0)
 
-        self.tab2.histPlot.plotHist(meanValuesNp)
+        if self.tab2.histTypeBox.currentText() == "General Histogram":
+            self.tab2.histPlot.plotGeneralHist(self.contacts)
+        elif self.tab2.histTypeBox.currentText() == "Bin per Contact":
+            self.tab2.histPlot.plotContactHist(self.contacts)
+
         self.tab2.histPlot.update()
 
     def pushSave(self):
