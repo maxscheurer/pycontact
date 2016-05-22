@@ -16,6 +16,7 @@ import re, sys
 from biochemistry import *
 from read_db import *
 from copy import deepcopy
+import time
 
 MDAnalysis.core.flags['use_periodic_selections'] = True
 MDAnalysis.core.flags['use_KDTree_routines'] = False
@@ -191,7 +192,6 @@ class AccumulatedContact(object):
         r1 = self.key1[AccumulationMapIndex.resname].lower()
         r2 = self.key2[AccumulationMapIndex.resname].lower()
         if r1 == "none" or r2 == "none":
-            print "both maps must contain resname!"
             return ContactType.other
         self.determineBackboneSidechainType()
         try:
@@ -518,7 +518,7 @@ class Analyzer(object):
         # reading topology/parameter CHARMM files for setting AtomTypes and AtomHBondTypes
         heavyatomlines = []
         heavyatoms = []
-        pars = open('testpar.prm', 'r')
+        pars = open(os.path.dirname(os.path.abspath(__file__))+'/testpar.prm', 'r')
         for line in pars:
             if re.match("MASS", line):
                 heavyatomlines.append(line.rstrip())
@@ -590,9 +590,11 @@ class Analyzer(object):
         print len(sel1.coordinates()), len(sel2.coordinates())
         contactResults = []
         # loop over trajectory
+        self.totalFrameNumber = len(u.trajectory)
         for ts in u.trajectory:
             currentFrameContacts = []
             frame = ts.frame
+            self.currentFrameNumber = ts.frame
             print frame
             result = np.ndarray(shape=(len(sel1.coordinates()), len(sel2.coordinates())), dtype=float)
             # distarray is the distance matrix between all atoms in sel1 and sel2
@@ -732,6 +734,7 @@ class Analyzer(object):
         # --------> key vs. TempContactAccumulate
 
         # list of all contacts keys (= unique identifiers, determined by the given maps)
+        start = time.time()
         allkeys = []
         for frame in contactResults:
             currentFrameAcc = {}
@@ -764,7 +767,6 @@ class Analyzer(object):
                 if not key in allkeys:
                     allkeys.append(key)
             frame_contacts_accumulated.append(currentFrameAcc)
-
         accumulatedContactsDict = {}
         # accumulatedContactsDict (dict)
         # ---> key vs. list of TempContactAccumulated
@@ -797,4 +799,6 @@ class Analyzer(object):
             finalAccumulatedContacts.append(acc)
             print key, acc.bb1, acc.bb2, acc.sc1, acc.sc2
             print len(acc.scoreArray)
+        stop = time.time()
+        print stop - start
         return finalAccumulatedContacts

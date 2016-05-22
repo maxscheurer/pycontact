@@ -10,6 +10,7 @@ from Plotters import *
 from mdanalysis import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
+from PyQt5.QtWidgets import QProgressBar
 import warnings
 with warnings.catch_warnings():
     warnings.simplefilter("ignore"); 
@@ -82,6 +83,8 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.colorScheme = ColorScheme.bbsc
 
         self.actionDefault.triggered.connect(self.loadDefault)
+
+        self.progressWidget = ProgessWidget("Progress")
         # map1 = [0, 0, 0, 1, 1, 0]
         # map2 = [0, 0, 0, 1, 1, 0]
         # self.map1 = map1
@@ -171,6 +174,9 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             attrs = vars(self.config)
             print ', '.join("%s: %s" % item for item in attrs.items())
             self.analysis = Analyzer(self.config.psf,self.config.dcd, self.config.cutoff,self.config.hbondcutoff,self.config.hbondcutangle,self.config.sel1text,self.config.sel2text)
+            # self.connect(self.analysis, QtCore.SIGNAL('taskUpdated'),self.handleTaskUpdated)
+            # self.connect(self.analysis, QtCore.SIGNAL('frameNumberSet'),self.setFrameNumber)
+            # self.progressWidget.show()
             self.analysis.runFrameScan()
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Information)
@@ -179,6 +185,12 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             msg.setWindowTitle("Data loaded")
             msg.setDetailedText("Now click on Analysis to proceed")
             msg.exec_()
+    def handleTaskUpdated(self):
+    	print self.analysis.currentFrame
+    	self.progressWidget.setValue(self.analysis.currentFrame)
+
+    def setFrameNumber(self):
+    	self.progressWidget.setMax(self.analysis.totalFrameNumber)
 
     def analyzeDataPushed(self):
         self.maps, result = AnalysisDialog.getMapping()
@@ -925,6 +937,25 @@ class SettingsTabWidget(QTabWidget, Ui_settingsWindowWidget):
     def __init__(self, parent=None):
         super(QtWidgets.QTabWidget, self).__init__(parent)
         self.setupUi(self)
+
+class ProgessWidget(QWidget):
+    def __init__(self, title):
+        super(QWidget, self).__init__()
+        grid = QGridLayout()
+        self.title = title
+        self.setGeometry(QRect(20, 40, 120, 80))
+        self.progress = QProgressBar(self)
+        self.progress.setGeometry(0,0,80,60)
+        self.progress.setGeometry(0, 0, 80, 60)
+        grid.addWidget(self.progress, 0,0)
+        self.setLayout(grid)
+
+
+    def setMax(self, maxi):
+        self.progress.setRange(0, maxi - 1)
+
+    def setValue(self, value):
+        self.progress.setValue(value)
 
 
 class ColorScheme:
