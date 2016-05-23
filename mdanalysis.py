@@ -768,11 +768,14 @@ class Analyzer(object):
                     allkeys.append(key)
             frame_contacts_accumulated.append(currentFrameAcc)
         accumulatedContactsDict = {}
+        stop = time.time()
+        print stop - start
         # accumulatedContactsDict (dict)
         # ---> key vs. list of TempContactAccumulated
         #
         # loop fills gaps with zero-score TempContactAccumulate of key if key is not occuring in a frame
         # provides clean data!
+        start = time.time()
         for key in allkeys:
             accumulatedContactsDict[key] = []
             for frame_dict in frame_contacts_accumulated:
