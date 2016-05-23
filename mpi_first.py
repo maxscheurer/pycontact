@@ -1,3 +1,4 @@
+#usage: mpirun -np 4 python mpi_first.py
 from mpi4py import MPI
 import numpy as np
 import MDAnalysis
