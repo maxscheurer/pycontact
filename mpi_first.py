@@ -202,8 +202,8 @@ rank = comm.Get_rank()
 if rank == 0:
 	start = time.time()
 	import pickle
-	# importDict = pickle.load(open("/Users/mscheurer/Projects/pycontact/pycontact/defaultsession", "rb"))
-	importDict = pickle.load(open("/Users/mscheurer/Dropbox/TCBG/ba/data/yeast_proteasome_ubp6_session", "rb"))
+	importDict = pickle.load(open("/Users/mscheurer/Projects/pycontact/pycontact/defaultsession", "rb"))
+	# importDict = pickle.load(open("/Users/mscheurer/Dropbox/TCBG/ba/data/yeast_proteasome_ubp6_session", "rb"))
 	stop = time.time()
 	print stop-start
 	contResults = importDict["analyzer"][-1]
@@ -228,8 +228,8 @@ else:
 	# print "time: ", str(stop-start), rank
 	# print str(len(all_chunk)), rank
 all_chunk = comm.scatter(all_chunk,root=0)
-map1=[1,0,0,0,0]
-map2=[1,0,0,0,0]
+map1=[0,0,0,1,1,0]
+map2=[0,0,0,1,1,0]
 start = time.time()
 backbone,type_array,name_array,resid_array,resname_array,segids = trajArgs[-1],trajArgs[3],trajArgs[2],trajArgs[1],trajArgs[0],trajArgs[4]
 results = loop_frame(all_chunk,map1,map2)
@@ -272,8 +272,8 @@ if rank == 0:
                 acc.sc1 += tempContact.sc1score
                 acc.sc2 += tempContact.sc2score
             finalAccumulatedContacts.append(acc)
-            print key, acc.bb1, acc.bb2, acc.sc1, acc.sc2
-            print len(acc.scoreArray)
+            # print key, acc.bb1, acc.bb2, acc.sc1, acc.sc2
+            # print len(acc.scoreArray)
         stop = time.time()
         print stop - start
         glob_stop = time.time()
