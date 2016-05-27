@@ -36,56 +36,66 @@
      </sizepolicy>
     </property>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="6" column="1">
-      <widget class="QComboBox" name="sortingKeyDropdown">
-       <item>
-        <property name="text">
-         <string>mean</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>median</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>bb/sc type</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>contact type</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>total time</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>mean lifetime</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>median lifetime</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>resid A</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>resid B</string>
-        </property>
-       </item>
+     <item row="13" column="4">
+      <widget class="QCheckBox" name="functionActiveCheckbox">
+       <property name="text">
+        <string>weight active</string>
+       </property>
       </widget>
      </item>
-     <item row="10" column="0" colspan="5">
+     <item row="13" column="0" rowspan="3" colspan="4">
+      <widget class="QGroupBox" name="functionGroupBox">
+       <property name="title">
+        <string>Frame weight functions</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QWidget" name="weightFunctionWidget" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <layout class="QGridLayout" name="functionGridLayout">
+           <item row="0" column="0">
+            <widget class="QRadioButton" name="sigmoidRadioButton">
+             <property name="text">
+              <string>sigmoid</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QRadioButton" name="linRadioButton">
+             <property name="text">
+              <string>linear</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QRadioButton" name="rectRadioButton">
+             <property name="text">
+              <string>rectangle</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="3">
+            <widget class="QPushButton" name="previewButton">
+             <property name="text">
+              <string>Preview</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="11" column="0" colspan="5">
       <widget class="QTabWidget" name="filterAtomsResTabWidget">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -96,7 +106,7 @@
        <property name="currentIndex">
         <number>0</number>
        </property>
-       <widget class="QWidget" name="atomFilterPage" native="true">
+       <widget class="QWidget" name="atomFilterPage">
         <attribute name="title">
          <string>Atoms</string>
         </attribute>
@@ -197,7 +207,7 @@
          </layout>
         </widget>
        </widget>
-       <widget class="QWidget" name="residueFilterPage" native="true">
+       <widget class="QWidget" name="residueFilterPage">
         <attribute name="title">
          <string>Residues</string>
         </attribute>
@@ -272,77 +282,52 @@
        </widget>
       </widget>
      </item>
-     <item row="12" column="0" rowspan="3" colspan="4">
-      <widget class="QGroupBox" name="functionGroupBox">
-       <property name="title">
-        <string>Frame weight functions</string>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <widget class="QWidget" name="weightFunctionWidget" native="true">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <layout class="QGridLayout" name="functionGridLayout">
-           <item row="0" column="0">
-            <widget class="QRadioButton" name="sigmoidRadioButton">
-             <property name="text">
-              <string>sigmoid</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="2">
-            <widget class="QRadioButton" name="linRadioButton">
-             <property name="text">
-              <string>linear</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QRadioButton" name="rectRadioButton">
-             <property name="text">
-              <string>rectangle</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="3">
-            <widget class="QPushButton" name="previewButton">
-             <property name="text">
-              <string>Preview</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item row="12" column="4">
-      <widget class="QCheckBox" name="functionActiveCheckbox">
-       <property name="text">
-        <string>weight active</string>
+     <item row="12" column="0" colspan="5">
+      <widget class="Line" name="line_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
        </property>
       </widget>
      </item>
-     <item row="14" column="4">
-      <widget class="QPushButton" name="applyFilterButton">
+     <item row="5" column="2">
+      <widget class="QLineEdit" name="scoreField">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Apply</string>
+        <string>0</string>
        </property>
       </widget>
+     </item>
+     <item row="6" column="2">
+      <widget class="QComboBox" name="sortingOrderDropdown">
+       <item>
+        <property name="text">
+         <string>asc</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>desc</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="14" column="4">
+      <spacer name="verticalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
      </item>
      <item row="6" column="3">
       <widget class="QCheckBox" name="activeSortingBox">
@@ -351,11 +336,53 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="3">
-      <widget class="QCheckBox" name="filterRangeCheckbox">
-       <property name="text">
-        <string>filter range</string>
-       </property>
+     <item row="6" column="1">
+      <widget class="QComboBox" name="sortingKeyDropdown">
+       <item>
+        <property name="text">
+         <string>mean</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>median</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>bb/sc type</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>contact type</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>total time</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>mean lifetime</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>median lifetime</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>resid A</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>resid B</string>
+        </property>
+       </item>
       </widget>
      </item>
      <item row="1" column="2">
@@ -368,6 +395,13 @@
        </property>
        <property name="text">
         <string>end</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="QCheckBox" name="filterRangeCheckbox">
+       <property name="text">
+        <string>filter range</string>
        </property>
       </widget>
      </item>
@@ -391,6 +425,19 @@
        </property>
       </widget>
      </item>
+     <item row="15" column="4">
+      <widget class="QPushButton" name="applyFilterButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Apply</string>
+       </property>
+      </widget>
+     </item>
      <item row="4" column="2">
       <widget class="QLineEdit" name="totalTimeField">
        <property name="sizePolicy">
@@ -404,7 +451,7 @@
        </property>
       </widget>
      </item>
-     <item row="7" column="0" colspan="5">
+     <item row="8" column="0" colspan="5">
       <widget class="Line" name="line_3">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -526,50 +573,47 @@
        </item>
       </widget>
      </item>
-     <item row="5" column="2">
-      <widget class="QLineEdit" name="scoreField">
+     <item row="7" column="1">
+      <widget class="QComboBox" name="selectOnlyToolbox">
+       <item>
+        <property name="text">
+         <string>hbonds</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>hydrophobic</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>saltbridges</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>unknown</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="7" column="0">
+      <widget class="QLabel" name="sortingLabel_2">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
        <property name="text">
-        <string>0</string>
+        <string>only:</string>
        </property>
       </widget>
      </item>
-     <item row="6" column="2">
-      <widget class="QComboBox" name="sortingOrderDropdown">
-       <item>
-        <property name="text">
-         <string>asc</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>desc</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item row="13" column="4">
-      <spacer name="verticalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item row="11" column="0" colspan="5">
-      <widget class="Line" name="line_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+     <item row="7" column="3">
+      <widget class="QCheckBox" name="onlyBoxActiveCheckbox">
+       <property name="text">
+        <string>active</string>
        </property>
       </widget>
      </item>
@@ -599,6 +643,9 @@
     <zorder>sortingOrderDropdown</zorder>
     <zorder>filterAtomsResTabWidget</zorder>
     <zorder>lowerRangeField</zorder>
+    <zorder>selectOnlyToolbox</zorder>
+    <zorder>sortingLabel_2</zorder>
+    <zorder>onlyBoxActiveCheckbox</zorder>
    </widget>
   </widget>
   <widget class="QWidget" name="colorsTab">

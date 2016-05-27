@@ -47,6 +47,7 @@ class Canvas(QWidget):
         self.contacts = []
         self.range = [0, 0]
         self.rangeFilterActive = False
+        self.showHbondScores = False
 
     def paintEvent(self, event):
 
@@ -108,13 +109,22 @@ class Canvas(QWidget):
         p.fillRect(0, 0, self.sizeX, self.sizeY, whiteColor)
 
         row = 0
+        self.alphaFactor = 50
         for c in self.contacts:
             bbScColor = BackboneSidechainContactType.colors[c.determineBackboneSidechainType()]
             i = 0
-            if self.rangeFilterActive:
-                rangedScores = c.scoreArray
+            if not self.showHbondScores:
+                if self.rangeFilterActive:
+                    rangedScores = c.scoreArray
+                else:
+                    rangedScores = c.scoreArray[self.range[0]:self.range[1]]
             else:
-                rangedScores = c.scoreArray[self.range[0]:self.range[1]]
+                hbarray = c.hbondFramesScan()
+                self.alphaFactor = 100
+                if self.rangeFilterActive:
+                    rangedScores = hbarray
+                else:
+                    rangedScores = hbarray[self.range[0]:self.range[1]]
             while i < len(rangedScores):
                 p.setPen(blackColor)
                 merged_score = 0

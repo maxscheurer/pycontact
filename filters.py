@@ -122,6 +122,26 @@ class BinaryFilter(object):
     def filterContacts(self,contacts):
         pass
 
+class OnlyFilter(object):
+    def __init__(self, name, operator, value):
+        self.name = name
+        self.operator = operator
+        self.value = value
+
+    def filterContacts(self, contacts):
+        filtered = []
+        if self.operator == "hbonds":
+            for c in contacts:
+                hb = c.hbondFramesScan()
+                for bla in hb:
+                    if bla > 0:
+                        filtered.append(c)
+                        break
+        elif self.operator == "hydrophobic":
+            for c in contacts:
+                if c.determine_ctype() == ContactType.hydrophobic:
+                    filtered.append(c)
+        return filtered
 
 class TotalTimeFilter(BinaryFilter):
     def __init__(self,name, operator, value):

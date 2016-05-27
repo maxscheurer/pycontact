@@ -303,11 +303,13 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
     def updateFilters(self):
         print("filter update")
         self.painter.labelView.clean()
+        self.painter.showHbondScores = False
         # total time filter
         totalTimeActive = self.settingsView.activeTotalTimeCheckbox.isChecked()
         scoreActive = self.settingsView.activeScoreCheckbox.isChecked()
         sortingActive = self.settingsView.activeSortingBox.isChecked()
-        filterActive = (totalTimeActive or scoreActive or sortingActive)
+        onlyActive = self.settingsView.onlyBoxActiveCheckbox.isChecked()
+        filterActive = (totalTimeActive or scoreActive or sortingActive or onlyActive)
         weightActive = self.settingsView.functionActiveCheckbox.isChecked()
         # only filter given range
         rangeFilterActive = self.settingsView.filterRangeCheckbox.isChecked()
@@ -377,6 +379,12 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
                         sorter = Sorting("sorting", key, descending)
                         sorter.setThresholdAndNsPerFrame(float(self.settingsView.thresholdField.text()), float(self.settingsView.nsPerFrameField.text()))
                         self.filteredContacts = sorter.sortContacts(self.filteredContacts)
+                    if onlyActive:
+                        key = self.settingsView.selectOnlyToolbox.currentText()
+                        only = OnlyFilter("only", key, 0)
+                        self.filteredContacts = only.filterContacts(self.filteredContacts)
+                        if key == "hbonds":
+                            self.painter.showHbondScores = True
                     self.painter.contacts = self.filteredContacts
                     self.painter.rendered = False
                     self.painter.update()
@@ -385,6 +393,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
                         self.painter.labelView.clean()
             else:
                 #no weight or filters
+                self.painter.showHbondScores = False
                 self.painter.contacts = self.filteredContacts
                 self.painter.rendered = False
                 self.painter.update()
