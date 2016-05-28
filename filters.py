@@ -141,6 +141,10 @@ class OnlyFilter(object):
             for c in contacts:
                 if c.determine_ctype() == ContactType.hydrophobic:
                     filtered.append(c)
+        elif self.operator == "saltbridges":
+            for c in contacts:
+                if c.determine_ctype() == ContactType.saltbr:
+                    filtered.append(c)
         return filtered
 
 class TotalTimeFilter(BinaryFilter):

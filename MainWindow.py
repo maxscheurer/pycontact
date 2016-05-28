@@ -339,6 +339,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
                 self.filteredContacts = frameRangeFilter.extractFrameRange(self.filteredContacts, [lower, upper])
             for c in self.filteredContacts:
                 c.setScores()
+                c.setContactType()
             # weight functions
             if weightActive:
                 if self.currentFunctionType == FunctionType.sigmoid:

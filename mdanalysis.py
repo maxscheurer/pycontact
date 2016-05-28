@@ -187,6 +187,9 @@ class AccumulatedContact(object):
             self.hbondFrames.append(currentFrame)
         return self.hbondFrames
 
+    def setContactType(self):
+        self.contactType = self.determine_ctype()
+
     def determine_ctype(self):
         #only works if both maps contain resname
         r1 = self.key1[AccumulationMapIndex.resname].lower()
