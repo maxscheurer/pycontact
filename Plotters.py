@@ -48,7 +48,6 @@ class MplPlotter(FigureCanvas):
 
 
 class ContactPlotter(MplPlotter):
-    """Simple canvas with a sine plot."""
 
     def plot_contact_figure(self, contact):
         self.axes.plot(contact.scoreArray)
@@ -93,7 +92,7 @@ class HistPlotter(MplPlotter):
         self.axes.set_xlabel(attribute + " bins")
         self.fig.subplots_adjust(bottom=0.2, top=0.95, left=0.15, right=0.85)
 
-    def plotContactHist(self, currentContacts, attribute, threshold, nsPerFrame):
+    def plotContactHist(self, currentContacts, attribute, threshold, nsPerFrame,xticksfontsize):
         values = []
         titles = []
 
@@ -122,6 +121,8 @@ class HistPlotter(MplPlotter):
         xticks_pos = [0.7071 * patch.get_width() + patch.get_xy()[0] for patch in h]
         self.axes.set_xticklabels(titlesNp, ha='right', size=8, rotation=45)
         self.axes.set_xticks(xticks_pos)
+        for tick in self.axes.xaxis.get_major_ticks():
+            tick.label.set_fontsize(xticksfontsize)
         self.axes.set_ylabel(attribute)
         self.fig.subplots_adjust(bottom=0.2, top=0.95, left=0.1, right=0.9)
 
@@ -130,7 +131,6 @@ class HistPlotter(MplPlotter):
 
 
 class SimplePlotter(MplPlotter):
-    """Simple canvas with a sine plot."""
     def plot(self, x, y):
         self.axes.plot(x, y)
         self.axes.set_xlabel("x")

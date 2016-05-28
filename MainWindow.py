@@ -916,7 +916,7 @@ class ExportTabWidget(QTabWidget):
         self.tab2.setLayout(self.grid1)
 
         self.tab2.histPlot = HistPlotter(None, width=8, height=5, dpi=60)
-        self.grid1.addWidget(self.tab2.histPlot, 2, 0, 1, 3)
+        self.grid1.addWidget(self.tab2.histPlot, 3, 0, 1, 4)
 
         self.tab2.histTypeBox = QComboBox()
         self.tab2.histTypeBox.addItem("General Histogram")
@@ -945,6 +945,12 @@ class ExportTabWidget(QTabWidget):
         self.tab2.formatLabel = QLabel("Format: ")
         self.grid1.addWidget(self.tab2.formatLabel, 1, 1)
 
+        self.tab2.xTicksFontSizeLabel = QLabel("bin per contact font size: ")
+        self.grid1.addWidget(self.tab2.xTicksFontSizeLabel, 2, 0)
+
+        self.tab2.xTicksFontSizeField = QLineEdit("11")
+        self.grid1.addWidget(self.tab2.xTicksFontSizeField, 2, 1)
+
         self.tab2.formatBox = QComboBox()
         self.tab2.formatBox.addItem("pdf")
         self.tab2.formatBox.addItem("png")
@@ -965,12 +971,11 @@ class ExportTabWidget(QTabWidget):
     def plotHist(self):
         sip.delete(self.tab2.histPlot)
         self.tab2.histPlot = HistPlotter(None, width=8, height=5, dpi=60)
-        self.grid1.addWidget(self.tab2.histPlot, 2, 0, 1, 3)
-
+        self.grid1.addWidget(self.tab2.histPlot, 3, 0, 1, 4)
         if self.tab2.histTypeBox.currentText() == "General Histogram":
             self.tab2.histPlot.plotGeneralHist(self.contacts, self.tab2.attributeBox.currentText(), self.threshold, self.nsPerFrame)
         elif self.tab2.histTypeBox.currentText() == "Bin per Contact":
-            self.tab2.histPlot.plotContactHist(self.contacts, self.tab2.attributeBox.currentText(), self.threshold, self.nsPerFrame)
+            self.tab2.histPlot.plotContactHist(self.contacts, self.tab2.attributeBox.currentText(), self.threshold, self.nsPerFrame,int(self.tab2.xTicksFontSizeField.text()))
 
         self.tab2.histPlot.update()
 
