@@ -27,15 +27,15 @@ class MplPlotter(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
 
     def __init__(self, parent=None, width=5, height=4, dpi=100):
-        fig = Figure(figsize=(width, height), dpi=dpi)
-        self.axes = fig.add_subplot(111)
+        self.fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes = self.fig.add_subplot(111)
         # We want the axes cleared every time plot() is called
         self.axes.hold(False)
 
         self.compute_initial_figure()
 
         #
-        FigureCanvas.__init__(self, fig)
+        FigureCanvas.__init__(self, self.fig)
         self.setParent(parent)
 
         FigureCanvas.setSizePolicy(self,
@@ -71,28 +71,59 @@ class ContactPlotter(MplPlotter):
 class HistPlotter(MplPlotter):
     """Simple canvas with an histogram plot."""
 
-    def plotGeneralHist(self, currentContacts):
-        meanValues = []
-        for c in currentContacts:
-            meanValues.append(c.mean_score())
+    def plotGeneralHist(self, currentContacts, attribute, threshold, nsPerFrame):
+        values = []
 
-        meanValuesNp = np.array(meanValues, dtype = float)
-        self.axes.hist(meanValuesNp, bins=20)
+        if attribute == "Mean Score":
+            for c in currentContacts:
+                values.append(c.mean_score())
+        elif attribute == "Median Score":
+            for c in currentContacts:
+                values.append(c.median_score())
+        elif attribute == "Mean Lifetime":
+            for c in currentContacts:
+                values.append(c.mean_life_time(nsPerFrame, threshold))
+        elif attribute == "Median Lifetime":
+            for c in currentContacts:
+                values.append(c.median_life_time(nsPerFrame, threshold))
 
-    def plotContactHist(self, currentContacts):
-        meanValues = []
+        valuesNp = np.array(values, dtype = float)
+        self.axes.hist(valuesNp, bins=20)
+        self.fig.subplots_adjust(bottom=0.2, top=0.95, left=0.15, right=0.85)
+
+    def plotContactHist(self, currentContacts, attribute, threshold, nsPerFrame):
+        values = []
         titles = []
-        for c in currentContacts:
-            meanValues.append(c.mean_score())
-            titles.append(c.title)
 
-        meanValuesNp = np.array(meanValues, dtype = float)
+        if attribute == "Mean Score":
+            for c in currentContacts:
+                values.append(c.mean_score())
+                titles.append(c.title)
+        elif attribute == "Median Score":
+            for c in currentContacts:
+                values.append(c.median_score())
+                titles.append(c.title)
+        elif attribute == "Mean Lifetime":
+            for c in currentContacts:
+                values.append(c.mean_life_time(nsPerFrame, threshold))
+                titles.append(c.title)
+        elif attribute == "Median Lifetime":
+            for c in currentContacts:
+                values.append(c.median_life_time(nsPerFrame, threshold))
+                titles.append(c.title)
+
+        valuesNp = np.array(values, dtype = float)
         titlesNp = np.array(titles, dtype = str)
 
         x = range(len(currentContacts))
-        self.axes.bar(x, meanValuesNp, color="red")
-        self.axes.set_xticks(x)
-        self.axes.set_xticklabels(titlesNp, rotation=90)
+        h = self.axes.bar(x, valuesNp, color="red")
+        xticks_pos = [0.7071 * patch.get_width() + patch.get_xy()[0] for patch in h]
+        self.axes.set_xticklabels(titlesNp, ha='right', size=8, rotation=45)
+        self.axes.set_xticks(xticks_pos)
+        self.fig.subplots_adjust(bottom=0.2, top=0.95, left=0.1, right=0.9)
+
+    def saveFigure(self, path, outputFormat):
+        self.fig.savefig(path + "." + outputFormat, format=outputFormat)
 
 
 class SimplePlotter(MplPlotter):
