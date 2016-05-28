@@ -89,6 +89,8 @@ class HistPlotter(MplPlotter):
 
         valuesNp = np.array(values, dtype = float)
         self.axes.hist(valuesNp, bins=20)
+        self.axes.set_ylabel("N")
+        self.axes.set_xlabel(attribute + " bins")
         self.fig.subplots_adjust(bottom=0.2, top=0.95, left=0.15, right=0.85)
 
     def plotContactHist(self, currentContacts, attribute, threshold, nsPerFrame):
@@ -120,6 +122,7 @@ class HistPlotter(MplPlotter):
         xticks_pos = [0.7071 * patch.get_width() + patch.get_xy()[0] for patch in h]
         self.axes.set_xticklabels(titlesNp, ha='right', size=8, rotation=45)
         self.axes.set_xticks(xticks_pos)
+        self.axes.set_ylabel(attribute)
         self.fig.subplots_adjust(bottom=0.2, top=0.95, left=0.1, right=0.9)
 
     def saveFigure(self, path, outputFormat):
