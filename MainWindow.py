@@ -15,7 +15,7 @@ import warnings
 with warnings.catch_warnings():
     warnings.simplefilter("ignore"); 
     import matplotlib.pyplot as plt
-
+import os
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import cm
@@ -550,6 +550,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.exportWidget = ExportTabWidget()
         self.exportWidget.valueUpdated.connect(self.handleExportUpdate)
         self.exportWidget.setContacts(self.filteredContacts)
+        self.exportWidget.setThresholdAndNsPerFrame(self.painter.threshold, self.painter.nsPerFrame)
         self.exportWidget.show()
 
     @QtCore.Slot(str, str)
@@ -883,6 +884,12 @@ class ExportTabWidget(QTabWidget):
        self.tab2UI()
        self.setWindowTitle("Export")
        self.contacts = []
+       self.threshold = 0
+       self.nsPerFrame = 0
+
+    def setThresholdAndNsPerFrame(self, currentThreshold, currentNsPerFrame):
+        self.threshold = currentThreshold
+        self.nsPerFrame = currentNsPerFrame
 
     def tab1UI(self):
         grid = QGridLayout()
@@ -909,18 +916,48 @@ class ExportTabWidget(QTabWidget):
         self.tab2.setLayout(self.grid1)
 
         self.tab2.histPlot = HistPlotter(None, width=8, height=5, dpi=60)
-        self.grid1.addWidget(self.tab2.histPlot, 1, 0)
+        self.grid1.addWidget(self.tab2.histPlot, 2, 0, 1, 3)
 
         self.tab2.histTypeBox = QComboBox()
         self.tab2.histTypeBox.addItem("General Histogram")
         self.tab2.histTypeBox.addItem("Bin per Contact")
 
-        self.grid1.addWidget(self.tab2.histTypeBox, 0, 1)
+        self.grid1.addWidget(self.tab2.histTypeBox, 0, 3)
+
+        self.tab2.attributeBox = QComboBox()
+        self.tab2.attributeBox.addItem("Mean Score")
+        self.tab2.attributeBox.addItem("Median Score")
+        self.tab2.attributeBox.addItem("Mean Lifetime")
+        self.tab2.attributeBox.addItem("Median Lifetime")
+
+        self.grid1.addWidget(self.tab2.attributeBox, 1, 3)
 
         self.tab2.plotButton = QPushButton("Show Preview")
         self.tab2.plotButton.setAutoDefault(False)
         self.tab2.plotButton.clicked.connect(self.pushPlot)
-        self.grid1.addWidget(self.tab2.plotButton, 0, 0)
+        self.grid1.addWidget(self.tab2.plotButton, 0, 0, 1, 3)
+
+        self.tab2.saveButton = QPushButton("Save Histogram")
+        self.tab2.saveButton.setAutoDefault(False)
+        self.tab2.saveButton.clicked.connect(self.saveHist)
+        self.grid1.addWidget(self.tab2.saveButton, 1, 0, 1, 1)
+
+        self.tab2.formatLabel = QLabel("Format: ")
+        self.grid1.addWidget(self.tab2.formatLabel, 1, 1)
+
+        self.tab2.formatBox = QComboBox()
+        self.tab2.formatBox.addItem("pdf")
+        self.tab2.formatBox.addItem("png")
+        self.tab2.formatBox.addItem("svg")  
+        self.grid1.addWidget(self.tab2.formatBox, 1, 2)      
+
+    def saveHist(self):
+        self.plotHist()
+
+        fileName = QFileDialog.getSaveFileName(self, 'Export Path')
+        if len(fileName[0]) > 0:
+            path, file_extension = os.path.splitext(fileName[0])
+            self.tab2.histPlot.saveFigure(path, self.tab2.formatBox.currentText())
 
     def pushPlot(self):
         self.plotHist()
@@ -928,12 +965,12 @@ class ExportTabWidget(QTabWidget):
     def plotHist(self):
         sip.delete(self.tab2.histPlot)
         self.tab2.histPlot = HistPlotter(None, width=8, height=5, dpi=60)
-        self.grid1.addWidget(self.tab2.histPlot, 1, 0)
+        self.grid1.addWidget(self.tab2.histPlot, 2, 0, 1, 3)
 
         if self.tab2.histTypeBox.currentText() == "General Histogram":
-            self.tab2.histPlot.plotGeneralHist(self.contacts)
+            self.tab2.histPlot.plotGeneralHist(self.contacts, self.tab2.attributeBox.currentText(), self.threshold, self.nsPerFrame)
         elif self.tab2.histTypeBox.currentText() == "Bin per Contact":
-            self.tab2.histPlot.plotContactHist(self.contacts)
+            self.tab2.histPlot.plotContactHist(self.contacts, self.tab2.attributeBox.currentText(), self.threshold, self.nsPerFrame)
 
         self.tab2.histPlot.update()
 
