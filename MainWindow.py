@@ -929,6 +929,7 @@ class ExportTabWidget(QTabWidget):
         self.tab2.attributeBox.addItem("Median Score")
         self.tab2.attributeBox.addItem("Mean Lifetime")
         self.tab2.attributeBox.addItem("Median Lifetime")
+        self.tab2.attributeBox.addItem("Hbond percentage")
 
         self.grid1.addWidget(self.tab2.attributeBox, 1, 3)
 

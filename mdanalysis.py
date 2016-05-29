@@ -127,6 +127,15 @@ class AccumulatedContact(object):
     	self.mean_score()
     	self.median_score()
 
+    def hbond_percentage(self):
+        self.hbondFramesScan()
+        fnumber = len(self.scoreArray)
+        counter = 0
+        for element in self.hbondFrames:
+            if element > 0:
+                counter += 1
+        return float(counter)/float(fnumber) * 100
+
     def total_time(self, ns_per_frame, threshold):
         time = 0
         for score in self.scoreArray:

@@ -203,8 +203,8 @@ rank = comm.Get_rank()
 if rank == 0:
 	start = time.time()
 	import pickle
-	importDict = pickle.load(open("/Users/mscheurer/Projects/pycontact/pycontact/defaultsession", "rb"))
-	# importDict = pickle.load(open("/Users/mscheurer/Dropbox/TCBG/ba/data/yeast_proteasome_ubp6_session", "rb"))
+	# importDict = pickle.load(open("/Users/mscheurer/Projects/pycontact/pycontact/defaultsession", "rb"))
+	importDict = pickle.load(open("/Users/mscheurer/Dropbox/TCBG/ba/data/yeast_proteasome_ubp6_session", "rb"))
 	stop = time.time()
 	print stop-start
 	contResults = importDict["analyzer"][-1]

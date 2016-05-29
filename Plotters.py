@@ -112,6 +112,10 @@ class HistPlotter(MplPlotter):
             for c in currentContacts:
                 values.append(c.median_life_time(nsPerFrame, threshold))
                 titles.append(c.title)
+        elif attribute == "Hbond percentage":
+            for c in currentContacts:
+                values.append(c.hbond_percentage())
+                titles.append(c.title)
 
         valuesNp = np.array(values, dtype = float)
         titlesNp = np.array(titles, dtype = str)

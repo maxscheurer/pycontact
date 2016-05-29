@@ -179,6 +179,11 @@ class ScoreFilter(BinaryFilter):
                 med = c.median_score()
                 if op.compare(med, self.value, self.operator):
                     filtered.append(c)
+        elif self.ftype == u"hbond perc.":
+            for c in contacts:
+                med = c.hbond_percentage()
+                if op.compare(med, self.value, self.operator):
+                    filtered.append(c)
         return filtered
 
 class SortingOrder(object):
