@@ -10,7 +10,6 @@
 # Author: Maximilian Scheurer, mscheurer@ks.uiuc.edu
 import MDAnalysis
 from MDAnalysis.analysis import distances
-from MDAnalysis.analysis.hbonds.hbond_analysis import *
 import itertools
 import re, sys
 from biochemistry import *
