@@ -130,9 +130,11 @@ class AccumulatedContact(object):
         self.hbondFramesScan()
         fnumber = len(self.scoreArray)
         counter = 0
+        print fnumber
         for element in self.hbondFrames:
             if element > 0:
                 counter += 1
+        print counter
         return float(counter)/float(fnumber) * 100
 
     def total_time(self, ns_per_frame, threshold):

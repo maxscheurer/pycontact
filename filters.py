@@ -33,6 +33,8 @@ class FrameFilter(object):
         upper = range[1]
         for c in contacts:
             newScores = c.scoreArray[lower:upper]
+            newAtoms = c.contributingAtoms[lower:upper]
+            c.contributingAtoms = newAtoms
             c.scoreArray = newScores
         return contacts
 

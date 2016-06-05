@@ -955,7 +955,8 @@ class ExportTabWidget(QTabWidget):
         self.tab2.formatBox = QComboBox()
         self.tab2.formatBox.addItem("pdf")
         self.tab2.formatBox.addItem("png")
-        self.tab2.formatBox.addItem("svg")  
+        self.tab2.formatBox.addItem("svg")
+	self.tab2.formatBox.addItem("eps")  
         self.grid1.addWidget(self.tab2.formatBox, 1, 2)      
 
     def saveHist(self):
