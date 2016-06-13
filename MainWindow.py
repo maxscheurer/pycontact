@@ -738,7 +738,7 @@ class FileLoaderDialog(QDialog):
 
         self.cutoffField = QLineEdit("5.0")
         self.cutoffAngleField = QLineEdit("120")
-        self.cutoffHbondField = QLineEdit("2.0")
+        self.cutoffHbondField = QLineEdit("2.5")
         self.selection1Field = QLineEdit("segid RN11")
         self.selection2Field = QLineEdit("segid UBQ")
 
