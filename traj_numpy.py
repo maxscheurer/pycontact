@@ -66,7 +66,9 @@ if rank == 0:
         atype = AtomType.parseParameterFileString(atomline)
         heavyatoms.append(atype)
     # load psf and dcd file in memory
+    
     u = MDAnalysis.Universe("rpn11_ubq_interface-ionized.psf", "short.dcd")
+    # u = MDAnalysis.Universe("/Users/maximilianscheurer/Dropbox/TCBG/ba/data/prot_ubp6/yeast_proteasome_ubp6_corr.psf", "/Users/maximilianscheurer/Dropbox/TCBG/ba/data/prot_ubp6/10ns_mdff_prot_wubp6.dcd")
     # define selections according to sel1text and sel2text
     sel1 = u.select_atoms("segid RN11")
     sel2 = u.select_atoms("segid UBQ")
