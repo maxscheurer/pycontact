@@ -604,6 +604,7 @@ class Analyzer(object):
         contactResults = []
         # loop over trajectory
         self.totalFrameNumber = len(u.trajectory)
+        start = time.time()
         for ts in u.trajectory:
             currentFrameContacts = []
             frame = ts.frame
@@ -727,6 +728,8 @@ class Analyzer(object):
                                              hydrogenBonds)
                 currentFrameContacts.append(newAtomContact)
             contactResults.append(currentFrameContacts)
+        stop = time.time()
+        print "analyzeTime:",stop-start
         return contactResults
 
     def analyze_contactResultsWithMaps(self,contactResults, map1, map2):
