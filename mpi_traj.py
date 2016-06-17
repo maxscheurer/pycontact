@@ -57,6 +57,7 @@ if rank == 0:
 	comm.send(resname_array,dest=1,tag=12)
 else:
 	resname_array = comm.recv(tag=12,source=0)
+	traj_chunks = None
 
 
 traj = comm.scatter(traj_chunks,root=0)
