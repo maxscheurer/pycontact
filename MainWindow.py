@@ -505,27 +505,6 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         d.setWindowModality(Qt.ApplicationModal)
         d.exec_()
 
-    # deprecated!
-    # def pushOpen(self):
-    #     fnames = QFileDialog.getOpenFileNames(self, "Open file")
-    #     for file in fnames[0]:
-    #         self.file = file
-    #         break
-    #     lines = []
-    #     print(self.file)
-    #     with open(self.file, "r") as f:
-    #         for line in f.readlines():
-    #             lines.append(line)
-    #     self.contacts = makeContactFromLines(lines)
-    #     print("new contacts: " + str(len(self.contacts)))
-    #     self.painter.contacts = self.contacts
-    #     self.painter.range = [0, len(self.contacts[0].scoreArray)]
-    #     # self.painter.update()
-    #     # set max slider value to frame number!
-    #     self.mergeSlider.setMaximum(len(self.contacts[0].scoreArray) / 15)
-    #     self.updateSettings()
-    #     self.updateFilters()
-
     def showDeveloperInfo(self):
         d = QDialog()
         grid = QGridLayout()

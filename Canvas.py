@@ -21,7 +21,6 @@ import numpy as np
 import gui
 from settings import *
 from biochemistry import *
-from inputreader import *
 from filters import *
 from functools import partial
 from LabelView import *

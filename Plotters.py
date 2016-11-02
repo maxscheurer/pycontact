@@ -19,7 +19,6 @@ with warnings.catch_warnings():
 import gui
 from settings import *
 from biochemistry import *
-from inputreader import *
 from filters import *
 from functools import partial
 
