@@ -162,7 +162,8 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             pickle.dump(exportDict, open(filestring, "wb"))
 
     def loadDefault(self):
-        importDict = pickle.load(open("defaultsession", "rb"))
+        # importDict = pickle.load(open("defaultsession", "rb"))
+        importDict = pickle.load(open("arfsession", "rb"))
         self.contacts = importDict["contacts"]
         arguments = importDict["analyzer"][0:-1]
         trajArgs = importDict["trajectory"]
@@ -196,12 +197,73 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
     def setFrameNumber(self):
     	self.progressWidget.setMax(self.analysis.totalFrameNumber)
 
+    def analyzeParallel(self,map1,map2):
+        start = time.time()
+        trajData = self.analysis.getTrajectoryData()
+        contResults = self.analysis.contactResults
+        nproc = 1
+        tasks = []
+        results = []
+        rank = 0
+        manager = multiprocessing.Manager()
+        d=manager.list(trajData)
+        all_chunk = chunks(contResults,nproc)
+        pool = multiprocessing.Pool(nproc)
+        for c in all_chunk:
+            results.append( pool.apply_async( loop_frame, args=(c,map1,map2,d)) )
+            rank +=1
+        # TODO: might be important, but without, it's faster and until now, provides the same results
+        # pool.close()
+        # pool.join()
+        stop = time.time()
+        print "time: ", str(stop-start), rank
+        print str(len(c)), rank
+        allkeys = []
+        frame_contacts_accumulated = []
+        print len(results)
+        for res in results:
+            rn = res.get()
+            allkeys.extend(rn[0])
+            frame_contacts_accumulated.extend(rn[1])
+        accumulatedContactsDict = {}
+        #   start = time.time()
+        for key in allkeys:
+            accumulatedContactsDict[key] = []
+            for frame_dict in frame_contacts_accumulated:
+                if not key in frame_dict:  # puts empty score TempContactAccumulate in dict
+                    key1, key2 = makeKeyArraysFromKey(key)
+                    emptyCont = TempContactAccumulate(key1, key2)
+                    emptyCont.fscore = 0
+                    frame_dict[key] = emptyCont
+                accumulatedContactsDict[key].append(frame_dict[key])
+        finalAccumulatedContacts = []  # list of AccumulatedContacts
+        for key in accumulatedContactsDict:
+            key1, key2 = makeKeyArraysFromKey(key)
+            acc = AccumulatedContact(key1, key2)
+            for tempContact in accumulatedContactsDict[key]:
+                acc.addScore(tempContact.fscore)
+                acc.addContributingAtoms(tempContact.contributingAtomContacts)
+                acc.bb1 += tempContact.bb1score
+                acc.bb2 += tempContact.bb2score
+                acc.sc1 += tempContact.sc1score
+                acc.sc2 += tempContact.sc2score
+            finalAccumulatedContacts.append(acc)
+        # stop = time.time()
+        # print stop - start
+        glob_stop = time.time()
+        print glob_stop - start
+        return finalAccumulatedContacts
+
     def analyzeDataPushed(self):
         self.maps, result = AnalysisDialog.getMapping()
         if result == 1:
             map1 = self.maps[0]
             map2 = self.maps[1]
-            self.contacts = self.analysis.runContactAnalysis(map1, map2)
+            parallel = 1
+            if parallel:
+                self.contacts = self.analyzeParallel(map1, map2)
+            else:
+                self.contacts = self.analysis.runContactAnalysis(map1, map2)
             # for cont in self.contacts:
                 # cont.setScores()
             self.updateSettings()
