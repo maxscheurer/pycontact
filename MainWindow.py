@@ -173,7 +173,15 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.updateSettings()
         self.updateFilters()
 
+    def loadData_parallel(self):
+        from multi_trajectory import *
+        nprocs = 8
+        pool = multiprocessing.Pool(nprocs)
+        manager = multiprocessing.Manager()
+        d=manager.list(trajArgs)
+
     def loadDataPushed(self):
+        parallel = 0
         self.config,result = FileLoaderDialog.getConfig()
         if result == 1:
             attrs = vars(self.config)
@@ -182,7 +190,10 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             # self.connect(self.analysis, QtCore.SIGNAL('taskUpdated'),self.handleTaskUpdated)
             # self.connect(self.analysis, QtCore.SIGNAL('frameNumberSet'),self.setFrameNumber)
             # self.progressWidget.show()
-            self.analysis.runFrameScan()
+            if parallel:
+                pass
+            else:
+                self.analysis.runFrameScan()
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Information)
             msg.setText("Data loaded: %f frames scanned." % len(self.analysis.contactResults))
