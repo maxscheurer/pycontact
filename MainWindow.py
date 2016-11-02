@@ -13,7 +13,7 @@ from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QProgressBar
 import warnings
 with warnings.catch_warnings():
-    warnings.simplefilter("ignore"); 
+    warnings.simplefilter("ignore");
     import matplotlib.pyplot as plt
 import os
 import numpy as np
@@ -22,6 +22,9 @@ from matplotlib import cm
 import pickle
 from matplotlib.mlab import bivariate_normal
 from mpl_toolkits.mplot3d import Axes3D
+
+import multiprocessing
+from multi_accumulation import *
 
 class MainWindow(QMainWindow, gui.Ui_MainWindow):
     def __init__(self, parent=None):
@@ -131,6 +134,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.updateSettings()
         self.updateFilters()
 
+
     def importSession(self):
         fnames = QFileDialog.getOpenFileNames(self, "Open file")
         importfile = ""
@@ -229,7 +233,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             # fig.colorbar(cax)
             # plt.savefig("contactmap.png")
 
-        
+
 
     def setupFunctionBox(self):
         # sig
@@ -550,7 +554,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.painter.rendered = False
         self.painter.update()
         self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
-            
+
 
     def pushSave(self):
         fileName = QFileDialog.getSaveFileName(self, 'Export Path')
@@ -770,7 +774,7 @@ class AnalysisDialog(QDialog):
         super(AnalysisDialog, self).__init__(parent)
 
         grid = QGridLayout(self)
-        
+
         title1 = QLabel("selection 1")
         title2 = QLabel("selection 2")
         indexLabel = QLabel("index: ")
@@ -856,7 +860,7 @@ class ExportTabWidget(QTabWidget):
 
        self.tab1 = QWidget()
        self.tab2 = QWidget()
-        
+
        self.addTab(self.tab1, "View")
        self.addTab(self.tab2, "Histogram")
        self.tab1UI()
@@ -889,7 +893,7 @@ class ExportTabWidget(QTabWidget):
 
         grid.addWidget(self.tab1.formatBox, 2, 0)
 
-        
+
     def tab2UI(self):
         self.grid1 = QGridLayout()
         self.tab2.setLayout(self.grid1)
@@ -935,8 +939,8 @@ class ExportTabWidget(QTabWidget):
         self.tab2.formatBox.addItem("pdf")
         self.tab2.formatBox.addItem("png")
         self.tab2.formatBox.addItem("svg")
-	self.tab2.formatBox.addItem("eps")  
-        self.grid1.addWidget(self.tab2.formatBox, 1, 2)      
+	self.tab2.formatBox.addItem("eps")
+        self.grid1.addWidget(self.tab2.formatBox, 1, 2)
 
     def saveHist(self):
         self.plotHist()
@@ -966,7 +970,7 @@ class ExportTabWidget(QTabWidget):
 
     def setContacts(self, currentContacts):
         self.contacts = currentContacts
-        
+
 
 class SettingsTabWidget(QTabWidget, Ui_settingsWindowWidget):
     def __init__(self, parent=None):
