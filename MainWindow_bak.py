@@ -25,6 +25,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 import multiprocessing
 from multi_accumulation import *
+from functools import partial
 
 class MainWindow(QMainWindow, gui.Ui_MainWindow):
     def __init__(self, parent=None):
@@ -208,36 +209,15 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
     def setFrameNumber(self):
     	self.progressWidget.setMax(self.analysis.totalFrameNumber)
 
-    def analyzeParallel(self,map1,map2):
-        start = time.time()
-        trajData = self.analysis.getTrajectoryData()
-        contResults = self.analysis.contactResults
-        nproc = 1
-        tasks = []
-        results = []
-        rank = 0
-        manager = multiprocessing.Manager()
-        d=manager.list(trajData)
-        all_chunk = chunks(contResults,nproc)
-        pool = multiprocessing.Pool(nproc)
-        for c in all_chunk:
-            results.append( pool.apply_async( loop_frame, args=(c,map1,map2,d)) )
-            rank +=1
-        # TODO: might be important, but without, it's faster and until now, provides the same results
-        # pool.close()
-        # pool.join()
-        stop = time.time()
-        print "time: ", str(stop-start), rank
-        print str(len(c)), rank
+    def callback_analysis(self,results):
         allkeys = []
         frame_contacts_accumulated = []
-        print len(results)
         for res in results:
-            rn = res.get()
-            allkeys.extend(rn[0])
-            frame_contacts_accumulated.extend(rn[1])
+            for rn in res:
+                print len(rn)
+                allkeys.extend(rn[0])
+                frame_contacts_accumulated.extend(rn[1])
         accumulatedContactsDict = {}
-        #   start = time.time()
         for key in allkeys:
             accumulatedContactsDict[key] = []
             for frame_dict in frame_contacts_accumulated:
@@ -259,11 +239,30 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
                 acc.sc1 += tempContact.sc1score
                 acc.sc2 += tempContact.sc2score
             finalAccumulatedContacts.append(acc)
-        # stop = time.time()
-        # print stop - start
-        glob_stop = time.time()
-        print glob_stop - start
-        return finalAccumulatedContacts
+        self.contacts = finalAccumulatedContacts
+
+    def analyzeParallel(self,map1,map2):
+        start = time.time()
+        trajData = self.analysis.getTrajectoryData()
+        contResults = self.analysis.contactResults
+        nproc = 8
+        tasks = []
+        results = []
+        rank = 0
+        manager = multiprocessing.Manager()
+        d=manager.list(trajData)
+        all_chunk = chunks(contResults,nproc)
+        pool = multiprocessing.Pool(nproc)
+        # for c in all_chunk:
+            # results.append( pool.apply_async( loop_frame, args=(c,map1,map2,d)) )
+            # rank +=1
+        r = pool.map_async(partial(loop_frame,map1=map1,map2=map2,trajArgs=d), all_chunk,callback=self.callback_analysis)
+        # TODO: might be important, but without, it's faster and until now, provides the same results
+        r.wait()
+        # pool.close()
+        # pool.join()
+        stop = time.time()
+        print "time: ", str(stop-start)
 
     def analyzeDataPushed(self):
         self.maps, result = AnalysisDialog.getMapping()
@@ -272,7 +271,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             map2 = self.maps[1]
             parallel = 1
             if parallel:
-                self.contacts = self.analyzeParallel(map1, map2)
+                self.analyzeParallel(map1, map2)
             else:
                 self.contacts = self.analysis.runContactAnalysis(map1, map2)
             # for cont in self.contacts:
