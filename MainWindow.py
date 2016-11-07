@@ -25,6 +25,11 @@ from mpl_toolkits.mplot3d import Axes3D
 
 import multiprocessing
 from multi_accumulation import *
+from sasa_gui import *
+
+
+sasaProgressManager = multiprocessing.Manager()
+sasaProgressDict = sasaProgressManager.dict()
 
 class MainWindow(QMainWindow, gui.Ui_MainWindow):
     def __init__(self, parent=None):
@@ -88,6 +93,9 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.actionDefault.triggered.connect(self.loadDefault)
 
         self.progressWidget = ProgessWidget("Progress")
+
+        self.sasaView = SasaWidget()
+        self.sasaView.show()
         # map1 = [0, 0, 0, 1, 1, 0]
         # map2 = [0, 0, 0, 1, 1, 0]
         # self.map1 = map1
@@ -1056,6 +1064,69 @@ class SettingsTabWidget(QTabWidget, Ui_settingsWindowWidget):
     def __init__(self, parent=None):
         super(QtWidgets.QTabWidget, self).__init__(parent)
         self.setupUi(self)
+
+class SasaWidget(QWidget, Ui_SasaWidget):
+    def __init__(self, parent=None):
+        super(QtWidgets.QWidget, self).__init__(parent)
+        self.setupUi(self)
+
+        self.state = True
+        self.name = None
+
+        sip.delete(self.sasaProgressBar)
+        self.sasaProgressBar = PbWidget(total=100)
+        self.sasaProgressBar.setProperty("value", 0)
+        self.sasaProgressBar.setTextVisible(True)
+        self.sasaProgressBar.setInvertedAppearance(False)
+        self.sasaProgressBar.setObjectName("sasaProgressBar")
+        self.gridLayout.addWidget(self.sasaProgressBar, 4, 1, 1, 1)
+
+        self.calcSasaButton.clicked.connect(self.calculateSasa)
+
+        # self.totalFramesToProcess
+
+    def calculateSasa(self):
+        print "calculate SASA"
+        pass
+
+    def sasaEventListener(self):
+        while self.state:
+            progress = 0
+            for each in sasaProgressDict.keys():
+                progress += sasaProgressDict[each]
+                # sasaProgressDict[each] = 0
+                progress = float(progress) / float(self.totalFramesToProcess) * 100
+                # update bar with delivered value
+                if (101 - self.sasaProgressBar.value()) < progress:
+                    self.sasaProgressBar.update_bar(101 - self.sasaProgressBar.value())
+                elif progress > 0:
+                    self.sasaProgressBar.update_bar(progress)
+
+                if len(self.processes.keys()) == 0:
+                    self.state = False
+
+
+
+
+class PbWidget(QProgressBar):
+    def __init__(self, parent=None, total=20):
+        super(PbWidget, self).__init__()
+        self.setMinimum(0)
+        self.setMaximum(total)
+        self._active = False
+
+    def update_bar(self, to_add_number):
+        while True:
+            time.sleep(0.01)
+            value = self.value() + to_add_number
+            self.setValue(value)
+            qApp.processEvents()
+            if (not self._active or value >= self.maximum()):
+                break
+        self._active = False
+
+    def closeEvent(self, event):
+        self._active = False
 
 class ProgessWidget(QWidget):
     def __init__(self, title):
