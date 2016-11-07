@@ -26,6 +26,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import multiprocessing
 from multi_accumulation import *
 from sasa_gui import *
+from asa_grid import *
 
 
 sasaProgressManager = multiprocessing.Manager()
@@ -1065,12 +1066,45 @@ class SettingsTabWidget(QTabWidget, Ui_settingsWindowWidget):
         super(QtWidgets.QTabWidget, self).__init__(parent)
         self.setupUi(self)
 
-def calc_sasa(rank,size):
+def test_progress(rank,size):
     for i in range(size):
         # print rank,i
         value = i+1
         sasaProgressDict[rank] = value
+        sasaProgressDict["bla"] = "p"
         time.sleep(0.1)
+
+def calculate_sasa_parallel(input_coords,natoms,pairdist,nprad,surfacePoints,probeRadius,pointstyle,restricted, restrictedList,rank):
+    # load shared libraries
+    cgrid = cdll.LoadLibrary('./shared/libgridsearch.so')
+    search = cgrid.sasa_grid
+    search.restype = ctypes.c_double
+    search.argtypes = [ndpointer(ctypes.c_float, flags="C_CONTIGUOUS"), ctypes.c_int, ctypes.c_float, ctypes.c_int,
+                       ctypes.c_int, \
+                       ndpointer(ctypes.c_float, flags="C_CONTIGUOUS"), ctypes.c_int, ctypes.c_double, ctypes.c_int,
+                       ctypes.c_int, ndpointer(ctypes.c_uint32, flags="C_CONTIGUOUS")]
+
+    temp_sasa = []
+    frames_processed = 0
+    sasaProgressDict[rank] = frames_processed
+    print len(input_coords)
+    for c in input_coords:
+        coords = np.reshape(c, (1, natoms * 3))
+        npcoords = np.array(coords, dtype=np.float32)
+        print "start C"
+        startC = time.time()
+        # sasa_grid(const float *pos,int natoms, float pairdist, int allow_double_counting, int maxpairs, const float *radius,const int npts, double srad, int pointstyle)
+        # point style: 0=spiral, 1=random
+        asa = search(npcoords, natoms, pairdist, 0, -1, nprad, surfacePoints, probeRadius, pointstyle, restricted,
+                     restrictedList)
+        stopC = time.time()
+        print "time for grid search: ", (stopC - startC)
+        print "asa:", asa
+        temp_sasa.append(asa)
+        frames_processed += 1
+        sasaProgressDict[rank] = frames_processed
+    return temp_sasa
+
 
 class SasaWidget(QWidget, Ui_SasaWidget):
     def __init__(self, parent=None):
@@ -1095,19 +1129,93 @@ class SasaWidget(QWidget, Ui_SasaWidget):
 
     def calculateSasa(self):
         print "calculate SASA"
-        self.totalFramesToProcess = 100
-        size = 5
-        pool = multiprocessing.Pool(size)
+
+        ### test data ###
+        psf = "rpn11_ubq_interface-ionized.psf"
+        pdb = "rpn11_ubq_interface-ionized.pdb"
+        dcd = "/home/max/Projects/pycontact/short.dcd"
+
+        # load psf and trajectory, make lists with radii and coordinates
+        u = MDAnalysis.Universe(psf, dcd)
+
+        probeRadius = 1.4
+
+        # seltext = "segid UBQ"
+        # resseltext = "segid UBQ and same residue as around 5.0 (segid RN11)"
+        seltext = self.sasaSelection1TextField.text()
+        resseltext = self.sasaRestrictionTextField.text()
+        perres = 0
+
+        # 0=spiral, 1=random (VMD)
+        pointstyle = 1
+        # number of points to approximate the sphere
+        surfacePoints = 100
+        # pair distance
+        pairdist = 2 * (2.0 + 1.4)
+
+        if resseltext != "":
+            restricted = 1
+        else:
+            restricted = 0
+
+        selection = u.select_atoms(seltext)
+
+        if perres:
+            resids = sorted(set(selection.resids))
+            segs = sorted(set(selection.segids))
+        else:
+            pass
+
+        natoms = len(selection.atoms)
+        radius = []
+        restrictedList = []
+        if restricted:
+            ressel = u.select_atoms(resseltext)
+            for s in selection.atoms:
+                if s in ressel.atoms:
+                    restrictedList.append(1)
+                else:
+                    restrictedList.append(0)
+                radius.append(vdwRadius(s.name[0]))
+        else:
+            for s in selection.atoms:
+                radius.append(vdwRadius(s.name[0]))
+        natoms = len(selection)
+        nprad = np.array(radius, dtype=np.float32)
+        restrictedList = np.array(restrictedList, dtype=np.uint32)
+
+        input_coords = []
+        for ts in u.trajectory:
+            input_coords.append(selection.positions)
+
+        nprocs = 5
+        input_chunks = chunks(input_coords,nprocs)
+        pool = multiprocessing.Pool(nprocs)
         results = []
         rank = 0
-        for p in range(5):
-            results.append(pool.apply_async(calc_sasa, args=(rank,20)))
+        trajLength = len(u.trajectory)
+        self.totalFramesToProcess = trajLength
+        for input_coords_chunk in input_chunks:
+            results.append(pool.apply_async(calculate_sasa_parallel, args=(input_coords_chunk,natoms,pairdist,nprad,surfacePoints,probeRadius,pointstyle,restricted, restrictedList,rank)))
             rank += 1
         print "ranks", rank
         self.state = True
         self.sasaEventListener()
         pool.close()
         pool.join()
+
+        all_sasas = []
+        for r in results:
+            all_sasas.extend(r.get())
+
+        sip.delete(self.previewPlot)
+        self.previewPlot = SimplePlotter(None, width=5, height=2, dpi=60)
+        self.previewPlot.plot(np.arange(0,trajLength,1),all_sasas)
+        self.previewPlot.axes.set_xlabel("frame")
+        self.previewPlot.axes.set_ylabel(r'SASA [A$^\circ$^2]')
+        self.graphGridLayout.addWidget(self.previewPlot)
+        self.previewPlot.update()
+
 
     def sasaEventListener(self):
         while self.state:
@@ -1127,13 +1235,13 @@ class SasaWidget(QWidget, Ui_SasaWidget):
                     sasaProgressDict[each]=0
                 progress = 0
                 self.state = False
-            time.sleep(0.2)
+            # time.sleep(0.2)
 
 
 
 
 class PbWidget(QProgressBar):
-    def __init__(self, parent=None, total=20):
+    def __init__(self, parent=None, total=100):
         super(PbWidget, self).__init__()
         self.setMinimum(0)
         self.setMaximum(total)

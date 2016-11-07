@@ -107,6 +107,6 @@ class SurfaceAnalyser:
             print "asa:", asa
         looptimeEnd = time.time()
         print "Loop time: ", looptimeEnd-looptime
-
-a = SurfaceAnalyser()
-a.computeAsa()
+#
+# a = SurfaceAnalyser()
+# a.computeAsa()
