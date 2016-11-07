@@ -1,3 +1,38 @@
+def weight_function(value):
+    return (1.0) / (1.0 + np.exp(5.0 * (value - 4.0)))
+
+
+def chunks(seq, num):
+    avg = len(seq) / float(num)
+    out = []
+    last = 0.0
+
+    while last < len(seq):
+        out.append(seq[int(last):int(last + avg)])
+        last += avg
+
+    return out
+
+class ConvBond(object):
+    """docstring for ConvBond"""
+    def __init__(self, bonds):
+        super(ConvBond, self).__init__()
+        # print bonds.types()
+        # self.types = deepcopy(bonds.types())
+        try:
+            self.types = deepcopy(bonds.types())
+            # print type(self.types)
+        except IndexError, e:
+            self.types = []
+        self.indices = deepcopy(bonds.to_indices())
+
+    def types(self):
+        return self.types
+
+    def to_indices(self):
+        return self.indices
+
+
 def loop_trajectory(sel1c,sel2c,config,suppl):
     print len(sel1c) , len(sel2c)
     indices1 = suppl[0]
@@ -123,3 +158,79 @@ def loop_trajectory(sel1c,sel2c,config,suppl):
             currentFrameContacts.append(newAtomContact)
         allRankContacts.append(currentFrameContacts)
     return allRankContacts
+
+
+def run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1text, sel2text):
+    nproc = int(self.settingsView.coreBox.value())
+    pool = multiprocessing.Pool(nprocs)
+    manager = multiprocessing.Manager()
+    d=manager.list(trajArgs)
+
+
+    heavyatomlines = []
+    heavyatoms = []
+    pars = open(os.path.dirname(os.path.abspath(__file__)) + '/testpar.prm', 'r')
+    for line in pars:
+        if re.match("MASS", line):
+            heavyatomlines.append(line.rstrip())
+    for atomline in heavyatomlines:
+        # read new AtomType and its corresponding AtomHBondType from file
+        atype = AtomType.parseParameterFileString(atomline)
+        heavyatoms.append(atype)
+
+    #load psf and dcd
+    u = MDAnalysis.Universe(psf, dcd)
+    # define selections according to sel1text and sel2text
+    sel1 = u.select_atoms(sel1text)
+    sel2 = u.select_atoms(sel2text)
+    # write atomindices for each selection to list
+    indices1 = []
+    for at in sel1.atoms:
+        indices1.append(at.index)
+    indices2 = []
+    for at in sel2.atoms:
+        indices2.append(at.index)
+        # write properties of all atoms to lists
+    all_sel = u.select_atoms("all")
+    backbone_sel = u.select_atoms("backbone")
+    resname_array = []
+    resid_array = []
+    name_array = []
+    type_array = []
+    bonds = []
+    segids = []
+    backbone = []
+    for atom in all_sel.atoms:
+        resname_array.append(atom.resname)
+        resid_array.append(atom.resid)
+        name_array.append(atom.name)
+        type_array.append(atom.type)
+        bonds.append(ConvBond(atom.bonds))
+        segids.append(atom.segid)
+    for atom in backbone_sel:
+        backbone.append(atom.index)
+    # show trajectory information and selection information
+    print "trajectory with %d frames loaded" % len(u.trajectory)
+    print len(sel1.coordinates()), len(sel2.coordinates())
+    sel1coords = []
+    sel2coords = []
+    start = time.time()
+    for ts in u.trajectory:
+        sel1coords.append(sel1.coordinates())
+        sel2coords.append(sel2.coordinates())
+    contactResults = []
+    # loop over trajectory
+    self.totalFrameNumber = len(u.trajectory)
+    start = time.time()
+    sel1c = chunks(sel1coords, nproc)
+    sel2c = chunks(sel2coords, nproc)
+
+    print "Running on %d cores" % nproc
+    for c in zip(sel1c,sel2c):
+        results.append( pool.apply_async( loop_trajectory, args=(c[0],c[1],map1,map2,d)) )
+        rank +=1
+    # TODO: might be important, but without, it's faster and until now, provides the same results
+    pool.close()
+    pool.join()
+    stop = time.time()
+    print "time: ", str(stop-start), rank

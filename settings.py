@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'settings.ui'
 #
-# Created by: PyQt5 UI code generator 5.5.1
+# Created by: PyQt5 UI code generator 5.7
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_settingsWindowWidget(object):
     def setupUi(self, settingsWindowWidget):
         settingsWindowWidget.setObjectName("settingsWindowWidget")
-        settingsWindowWidget.resize(597, 699)
+        settingsWindowWidget.resize(585, 698)
         self.filterTab = QtWidgets.QWidget()
         self.filterTab.setObjectName("filterTab")
         self.filterWidget = QtWidgets.QWidget(self.filterTab)
@@ -23,6 +23,7 @@ class Ui_settingsWindowWidget(object):
         self.filterWidget.setSizePolicy(sizePolicy)
         self.filterWidget.setObjectName("filterWidget")
         self.gridLayout = QtWidgets.QGridLayout(self.filterWidget)
+        self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.gridLayout.setObjectName("gridLayout")
         self.functionActiveCheckbox = QtWidgets.QCheckBox(self.filterWidget)
         self.functionActiveCheckbox.setObjectName("functionActiveCheckbox")
@@ -39,6 +40,7 @@ class Ui_settingsWindowWidget(object):
         self.weightFunctionWidget.setSizePolicy(sizePolicy)
         self.weightFunctionWidget.setObjectName("weightFunctionWidget")
         self.functionGridLayout = QtWidgets.QGridLayout(self.weightFunctionWidget)
+        self.functionGridLayout.setContentsMargins(0, 0, 0, 0)
         self.functionGridLayout.setObjectName("functionGridLayout")
         self.sigmoidRadioButton = QtWidgets.QRadioButton(self.weightFunctionWidget)
         self.sigmoidRadioButton.setChecked(True)
@@ -68,6 +70,7 @@ class Ui_settingsWindowWidget(object):
         self.widget.setGeometry(QtCore.QRect(0, -10, 561, 131))
         self.widget.setObjectName("widget")
         self.gridLayout_4 = QtWidgets.QGridLayout(self.widget)
+        self.gridLayout_4.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_4.setObjectName("gridLayout_4")
         self.atomATypeField = QtWidgets.QLineEdit(self.widget)
         self.atomATypeField.setObjectName("atomATypeField")
@@ -112,6 +115,7 @@ class Ui_settingsWindowWidget(object):
         self.residueFilterContainer.setGeometry(QtCore.QRect(0, -10, 561, 91))
         self.residueFilterContainer.setObjectName("residueFilterContainer")
         self.gridLayout_3 = QtWidgets.QGridLayout(self.residueFilterContainer)
+        self.gridLayout_3.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_3.setObjectName("gridLayout_3")
         self.residARangeLabel = QtWidgets.QLabel(self.residueFilterContainer)
         self.residARangeLabel.setObjectName("residARangeLabel")
@@ -329,6 +333,7 @@ class Ui_settingsWindowWidget(object):
         self.colorWidget.setSizePolicy(sizePolicy)
         self.colorWidget.setObjectName("colorWidget")
         self.gridLayout_5 = QtWidgets.QGridLayout(self.colorWidget)
+        self.gridLayout_5.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_5.setObjectName("gridLayout_5")
         self.framesLabel = QtWidgets.QLabel(self.colorWidget)
         self.framesLabel.setObjectName("framesLabel")
@@ -355,6 +360,7 @@ class Ui_settingsWindowWidget(object):
         self.settingsWidget.setGeometry(QtCore.QRect(-1, -1, 581, 431))
         self.settingsWidget.setObjectName("settingsWidget")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.settingsWidget)
+        self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_2.setObjectName("gridLayout_2")
         self.thresholdLabel = QtWidgets.QLabel(self.settingsWidget)
         self.thresholdLabel.setObjectName("thresholdLabel")
@@ -370,7 +376,7 @@ class Ui_settingsWindowWidget(object):
         sizePolicy.setHeightForWidth(self.applySettingsButton.sizePolicy().hasHeightForWidth())
         self.applySettingsButton.setSizePolicy(sizePolicy)
         self.applySettingsButton.setObjectName("applySettingsButton")
-        self.gridLayout_2.addWidget(self.applySettingsButton, 4, 2, 1, 1)
+        self.gridLayout_2.addWidget(self.applySettingsButton, 5, 2, 1, 1)
         self.nsPerFrameField = QtWidgets.QLineEdit(self.settingsWidget)
         self.nsPerFrameField.setClearButtonEnabled(True)
         self.nsPerFrameField.setObjectName("nsPerFrameField")
@@ -379,7 +385,16 @@ class Ui_settingsWindowWidget(object):
         self.nsPerFrameLabel.setObjectName("nsPerFrameLabel")
         self.gridLayout_2.addWidget(self.nsPerFrameLabel, 0, 0, 1, 1)
         spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.gridLayout_2.addItem(spacerItem2, 2, 0, 1, 2)
+        self.gridLayout_2.addItem(spacerItem2, 3, 0, 1, 2)
+        self.coreBox = QtWidgets.QSpinBox(self.settingsWidget)
+        self.coreBox.setMinimum(1)
+        self.coreBox.setMaximum(64)
+        self.coreBox.setProperty("value", 4)
+        self.coreBox.setObjectName("coreBox")
+        self.gridLayout_2.addWidget(self.coreBox, 2, 1, 1, 1)
+        self.thresholdLabel_2 = QtWidgets.QLabel(self.settingsWidget)
+        self.thresholdLabel_2.setObjectName("thresholdLabel_2")
+        self.gridLayout_2.addWidget(self.thresholdLabel_2, 2, 0, 1, 1)
         settingsWindowWidget.addTab(self.settingsTab, "")
 
         self.retranslateUi(settingsWindowWidget)
@@ -470,5 +485,6 @@ class Ui_settingsWindowWidget(object):
         self.applySettingsButton.setText(_translate("settingsWindowWidget", "Apply"))
         self.nsPerFrameField.setText(_translate("settingsWindowWidget", "1.0"))
         self.nsPerFrameLabel.setText(_translate("settingsWindowWidget", "Nanoseconds per frame:"))
+        self.thresholdLabel_2.setText(_translate("settingsWindowWidget", "Cores:"))
         settingsWindowWidget.setTabText(settingsWindowWidget.indexOf(self.settingsTab), _translate("settingsWindowWidget", "Settings"))
 

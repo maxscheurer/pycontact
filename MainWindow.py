@@ -162,8 +162,8 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             pickle.dump(exportDict, open(filestring, "wb"))
 
     def loadDefault(self):
-        importDict = pickle.load(open("defaultsession", "rb"))
-        # importDict = pickle.load(open("arfsession", "rb"))
+        # importDict = pickle.load(open("defaultsession", "rb"))
+        importDict = pickle.load(open("arfsession", "rb"))
         self.contacts = importDict["contacts"]
         arguments = importDict["analyzer"][0:-1]
         trajArgs = importDict["trajectory"]
@@ -174,11 +174,9 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.updateFilters()
 
     def loadData_parallel(self):
-        from multi_trajectory import *
-        nprocs = 8
-        pool = multiprocessing.Pool(nprocs)
-        manager = multiprocessing.Manager()
-        d=manager.list(trajArgs)
+        from multi_trajectory import run_load_parallel
+
+
 
     def loadDataPushed(self):
         parallel = 0
@@ -209,10 +207,10 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
     	self.progressWidget.setMax(self.analysis.totalFrameNumber)
 
     def analyzeParallel(self,map1,map2):
+        nproc = int(self.settingsView.coreBox.value())
         start = time.time()
         trajData = self.analysis.getTrajectoryData()
         contResults = self.analysis.contactResults
-        nproc = 1
         tasks = []
         results = []
         rank = 0
@@ -220,12 +218,13 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         d=manager.list(trajData)
         all_chunk = chunks(contResults,nproc)
         pool = multiprocessing.Pool(nproc)
+        print "Running on %d cores" % nproc
         for c in all_chunk:
             results.append( pool.apply_async( loop_frame, args=(c,map1,map2,d)) )
             rank +=1
         # TODO: might be important, but without, it's faster and until now, provides the same results
-        # pool.close()
-        # pool.join()
+        pool.close()
+        pool.join()
         stop = time.time()
         print "time: ", str(stop-start), rank
         print str(len(c)), rank
@@ -270,7 +269,15 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         if result == 1:
             map1 = self.maps[0]
             map2 = self.maps[1]
-            parallel = 1
+            nproc = int(self.settingsView.coreBox.value())
+            frames = len(self.analysis.contactResults[0])
+            print "frames: ",frames
+            # do not allow multiprocessing unless the trajectory has enough frames
+            if nproc == 1: #or  frames <= 5*nproc:
+                parallel = 0
+            else:
+                parallel = 1
+
             if parallel:
                 self.contacts = self.analyzeParallel(map1, map2)
             else:
@@ -590,7 +597,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         info = QLabel("Developers: Maximilian Scheurer and Peter Rodenkirch")
         info2 = QLabel("Departments: TCBG, University of Illinois at Urbana-Champaign; BZH Heidelberg University")
         mail = QLabel("Contact: mscheurer@ks.uiuc.edu, rodenkirch@stud.uni-heidelberg.de")
-        copyright = QLabel("Version 0.1a, May 2016")
+        copyright = QLabel("Version 0.1.1a, November 2016")
 
         grid.addWidget(info, 0, 0)
         grid.addWidget(info2, 1, 0)
