@@ -23,9 +23,6 @@
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="3" column="1">
-     <widget class="QWidget" name="sasaGraphWidget" native="true"/>
-    </item>
     <item row="1" column="3">
      <spacer name="horizontalSpacer">
       <property name="orientation">
@@ -173,6 +170,21 @@
       <property name="text">
        <string>selection:</string>
       </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QWidget" name="sasaGraphWidget" native="true">
+      <widget class="QWidget" name="gridLayoutWidget_2">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>411</width>
+         <height>251</height>
+        </rect>
+       </property>
+       <layout class="QGridLayout" name="graphGridLayout"/>
+      </widget>
      </widget>
     </item>
    </layout>

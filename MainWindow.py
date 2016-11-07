@@ -1065,6 +1065,13 @@ class SettingsTabWidget(QTabWidget, Ui_settingsWindowWidget):
         super(QtWidgets.QTabWidget, self).__init__(parent)
         self.setupUi(self)
 
+def calc_sasa(rank,size):
+    for i in range(size):
+        # print rank,i
+        value = i+1
+        sasaProgressDict[rank] = value
+        time.sleep(0.1)
+
 class SasaWidget(QWidget, Ui_SasaWidget):
     def __init__(self, parent=None):
         super(QtWidgets.QWidget, self).__init__(parent)
@@ -1080,14 +1087,27 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         self.sasaProgressBar.setInvertedAppearance(False)
         self.sasaProgressBar.setObjectName("sasaProgressBar")
         self.gridLayout.addWidget(self.sasaProgressBar, 4, 1, 1, 1)
+        self.previewPlot = SimplePlotter(None, width=5, height=2, dpi=60)
+        self.graphGridLayout.addWidget(self.previewPlot)
 
         self.calcSasaButton.clicked.connect(self.calculateSasa)
 
-        # self.totalFramesToProcess
 
     def calculateSasa(self):
         print "calculate SASA"
-        pass
+        self.totalFramesToProcess = 100
+        size = 5
+        pool = multiprocessing.Pool(size)
+        results = []
+        rank = 0
+        for p in range(5):
+            results.append(pool.apply_async(calc_sasa, args=(rank,20)))
+            rank += 1
+        print "ranks", rank
+        self.state = True
+        self.sasaEventListener()
+        pool.close()
+        pool.join()
 
     def sasaEventListener(self):
         while self.state:
@@ -1095,15 +1115,19 @@ class SasaWidget(QWidget, Ui_SasaWidget):
             for each in sasaProgressDict.keys():
                 progress += sasaProgressDict[each]
                 # sasaProgressDict[each] = 0
-                progress = float(progress) / float(self.totalFramesToProcess) * 100
-                # update bar with delivered value
-                if (101 - self.sasaProgressBar.value()) < progress:
-                    self.sasaProgressBar.update_bar(101 - self.sasaProgressBar.value())
-                elif progress > 0:
-                    self.sasaProgressBar.update_bar(progress)
+            progress = float(progress) / float(self.totalFramesToProcess) * 100
+            # if (101 - self.sasaProgressBar.value()) < progress:
+            #     self.sasaProgressBar.update_bar(101 - self.sasaProgressBar.value())
+            if progress > 0:
+                self.sasaProgressBar.setValue(progress)
 
-                if len(self.processes.keys()) == 0:
-                    self.state = False
+            if int(progress) == 100:
+                print "finished"
+                for each in sasaProgressDict.keys():
+                    sasaProgressDict[each]=0
+                progress = 0
+                self.state = False
+            time.sleep(0.2)
 
 
 

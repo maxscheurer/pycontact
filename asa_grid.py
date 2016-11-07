@@ -37,7 +37,7 @@ class SurfaceAnalyser:
 
     def computeAsa(self):
         #load shared libraries
-        cgrid = cdll.LoadLibrary('./libgridsearch.so')
+        cgrid = cdll.LoadLibrary('./shared/libgridsearch.so')
         search = cgrid.sasa_grid
         search.restype = ctypes.c_double
         search.argtypes = [ndpointer(ctypes.c_float, flags="C_CONTIGUOUS"), ctypes.c_int,ctypes.c_float, ctypes.c_int,ctypes.c_int, \
@@ -51,10 +51,10 @@ class SurfaceAnalyser:
         u = MDAnalysis.Universe(psf, dcd)
 
         probeRadius = 1.4
-        seltext="segid UBQ"
+        seltext="protein"
         resseltext="segid UBQ and same residue as around 5.0 (segid RN11)"
         perres = 0
-        
+
         # 0=spiral, 1=random (VMD)
         pointstyle = 1
         # number of points to approximate the sphere
@@ -66,7 +66,7 @@ class SurfaceAnalyser:
             restricted = 1
         else:
             restricted = 0
-            
+
         selection = u.select_atoms(seltext)
 
         if perres:
