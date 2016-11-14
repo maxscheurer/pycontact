@@ -16,3 +16,8 @@ MASS    80 OS    15.99940 ! ester oxygen !acc
 MASS    81 S     32.06000 ! sulphur !don
 MASS    82 SM    32.06000 ! sulfur C-S-S-C type !none
 MASS    83 SS    32.06000 ! thiolate sulfur !none
+MASS   201 NC=C  14.00670 ! NCC !none
+MASS   203 N=C   14.00670 ! aza-N !acc
+MASS   205 NC=O  14.00670 ! nh in lmf !don
+MASS   206 O=C   15.99940 ! OC in lmf !acc
+MASS    75 OT    15.99940 ! TIPS3P WATER OXYGEN !both
