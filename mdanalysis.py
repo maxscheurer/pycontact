@@ -538,6 +538,7 @@ class Analyzer(object):
         for atomline in heavyatomlines:
             # read new AtomType and its corresponding AtomHBondType from file
             atype = AtomType.parseParameterFileString(atomline)
+            # print atomline, atype.htype
             heavyatoms.append(atype)
 
         ### config (GUI settings!)
@@ -648,29 +649,66 @@ class Analyzer(object):
                         # search for hydrogen atoms bound to atom 1
                         bondcount1 = 0
                         hydrogenAtomsBoundToAtom1 = []
-                        for b in b1.types():
+                        # old code, wrong!
+                        # for b in b1.types():
+                        #     hydrogen = next((x for x in b if x.startswith("H")), 0)
+                        #     # print b
+                        #     if hydrogen != 0:
+                        #         # print "h bond to atom1"
+                        #         bondindices1 = b1.to_indices()[bondcount1]
+                        #         print bondindices1
+                        #         # for j in bondindices1:
+                        #         #     print self.type_array[j+1]
+                        #         hydrogenidx = next(
+                        #             ((j + 1) for j in bondindices1 if self.type_array[j + 1].startswith("H")), -1)
+                        #         if hydrogenidx != -1:
+                        #             # print type_array[hydrogenidx]
+                        #             hydrogenAtomsBoundToAtom1.append(hydrogenidx)
+                        #     bondcount1 += 1
+                        # # search for hydrogen atoms bound to atom 2
+                        # bondcount2 = 0
+                        # hydrogenAtomsBoundToAtom2 = []
+                        # for b in b2.types():
+                        #     hydrogen = next((x for x in b if x.startswith("H")), 0)
+                        #     # print b
+                        #     if hydrogen != 0:
+                        #         # print "h bond to atom2"
+                        #         bondindices2 = b2.to_indices()[bondcount2]
+                        #         hydrogenidx = next(
+                        #             ((k + 1) for k in bondindices2 if self.type_array[k + 1].startswith("H")), -1)
+                        #         if hydrogenidx != -1:
+                        #             # print type_array[hydrogenidx]
+                        #             hydrogenAtomsBoundToAtom2.append(hydrogenidx)
+                        #     bondcount2 += 1
+                        # new code
+                        for bnd in b1:
+                            b = bnd.type
                             hydrogen = next((x for x in b if x.startswith("H")), 0)
                             # print b
                             if hydrogen != 0:
                                 # print "h bond to atom1"
                                 bondindices1 = b1.to_indices()[bondcount1]
+                                # print bondindices1
+                                # for j in bondindices1:
+                                #     print self.type_array[j+1]
                                 hydrogenidx = next(
-                                    ((j + 1) for j in bondindices1 if self.type_array[j + 1].startswith("H")), -1)
+                                    (j for j in bondindices1 if self.type_array[j].startswith("H")), -1)
                                 if hydrogenidx != -1:
-                                    # print type_array[hydrogenidx]
+                                    # print self.type_array[hydrogenidx]
                                     hydrogenAtomsBoundToAtom1.append(hydrogenidx)
                             bondcount1 += 1
                         # search for hydrogen atoms bound to atom 2
                         bondcount2 = 0
                         hydrogenAtomsBoundToAtom2 = []
-                        for b in b2.types():
+                        for bnd2 in b2:
+                            b = bnd2.type
                             hydrogen = next((x for x in b if x.startswith("H")), 0)
                             # print b
                             if hydrogen != 0:
                                 # print "h bond to atom2"
                                 bondindices2 = b2.to_indices()[bondcount2]
                                 hydrogenidx = next(
-                                    ((k + 1) for k in bondindices2 if self.type_array[k + 1].startswith("H")), -1)
+                                    (k for k in bondindices2 if self.type_array[k].startswith("H")), -1)
                                 if hydrogenidx != -1:
                                     # print type_array[hydrogenidx]
                                     hydrogenAtomsBoundToAtom2.append(hydrogenidx)
@@ -680,6 +718,7 @@ class Analyzer(object):
                             conv_hatom = indices1.index(global_hatom)
                             typeHeavy = next((x.htype for x in heavyatoms if x.name == self.type_array[convindex2]),
                                              AtomHBondType.none)
+                            # print typeHeavy
                             if typeHeavy == AtomHBondType.acc and (distarray[conv_hatom, idx2] <= hbondcutoff):
                                 donorPosition = sel1.coordinates()[idx1]
                                 hydrogenPosition = sel1.coordinates()[conv_hatom]
