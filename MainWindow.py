@@ -28,6 +28,8 @@ from multi_accumulation import *
 from sasa_gui import *
 from asa_grid import *
 
+# patched around selection
+from aroundPatch import AroundSelection
 
 sasaProgressManager = multiprocessing.Manager()
 sasaProgressDict = sasaProgressManager.dict()
@@ -1066,14 +1068,6 @@ class SettingsTabWidget(QTabWidget, Ui_settingsWindowWidget):
         super(QtWidgets.QTabWidget, self).__init__(parent)
         self.setupUi(self)
 
-def test_progress(rank,size):
-    for i in range(size):
-        # print rank,i
-        value = i+1
-        sasaProgressDict[rank] = value
-        sasaProgressDict["bla"] = "p"
-        time.sleep(0.1)
-
 def calculate_sasa_parallel(input_coords,natoms,pairdist,nprad,surfacePoints,probeRadius,pointstyle,restricted, restrictedList,rank):
     # load shared libraries
     cgrid = cdll.LoadLibrary('./shared/libgridsearch.so')
@@ -1143,13 +1137,14 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         # seltext = "segid UBQ"
         # resseltext = "segid UBQ and same residue as around 5.0 (segid RN11)"
         seltext = self.sasaSelection1TextField.text()
+        seltext2 = self.sasaSelection2TextField.text()
         resseltext = self.sasaRestrictionTextField.text()
         perres = 0
 
         # 0=spiral, 1=random (VMD)
         pointstyle = 1
         # number of points to approximate the sphere
-        surfacePoints = 100
+        surfacePoints = 50
         # pair distance
         pairdist = 2 * (2.0 + 1.4)
 
@@ -1184,11 +1179,15 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         nprad = np.array(radius, dtype=np.float32)
         restrictedList = np.array(restrictedList, dtype=np.uint32)
 
+        # TODO: bug if selection is not static for all frames
+        # TODO: dynamic allocation of positions in every frame!
         input_coords = []
         for ts in u.trajectory:
+            ressel = u.select_atoms(resseltext)
+            print "restricted: ", len(ressel.atoms)
             input_coords.append(selection.positions)
 
-        nprocs = 5
+        nprocs = 4#int(self.settingsView.coreBox.value())
         input_chunks = chunks(input_coords,nprocs)
         pool = multiprocessing.Pool(nprocs)
         results = []
@@ -1204,9 +1203,61 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         pool.close()
         pool.join()
 
+        self.state = False
         all_sasas = []
         for r in results:
             all_sasas.extend(r.get())
+
+        if self.calculateContactAreaCheckbox.isChecked():
+            print "Calculate contact area"
+            selection2 = u.select_atoms(seltext2)
+
+            natoms2 = len(selection2.atoms)
+            radius2 = []
+            restrictedList2 = []
+            if restricted:
+                ressel = u.select_atoms(resseltext)
+                for s in selection2.atoms:
+                    if s in ressel.atoms:
+                        restrictedList2.append(1)
+                    else:
+                        restrictedList2.append(0)
+                    radius.append(vdwRadius(s.name[0]))
+            else:
+                print "You need a restricted selection for contact areas!"
+
+            natoms2 = len(selection2)
+            nprad = np.array(radius, dtype=np.float32)
+            restrictedList2 = np.array(restrictedList2, dtype=np.uint32)
+
+            input_coords2 = []
+            for ts in u.trajectory:
+                input_coords2.append(selection2.positions)
+
+            nprocs = 4#int(self.settingsView.coreBox.value())
+            input_chunks2 = chunks(input_coords2,nprocs)
+            pool = multiprocessing.Pool(nprocs)
+            results = []
+            rank = 0
+            trajLength = len(u.trajectory)
+            self.totalFramesToProcess = trajLength
+            for input_coords_chunk2 in input_chunks2:
+                results.append(pool.apply_async(calculate_sasa_parallel, args=(input_coords_chunk2,natoms2,pairdist,nprad,surfacePoints,probeRadius,pointstyle,restricted, restrictedList2,rank)))
+                rank += 1
+            print "ranks", rank
+            self.state = True
+            self.sasaEventListener()
+            pool.close()
+            pool.join()
+
+            all_sasas2 = []
+            for r in results:
+                all_sasas2.extend(r.get())
+
+            diff_list = []
+            for sasa_value1, sasa_value2 in zip(all_sasas,all_sasas2):
+                diff_list.append(sasa_value1-sasa_value2)
+            all_sasas = diff_list
 
         sip.delete(self.previewPlot)
         self.previewPlot = SimplePlotter(None, width=5, height=2, dpi=60)

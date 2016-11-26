@@ -17,8 +17,8 @@ from read_db import *
 from copy import deepcopy
 import time
 
-MDAnalysis.core.flags['use_periodic_selections'] = True
-MDAnalysis.core.flags['use_KDTree_routines'] = False
+MDAnalysis.core.flags['use_periodic_selections'] = False
+MDAnalysis.core.flags['use_KDTree_routines'] = True
 
 # type of Atom concerning it hbond behavior
 class AtomHBondType:
