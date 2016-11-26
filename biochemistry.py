@@ -11,6 +11,17 @@ from read_db import *
 from PyQt5.QtGui import QColor
 compare = lambda x, y: collections.Counter(x) == collections.Counter(y)
 
+# NOTE: needed for sasa calculation, we should add more...
+# CHARMM radii, from VMD
+vdwRadii = {"H": 1.0,
+            "C": 1.5,
+            "N": 1.399999976158142,
+            "O": 1.2999999523162842,
+            "F": 1.47,
+            "Mg": 1.73,
+            "P": 1.8,
+            "S": 1.899999976158142}
+
 class ContactType:
     saltbr, hydrophobic, hbond, other = range(4)
     colors = ["rgba(255, 0,0, 50)", "rgba(0, 0,255, 50)", "rgba(255, 0 ,255, 50)", "rgba(255, 255 ,255, 50)"]

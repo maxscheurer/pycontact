@@ -24,6 +24,8 @@ class AroundSelection(DistanceSelection):
         for typical problems.
         Limitations: always ignores periodicity
         """
+
+        # NOTE: Max' custom version of around search
         custom = 1
         sel = self.sel.apply(group)
         # All atoms in group that aren't in sel
@@ -70,7 +72,7 @@ class AroundSelection(DistanceSelection):
 
 
     def _apply_distmat(self, group):
-        print "custom distmat running"
+        # print "custom distmat running"
         sel = self.sel.apply(group)
         sys = group[~np.in1d(group.indices, sel.indices)]
 
