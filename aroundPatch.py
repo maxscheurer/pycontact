@@ -1,3 +1,12 @@
+'''
+    Authors: Maximilian Scheurer, Peter Rodenkirch
+    Date created: Nov 2016
+    Python Version: 2.7
+    Version: 0.1a
+    Status: Development
+    Patch for MDAnalysis AroundSelection to make it faster
+'''
+
 from MDAnalysis.core.Selection import *
 # import numpy as np
 from ctypes import cdll

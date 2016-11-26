@@ -22,6 +22,9 @@ vdwRadii = {"H": 1.0,
             "P": 1.8,
             "S": 1.899999976158142}
 
+def vdwRadius(atomType):
+        return vdwRadii.get(atomType, 1.5)
+
 class ContactType:
     saltbr, hydrophobic, hbond, other = range(4)
     colors = ["rgba(255, 0,0, 50)", "rgba(0, 0,255, 50)", "rgba(255, 0 ,255, 50)", "rgba(255, 255 ,255, 50)"]
