@@ -27,6 +27,7 @@ def find_between(s, first, last):
         return ""
 
 # weight function to score contact distances
+# NOTE: defined twice? see mdanalysis.py
 def weight_function(value):
     return (1.0) / (1.0 + np.exp(5.0 * (value - 4.0)))
 
