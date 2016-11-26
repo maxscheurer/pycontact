@@ -11,7 +11,7 @@
 import MDAnalysis
 from MDAnalysis.analysis import distances
 import itertools
-import re, sys
+import re
 from biochemistry import *
 from read_db import *
 from copy import deepcopy
