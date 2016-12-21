@@ -78,9 +78,13 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         print "calculate SASA"
 
         ### test data ###
-        psf = "rpn11_ubq_interface-ionized.psf"
-        pdb = "rpn11_ubq_interface-ionized.pdb"
-        dcd = "/home/max/Projects/pycontact/short.dcd"
+        # psf = "rpn11_ubq_interface-ionized.psf"
+        # pdb = "rpn11_ubq_interface-ionized.pdb"
+        # dcd = "/home/max/Projects/pycontact/short.dcd"
+
+        # Rafaels COH3 DOC3
+        psf = "/mnt/workspace/pycontactData/nowater.psf"
+        dcd = "/mnt/workspace/pycontactData/trajectory_short.dcd"
 
         # load psf and trajectory, make lists with radii and coordinates
         u = MDAnalysis.Universe(psf, dcd)
@@ -187,7 +191,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
             for ts in u.trajectory:
                 input_coords2.append(selection2.positions)
 
-            nprocs = 4#int(self.settingsView.coreBox.value())
+            nprocs = 8#int(self.settingsView.coreBox.value())
             input_chunks2 = chunks(input_coords2,nprocs)
             pool = multiprocessing.Pool(nprocs)
             results = []
