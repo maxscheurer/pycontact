@@ -1,0 +1,43 @@
+""" pycontact setup
+
+by Maximilian Scheurer, Peter Rodenkirch
+"""
+from setuptools import setup, find_packages
+
+setup(
+    name='pycontact',
+    version='0.1b',
+    description='pycontact - a tool for contact analysis of biomolecules from MD trajectories',
+    long_description='',
+    url='https://github.com/maxscheurer/pycontact',
+    author='Maximilian Scheurer, Peter Rodenkirch',
+    author_email='mscheurer@ks.uiuc.edu',
+    license='GPLv3',
+
+# https://pypi.python.org/pypi?%3Aaction=list_classifiers
+    classifiers=[
+        'Development Status :: 4 - Beta',
+
+        # Indicate who your project is intended for
+        'Intended Audience :: Science/Research',
+        'Topic :: Scientific/Engineering',
+
+        # Pick your license as you wish (should match "license" above)
+        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+
+        'Programming Language :: Python :: 2.7',
+    ],
+
+    keywords='computational biophysics simulation biology bioinformatics visualization protein biomolecules dna',
+
+    packages=find_packages(),
+
+    install_requires=['numpy','matplotlib','python-qt5','mdanalysis'],
+
+    entry_points={
+        'console_scripts': [
+            'pycontact=pycontact:main',
+        ],
+    },
+
+)
