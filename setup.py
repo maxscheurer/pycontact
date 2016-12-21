@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pycontact',
-    version='0.1b',
+    version='0.1.0b',
     description='pycontact - a tool for contact analysis of biomolecules from MD trajectories',
     long_description='',
     url='https://github.com/maxscheurer/pycontact',
@@ -32,7 +32,9 @@ setup(
 
     packages=find_packages(),
 
-    install_requires=['numpy','matplotlib','python-qt5','mdanalysis'],
+    install_requires=['numpy','matplotlib','mdanalysis'],
+
+    dependency_links = ['https://github.com/pyqt/python-qt5']
 
     entry_points={
         'console_scripts': [
