@@ -34,7 +34,7 @@ setup(
 
     install_requires=['numpy','matplotlib','mdanalysis'],
 
-    dependency_links = ['https://github.com/pyqt/python-qt5']
+    dependency_links = ['https://github.com/pyqt/python-qt5'],
 
     entry_points={
         'console_scripts': [
