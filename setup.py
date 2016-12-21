@@ -32,7 +32,7 @@ setup(
 
     packages=find_packages(),
 
-    install_requires=['numpy','matplotlib','mdanalysis'],
+    install_requires=['sip','numpy','matplotlib','mdanalysis'],
 
     dependency_links = ['https://github.com/pyqt/python-qt5'],
 
