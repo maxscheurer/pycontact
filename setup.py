@@ -30,9 +30,11 @@ setup(
 
     keywords='computational biophysics simulation biology bioinformatics visualization protein biomolecules dna',
 
+    package_dir = {'pycontact': 'pycontact'},
+    py_modules=['MainWindow'],
     packages=find_packages(),
 
-    install_requires=['sip','numpy','matplotlib','mdanalysis'],
+    install_requires=['numpy','matplotlib','mdanalysis'],
 
     dependency_links = ['https://github.com/pyqt/python-qt5'],
 
