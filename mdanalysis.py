@@ -570,17 +570,7 @@ class Analyzer(object):
         ######################
         # load psf and dcd file in memory
         u = MDAnalysis.Universe(psf, dcd)
-        # define selections according to sel1text and sel2text
-        sel1 = u.select_atoms(sel1text)
-        sel2 = u.select_atoms(sel2text)
-        # write atomindices for each selection to list
-        indices1 = []
-        for at in sel1.atoms:
-            indices1.append(at.index)
-        indices2 = []
-        for at in sel2.atoms:
-            indices2.append(at.index)
-            # write properties of all atoms to lists
+
         all_sel = u.select_atoms("all")
         backbone_sel = u.select_atoms("backbone")
         self.resname_array = []
@@ -599,14 +589,24 @@ class Analyzer(object):
             self.segids.append(atom.segid)
         for atom in backbone_sel:
             self.backbone.append(atom.index)
-        # show trajectory information and selection information
-        print "trajectory with %d frames loaded" % len(u.trajectory)
-        print len(sel1.coordinates()), len(sel2.coordinates())
+
         contactResults = []
         # loop over trajectory
         self.totalFrameNumber = len(u.trajectory)
         start = time.time()
         for ts in u.trajectory:
+            # define selections according to sel1text and sel2text
+            sel1 = u.select_atoms(sel1text)
+            sel2 = u.select_atoms(sel2text)
+            # write atomindices for each selection to list
+            indices1 = []
+            for at in sel1.atoms:
+                indices1.append(at.index)
+            indices2 = []
+            for at in sel2.atoms:
+                indices2.append(at.index)
+                # write properties of all atoms to lists
+
             currentFrameContacts = []
             frame = ts.frame
             self.currentFrameNumber = ts.frame
@@ -768,6 +768,11 @@ class Analyzer(object):
                 currentFrameContacts.append(newAtomContact)
             contactResults.append(currentFrameContacts)
         stop = time.time()
+
+        # show trajectory information and selection information
+        print "trajectory with %d frames loaded" % len(u.trajectory)
+        print len(sel1.coordinates()), len(sel2.coordinates())
+
         print "analyzeTime:",stop-start
         return contactResults
 

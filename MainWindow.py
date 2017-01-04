@@ -46,7 +46,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.contacts = []
         self.filteredContacts = []
         self.setupUi(self)
-
+        
         self.setWindowTitle("pyContact")
         self.mergeSlider.valueChanged.connect(self.mergeValueChanged)
 
