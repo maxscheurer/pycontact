@@ -7,6 +7,7 @@
 '''
 from __future__ import division
 from __future__ import absolute_import
+from __future__ import print_function
 from biochemistry import *
 import numpy as np
 
@@ -93,7 +94,7 @@ class ResidueRangeFilter(object):
             bRanges =[]
             for ran in splitB:
                 r = ran.split(u"-")
-                print r
+                print(r)
                 bRanges.append(xrange(int(r[0]), int(r[1]) + 1))
 
         filtered = []
@@ -159,7 +160,7 @@ class TotalTimeFilter(BinaryFilter):
         for c in contacts:
             if op.compare(c.total_time(1, 0), self.value, self.operator):
                 filtered.append(c)
-        print unicode(len(filtered))
+        print(unicode(len(filtered)))
         return filtered
 
 # filter compares contact score of every frame, only adds contact if true for all frames

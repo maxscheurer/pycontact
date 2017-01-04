@@ -1,3 +1,4 @@
+from __future__ import print_function
 import MDAnalysis
 import time
 from mpi4py import MPI
@@ -99,8 +100,8 @@ if rank == 0:
     for atom in backbone_sel:
         backbone.append(atom.index)
     # show trajectory information and selection information
-    print "trajectory with %d frames loaded" % len(u.trajectory)
-    print len(sel1.coordinates()), len(sel2.coordinates())
+    print("trajectory with %d frames loaded" % len(u.trajectory))
+    print(len(sel1.coordinates()), len(sel2.coordinates()))
     sel1coords = []
     sel2coords = []
     start = time.time()
@@ -110,7 +111,7 @@ if rank == 0:
     sel1c = chunks(sel1coords, size)
     sel2c = chunks(sel2coords, size)
 else:
-    print rank
+    print(rank)
     sel1c = None
     sel2c = None
     indices1 = None
@@ -251,14 +252,14 @@ for s1, s2 in zip(sel1c, sel2c):
     allRankContacts.append(currentFrameContacts)
 
 stop = time.time()
-print rank,stop-start
+print(rank, stop - start)
 allChunks = comm.gather(allRankContacts,root=0)
 if rank == 0:
     allContacts = []
     for chunk in allChunks:
         for el in chunk:
             allContacts.append(el)
-    print len(allContacts)
+    print(len(allContacts))
 # contactResults = []
 # # loop over trajectory
 # totalFrameNumber = len(u.trajectory)

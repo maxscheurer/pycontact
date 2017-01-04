@@ -1,3 +1,4 @@
+from __future__ import print_function
 from PyQt5.QtWidgets import QWidget, QProgressBar,QGridLayout
 from PyQt5.QtCore import QRect
 import sip
@@ -34,19 +35,19 @@ def calculate_sasa_parallel(input_coords,natoms,pairdist,nprad,surfacePoints,pro
     temp_sasa = []
     frames_processed = 0
     sasaProgressDict[rank] = frames_processed
-    print len(input_coords)
+    print(len(input_coords))
     for c in input_coords:
         coords = np.reshape(c, (1, natoms * 3))
         npcoords = np.array(coords, dtype=np.float32)
-        print "start C"
+        print("start C")
         startC = time.time()
         # sasa_grid(const float *pos,int natoms, float pairdist, int allow_double_counting, int maxpairs, const float *radius,const int npts, double srad, int pointstyle)
         # point style: 0=spiral, 1=random
         asa = search(npcoords, natoms, pairdist, 0, -1, nprad, surfacePoints, probeRadius, pointstyle, restricted,
                      restrictedList)
         stopC = time.time()
-        print "time for grid search: ", (stopC - startC)
-        print "asa:", asa
+        print("time for grid search: ", (stopC - startC))
+        print("asa:", asa)
         temp_sasa.append(asa)
         frames_processed += 1
         sasaProgressDict[rank] = frames_processed
@@ -75,7 +76,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
 
 
     def calculateSasa(self):
-        print "calculate SASA"
+        print("calculate SASA")
 
         ### test data ###
         # psf = "rpn11_ubq_interface-ionized.psf"
@@ -141,7 +142,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         input_coords = []
         for ts in u.trajectory:
             ressel = u.select_atoms(resseltext)
-            print "restricted: ", len(ressel.atoms)
+            print("restricted: ", len(ressel.atoms))
             input_coords.append(selection.positions)
 
         nprocs = 4#int(self.settingsView.coreBox.value())
@@ -154,7 +155,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         for input_coords_chunk in input_chunks:
             results.append(pool.apply_async(calculate_sasa_parallel, args=(input_coords_chunk,natoms,pairdist,nprad,surfacePoints,probeRadius,pointstyle,restricted, restrictedList,rank)))
             rank += 1
-        print "ranks", rank
+        print("ranks", rank)
         self.state = True
         self.sasaEventListener()
         pool.close()
@@ -166,7 +167,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
             all_sasas.extend(r.get())
 
         if self.calculateContactAreaCheckbox.isChecked():
-            print "Calculate contact area"
+            print("Calculate contact area")
             selection2 = u.select_atoms(seltext2)
 
             natoms2 = len(selection2.atoms)
@@ -181,7 +182,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
                         restrictedList2.append(0)
                     radius.append(vdwRadius(s.name[0]))
             else:
-                print "You need a restricted selection for contact areas!"
+                print("You need a restricted selection for contact areas!")
 
             natoms2 = len(selection2)
             nprad = np.array(radius, dtype=np.float32)
@@ -201,7 +202,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
             for input_coords_chunk2 in input_chunks2:
                 results.append(pool.apply_async(calculate_sasa_parallel, args=(input_coords_chunk2,natoms2,pairdist,nprad,surfacePoints,probeRadius,pointstyle,restricted, restrictedList2,rank)))
                 rank += 1
-            print "ranks", rank
+            print("ranks", rank)
             self.state = True
             self.sasaEventListener()
             pool.close()
@@ -238,7 +239,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
                 self.sasaProgressBar.setValue(progress)
 
             if int(progress) == 100:
-                print "finished"
+                print("finished")
                 for each in sasaProgressDict.keys():
                     sasaProgressDict[each]=0
                 progress = 0

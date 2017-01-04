@@ -1,3 +1,4 @@
+from __future__ import print_function
 import numpy as np
 import MDAnalysis
 from mdanalysis import *
@@ -76,7 +77,7 @@ def makeKeyArraysFromKey(key):
 def chunks_old(l, n):
     """Yield successive n-sized chunks from l."""
     ratio = int(math.floor(len(l)/n))
-    print 'RATIO', ratio
+    print("RATIO", ratio)
     current_chunk = 1
     for i in range(0, len(l), ratio):
         if current_chunk == n:

@@ -1,3 +1,4 @@
+from __future__ import print_function
 from PyQt5.QtWidgets import QDialog, QGridLayout, QPushButton, QLabel,QLineEdit,QDialogButtonBox, QFileDialog, QCheckBox
 from PyQt5.QtCore import Qt
 from LoadConfiguration import Configuration
@@ -135,7 +136,7 @@ class AnalysisDialog(QDialog):
         # atom types will not be supported in the future
         map1 = [self.index1Checkbox.isChecked(),0,self.name1Checkbox.isChecked(),self.resid1Checkbox.isChecked(),self.resname1Checkbox.isChecked(),self.segid1Checkbox.isChecked()]
         map2 = [self.index2Checkbox.isChecked(),0,self.name2Checkbox.isChecked(),self.resid2Checkbox.isChecked(),self.resname2Checkbox.isChecked(),self.segid2Checkbox.isChecked()]
-        print map1, map2
+        print(map1, map2)
         return [map1,map2]
 
     # static method to create the dialog and return (date, time, accepted)

@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 def weight_function(value):
     return (1.0) / (1.0 + np.exp(5.0 * (value - 4.0)))
 
@@ -34,7 +36,7 @@ class ConvBond(object):
 
 
 def loop_trajectory(sel1c,sel2c,config,suppl):
-    print len(sel1c) , len(sel2c)
+    print(len(sel1c) , len(sel2c))
     indices1 = suppl[0]
     indices2 = suppl[1]
     cutoff, hbondcutoff, hbondcutangle = config
@@ -210,8 +212,8 @@ def run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1t
     for atom in backbone_sel:
         backbone.append(atom.index)
     # show trajectory information and selection information
-    print "trajectory with %d frames loaded" % len(u.trajectory)
-    print len(sel1.coordinates()), len(sel2.coordinates())
+    print("trajectory with %d frames loaded" % len(u.trajectory))
+    print(len(sel1.coordinates()), len(sel2.coordinates()))
     sel1coords = []
     sel2coords = []
     start = time.time()
@@ -225,7 +227,7 @@ def run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1t
     sel1c = chunks(sel1coords, nproc)
     sel2c = chunks(sel2coords, nproc)
 
-    print "Running on %d cores" % nproc
+    print("Running on %d cores" % nproc)
     for c in zip(sel1c,sel2c):
         results.append( pool.apply_async( loop_trajectory, args=(c[0],c[1],map1,map2,d)) )
         rank +=1
@@ -233,4 +235,4 @@ def run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1t
     pool.close()
     pool.join()
     stop = time.time()
-    print "time: ", str(stop-start), rank
+    print("time: ", str(stop-start), rank)

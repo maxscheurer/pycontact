@@ -1,3 +1,4 @@
+from __future__ import print_function
 import MDAnalysis
 from aroundPatch import *
 MDAnalysis.core.flags['use_periodic_selections'] = False
@@ -15,6 +16,6 @@ import time
 start = time.time()
 for ts in u.trajectory:
     selection = u.select_atoms(seltext)
-    print "atoms in selection: ", selection.positions.size
+    print("atoms in selection: ", selection.positions.size)
 stop = time.time()
-print stop-start
+print(stop - start)

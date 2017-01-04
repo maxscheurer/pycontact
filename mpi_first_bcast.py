@@ -1,4 +1,5 @@
 #usage: mpirun -np 4 python mpi_first.py
+from __future__ import print_function
 from mpi4py import MPI
 import numpy as np
 import MDAnalysis
@@ -78,7 +79,7 @@ def makeKeyArraysFromKey(key):
 def chunks_old(l, n):
     """Yield successive n-sized chunks from l."""
     ratio = int(math.floor(len(l)/n))
-    print 'RATIO', ratio
+    print("RATIO", ratio)
     current_chunk = 1
     for i in range(0, len(l), ratio):
         if current_chunk == n:
@@ -206,7 +207,7 @@ if rank == 0:
 	importDict = pickle.load(open("defaultsession", "rb"))
 	# importDict = pickle.load(open("/Users/mscheurer/Dropbox/TCBG/ba/data/yeast_proteasome_ubp6_session", "rb"))
 	stop = time.time()
-	print stop-start
+	print(stop - start)
 	contResults = importDict["analyzer"][-1]
 	trajArgs = importDict["trajectory"]
 	all_chunk = list(chunks(contResults,size))
@@ -231,17 +232,17 @@ map1=[0,0,0,1,1,0]
 map2=[0,0,0,1,1,0]
 start = time.time()
 backbone,type_array,name_array,resid_array,resname_array,segids = trajArgs[-1],trajArgs[3],trajArgs[2],trajArgs[1],trajArgs[0],trajArgs[4]
-results = loop_frame(all_chunk,map1,map2)
+results = loop_frame(all_chunk, map1, map2)
 stop = time.time()
-print "time: ", str(stop-start), rank
-print str(len(all_chunk)), rank
+print("time: ", str(stop - start), rank)
+print(str(len(all_chunk)), rank)
 
 results = comm.gather(results,root=0)
 
 if rank == 0:
 	allkeys = []
 	frame_contacts_accumulated = []
-	print len(results)
+	print(len(results))
 	for rn in results:
 		allkeys.extend(rn[0])
 		frame_contacts_accumulated.extend(rn[1])
@@ -274,9 +275,9 @@ if rank == 0:
             # print key, acc.bb1, acc.bb2, acc.sc1, acc.sc2
             # print len(acc.scoreArray)
         stop = time.time()
-        print stop - start
+        print(stop - start)
         glob_stop = time.time()
-        print glob_stop - glob_start
+        print(glob_stop - glob_start)
 # all_chunk = comm.scatter(all_chunk, root=0)
 #print 'rank',rank,'has data:',data
 # newData = comm.gather(arguments,root=0)

@@ -8,6 +8,7 @@
 # md analysis implementation for contact search
 # May 2016
 # Author: Maximilian Scheurer, mscheurer@ks.uiuc.edu
+from __future__ import print_function
 import MDAnalysis
 from MDAnalysis.analysis import distances
 import itertools
@@ -130,11 +131,11 @@ class AccumulatedContact(object):
         self.hbondFramesScan()
         fnumber = len(self.scoreArray)
         counter = 0
-        print fnumber
+        print(fnumber)
         for element in self.hbondFrames:
             if element > 0:
                 counter += 1
-        print counter
+        print(counter)
         return float(counter)/float(fnumber) * 100
 
     def total_time(self, ns_per_frame, threshold):
@@ -308,8 +309,8 @@ class AtomContact:
 
     def toString(self):
         # print details about contact to console
-        print "frame: %d, dist: %f, weight: %f, idx1: %d, idx2: %d" % (
-            self.frame, self.distance, self.weight, self.idx1, self.idx2)
+        print("frame: %d, dist: %f, weight: %f, idx1: %d, idx2: %d" % (
+            self.frame, self.distance, self.weight, self.idx1, self.idx2))
 
 
 # contains infos about a hydrogenbond corresponding to a contact between two heavyatoms
@@ -326,9 +327,9 @@ class HydrogenBond:
 
     def toString(self):
         # print details about hbond to console
-        print "donor: %d, acceptor: %d, hydrogen: %d, dist: %f, angle: %f, usedCutoffDist: %f, usedCutoffAngle: %f" % (
+        print("donor: %d, acceptor: %d, hydrogen: %d, dist: %f, angle: %f, usedCutoffDist: %f, usedCutoffAngle: %f" % (
             self.donorIndex, self.acceptorIndex, self.hydrogenIndex, self.acceptorHydrogenDistance, self.angle,
-            self.usedCutoffDist, self.usedCutoffAngle)
+            self.usedCutoffDist, self.usedCutoffAngle))
 
 
 class Analyzer(object):
@@ -538,7 +539,7 @@ class Analyzer(object):
         for atomline in heavyatomlines:
             # read new AtomType and its corresponding AtomHBondType from file
             atype = AtomType.parseParameterFileString(atomline)
-            # print atomline, atype.htype
+            # print(atomline, atype.htype)
             heavyatoms.append(atype)
 
         ### config (GUI settings!)
@@ -610,7 +611,7 @@ class Analyzer(object):
             currentFrameContacts = []
             frame = ts.frame
             self.currentFrameNumber = ts.frame
-            print frame
+            print(frame)
             result = np.ndarray(shape=(len(sel1.coordinates()), len(sel2.coordinates())), dtype=float)
             # distarray is the distance matrix between all atoms in sel1 and sel2
             # row = sel1, column = sel2
@@ -642,7 +643,7 @@ class Analyzer(object):
                             (type1 == AtomHBondType.acc and type2 == AtomHBondType.both) or \
                             (type1 == AtomHBondType.don and type2 == AtomHBondType.both) or \
                             (type1 == AtomHBondType.both and type2 == AtomHBondType.don):
-                        # print "hbond? %s - %s" % (type_array[convindex1], type_array[convindex2])
+                        # print("hbond? %s - %s" % (type_array[convindex1], type_array[convindex2]))
                         # search for hatom, check numbering in bond!!!!!!!!!!
                         b1 = self.bonds[convindex1]
                         b2 = self.bonds[convindex2]
@@ -652,17 +653,17 @@ class Analyzer(object):
                         # old code, wrong!
                         # for b in b1.types():
                         #     hydrogen = next((x for x in b if x.startswith("H")), 0)
-                        #     # print b
+                        #     # print(b)
                         #     if hydrogen != 0:
-                        #         # print "h bond to atom1"
+                        #         # print("h bond to atom1")
                         #         bondindices1 = b1.to_indices()[bondcount1]
-                        #         print bondindices1
+                        #         print(bondindices1)
                         #         # for j in bondindices1:
-                        #         #     print self.type_array[j+1]
+                        #         #     print(self.type_array[j+1])
                         #         hydrogenidx = next(
                         #             ((j + 1) for j in bondindices1 if self.type_array[j + 1].startswith("H")), -1)
                         #         if hydrogenidx != -1:
-                        #             # print type_array[hydrogenidx]
+                        #             # print(type_array[hydrogenidx])
                         #             hydrogenAtomsBoundToAtom1.append(hydrogenidx)
                         #     bondcount1 += 1
                         # # search for hydrogen atoms bound to atom 2
@@ -670,31 +671,31 @@ class Analyzer(object):
                         # hydrogenAtomsBoundToAtom2 = []
                         # for b in b2.types():
                         #     hydrogen = next((x for x in b if x.startswith("H")), 0)
-                        #     # print b
+                        #     # print(b)
                         #     if hydrogen != 0:
-                        #         # print "h bond to atom2"
+                        #         # print("h bond to atom2")
                         #         bondindices2 = b2.to_indices()[bondcount2]
                         #         hydrogenidx = next(
                         #             ((k + 1) for k in bondindices2 if self.type_array[k + 1].startswith("H")), -1)
                         #         if hydrogenidx != -1:
-                        #             # print type_array[hydrogenidx]
+                        #             # print(type_array[hydrogenidx])
                         #             hydrogenAtomsBoundToAtom2.append(hydrogenidx)
                         #     bondcount2 += 1
                         # new code
                         for bnd in b1:
                             b = bnd.type
                             hydrogen = next((x for x in b if x.startswith("H")), 0)
-                            # print b
+                            # print(b)
                             if hydrogen != 0:
-                                # print "h bond to atom1"
+                                # print("h bond to atom1")
                                 bondindices1 = b1.to_indices()[bondcount1]
                                 # print bondindices1
                                 # for j in bondindices1:
-                                #     print self.type_array[j+1]
+                                #     print(self.type_array[j+1])
                                 hydrogenidx = next(
                                     (j for j in bondindices1 if self.type_array[j].startswith("H")), -1)
                                 if hydrogenidx != -1:
-                                    # print self.type_array[hydrogenidx]
+                                    # print(self.type_array[hydrogenidx])
                                     hydrogenAtomsBoundToAtom1.append(hydrogenidx)
                             bondcount1 += 1
                         # search for hydrogen atoms bound to atom 2
@@ -703,14 +704,14 @@ class Analyzer(object):
                         for bnd2 in b2:
                             b = bnd2.type
                             hydrogen = next((x for x in b if x.startswith("H")), 0)
-                            # print b
+                            # print(b)
                             if hydrogen != 0:
-                                # print "h bond to atom2"
+                                # print("h bond to atom2")
                                 bondindices2 = b2.to_indices()[bondcount2]
                                 hydrogenidx = next(
                                     (k for k in bondindices2 if self.type_array[k].startswith("H")), -1)
                                 if hydrogenidx != -1:
-                                    # print type_array[hydrogenidx]
+                                    # print(type_array[hydrogenidx])
                                     hydrogenAtomsBoundToAtom2.append(hydrogenidx)
                             bondcount2 += 1
                         # check hbond criteria for hydrogen atoms bound to first atom
@@ -718,7 +719,7 @@ class Analyzer(object):
                             conv_hatom = indices1.index(global_hatom)
                             typeHeavy = next((x.htype for x in heavyatoms if x.name == self.type_array[convindex2]),
                                              AtomHBondType.none)
-                            # print typeHeavy
+                            # print(typeHeavy)
                             if typeHeavy == AtomHBondType.acc and (distarray[conv_hatom, idx2] <= hbondcutoff):
                                 donorPosition = sel1.coordinates()[idx1]
                                 hydrogenPosition = sel1.coordinates()[conv_hatom]
@@ -735,9 +736,9 @@ class Analyzer(object):
                                                              hbondcutoff,
                                                              hbondcutangle)
                                     hydrogenBonds.append(new_hbond)
-                                    # print str(convindex1) + " " + str(convindex2)
-                                    # print "hbond found: %d,%d,%d"%(convindex1,global_hatom,convindex2)
-                                    # print angle
+                                    # print(str(convindex1) + " " + str(convindex2)
+                                    # print("hbond found: %d,%d,%d"%(convindex1,global_hatom,convindex2))
+                                    # print(angle)
                         for global_hatom in hydrogenAtomsBoundToAtom2:
                             conv_hatom = indices2.index(global_hatom)
                             typeHeavy = next((x.htype for x in heavyatoms if x.name == self.type_array[convindex1]),
@@ -770,10 +771,10 @@ class Analyzer(object):
         stop = time.time()
 
         # show trajectory information and selection information
-        print "trajectory with %d frames loaded" % len(u.trajectory)
-        print len(sel1.coordinates()), len(sel2.coordinates())
+        print("trajectory with %d frames loaded" % len(u.trajectory))
+        print("Selection 1: ", len(sel1.coordinates()), ", Selection2: ", len(sel2.coordinates()))
 
-        print "analyzeTime:",stop-start
+        print("analyzeTime: ", stop-start)
         return contactResults
 
     def analyze_contactResultsWithMaps(self,contactResults, map1, map2):
@@ -829,7 +830,7 @@ class Analyzer(object):
             frame_contacts_accumulated.append(currentFrameAcc)
         accumulatedContactsDict = {}
         stop = time.time()
-        print stop - start
+        print(stop - start)
         # accumulatedContactsDict (dict)
         # ---> key vs. list of TempContactAccumulated
         #
@@ -860,8 +861,8 @@ class Analyzer(object):
                 acc.sc1 += tempContact.sc1score
                 acc.sc2 += tempContact.sc2score
             finalAccumulatedContacts.append(acc)
-            print key, acc.bb1, acc.bb2, acc.sc1, acc.sc2
-            print len(acc.scoreArray)
+            print(key, acc.bb1, acc.bb2, acc.sc1, acc.sc2)
+            print(len(acc.scoreArray))
         stop = time.time()
-        print stop - start
+        print(stop - start)
         return finalAccumulatedContacts

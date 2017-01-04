@@ -5,6 +5,7 @@
     Version: 0.1a
     Status: Development
 '''
+from __future__ import print_function
 from Canvas import *
 from Plotters import *
 from mdanalysis import *
@@ -46,7 +47,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.contacts = []
         self.filteredContacts = []
         self.setupUi(self)
-        
+
         self.setWindowTitle("pyContact")
         self.mergeSlider.valueChanged.connect(self.mergeValueChanged)
 
@@ -200,7 +201,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.config,result = FileLoaderDialog.getConfig()
         if result == 1:
             attrs = vars(self.config)
-            print ', '.join("%s: %s" % item for item in attrs.items())
+            print(', '.join("%s: %s" % item for item in attrs.items()))
             self.analysis = Analyzer(self.config.psf,self.config.dcd, self.config.cutoff,self.config.hbondcutoff,self.config.hbondcutangle,self.config.sel1text,self.config.sel2text)
             # self.connect(self.analysis, QtCore.SIGNAL('taskUpdated'),self.handleTaskUpdated)
             # self.connect(self.analysis, QtCore.SIGNAL('frameNumberSet'),self.setFrameNumber)
@@ -217,7 +218,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             msg.setDetailedText("Now click on Analysis to proceed")
             msg.exec_()
     def handleTaskUpdated(self):
-    	print self.analysis.currentFrame
+    	print(self.analysis.currentFrame)
     	self.progressWidget.setValue(self.analysis.currentFrame)
 
     def setFrameNumber(self):
@@ -235,7 +236,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         d=manager.list(trajData)
         all_chunk = chunks(contResults,nproc)
         pool = multiprocessing.Pool(nproc)
-        print "Running on %d cores" % nproc
+        print("Running on %d cores" % nproc)
         for c in all_chunk:
             results.append( pool.apply_async( loop_frame, args=(c,map1,map2,d)) )
             rank +=1
@@ -243,11 +244,11 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         pool.close()
         pool.join()
         stop = time.time()
-        print "time: ", str(stop-start), rank
-        print str(len(c)), rank
+        print("time: ", str(stop-start), rank)
+        print(str(len(c)), rank)
         allkeys = []
         frame_contacts_accumulated = []
-        print len(results)
+        print(len(results))
         for res in results:
             rn = res.get()
             allkeys.extend(rn[0])
@@ -276,9 +277,9 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
                 acc.sc2 += tempContact.sc2score
             finalAccumulatedContacts.append(acc)
         # stop = time.time()
-        # print stop - start
+        # print(stop - start)
         glob_stop = time.time()
-        print glob_stop - start
+        print(glob_stop - start)
         return finalAccumulatedContacts
 
     def analyzeDataPushed(self):
@@ -288,7 +289,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             map2 = self.maps[1]
             nproc = int(self.settingsView.coreBox.value())
             frames = len(self.analysis.contactResults[0])
-            print "frames: ",frames
+            print("frames: ",frames)
             # do not allow multiprocessing unless the trajectory has enough frames
             if nproc == 1: #or  frames <= 5*nproc:
                 parallel = 0

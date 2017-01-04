@@ -1,3 +1,4 @@
+from __future__ import print_function
 import MDAnalysis
 import numpy as np
 from numpy import linalg as la
@@ -97,16 +98,16 @@ class SurfaceAnalyser:
         for frame in u.trajectory:
             coords = np.reshape(selection.positions,(1,natoms*3))
             npcoords = np.array(coords,dtype=np.float32)
-            print "start C"
+            print("start C")
             startC = time.time()
             # sasa_grid(const float *pos,int natoms, float pairdist, int allow_double_counting, int maxpairs, const float *radius,const int npts, double srad, int pointstyle)
             # point style: 0=spiral, 1=random
             asa = search(npcoords, natoms, pairdist, 0,-1,nprad,surfacePoints,probeRadius,pointstyle,restricted,restrictedList)
             stopC = time.time()
-            print "time for grid search: ", (stopC-startC)
-            print "asa:", asa
+            print("time for grid search: ", (stopC - startC))
+            print("asa:", asa)
         looptimeEnd = time.time()
-        print "Loop time: ", looptimeEnd-looptime
+        print("Loop time: ", looptimeEnd - looptime)
 #
 # a = SurfaceAnalyser()
 # a.computeAsa()

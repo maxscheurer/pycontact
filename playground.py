@@ -1,3 +1,4 @@
+from __future__ import print_function
 #draft & sketch playground
 
 # prototype writer for vmd visualization
@@ -24,7 +25,7 @@
 # 	for frame in hbond_key_frame_accumulate[key]:
 # 		for item in frame:
 # 			for hbond in item:
-# 				print counter 
+# 				print counter
 # 				hbond.toString()
 # 		counter += 1
 
@@ -35,4 +36,4 @@
 	            memory.append([var, sys.getsizeof(obj)])
 	        sorted_by_second = sorted(memory, key=lambda data: data[1], reverse=True)
 	        for item in sorted_by_second:
-	            print item[0], humansize(item[1])
+	            print(item[0], humansize(item[1]))
