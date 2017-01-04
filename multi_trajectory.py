@@ -213,13 +213,13 @@ def run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1t
         backbone.append(atom.index)
     # show trajectory information and selection information
     print("trajectory with %d frames loaded" % len(u.trajectory))
-    print(len(sel1.coordinates()), len(sel2.coordinates()))
+    print(len(sel1.positions), len(sel2.positions))
     sel1coords = []
     sel2coords = []
     start = time.time()
     for ts in u.trajectory:
-        sel1coords.append(sel1.coordinates())
-        sel2coords.append(sel2.coordinates())
+        sel1coords.append(sel1.positions)
+        sel2coords.append(sel2.positions)
     contactResults = []
     # loop over trajectory
     self.totalFrameNumber = len(u.trajectory)

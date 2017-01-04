@@ -101,13 +101,13 @@ if rank == 0:
         backbone.append(atom.index)
     # show trajectory information and selection information
     print("trajectory with %d frames loaded" % len(u.trajectory))
-    print(len(sel1.coordinates()), len(sel2.coordinates()))
+    print(len(sel1.positions), len(sel2.positions))
     sel1coords = []
     sel2coords = []
     start = time.time()
     for ts in u.trajectory:
-        sel1coords.append(sel1.coordinates())
-        sel2coords.append(sel2.coordinates())
+        sel1coords.append(sel1.positions)
+        sel2coords.append(sel2.positions)
     sel1c = chunks(sel1coords, size)
     sel2c = chunks(sel2coords, size)
 else:

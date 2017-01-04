@@ -612,10 +612,10 @@ class Analyzer(object):
             frame = ts.frame
             self.currentFrameNumber = ts.frame
             print(frame)
-            result = np.ndarray(shape=(len(sel1.coordinates()), len(sel2.coordinates())), dtype=float)
+            result = np.ndarray(shape=(len(sel1.positions), len(sel2.positions)), dtype=float)
             # distarray is the distance matrix between all atoms in sel1 and sel2
             # row = sel1, column = sel2
-            distarray = distances.distance_array(sel1.coordinates(), sel2.coordinates(), box=None, result=result)
+            distarray = distances.distance_array(sel1.positions, sel2.positions, box=None, result=result)
             contacts = np.where(distarray <= cutoff)
             # idx1 and idx2 correspond to a row,column in contacts, respectively
             # they do NOT correspond to a global atom index!
@@ -721,9 +721,9 @@ class Analyzer(object):
                                              AtomHBondType.none)
                             # print(typeHeavy)
                             if typeHeavy == AtomHBondType.acc and (distarray[conv_hatom, idx2] <= hbondcutoff):
-                                donorPosition = sel1.coordinates()[idx1]
-                                hydrogenPosition = sel1.coordinates()[conv_hatom]
-                                acceptorPosition = sel2.coordinates()[idx2]
+                                donorPosition = sel1.positions[idx1]
+                                hydrogenPosition = sel1.positions[conv_hatom]
+                                acceptorPosition = sel2.positions[idx2]
                                 v1 = hydrogenPosition - acceptorPosition
                                 v2 = hydrogenPosition - donorPosition
                                 v1norm = np.linalg.norm(v1)
@@ -744,9 +744,9 @@ class Analyzer(object):
                             typeHeavy = next((x.htype for x in heavyatoms if x.name == self.type_array[convindex1]),
                                              AtomHBondType.none)
                             if typeHeavy == AtomHBondType.acc and (distarray[idx1, conv_hatom] <= hbondcutoff):
-                                donorPosition = sel2.coordinates()[idx2]
-                                hydrogenPosition = sel2.coordinates()[conv_hatom]
-                                acceptorPosition = sel1.coordinates()[idx1]
+                                donorPosition = sel2.positions[idx2]
+                                hydrogenPosition = sel2.positions[conv_hatom]
+                                acceptorPosition = sel1.positions[idx1]
                                 v1 = hydrogenPosition - acceptorPosition
                                 v2 = hydrogenPosition - donorPosition
                                 v1norm = np.linalg.norm(v1)
@@ -772,7 +772,7 @@ class Analyzer(object):
 
         # show trajectory information and selection information
         print("trajectory with %d frames loaded" % len(u.trajectory))
-        print("Selection 1: ", len(sel1.coordinates()), ", Selection2: ", len(sel2.coordinates()))
+        print("Selection 1: ", len(sel1.positions), ", Selection2: ", len(sel2.positions))
 
         print("analyzeTime: ", stop-start)
         return contactResults
