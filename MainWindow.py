@@ -103,6 +103,9 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.actionDefault.triggered.connect(self.loadDefault)
 
         self.progressWidget = ProgessWidget("Progress")
+        
+        self.exportWidget = ExportTabWidget()
+
 
         self.sasaView = SasaWidget()
         self.sasaView.show()
@@ -495,12 +498,16 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
                     if len(self.filteredContacts) == 0:
                         self.painter.labelView.clean()
             else:
-                #no weight or filters
+                # no weight or filters
                 self.painter.showHbondScores = False
                 self.painter.contacts = self.filteredContacts
                 self.painter.rendered = False
                 self.painter.update()
                 self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
+
+        # Update data for export
+        self.exportWidget.setContacts(self.filteredContacts)
+        self.exportWidget.setThresholdAndNsPerFrame(self.painter.threshold, self.painter.nsPerFrame)
 
     # switch between weight functions
     def showFunctionSettings(self, radiobutton):
@@ -628,7 +635,6 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         d.exec_()
 
     def pushExport(self):
-        self.exportWidget = ExportTabWidget()
         self.exportWidget.valueUpdated.connect(self.handleExportUpdate)
         self.exportWidget.setContacts(self.filteredContacts)
         self.exportWidget.setThresholdAndNsPerFrame(self.painter.threshold, self.painter.nsPerFrame)
