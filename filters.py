@@ -12,7 +12,7 @@ from biochemistry import *
 import numpy as np
 
 class Operator(object):
-    greater, smaller, equal, nequal = xrange(4)
+    greater, smaller, equal, nequal = range(4)
     mapping = {u"greater": greater, u"smaller": smaller, u"equal": equal, u"not equal": nequal}
 
     def compare(self, value1, value2, operator):
@@ -89,13 +89,13 @@ class ResidueRangeFilter(object):
             aRanges = []
             for ran in splitA:
                 r = ran.split(u"-")
-                aRanges.append(xrange(int(r[0]),int(r[1])+1))
+                aRanges.append(range(int(r[0]),int(r[1])+1))
         if notAllB:
             bRanges =[]
             for ran in splitB:
                 r = ran.split(u"-")
                 print(r)
-                bRanges.append(xrange(int(r[0]), int(r[1]) + 1))
+                bRanges.append(range(int(r[0]), int(r[1]) + 1))
 
         filtered = []
         for c in contacts:
@@ -190,7 +190,7 @@ class ScoreFilter(BinaryFilter):
         return filtered
 
 class SortingOrder(object):
-    ascending, descending = xrange(2)
+    ascending, descending = range(2)
     mapping = {u"asc": ascending, u"desc": descending}
 
 class Sorting(object):
@@ -302,4 +302,4 @@ class LinearWeightFunction(WeightFunction):
         return y
 
 class FunctionType(object):
-    sigmoid, rect, linear = xrange(3)
+    sigmoid, rect, linear = range(3)

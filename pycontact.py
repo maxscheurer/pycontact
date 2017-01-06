@@ -5,6 +5,10 @@
     Version: 0.1a
     Status: Development
 '''
+
+import warnings
+warnings.filterwarnings("ignore")
+
 from MainWindow import *
 def main():
     app = QApplication(sys.argv)
