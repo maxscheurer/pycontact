@@ -10,11 +10,14 @@ class ExportTabWidget(QTabWidget):
 
        self.tab1 = QWidget()
        self.tab2 = QWidget()
+       self.tab3 = QWidget()
 
        self.addTab(self.tab1, "View")
        self.addTab(self.tab2, "Histogram")
+       self.addTab(self.tab3, "Contact Map")
        self.tab1UI()
        self.tab2UI()
+       self.tab3UI()
        self.setWindowTitle("Export")
        self.contacts = []
        self.threshold = 0
@@ -92,6 +95,18 @@ class ExportTabWidget(QTabWidget):
         self.tab2.formatBox.addItem("eps")
         self.grid1.addWidget(self.tab2.formatBox, 1, 2)
 
+    def tab3UI(self):
+        self.grid1 = QGridLayout()
+        self.tab3.setLayout(self.grid1)
+
+        self.tab3.mapPlot = MapPlotter(None, width=8, height=5, dpi=60)
+        self.grid1.addWidget(self.tab3.mapPlot, 3, 0, 1, 4)
+
+        self.tab3.plotButton = QPushButton("Show Preview")
+        self.tab3.plotButton.setAutoDefault(False)
+        self.tab3.plotButton.clicked.connect(self.pushMapPlot)
+        self.grid1.addWidget(self.tab3.plotButton, 0, 0, 1, 3)
+
     def saveHist(self):
         self.plotHist()
 
@@ -102,6 +117,9 @@ class ExportTabWidget(QTabWidget):
 
     def pushPlot(self):
         self.plotHist()
+
+    def pushMapPlot(self):
+        self.plotMap()
 
     def plotHist(self):
         sip.delete(self.tab2.histPlot)
@@ -114,9 +132,20 @@ class ExportTabWidget(QTabWidget):
 
         self.tab2.histPlot.update()
 
+    def plotMap(self):
+        sip.delete(self.tab3.mapPlot)
+        self.tab3.mapPlot = MapPlotter(None, width=8, height=5, dpi=60)
+        self.grid1.addWidget(self.tab3.mapPlot, 3, 0, 1, 4)
+        self.tab3.mapPlot.plotMap(self.contacts, self.map1, self.map2)
+        self.tab3.mapPlot.update()
+
     def pushSave(self):
         fileName = QFileDialog.getSaveFileName(self, 'Export Path')
         self.valueUpdated.emit(fileName[0], self.tab1.formatBox.currentText())
 
     def setContacts(self, currentContacts):
         self.contacts = currentContacts
+
+    def setMaps(self, map1,map2):
+        self.map1 = map1
+        self.map2 = map2

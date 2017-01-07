@@ -46,6 +46,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
     def __init__(self, parent=None):
         self.config = None
         self.analysis = None
+        self.maps = None
         super(MainWindow, self).__init__(parent)
         self.contacts = []
         self.filteredContacts = []
@@ -193,7 +194,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
 
     def loadDefault(self):
         # importDict = pickle.load(open("defaultsession", "rb"))
-        importDict = pickle.load(open("arfsession", "rb"))
+        importDict = pickle.load(open("defaultsession", "rb"))
         self.contacts = importDict["contacts"]
         arguments = importDict["analyzer"][0:-1]
         trajArgs = importDict["trajectory"]
@@ -516,6 +517,8 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
 
         # Update data for export
         self.exportWidget.setContacts(self.filteredContacts)
+        if self.maps != None:
+            self.exportWidget.setMaps(self.maps[0],self.maps[1])
         self.exportWidget.setThresholdAndNsPerFrame(self.painter.threshold, self.painter.nsPerFrame)
 
     # switch between weight functions
@@ -650,6 +653,8 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
     def pushExport(self):
         self.exportWidget.valueUpdated.connect(self.handleExportUpdate)
         self.exportWidget.setContacts(self.filteredContacts)
+        if self.maps != None:
+            self.exportWidget.setMaps(self.maps[0],self.maps[1])
         self.exportWidget.setThresholdAndNsPerFrame(self.painter.threshold, self.painter.nsPerFrame)
         self.exportWidget.show()
 
