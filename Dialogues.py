@@ -1,7 +1,9 @@
 from __future__ import print_function
 from PyQt5.QtWidgets import QDialog, QGridLayout, QPushButton, QLabel,QLineEdit,QDialogButtonBox, QFileDialog, QCheckBox
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QDoubleValidator, QRegExpValidator
 from LoadConfiguration import Configuration
+from PyQt5.QtCore import QRegExp
 class FileLoaderDialog(QDialog):
     def __init__(self, parent = None):
         super(FileLoaderDialog, self).__init__(parent)
@@ -27,8 +29,14 @@ class FileLoaderDialog(QDialog):
         selection2Label = QLabel("selection 2: ")
 
         self.cutoffField = QLineEdit("5.0")
+        posDoubleValidator = QDoubleValidator()
+        posDoubleValidator.setBottom(0)
+        self.cutoffField.setValidator(posDoubleValidator)
         self.cutoffAngleField = QLineEdit("120")
+        self.cutoffAngleField.setValidator(posDoubleValidator)
         self.cutoffHbondField = QLineEdit("2.5")
+        self.cutoffHbondField.setValidator(posDoubleValidator)
+
         self.selection1Field = QLineEdit("segid RN11")
         self.selection2Field = QLineEdit("segid UBQ")
 

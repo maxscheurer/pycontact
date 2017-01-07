@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QTabWidget, QWidget, QGridLayout, QLabel, QPushButton, QComboBox, QLineEdit
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from Plotters import *
+from ErrorBox import ErrorBox
 class ExportTabWidget(QTabWidget):
 
     valueUpdated = pyqtSignal(str, str)
@@ -136,7 +137,10 @@ class ExportTabWidget(QTabWidget):
         sip.delete(self.tab3.mapPlot)
         self.tab3.mapPlot = MapPlotter(None, width=8, height=5, dpi=60)
         self.grid1.addWidget(self.tab3.mapPlot, 3, 0, 1, 4)
-        self.tab3.mapPlot.plotMap(self.contacts, self.map1, self.map2)
+        res = self.tab3.mapPlot.plotMap(self.contacts, self.map1, self.map2)
+        if res == -1:
+            box = ErrorBox("Please analyze the trajectory with the resid box checked for both atom selections!")
+            box.exec_()
         self.tab3.mapPlot.update()
 
     def pushSave(self):

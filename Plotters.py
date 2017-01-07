@@ -152,13 +152,13 @@ class MapPlotter(MplPlotter):
         minx = np.min(minmaxresids1)
         miny = np.min(minmaxresids2)
         data = np.zeros((len(y), len(x)))
-        # print x,y
         for cont in contacts:
             r1 = int(cont.key1[AccumulationMapIndex.resid])-minx
             r2 = int(cont.key2[AccumulationMapIndex.resid])-miny
             data[r2, r1] = cont.mean_score()
         cax = self.axes.matshow(data, cmap=cm.coolwarm)
 
+        # TODO: do this automatically
         stridex = 5
         stridey = 5
         self.axes.set_xticks(np.arange(0,x.size,stridex))
@@ -166,7 +166,7 @@ class MapPlotter(MplPlotter):
 
         self.axes.set_yticks(np.arange(0,y.size,stridey))
         self.axes.set_yticklabels(np.arange(miny,y.size+miny,stridey))
-        # self.axes.set_ylim(miny,np.max(minmaxresids2)+1)
+
         self.fig.colorbar(cax)
         self.fig.tight_layout()
 
