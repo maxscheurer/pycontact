@@ -21,6 +21,7 @@ from matplotlib import cm
 import pickle
 from matplotlib.mlab import bivariate_normal
 from mpl_toolkits.mplot3d import Axes3D
+from ErrorBox import ErrorBox
 
 #file loader
 from Dialogues import FileLoaderDialog,AnalysisDialog
@@ -103,7 +104,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.actionDefault.triggered.connect(self.loadDefault)
 
         self.progressWidget = ProgessWidget("Progress")
-        
+
         self.exportWidget = ExportTabWidget()
 
 
@@ -580,6 +581,10 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.settingsView.show()
 
     def showStatistics(self):
+        if len(self.contacts) == 0 or self.contacts == None:
+            box = ErrorBox("No data loaded!")
+            box.exec_()
+            return
         d = QDialog()
         grid = QGridLayout()
         d.setLayout(grid)
