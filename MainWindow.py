@@ -44,6 +44,8 @@ from SasaWidgets import *
 
 class MainWindow(QMainWindow, gui.Ui_MainWindow):
     def __init__(self, parent=None):
+        self.config = None
+        self.analysis = None
         super(MainWindow, self).__init__(parent)
         self.contacts = []
         self.filteredContacts = []
@@ -177,11 +179,17 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         fileName = QFileDialog.getSaveFileName(self, 'Export file')
         exportfile = ""
         filestring = fileName[0]
+        if filestring == "":
+            return
         if self.contacts is not None and self.analysis is not None:
             analyzerArgs = [self.analysis.psf, self.analysis.dcd, self.analysis.cutoff, self.analysis.hbondcutoff, self.analysis.hbondcutangle, self.analysis.sel1text, self.analysis.sel2text,self.analysis.contactResults]
             trajArgs = self.analysis.getTrajectoryData()
             exportDict = {"contacts":self.contacts,"analyzer":analyzerArgs,"trajectory":trajArgs}
             pickle.dump(exportDict, open(filestring, "wb"))
+        else:
+            box = ErrorBox("No data to export.")
+            box.exec_()
+            return
 
     def loadDefault(self):
         # importDict = pickle.load(open("defaultsession", "rb"))
@@ -742,6 +750,10 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         d.exec_()
 
     def createTclScriptVis(self):
+        if self.config == None or self.config.psf == None or self.config.dcd == None or self.contacts == None or len(self.contacts) == 0 or len(self.filteredContacts) == 0:
+            box = ErrorBox("No data loaded or no filtered contacts available.")
+            box.exec_()
+            return
         f = open('vis.tcl', 'w')
         f.write('mol new %s \n' % self.config.psf)
         f.write('mol addfile %s \n' % self.config.dcd)
