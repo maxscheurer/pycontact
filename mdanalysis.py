@@ -17,6 +17,7 @@ from biochemistry import *
 from read_db import *
 from copy import deepcopy
 import time
+from aroundPatch import AroundSelection
 
 MDAnalysis.core.flags['use_periodic_selections'] = False
 MDAnalysis.core.flags['use_KDTree_routines'] = True
@@ -591,14 +592,19 @@ class Analyzer(object):
         for atom in backbone_sel:
             self.backbone.append(atom.index)
 
+        sel1 = u.select_atoms(sel1text)
+        sel2 = u.select_atoms(sel2text)
+
         contactResults = []
         # loop over trajectory
         self.totalFrameNumber = len(u.trajectory)
         start = time.time()
         for ts in u.trajectory:
             # define selections according to sel1text and sel2text
-            sel1 = u.select_atoms(sel1text)
-            sel2 = u.select_atoms(sel2text)
+            if "around" in sel1text:
+                sel1 = u.select_atoms(sel1text)
+            if "around" in sel2text:
+                sel2 = u.select_atoms(sel2text)
             # write atomindices for each selection to list
             indices1 = []
             for at in sel1.atoms:
