@@ -23,6 +23,8 @@ class ExportTabWidget(QTabWidget):
        self.contacts = []
        self.threshold = 0
        self.nsPerFrame = 0
+       self.map1 = None
+       self.map2 = None
 
     def setThresholdAndNsPerFrame(self, currentThreshold, currentNsPerFrame):
         self.threshold = currentThreshold
@@ -103,10 +105,10 @@ class ExportTabWidget(QTabWidget):
         self.tab3.mapPlot = MapPlotter(None, width=8, height=5, dpi=60)
         self.grid1.addWidget(self.tab3.mapPlot, 3, 0, 1, 4)
 
-        self.tab3.plotButton = QPushButton("Show Preview")
-        self.tab3.plotButton.setAutoDefault(False)
-        self.tab3.plotButton.clicked.connect(self.pushMapPlot)
-        self.grid1.addWidget(self.tab3.plotButton, 0, 0, 1, 1)
+        self.tab3.plotMapButton = QPushButton("Show Preview")
+        self.tab3.plotMapButton.setAutoDefault(False)
+        self.tab3.plotMapButton.clicked.connect(self.pushMapPlot)
+        self.grid1.addWidget(self.tab3.plotMapButton, 0, 0, 1, 1)
 
         self.tab3.formatBox = QComboBox()
         self.tab3.formatBox.addItem("pdf")
@@ -119,6 +121,15 @@ class ExportTabWidget(QTabWidget):
         self.tab3.saveButton.setAutoDefault(False)
         self.tab3.saveButton.clicked.connect(self.saveMap)
         self.grid1.addWidget(self.tab3.saveButton, 0, 3, 1, 1)
+
+        self.tab3.attributeBox = QComboBox()
+        self.tab3.attributeBox.addItem("Mean Score")
+        self.tab3.attributeBox.addItem("Median Score")
+        self.tab3.attributeBox.addItem("Mean Lifetime")
+        self.tab3.attributeBox.addItem("Median Lifetime")
+        self.tab3.attributeBox.addItem("Hbond percentage")
+
+        self.grid1.addWidget(self.tab3.attributeBox, 0, 1)
 
     def saveHist(self):
         self.plotHist()
@@ -157,7 +168,11 @@ class ExportTabWidget(QTabWidget):
         sip.delete(self.tab3.mapPlot)
         self.tab3.mapPlot = MapPlotter(None, width=8, height=5, dpi=60)
         self.grid1.addWidget(self.tab3.mapPlot, 3, 0, 1, 4)
-        res = self.tab3.mapPlot.plotMap(self.contacts, self.map1, self.map2)
+        if self.map1 == None or self.map2 == None or self.contacts == None or len(self.contacts) == 0:
+            box = ErrorBox("Please analyze the trajectory with the resid box checked for both atom selections!")
+            box.exec_()
+            return
+        res = self.tab3.mapPlot.plotMap(self.contacts, self.map1, self.map2,"resids 1", "resids 2",self.tab3.attributeBox.currentText(), self.threshold, self.nsPerFrame)
         if res == -1:
             box = ErrorBox("Please analyze the trajectory with the resid box checked for both atom selections!")
             box.exec_()

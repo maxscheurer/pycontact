@@ -67,6 +67,9 @@ class ContactPlotter(MplPlotter):
         self.axes.set_xlabel("frame")
         self.axes.set_ylabel("score")
 
+class ContactPlotParameters():
+    mean, median, lifetime, median_life_time, hbond_percentage = range(5)
+    mapping = ["Mean Score", "Median Score", "Mean Lifetime", "Median Lifetime", "Hbond percentage"]
 
 class HistPlotter(MplPlotter):
     """Simple canvas with an histogram plot."""
@@ -137,7 +140,7 @@ class HistPlotter(MplPlotter):
 
 class MapPlotter(MplPlotter):
     """Simple canvas with an 2d heatmap plot."""
-    def plotMap(self,contacts,map1,map2):
+    def plotMap(self,contacts,map1,map2,label1,label2,attribute,threshold,nsPerFrame):
         minmaxresids1 = []
         minmaxresids2 = []
         if not map1[AccumulationMapIndex.resid] or not map2[AccumulationMapIndex.resid]:
@@ -152,22 +155,48 @@ class MapPlotter(MplPlotter):
         minx = np.min(minmaxresids1)
         miny = np.min(minmaxresids2)
         data = np.zeros((len(y), len(x)))
-        for cont in contacts:
-            r1 = int(cont.key1[AccumulationMapIndex.resid])-minx
-            r2 = int(cont.key2[AccumulationMapIndex.resid])-miny
-            data[r2, r1] = cont.mean_score()
-        cax = self.axes.matshow(data, cmap=cm.coolwarm)
+
+        if attribute == "Mean Score":
+            for c in contacts:
+                r1 = int(c.key1[AccumulationMapIndex.resid])-minx
+                r2 = int(c.key2[AccumulationMapIndex.resid])-miny
+                data[r2, r1] = c.mean_score()
+        elif attribute == "Median Score":
+            for c in contacts:
+                r1 = int(c.key1[AccumulationMapIndex.resid])-minx
+                r2 = int(c.key2[AccumulationMapIndex.resid])-miny
+                data[r2, r1] = c.median_score()
+        elif attribute == "Mean Lifetime":
+            for c in contacts:
+                r1 = int(c.key1[AccumulationMapIndex.resid])-minx
+                r2 = int(c.key2[AccumulationMapIndex.resid])-miny
+                data[r2, r1] = c.mean_life_time(nsPerFrame, threshold)
+        elif attribute == "Median Lifetime":
+            for c in contacts:
+                r1 = int(c.key1[AccumulationMapIndex.resid])-minx
+                r2 = int(c.key2[AccumulationMapIndex.resid])-miny
+                data[r2, r1] = c.median_life_time(nsPerFrame, threshold)
+        elif attribute == "Hbond percentage":
+            for c in contacts:
+                r1 = int(c.key1[AccumulationMapIndex.resid])-minx
+                r2 = int(c.key2[AccumulationMapIndex.resid])-miny
+                data[r2, r1] = c.hbond_percentage()
+
+        cax = self.axes.matshow(data, cmap=cm.coolwarm,label=attribute)
 
         # TODO: do this automatically
         stridex = 5
         stridey = 5
         self.axes.set_xticks(np.arange(0,x.size,stridex))
         self.axes.set_xticklabels(np.arange(minx,x.size+minx,stridex))
+        # self.axes.set_title("Contact Map")
+        self.axes.set_xlabel(label1)
+        self.axes.set_ylabel(label2)
 
         self.axes.set_yticks(np.arange(0,y.size,stridey))
         self.axes.set_yticklabels(np.arange(miny,y.size+miny,stridey))
-
-        self.fig.colorbar(cax)
+        cb = self.fig.colorbar(cax)
+        cb.set_label(attribute)
         self.fig.tight_layout()
 
     def saveFigure(self, path, outputFormat):
