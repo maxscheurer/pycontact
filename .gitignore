@@ -35,6 +35,10 @@ ehthumbs.db
 Thumbs.db
 vis.tcl
 
+# images
+*.png
+*.jpg
+*.svg
 
 #Misc#
 ######

@@ -106,7 +106,19 @@ class ExportTabWidget(QTabWidget):
         self.tab3.plotButton = QPushButton("Show Preview")
         self.tab3.plotButton.setAutoDefault(False)
         self.tab3.plotButton.clicked.connect(self.pushMapPlot)
-        self.grid1.addWidget(self.tab3.plotButton, 0, 0, 1, 3)
+        self.grid1.addWidget(self.tab3.plotButton, 0, 0, 1, 1)
+
+        self.tab3.formatBox = QComboBox()
+        self.tab3.formatBox.addItem("pdf")
+        self.tab3.formatBox.addItem("png")
+        self.tab3.formatBox.addItem("svg")
+        self.tab3.formatBox.addItem("eps")
+        self.grid1.addWidget(self.tab3.formatBox, 0, 2, 1, 1)
+
+        self.tab3.saveButton = QPushButton("Save Map")
+        self.tab3.saveButton.setAutoDefault(False)
+        self.tab3.saveButton.clicked.connect(self.saveMap)
+        self.grid1.addWidget(self.tab3.saveButton, 0, 3, 1, 1)
 
     def saveHist(self):
         self.plotHist()
@@ -115,6 +127,14 @@ class ExportTabWidget(QTabWidget):
         if len(fileName[0]) > 0:
             path, file_extension = os.path.splitext(fileName[0])
             self.tab2.histPlot.saveFigure(path, self.tab2.formatBox.currentText())
+
+    def saveMap(self):
+        self.plotMap()
+
+        fileName = QFileDialog.getSaveFileName(self, 'Export Path')
+        if len(fileName[0]) > 0:
+            path, file_extension = os.path.splitext(fileName[0])
+            self.tab3.mapPlot.saveFigure(path, self.tab3.formatBox.currentText())
 
     def pushPlot(self):
         self.plotHist()
