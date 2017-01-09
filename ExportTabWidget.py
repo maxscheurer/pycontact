@@ -25,6 +25,8 @@ class ExportTabWidget(QTabWidget):
        self.nsPerFrame = 0
        self.map1 = None
        self.map2 = None
+       self.label1 = ""
+       self.label2 = ""
 
     def setThresholdAndNsPerFrame(self, currentThreshold, currentNsPerFrame):
         self.threshold = currentThreshold
@@ -172,7 +174,7 @@ class ExportTabWidget(QTabWidget):
             box = ErrorBox("Please analyze the trajectory with the resid box checked for both atom selections!")
             box.exec_()
             return
-        res = self.tab3.mapPlot.plotMap(self.contacts, self.map1, self.map2,"resids 1", "resids 2",self.tab3.attributeBox.currentText(), self.threshold, self.nsPerFrame)
+        res = self.tab3.mapPlot.plotMap(self.contacts, self.map1, self.map2,self.label1,self.label2,self.tab3.attributeBox.currentText(), self.threshold, self.nsPerFrame)
         if res == -1:
             box = ErrorBox("Please analyze the trajectory with the resid box checked for both atom selections!")
             box.exec_()
@@ -188,3 +190,8 @@ class ExportTabWidget(QTabWidget):
     def setMaps(self, map1,map2):
         self.map1 = map1
         self.map2 = map2
+
+# labels for the contact map
+    def setMapLabels(self, label1, label2):
+        self.label1 = label1
+        self.label2 = label2

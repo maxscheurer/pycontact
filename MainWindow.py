@@ -113,7 +113,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
 
         # self.sasaView = SasaWidget()
         # self.sasaView.show()
-        
+
         self.updateSettings()
         self.updateFilters()
 
@@ -188,6 +188,8 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             msg.setWindowTitle("Data loaded")
             msg.setDetailedText("Now click on Analysis to proceed")
             msg.exec_()
+
+
     def handleTaskUpdated(self):
     	print(self.analysis.currentFrame)
     	self.progressWidget.setValue(self.analysis.currentFrame)
@@ -477,6 +479,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.exportWidget.setContacts(self.filteredContacts)
         if self.maps != None:
             self.exportWidget.setMaps(self.maps[0],self.maps[1])
+            self.exportWidget.setMapLabels(self.analysis.sel1text,self.analysis.sel2text)
         self.exportWidget.setThresholdAndNsPerFrame(self.painter.threshold, self.painter.nsPerFrame)
 
     # switch between weight functions
@@ -613,6 +616,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.exportWidget.setContacts(self.filteredContacts)
         if self.maps != None:
             self.exportWidget.setMaps(self.maps[0],self.maps[1])
+            self.exportWidget.setMapLabels(self.analysis.sel1text,self.analysis.sel2text)
         self.exportWidget.setThresholdAndNsPerFrame(self.painter.threshold, self.painter.nsPerFrame)
         self.exportWidget.show()
 
