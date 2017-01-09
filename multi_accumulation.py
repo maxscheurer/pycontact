@@ -165,7 +165,7 @@ def loop_frame(contacts,map1,map2,trajArgs):
     global resid_array
     global resname_array
     global segids
-    backbone,type_array,name_array,resid_array,resname_array,segids = trajArgs[-1],trajArgs[3],trajArgs[2],trajArgs[1],trajArgs[0],trajArgs[4]
+    backbone,type_array,name_array,resid_array,resname_array,segids = trajArgs[5],trajArgs[3],trajArgs[2],trajArgs[1],trajArgs[0],trajArgs[4]
     for frame in contacts:
         currentFrameAcc = {}
         for cont in frame:

@@ -22,6 +22,7 @@ import pickle
 from matplotlib.mlab import bivariate_normal
 from mpl_toolkits.mplot3d import Axes3D
 from ErrorBox import ErrorBox
+import traceback
 
 #file loader
 from Dialogues import FileLoaderDialog,AnalysisDialog
@@ -41,6 +42,38 @@ from biochemistry import vdwRadius
 from aroundPatch import AroundSelection
 
 from SasaWidgets import *
+
+import multiprocessing
+from multiprocessing.pool import Pool
+multiprocessing.log_to_stderr()
+
+# Shortcut to multiprocessing's logger
+def error(msg, *args):
+    return multiprocessing.get_logger().error(msg, *args)
+
+class LogExceptions(object):
+    def __init__(self, callable):
+        self.__callable = callable
+
+    def __call__(self, *args, **kwargs):
+        try:
+            result = self.__callable(*args, **kwargs)
+
+        except Exception as e:
+            # Here we add some debugging help. If multiprocessing's
+            # debugging is on, it will arrange to log the traceback
+            error(traceback.format_exc())
+            # Re-raise the original exception so the Pool worker can
+            # clean up
+            raise
+
+        # It was fine, give a normal answer
+        return result
+
+class LoggingPool(Pool):
+    def apply_async(self, func, args=(), kwds={}, callback=None):
+        return Pool.apply_async(self, LogExceptions(func), args, kwds, callback)
+
 
 class MainWindow(QMainWindow, gui.Ui_MainWindow):
     def __init__(self, parent=None):
@@ -208,7 +241,8 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         manager = multiprocessing.Manager()
         d=manager.list(trajData)
         all_chunk = chunks(contResults,nproc)
-        pool = multiprocessing.Pool(nproc)
+        pool = LoggingPool(nproc)
+        # pool = multiprocessing.Pool(nproc)
         print("Running on %d cores" % nproc)
         for c in all_chunk:
             results.append( pool.apply_async( loop_frame, args=(c,map1,map2,d)) )
