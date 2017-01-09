@@ -99,28 +99,28 @@ class ExportTabWidget(QTabWidget):
         self.grid1.addWidget(self.tab2.formatBox, 1, 2)
 
     def tab3UI(self):
-        self.grid1 = QGridLayout()
-        self.tab3.setLayout(self.grid1)
+        self.grid2 = QGridLayout()
+        self.tab3.setLayout(self.grid2)
 
         self.tab3.mapPlot = MapPlotter(None, width=8, height=5, dpi=60)
-        self.grid1.addWidget(self.tab3.mapPlot, 3, 0, 1, 4)
+        self.grid2.addWidget(self.tab3.mapPlot, 3, 0, 1, 4)
 
         self.tab3.plotMapButton = QPushButton("Show Preview")
         self.tab3.plotMapButton.setAutoDefault(False)
         self.tab3.plotMapButton.clicked.connect(self.pushMapPlot)
-        self.grid1.addWidget(self.tab3.plotMapButton, 0, 0, 1, 1)
+        self.grid2.addWidget(self.tab3.plotMapButton, 0, 0, 1, 1)
 
         self.tab3.formatBox = QComboBox()
         self.tab3.formatBox.addItem("pdf")
         self.tab3.formatBox.addItem("png")
         self.tab3.formatBox.addItem("svg")
         self.tab3.formatBox.addItem("eps")
-        self.grid1.addWidget(self.tab3.formatBox, 0, 2, 1, 1)
+        self.grid2.addWidget(self.tab3.formatBox, 0, 2, 1, 1)
 
         self.tab3.saveButton = QPushButton("Save Map")
         self.tab3.saveButton.setAutoDefault(False)
         self.tab3.saveButton.clicked.connect(self.saveMap)
-        self.grid1.addWidget(self.tab3.saveButton, 0, 3, 1, 1)
+        self.grid2.addWidget(self.tab3.saveButton, 0, 3, 1, 1)
 
         self.tab3.attributeBox = QComboBox()
         self.tab3.attributeBox.addItem("Mean Score")
@@ -129,7 +129,7 @@ class ExportTabWidget(QTabWidget):
         self.tab3.attributeBox.addItem("Median Lifetime")
         self.tab3.attributeBox.addItem("Hbond percentage")
 
-        self.grid1.addWidget(self.tab3.attributeBox, 0, 1)
+        self.grid2.addWidget(self.tab3.attributeBox, 0, 1)
 
     def saveHist(self):
         self.plotHist()
@@ -167,7 +167,7 @@ class ExportTabWidget(QTabWidget):
     def plotMap(self):
         sip.delete(self.tab3.mapPlot)
         self.tab3.mapPlot = MapPlotter(None, width=8, height=5, dpi=60)
-        self.grid1.addWidget(self.tab3.mapPlot, 3, 0, 1, 4)
+        self.grid2.addWidget(self.tab3.mapPlot, 3, 0, 1, 4)
         if self.map1 == None or self.map2 == None or self.contacts == None or len(self.contacts) == 0:
             box = ErrorBox("Please analyze the trajectory with the resid box checked for both atom selections!")
             box.exec_()

@@ -111,51 +111,9 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.exportWidget = ExportTabWidget()
 
 
-        self.sasaView = SasaWidget()
-        self.sasaView.show()
-        # map1 = [0, 0, 0, 1, 1, 0]
-        # map2 = [0, 0, 0, 1, 1, 0]
-        # self.map1 = map1
-        # self.map2 = map2
-        # self.psf = "rpn11_ubq_interface-ionized.psf"
-        # self.dcd = "short.dcd"
-        # analysis.runFrameScan()
-        # self.contacts= analysis.runContactAnalysis(map1, map2)
-
-        # map1 = [0, 0, 0, 1, 1, 0]
-        # map2 = [0, 0, 0, 1, 1, 0]
-        # contactResults = analyze_psf_dcd("membraneAligned-helixZ90X0-ionized.psf", "arf_hmmm_100ns_100f_comet.dcd", 5.0, 2.5, 120, "segid PROT","segid MEMB")
-        # self.contacts= analyze_contactResultsWithMaps(contactResults, map1, map2)
-
-        # testing shit
-        # maxresids1 = []
-        # maxresids2 = []
-        # for cont in self.contacts:
-        #     cont.determineBackboneSidechainType()
-        #     maxresids1.append(int(cont.key1[AccumulationMapIndex.resid]))
-        #     maxresids2.append(int(cont.key2[AccumulationMapIndex.resid]))
-
-        # # Generate some test data
-        # x = np.arange(1,np.max(maxresids1)+2)
-        # y = np.arange(1,np.max(maxresids2)+2)
-        # data = np.zeros((len(x), len(y)))
-        # for cont in self.contacts:
-        #     r1 = int(cont.key1[AccumulationMapIndex.resid])
-        #     r2 = int(cont.key2[AccumulationMapIndex.resid])
-        #     hbonds = cont.hbondFramesScan()
-        #     count = np.count_nonzero(hbonds)
-        #     if count > 0:
-        #         print cont.title + " contains " + str(count) + " hbonds in total"
-        #     # data[r1,r2] = cont.total_time(1, 0)
-        #     data[r1, r2] = cont.mean_score()
-        # fig = plt.figure()
-        # ax = fig.add_subplot(111)
-
-        # cax = ax.matshow(data, cmap=cm.coolwarm, aspect='equal')
-        # fig.tight_layout()
-        # fig.colorbar(cax)
-        # plt.show()
-
+        # self.sasaView = SasaWidget()
+        # self.sasaView.show()
+        
         self.updateSettings()
         self.updateFilters()
 
