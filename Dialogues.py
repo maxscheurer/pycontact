@@ -99,6 +99,8 @@ class AnalysisDialog(QDialog):
         resnameLabel = QLabel("resname: ")
         segidLabel = QLabel("segid: ")
 
+        self.setWindowTitle("Analysis - Score Accumulation")
+
         self.index1Checkbox = QCheckBox()
         self.name1Checkbox = QCheckBox()
         self.resid1Checkbox = QCheckBox()
