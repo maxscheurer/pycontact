@@ -1,4 +1,8 @@
 from __future__ import print_function
+import multiprocessing
+import os
+import re
+from mdanalysis import *
 
 def weight_function(value):
     return (1.0) / (1.0 + np.exp(5.0 * (value - 4.0)))
@@ -36,7 +40,7 @@ class ConvBond(object):
 
 
 def loop_trajectory(sel1c,sel2c,config,suppl):
-    print(len(sel1c) , len(sel2c))
+    # print(len(sel1c) , len(sel2c))
     indices1 = suppl[0]
     indices2 = suppl[1]
     cutoff, hbondcutoff, hbondcutangle = config
@@ -163,11 +167,10 @@ def loop_trajectory(sel1c,sel2c,config,suppl):
 
 
 def run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1text, sel2text):
-    nproc = int(self.settingsView.coreBox.value())
-    pool = multiprocessing.Pool(nprocs)
-    manager = multiprocessing.Manager()
-    d=manager.list(trajArgs)
-
+    # nproc = int(self.settingsView.coreBox.value())
+    pool = multiprocessing.Pool(nproc)
+    # manager = multiprocessing.Manager()
+    # d=manager.list(trajArgs)
 
     heavyatomlines = []
     heavyatoms = []
@@ -222,17 +225,26 @@ def run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1t
         sel2coords.append(sel2.positions)
     contactResults = []
     # loop over trajectory
-    self.totalFrameNumber = len(u.trajectory)
+    totalFrameNumber = len(u.trajectory)
     start = time.time()
     sel1c = chunks(sel1coords, nproc)
     sel2c = chunks(sel2coords, nproc)
 
     print("Running on %d cores" % nproc)
+    results = []
+    rank = 0
     for c in zip(sel1c,sel2c):
-        results.append( pool.apply_async( loop_trajectory, args=(c[0],c[1],map1,map2,d)) )
+        results.append( pool.apply_async( loop_trajectory, args=(c[0],c[1],[cutoff, hbondcutoff, hbondcutangle],[indices1,indices2,type_array,bonds,heavyatoms])) )
         rank +=1
     # TODO: might be important, but without, it's faster and until now, provides the same results
     pool.close()
     pool.join()
     stop = time.time()
     print("time: ", str(stop-start), rank)
+    allContacts = []
+    for res in results:
+        rn = res.get()
+        print(len(rn))
+        allContacts.extend(rn)
+    print("frames: ", len(allContacts))
+    return [allContacts,resname_array,resid_array,name_array,type_array,segids,backbone,sel1text,sel2text]

@@ -47,6 +47,7 @@ import multiprocessing
 from multiprocessing.pool import Pool
 multiprocessing.log_to_stderr()
 
+# from:
 # Shortcut to multiprocessing's logger
 def error(msg, *args):
     return multiprocessing.get_logger().error(msg, *args)
@@ -195,23 +196,29 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.updateSettings()
         self.updateFilters()
 
-    def loadData_parallel(self):
+    def loadData_parallel(self,nprocs):
         from multi_trajectory import run_load_parallel
-
+        # run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1text, sel2text)
+        return run_load_parallel(nprocs,self.config.psf,self.config.dcd, self.config.cutoff,self.config.hbondcutoff,self.config.hbondcutangle,self.config.sel1text,self.config.sel2text)
 
 
     def loadDataPushed(self):
-        parallel = 0
         self.config,result = FileLoaderDialog.getConfig()
         if result == 1:
             attrs = vars(self.config)
+            nproc = int(self.settingsView.coreBox.value())
+            # do not allow multiprocessing unless the trajectory has enough frames
+            if nproc == 1: #or  frames <= 5*nproc:
+                parallel = 0
+            else:
+                parallel = 1
             print(', '.join("%s: %s" % item for item in attrs.items()))
             self.analysis = Analyzer(self.config.psf,self.config.dcd, self.config.cutoff,self.config.hbondcutoff,self.config.hbondcutangle,self.config.sel1text,self.config.sel2text)
             # self.connect(self.analysis, QtCore.SIGNAL('taskUpdated'),self.handleTaskUpdated)
             # self.connect(self.analysis, QtCore.SIGNAL('frameNumberSet'),self.setFrameNumber)
             # self.progressWidget.show()
             if parallel:
-                pass
+                self.analysis.contactResults,self.analysis.resname_array,self.analysis.resid_array,self.analysis.name_array,self.analysis.type_array,self.analysis.segids,self.analysis.backbone,self.analysis.sel1text,self.analysis.sel2text = self.loadData_parallel(nproc)
             else:
                 self.analysis.runFrameScan()
             msg = QMessageBox()
@@ -296,7 +303,6 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             map2 = self.maps[1]
             nproc = int(self.settingsView.coreBox.value())
             frames = len(self.analysis.contactResults[0])
-            print("frames: ",frames)
             # do not allow multiprocessing unless the trajectory has enough frames
             if nproc == 1: #or  frames <= 5*nproc:
                 parallel = 0
@@ -311,34 +317,6 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
                 # cont.setScores()
             self.updateSettings()
             self.updateFilters()
-            # testing shit
-            # maxresids1 = []
-            # maxresids2 = []
-            # for cont in self.contacts:
-            #     cont.determineBackboneSidechainType()
-            #     maxresids1.append(int(cont.key1[AccumulationMapIndex.resid]))
-            #     maxresids2.append(int(cont.key2[AccumulationMapIndex.resid]))
-            # Generate some test data
-            # x = np.arange(1,np.max(maxresids1)+2)
-            # y = np.arange(1,np.max(maxresids2)+2)
-            # data = np.zeros((len(x), len(y)))
-            # for cont in self.contacts:
-            #     r1 = int(cont.key1[AccumulationMapIndex.resid])
-            #     r2 = int(cont.key2[AccumulationMapIndex.resid])
-            #     hbonds = cont.hbondFramesScan()
-            #     count = np.count_nonzero(hbonds)
-            #     if count > 0:
-            #         print cont.title + " contains " + str(count) + " hbonds in total"
-            #     # data[r1,r2] = cont.total_time(1, 0)
-            #     data[r1, r2] = cont.mean_score()
-            # fig = plt.figure()
-            # ax = fig.add_subplot(111)
-            # cax = ax.matshow(data, cmap=cm.coolwarm, aspect='equal')
-            # fig.tight_layout()
-            # fig.colorbar(cax)
-            # plt.savefig("contactmap.png")
-
-
 
     def setupFunctionBox(self):
         # sig
