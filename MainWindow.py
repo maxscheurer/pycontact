@@ -94,8 +94,8 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.analysisButton.clicked.connect(self.analyzeDataPushed)
 
 
-        #visualize button
-        self.visButton.clicked.connect(self.visualize)
+        #contact area button
+        self.contactAreaButton.clicked.connect(self.showContactAreaView)
 
         #button group for weight functions
         self.functionButtonGroup = QButtonGroup()
@@ -117,9 +117,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
 
         self.exportWidget = ExportTabWidget()
 
-
-        # self.sasaView = SasaWidget()
-        # self.sasaView.show()
+        self.sasaView = SasaWidget()
 
         self.updateSettings()
         self.updateFilters()
@@ -181,7 +179,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             attrs = vars(self.config)
             nproc = int(self.settingsView.coreBox.value())
             # do not allow multiprocessing unless the trajectory has enough frames
-            if nproc == 1: #or  frames <= 5*nproc:
+            if nproc == 1:
                 parallel = 0
             else:
                 parallel = 1
@@ -222,7 +220,6 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         d=manager.list(trajData)
         all_chunk = chunks(contResults,nproc)
         pool = LoggingPool(nproc)
-        # pool = multiprocessing.Pool(nproc)
         print("Running on %d cores" % nproc)
         for c in all_chunk:
             results.append( pool.apply_async( loop_frame, args=(c,map1,map2,d)) )
@@ -276,8 +273,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             map2 = self.maps[1]
             nproc = int(self.settingsView.coreBox.value())
             frames = len(self.analysis.contactResults[0])
-            # do not allow multiprocessing unless the trajectory has enough frames
-            if nproc == 1: #or  frames <= 5*nproc:
+            if nproc == 1:
                 parallel = 0
             else:
                 parallel = 1
@@ -672,6 +668,10 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.updateSettings()
         self.updateFilters()
 
+    def showContactAreaView(self):
+        self.sasaView.show()
+
+
     def visualize(self):
         d = QDialog()
         grid = QGridLayout()
@@ -700,71 +700,6 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         d.resize(300, 150)
         d.setWindowModality(Qt.ApplicationModal)
         d.exec_()
-
-    def createTclScriptVis(self):
-        if self.config == None or self.config.psf == None or self.config.dcd == None or self.contacts == None or len(self.contacts) == 0 or len(self.filteredContacts) == 0:
-            box = ErrorBox("No data loaded or no filtered contacts available.")
-            box.exec_()
-            return
-        f = open('vis.tcl', 'w')
-        f.write('mol new %s \n' % self.config.psf)
-        f.write('mol addfile %s \n' % self.config.dcd)
-        f.write('mol delrep 0 top \n')
-        f.write('mol representation NewCartoon \n')
-        f.write('mol Color ColorID 3 \n')
-        f.write('mol selection {all} \n')
-        f.write('mol addrep top \n')
-
-        if self.splitVisCheckbox.isChecked():
-            for cont in self.filteredContacts:
-                currentSel1 = []
-                index = 0
-                for item in cont.key1:
-                    if item != "none":
-                        currentSel1.append(AccumulationMapIndex.vmdsel[index] + " " + item)
-                    index += 1
-                currentSel1String = " and ".join(currentSel1)
-                currentSel2 = []
-                index = 0
-                for item in cont.key2:
-                    if item != "none":
-                        currentSel2.append(AccumulationMapIndex.vmdsel[index] + " " + item)
-                    index += 1
-                currentSel2String = " and ".join(currentSel2)
-                add1 = ("" if self.additionalText1.text()=="" else (" and " + self.additionalText1.text()))
-                add2 = ("" if self.additionalText2.text() == "" else (" and " + self.additionalText2.text()))
-                sel = "("+currentSel1String + add1 + ") or (" + currentSel2String + add2 + ")"
-                f.write('mol representation Licorice \n')
-                f.write('mol Color Name \n')
-                f.write('mol selection {%s} \n'%sel)
-                f.write('mol addrep top \n')
-        else:
-            total = []
-            for cont in self.filteredContacts:
-                currentSel1 = []
-                index = 0
-                for item in cont.key1:
-                    if item != "none":
-                        currentSel1.append(AccumulationMapIndex.vmdsel[index] + " " + item)
-                    index += 1
-                currentSel1String = " and ".join(currentSel1)
-                currentSel2 = []
-                index = 0
-                for item in cont.key2:
-                    if item != "none":
-                        currentSel2.append(AccumulationMapIndex.vmdsel[index] + " " + item)
-                    index += 1
-                currentSel2String = " and ".join(currentSel2)
-                add1 = ("" if self.additionalText1.text() == "" else (" and " + self.additionalText1.text()))
-                add2 = ("" if self.additionalText2.text() == "" else (" and " + self.additionalText2.text()))
-                sel = "(" + currentSel1String + add1 + ") or (" + currentSel2String + add2 + ")"
-                total.append(sel)
-            seltext = " or ".join(total)
-            f.write('mol representation Licorice \n')
-            f.write('mol Color Name \n')
-            f.write('mol selection {%s} \n' % seltext)
-            f.write('mol addrep top \n')
-        f.close()
 
 class SettingsTabWidget(QTabWidget, Ui_settingsWindowWidget):
     def __init__(self, parent=None):

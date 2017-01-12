@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'gui.ui'
 #
-# Created by: PyQt5 UI code generator 5.6
+# Created by: PyQt5 UI code generator 5.7
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -70,15 +70,15 @@ class Ui_MainWindow(object):
         self.alphaSlider.setOrientation(QtCore.Qt.Horizontal)
         self.alphaSlider.setObjectName("alphaSlider")
         self.gridLayout.addWidget(self.alphaSlider, 0, 3, 1, 1)
-        self.visButton = QtWidgets.QPushButton(self.centralwidget)
-        self.visButton.setObjectName("visButton")
-        self.gridLayout.addWidget(self.visButton, 0, 8, 1, 1)
+        self.contactAreaButton = QtWidgets.QPushButton(self.centralwidget)
+        self.contactAreaButton.setObjectName("contactAreaButton")
+        self.gridLayout.addWidget(self.contactAreaButton, 0, 8, 1, 1)
         self.scrollArea = QtWidgets.QScrollArea(self.centralwidget)
         self.scrollArea.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustIgnored)
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 961, 499))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 967, 502))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
         self.gridLayout.addWidget(self.scrollArea, 3, 0, 1, 9)
@@ -90,7 +90,7 @@ class Ui_MainWindow(object):
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 987, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 987, 25))
         self.menubar.setDefaultUp(False)
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
@@ -133,7 +133,7 @@ class Ui_MainWindow(object):
         self.alphaSliderLabel.setText(_translate("MainWindow", "Alpha:"))
         self.openPreferencesButton.setText(_translate("MainWindow", "Preferences"))
         self.statisticsButton.setText(_translate("MainWindow", "Statistics"))
-        self.visButton.setText(_translate("MainWindow", "Visualize"))
+        self.contactAreaButton.setText(_translate("MainWindow", "Contact areas"))
         self.analysisButton.setText(_translate("MainWindow", "Analyze"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.menuAbout.setTitle(_translate("MainWindow", "About"))

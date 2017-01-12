@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'settings.ui'
 #
-# Created by: PyQt5 UI code generator 5.6
+# Created by: PyQt5 UI code generator 5.7
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -376,7 +376,7 @@ class Ui_settingsWindowWidget(object):
         sizePolicy.setHeightForWidth(self.applySettingsButton.sizePolicy().hasHeightForWidth())
         self.applySettingsButton.setSizePolicy(sizePolicy)
         self.applySettingsButton.setObjectName("applySettingsButton")
-        self.gridLayout_2.addWidget(self.applySettingsButton, 5, 2, 1, 1)
+        self.gridLayout_2.addWidget(self.applySettingsButton, 6, 2, 1, 1)
         self.nsPerFrameField = QtWidgets.QLineEdit(self.settingsWidget)
         self.nsPerFrameField.setClearButtonEnabled(True)
         self.nsPerFrameField.setObjectName("nsPerFrameField")
@@ -385,7 +385,7 @@ class Ui_settingsWindowWidget(object):
         self.nsPerFrameLabel.setObjectName("nsPerFrameLabel")
         self.gridLayout_2.addWidget(self.nsPerFrameLabel, 0, 0, 1, 1)
         spacerItem2 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.gridLayout_2.addItem(spacerItem2, 3, 0, 1, 2)
+        self.gridLayout_2.addItem(spacerItem2, 4, 0, 1, 2)
         self.coreBox = QtWidgets.QSpinBox(self.settingsWidget)
         self.coreBox.setMinimum(1)
         self.coreBox.setMaximum(64)
@@ -395,6 +395,13 @@ class Ui_settingsWindowWidget(object):
         self.thresholdLabel_2 = QtWidgets.QLabel(self.settingsWidget)
         self.thresholdLabel_2.setObjectName("thresholdLabel_2")
         self.gridLayout_2.addWidget(self.thresholdLabel_2, 2, 0, 1, 1)
+        self.sfLabel = QtWidgets.QLabel(self.settingsWidget)
+        self.sfLabel.setObjectName("sfLabel")
+        self.gridLayout_2.addWidget(self.sfLabel, 3, 0, 1, 1)
+        self.scoreFunctionField = QtWidgets.QLineEdit(self.settingsWidget)
+        self.scoreFunctionField.setClearButtonEnabled(True)
+        self.scoreFunctionField.setObjectName("scoreFunctionField")
+        self.gridLayout_2.addWidget(self.scoreFunctionField, 3, 1, 1, 1)
         settingsWindowWidget.addTab(self.settingsTab, "")
 
         self.retranslateUi(settingsWindowWidget)
@@ -486,5 +493,7 @@ class Ui_settingsWindowWidget(object):
         self.nsPerFrameField.setText(_translate("settingsWindowWidget", "1.0"))
         self.nsPerFrameLabel.setText(_translate("settingsWindowWidget", "Nanoseconds per frame:"))
         self.thresholdLabel_2.setText(_translate("settingsWindowWidget", "Cores:"))
+        self.sfLabel.setText(_translate("settingsWindowWidget", "Score function:      s(d)="))
+        self.scoreFunctionField.setText(_translate("settingsWindowWidget", "1.0 / (1.0 + np.exp(5.0 * (d - 4.0)))"))
         settingsWindowWidget.setTabText(settingsWindowWidget.indexOf(self.settingsTab), _translate("settingsWindowWidget", "Settings"))
 

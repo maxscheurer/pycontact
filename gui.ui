@@ -115,9 +115,9 @@
      </widget>
     </item>
     <item row="0" column="8">
-     <widget class="QPushButton" name="visButton">
+     <widget class="QPushButton" name="contactAreaButton">
       <property name="text">
-       <string>Visualize</string>
+       <string>Contact areas</string>
       </property>
      </widget>
     </item>
@@ -134,8 +134,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>961</width>
-         <height>499</height>
+         <width>967</width>
+         <height>502</height>
         </rect>
        </property>
       </widget>
@@ -157,7 +157,7 @@
      <x>0</x>
      <y>0</y>
      <width>987</width>
-     <height>22</height>
+     <height>25</height>
     </rect>
    </property>
    <property name="defaultUp">

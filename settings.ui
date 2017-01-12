@@ -758,7 +758,7 @@
        </property>
       </widget>
      </item>
-     <item row="5" column="2">
+     <item row="6" column="2">
       <widget class="QPushButton" name="applySettingsButton">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -788,7 +788,7 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="0" colspan="2">
+     <item row="4" column="0" colspan="2">
       <spacer name="verticalSpacer">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
@@ -818,6 +818,23 @@
       <widget class="QLabel" name="thresholdLabel_2">
        <property name="text">
         <string>Cores:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="sfLabel">
+       <property name="text">
+        <string>Score function:      s(d)=</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="scoreFunctionField">
+       <property name="text">
+        <string>1.0 / (1.0 + np.exp(5.0 * (d - 4.0)))</string>
+       </property>
+       <property name="clearButtonEnabled">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
