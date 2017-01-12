@@ -41,20 +41,20 @@ class ConvBond(object):
         return self.indices
 
 
-def loop_trajectory(sel1c,sel2c,config,suppl):
+def loop_trajectory(sel1c,sel2c,indices1,indices2,config,suppl):
     # print(len(sel1c) , len(sel2c))
-    indices1 = suppl[0]
-    indices2 = suppl[1]
+    # indices1 = suppl[0]
+    # indices2 = suppl[1]
     cutoff, hbondcutoff, hbondcutangle = config
     # resname_array = comm.bcast(resname_array, root=0)
     # resid_array = comm.bcast(resid_array, root=0)
     # name_array = comm.bcast(name_array, root=0)
-    type_array = suppl[2]
-    bonds = suppl[3]
+    type_array = suppl[0]
+    bonds = suppl[1]
     # segids = comm.bcast(segids, root=0)
     # backbone = comm.bcast(backbone, root=0)
-    heavyatoms = suppl[4]
-    name_array = suppl[5]
+    heavyatoms = suppl[2]
+    name_array = suppl[3]
 
     allRankContacts = []
     start = time.time()
@@ -65,8 +65,8 @@ def loop_trajectory(sel1c,sel2c,config,suppl):
         distarray = distances.distance_array(s1, s2, box=None, result=result)
         contacts = np.where(distarray <= cutoff)
         for idx1, idx2 in itertools.izip(contacts[0], contacts[1]):
-            convindex1 = indices1[idx1]  # idx1 converted to global atom indexing
-            convindex2 = indices2[idx2]  # idx2 converted to global atom indexing
+            convindex1 = indices1[frame][idx1]  # idx1 converted to global atom indexing
+            convindex2 = indices2[frame][idx2]  # idx2 converted to global atom indexing
             # jump out of loop if hydrogen contacts are found, only contacts between heavy atoms are considered, hydrogen bonds can still be detected!
             if re.match("H(.*)", name_array[convindex1]) or re.match("H(.*)", name_array[convindex2]):
                 continue
@@ -120,7 +120,7 @@ def loop_trajectory(sel1c,sel2c,config,suppl):
                         bondcount2 += 1
                     # check hbond criteria for hydrogen atoms bound to first atom
                     for global_hatom in hydrogenAtomsBoundToAtom1:
-                        conv_hatom = indices1.index(global_hatom)
+                        conv_hatom = np.where(indices1[frame] == global_hatom)[0][0]
                         typeHeavy = next((x.htype for x in heavyatoms if x.name == type_array[convindex2]),
                                          AtomHBondType.none)
                         if typeHeavy == AtomHBondType.acc and (distarray[conv_hatom, idx2] <= hbondcutoff):
@@ -143,7 +143,7 @@ def loop_trajectory(sel1c,sel2c,config,suppl):
                             # print "hbond found: %d,%d,%d"%(convindex1,global_hatom,convindex2)
                             # print angle
                     for global_hatom in hydrogenAtomsBoundToAtom2:
-                        conv_hatom = indices2.index(global_hatom)
+                        conv_hatom = np.where(indices2[frame] == global_hatom)[0][0]
                         typeHeavy = next((x.htype for x in heavyatoms if x.name == type_array[convindex1]),
                                          AtomHBondType.none)
                         if typeHeavy == AtomHBondType.acc and (distarray[idx1, conv_hatom] <= hbondcutoff):
@@ -166,6 +166,7 @@ def loop_trajectory(sel1c,sel2c,config,suppl):
                                  hydrogenBonds)
             currentFrameContacts.append(newAtomContact)
         allRankContacts.append(currentFrameContacts)
+        frame+=1
     return allRankContacts
 
 
@@ -191,14 +192,8 @@ def run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1t
     # define selections according to sel1text and sel2text
     sel1 = u.select_atoms(sel1text)
     sel2 = u.select_atoms(sel2text)
-    # write atomindices for each selection to list
-    indices1 = []
-    for at in sel1.atoms:
-        indices1.append(at.index)
-    indices2 = []
-    for at in sel2.atoms:
-        indices2.append(at.index)
-        # write properties of all atoms to lists
+
+    # write properties of all atoms to lists
     all_sel = u.select_atoms("all")
     backbone_sel = u.select_atoms("backbone")
     resname_array = []
@@ -217,27 +212,48 @@ def run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1t
         segids.append(atom.segid)
     for atom in backbone_sel:
         backbone.append(atom.index)
-    # show trajectory information and selection information
-    print("trajectory with %d frames loaded" % len(u.trajectory))
-    print(len(sel1.positions), len(sel2.positions))
+
     sel1coords = []
     sel2coords = []
     start = time.time()
+    indices1 = []
+    indices2 = []
+
     for ts in u.trajectory:
+        # define selections according to sel1text and sel2text
+        if "around" in sel1text:
+            sel1 = u.select_atoms(sel1text)
+        if "around" in sel2text:
+            sel2 = u.select_atoms(sel2text)
+        # write atomindices for each selection to list
         sel1coords.append(sel1.positions)
         sel2coords.append(sel2.positions)
+        # tempindices1 = []
+        # for at in sel1.atoms:
+        #     tempindices1.append(at.index)
+        # tempindices2 = []
+        # for at in sel2.atoms:
+        #     tempindices2.append(at.index)
+        indices1.append(sel1.indices)
+        indices2.append(sel2.indices)
+
     contactResults = []
     # loop over trajectory
     totalFrameNumber = len(u.trajectory)
     start = time.time()
     sel1c = chunks(sel1coords, nproc)
     sel2c = chunks(sel2coords, nproc)
+    sel1ind = chunks(indices1, nproc)
+    sel2ind = chunks(indices2, nproc)
+    print(len(sel1ind),len(sel2ind))
+    # show trajectory information and selection information
+    print("trajectory with %d frames loaded" % len(u.trajectory))
 
     print("Running on %d cores" % nproc)
     results = []
     rank = 0
-    for c in zip(sel1c,sel2c):
-        results.append( pool.apply_async( loop_trajectory, args=(c[0],c[1],[cutoff, hbondcutoff, hbondcutangle],[indices1,indices2,type_array,bonds,heavyatoms,name_array])) )
+    for c in zip(sel1c,sel2c,sel1ind,sel2ind):
+        results.append( pool.apply_async( loop_trajectory, args=(c[0],c[1],c[2],c[3],[cutoff, hbondcutoff, hbondcutangle],[type_array,bonds,heavyatoms,name_array])) )
         rank +=1
     # TODO: might be important, but without, it's faster and until now, provides the same results
     pool.close()

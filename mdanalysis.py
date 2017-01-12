@@ -614,7 +614,6 @@ class Analyzer(object):
             indices2 = []
             for at in sel2.atoms:
                 indices2.append(at.index)
-                # write properties of all atoms to lists
 
             currentFrameContacts = []
             frame = ts.frame
