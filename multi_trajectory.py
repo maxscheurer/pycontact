@@ -1,8 +1,10 @@
 from __future__ import print_function
-import multiprocessing
 import os
 import re
+import sys
 from mdanalysis import *
+
+from LogPool import *
 
 def weight_function(value):
     return (1.0) / (1.0 + np.exp(5.0 * (value - 4.0)))
@@ -52,6 +54,7 @@ def loop_trajectory(sel1c,sel2c,config,suppl):
     # segids = comm.bcast(segids, root=0)
     # backbone = comm.bcast(backbone, root=0)
     heavyatoms = suppl[4]
+    name_array = suppl[5]
 
     allRankContacts = []
     start = time.time()
@@ -65,8 +68,8 @@ def loop_trajectory(sel1c,sel2c,config,suppl):
             convindex1 = indices1[idx1]  # idx1 converted to global atom indexing
             convindex2 = indices2[idx2]  # idx2 converted to global atom indexing
             # jump out of loop if hydrogen contacts are found, only contacts between heavy atoms are considered, hydrogen bonds can still be detected!
-            # if re.match("H(.*)", self.name_array[convindex1]) or re.match("H(.*)", self.name_array[convindex2]):
-            #     continue
+            if re.match("H(.*)", name_array[convindex1]) or re.match("H(.*)", name_array[convindex2]):
+                continue
             # distance between atom1 and atom2
             distance = distarray[idx1, idx2]
             weight = weight_function(distance)
@@ -168,7 +171,7 @@ def loop_trajectory(sel1c,sel2c,config,suppl):
 
 def run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1text, sel2text):
     # nproc = int(self.settingsView.coreBox.value())
-    pool = multiprocessing.Pool(nproc)
+    pool = LoggingPool(nproc)
     # manager = multiprocessing.Manager()
     # d=manager.list(trajArgs)
 
@@ -234,7 +237,7 @@ def run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1t
     results = []
     rank = 0
     for c in zip(sel1c,sel2c):
-        results.append( pool.apply_async( loop_trajectory, args=(c[0],c[1],[cutoff, hbondcutoff, hbondcutangle],[indices1,indices2,type_array,bonds,heavyatoms])) )
+        results.append( pool.apply_async( loop_trajectory, args=(c[0],c[1],[cutoff, hbondcutoff, hbondcutangle],[indices1,indices2,type_array,bonds,heavyatoms,name_array])) )
         rank +=1
     # TODO: might be important, but without, it's faster and until now, provides the same results
     pool.close()
