@@ -206,8 +206,8 @@ class AccumulatedContact(object):
         #only works if both maps contain resname
         r1 = self.key1[AccumulationMapIndex.resname].lower()
         r2 = self.key2[AccumulationMapIndex.resname].lower()
-        if r1 == "none" or r2 == "none":
-            return ContactType.other
+        # if r1 == "none" or r2 == "none":
+            # return ContactType.other
         self.determineBackboneSidechainType()
         try:
             sc1 = str(read_residue_db("scpolarity", "name", r1)[0]["scpolarity"])
@@ -222,35 +222,42 @@ class AccumulatedContact(object):
             scpol2 = SideChainPolarity.other
 
         # hydrogen bonds: donor, acceptor, both
+        ishbond = 0
+        hb = self.hbondFramesScan()
+        for bla in hb:
+            if bla > 0:
+                ishbond = 1
+                break
 
-        try:
-            hb1 = str(read_residue_db("hbondtype", "name", r1)[0]["hbondtype"])
-            hbond1 = HBondType.mapping[hb1]
-        except:
-            hbond1 = HBondType.other
-
-        try:
-            hb2 = str(read_residue_db("hbondtype", "name", r2)[0]["hbondtype"])
-            hbond2 = HBondType.mapping[hb2]
-        except:
-            hbond2 = HBondType.other
+# will be removed!
+        # try:
+        #     hb1 = str(read_residue_db("hbondtype", "name", r1)[0]["hbondtype"])
+        #     hbond1 = HBondType.mapping[hb1]
+        # except:
+        #     hbond1 = HBondType.other
+        #
+        # try:
+        #     hb2 = str(read_residue_db("hbondtype", "name", r2)[0]["hbondtype"])
+        #     hbond2 = HBondType.mapping[hb2]
+        # except:
+        #     hbond2 = HBondType.other
 
         # check if both residues contact by backbone
-        if self.atom1contactsBy == BackboneSidechainType.contactsBb and self.atom2contactsBy == BackboneSidechainType.contactsBb:
-            return ContactType.hbond
-        # check if contact by sidechain and backbone
-        if (self.atom1contactsBy == BackboneSidechainType.contactsBb and self.atom2contactsBy == BackboneSidechainType.contactsSc):
-            # sc contact by residue B
-            if hbond2 != HBondType.none:
-                return ContactType.hbond
-            else:
-                return ContactType.other
-        elif (self.atom1contactsBy == BackboneSidechainType.contactsSc and self.atom2contactsBy == BackboneSidechainType.contactsBb):
-            # sc contact by residue A
-            if hbond1 != HBondType.none:
-                return ContactType.hbond
-            else:
-                return ContactType.other
+        # if self.atom1contactsBy == BackboneSidechainType.contactsBb and self.atom2contactsBy == BackboneSidechainType.contactsBb:
+        #     return ContactType.hbond
+        # # check if contact by sidechain and backbone
+        # if (self.atom1contactsBy == BackboneSidechainType.contactsBb and self.atom2contactsBy == BackboneSidechainType.contactsSc):
+        #     # sc contact by residue B
+        #     if hbond2 != HBondType.none:
+        #         return ContactType.hbond
+        #     else:
+        #         return ContactType.other
+        # elif (self.atom1contactsBy == BackboneSidechainType.contactsSc and self.atom2contactsBy == BackboneSidechainType.contactsBb):
+        #     # sc contact by residue A
+        #     if hbond1 != HBondType.none:
+        #         return ContactType.hbond
+        #     else:
+        #         return ContactType.other
         if self.atom1contactsBy == BackboneSidechainType.contactsSc and self.atom2contactsBy == BackboneSidechainType.contactsSc:
             # check for saltbridge
             if (scpol1 == SideChainPolarity.positive and scpol2 == SideChainPolarity.negative) or \
@@ -258,18 +265,25 @@ class AccumulatedContact(object):
                 return ContactType.saltbr
             # check for hydrophobic contact
             if scpol1 == SideChainPolarity.nonpolar and scpol2 == SideChainPolarity.nonpolar:
-                if hbond1 == HBondType.none or hbond2 == HBondType.none:
+                if ishbond == 0:
                     return ContactType.hydrophobic
-            # final hbond scan
-            if (hbond1 == HBondType.donor and hbond2 == HBondType.acceptor) or \
-                    (hbond1 == HBondType.acceptor and hbond2 == HBondType.donor) or \
-                    (hbond1 == HBondType.both and hbond2 == HBondType.both) or \
-                    (hbond1 == HBondType.donor and hbond2 == HBondType.both) or \
-                    (hbond1 == HBondType.both and hbond2 == HBondType.donor) or \
-                    (hbond1 == HBondType.acceptor and hbond2 == HBondType.both) or \
-                    (hbond1 == HBondType.both and hbond2 == HBondType.acceptor):
+            if ishbond == 1:
                 return ContactType.hbond
+            # final hbond scan
+            # if (hbond1 == HBondType.donor and hbond2 == HBondType.acceptor) or \
+            #         (hbond1 == HBondType.acceptor and hbond2 == HBondType.donor) or \
+            #         (hbond1 == HBondType.both and hbond2 == HBondType.both) or \
+            #         (hbond1 == HBondType.donor and hbond2 == HBondType.both) or \
+            #         (hbond1 == HBondType.both and hbond2 == HBondType.donor) or \
+            #         (hbond1 == HBondType.acceptor and hbond2 == HBondType.both) or \
+            #         (hbond1 == HBondType.both and hbond2 == HBondType.acceptor):
+            #     return ContactType.hbond
 
+            return ContactType.other
+
+        if ishbond == 1:
+            return ContactType.hbond
+        else:
             return ContactType.other
 
 

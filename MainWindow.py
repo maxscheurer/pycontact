@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import QProgressBar
 import warnings
 with warnings.catch_warnings():
     warnings.simplefilter("ignore");
-    import matplotlib.pyplot as plt
+
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import cm
