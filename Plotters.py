@@ -1,26 +1,12 @@
-import sys, sip, copy
 import warnings
-from functools import partial
 
-
-from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget, QDialog, QTabWidget, QButtonGroup,
-                             QLabel, QCheckBox, QPushButton, QMainWindow, QMenuBar, QComboBox,
-                             QLineEdit, QTextEdit, QGridLayout, QFileDialog, QAction, qApp, QHBoxLayout, QVBoxLayout)
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtGui import (QColor, QPainter, QFont)
-from PyQt5.QtWidgets import (QWidget, QPushButton, QRadioButton,
-                             QFrame, QApplication, QSizePolicy)
-from PyQt5.QtSvg import QSvgGenerator
+from PyQt5.QtWidgets import QSizePolicy
 import numpy as np
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg \
+    as FigureCanvas
 from matplotlib.figure import Figure
 from matplotlib import cm
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore");
-    import matplotlib.pyplot as plt
 
-import gui
 from settings import *
 from biochemistry import *
 from filters import *
@@ -70,9 +56,11 @@ class ContactPlotter(MplPlotter):
         self.axes.set_xlabel("frame")
         self.axes.set_ylabel("score")
 
+
 class ContactPlotParameters():
     mean, median, lifetime, median_life_time, hbond_percentage = range(5)
     mapping = ["Mean Score", "Median Score", "Mean Lifetime", "Median Lifetime", "Hbond percentage"]
+
 
 class HistPlotter(MplPlotter):
     """Simple canvas with an histogram plot."""
@@ -143,7 +131,7 @@ class HistPlotter(MplPlotter):
 
 class MapPlotter(MplPlotter):
     """Simple canvas with an 2d heatmap plot."""
-    def plotMap(self,contacts,map1,map2,label1,label2,attribute,threshold,nsPerFrame):
+    def plotMap(self, contacts, map1, map2, label1, label2, attribute, threshold, nsPerFrame):
         minmaxresids1 = []
         minmaxresids2 = []
         if not map1[AccumulationMapIndex.resid] or not map2[AccumulationMapIndex.resid]:
@@ -153,8 +141,8 @@ class MapPlotter(MplPlotter):
             minmaxresids1.append(int(cont.key1[AccumulationMapIndex.resid]))
             minmaxresids2.append(int(cont.key2[AccumulationMapIndex.resid]))
 
-        x = np.arange(np.min(minmaxresids1),np.max(minmaxresids1)+1)
-        y = np.arange(np.min(minmaxresids2),np.max(minmaxresids2)+1)
+        x = np.arange(np.min(minmaxresids1), np.max(minmaxresids1)+1)
+        y = np.arange(np.min(minmaxresids2), np.max(minmaxresids2)+1)
         minx = np.min(minmaxresids1)
         miny = np.min(minmaxresids2)
         data = np.zeros((len(y), len(x)))
@@ -185,25 +173,26 @@ class MapPlotter(MplPlotter):
                 r2 = int(c.key2[AccumulationMapIndex.resid])-miny
                 data[r2, r1] = c.hbond_percentage()
 
-        cax = self.axes.matshow(data, cmap=cm.coolwarm,label=attribute)
+        cax = self.axes.matshow(data, cmap=cm.coolwarm, label=attribute)
 
         # TODO: do this automatically
         stridex = 5
         stridey = 5
-        self.axes.set_xticks(np.arange(0,x.size,stridex))
-        self.axes.set_xticklabels(np.arange(minx,x.size+minx,stridex))
+        self.axes.set_xticks(np.arange(0, x.size, stridex))
+        self.axes.set_xticklabels(np.arange(minx, x.size+minx, stridex))
         # self.axes.set_title("Contact Map")
         self.axes.set_xlabel(label1)
         self.axes.set_ylabel(label2)
 
-        self.axes.set_yticks(np.arange(0,y.size,stridey))
-        self.axes.set_yticklabels(np.arange(miny,y.size+miny,stridey))
+        self.axes.set_yticks(np.arange(0, y.size, stridey))
+        self.axes.set_yticklabels(np.arange(miny, y.size+miny, stridey))
         cb = self.fig.colorbar(cax)
         cb.set_label(attribute)
         self.fig.tight_layout()
 
     def saveFigure(self, path, outputFormat):
         self.fig.savefig(path + "." + outputFormat, format=outputFormat)
+
 
 class SimplePlotter(MplPlotter):
     def plot(self, x, y):

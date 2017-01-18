@@ -23,6 +23,8 @@ from biochemistry import vdwRadius
 sasaProgressManager = multiprocessing.Manager()
 sasaProgressDict = sasaProgressManager.dict()
 
+
+
 def calculate_sasa_parallel(input_coords,natoms,pairdist,nprad,surfacePoints,probeRadius,pointstyle,restricted, restrictedList,rank):
     # load shared libraries
     cgrid = cdll.LoadLibrary('./shared/libgridsearch.so')

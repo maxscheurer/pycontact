@@ -11,18 +11,21 @@ import warnings
 import time
 import itertools
 import pickle
+import copy
 
 from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QProgressBar
+from PyQt5.QtGui import QPaintEvent
 import numpy as np
 from numpy import linalg as la
 from matplotlib import cm
 
+import gui
 from multi_accumulation import *
 from biochemistry import vdwRadius
 from SasaWidgets import *
 from Canvas import *
-from Dialogues import FileLoaderDialog,AnalysisDialog
+from Dialogues import FileLoaderDialog, AnalysisDialog
 from ExportTabWidget import ExportTabWidget
 from Plotters import *
 from ContactAnalyzer import *
@@ -33,7 +36,8 @@ from aroundPatch import AroundSelection
 multiprocessing.log_to_stderr()
 np.set_printoptions(threshold=np.inf)
 with warnings.catch_warnings():
-    warnings.simplefilter("ignore");
+    warnings.simplefilter("ignore")
+
 
 class MainWindow(QMainWindow, gui.Ui_MainWindow):
     def __init__(self, parent=None):
@@ -108,7 +112,6 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.updateSettings()
         self.updateFilters()
 
-
     def importSession(self):
         fnames = QFileDialog.getOpenFileNames(self, "Open file")
         importfile = ""
@@ -152,11 +155,10 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.updateSettings()
         self.updateFilters()
 
-    def loadData_parallel(self,nprocs):
+    def loadData_parallel(self, nprocs):
         from multi_trajectory import run_load_parallel
         # run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1text, sel2text)
         return run_load_parallel(nprocs,self.config.psf,self.config.dcd, self.config.cutoff,self.config.hbondcutoff,self.config.hbondcutangle,self.config.sel1text,self.config.sel2text)
-
 
     def loadDataPushed(self):
         self.config,result = FileLoaderDialog.getConfig()
