@@ -5,12 +5,15 @@
     Version: 0.1a
     Status: Development
 '''
+
 import sip
+from functools import partial
+
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import (QWidget, QPushButton, QLabel, QDialog, QGridLayout)
 from PyQt5.Qt import Qt
+
 from biochemistry import ContactType
-from functools import partial
 from Plotters import ContactPlotter
 
 class LabelView(QWidget):

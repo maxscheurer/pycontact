@@ -8,17 +8,19 @@
 # md analysis implementation for contact search
 # May 2016
 # Author: Maximilian Scheurer, mscheurer@ks.uiuc.edu
+
 from __future__ import print_function
+import itertools
+import re, os, time
+from copy import deepcopy
+
 import MDAnalysis
 from MDAnalysis.analysis import distances
-import itertools
-import re, os
-from biochemistry import (AccumulatedContact, AtomContact, AccumulationMapIndex, AtomType, HydrogenBond, AtomHBondType, TempContactAccumulate)
-from read_db import *
-from copy import deepcopy
-import time
-from aroundPatch import AroundSelection
 import numpy as np
+
+from aroundPatch import AroundSelection
+from read_db import *
+from biochemistry import (AccumulatedContact, AtomContact, AccumulationMapIndex, AtomType, HydrogenBond, AtomHBondType, TempContactAccumulate)
 
 MDAnalysis.core.flags['use_periodic_selections'] = False
 MDAnalysis.core.flags['use_KDTree_routines'] = True

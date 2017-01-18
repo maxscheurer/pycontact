@@ -1,4 +1,5 @@
 from PyQt5.QtWidgets import QMessageBox
+
 class ErrorBox(QMessageBox):
     """docstring for ErrorBox"""
     def __init__(self, msg):

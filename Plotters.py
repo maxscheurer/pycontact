@@ -1,8 +1,11 @@
 import sys, sip, copy
+import warnings
+from functools import partial
+
+
 from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget, QDialog, QTabWidget, QButtonGroup,
                              QLabel, QCheckBox, QPushButton, QMainWindow, QMenuBar, QComboBox,
                              QLineEdit, QTextEdit, QGridLayout, QFileDialog, QAction, qApp, QHBoxLayout, QVBoxLayout)
-
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtGui import (QColor, QPainter, QFont)
@@ -12,17 +15,17 @@ from PyQt5.QtSvg import QSvgGenerator
 import numpy as np
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-import warnings
+from matplotlib import cm
 with warnings.catch_warnings():
     warnings.simplefilter("ignore");
     import matplotlib.pyplot as plt
+
 import gui
 from settings import *
 from biochemistry import *
 from filters import *
-from functools import partial
 from biochemistry import AccumulationMapIndex
-from matplotlib import cm
+
 
 class MplPlotter(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""

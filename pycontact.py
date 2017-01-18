@@ -6,12 +6,14 @@
     Status: Development
 '''
 
-import warnings
-warnings.filterwarnings("ignore")
+import warnings, sys
+
+from PyQt5.QtWidgets import QApplication
 
 from MainWindow import MainWindow
-from PyQt5.QtWidgets import QApplication
-import sys
+
+warnings.filterwarnings("ignore")
+
 def main():
     app = QApplication(sys.argv)
     window = MainWindow()

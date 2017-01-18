@@ -6,45 +6,34 @@
     Status: Development
 '''
 from __future__ import print_function
-from Canvas import *
-from Plotters import *
-from ContactAnalyzer import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtWidgets import QProgressBar
+import multiprocessing
 import warnings
-with warnings.catch_warnings():
-    warnings.simplefilter("ignore");
-
-import numpy as np
-from matplotlib import cm
-import pickle
-from ErrorBox import ErrorBox
-
-#file loader
-from Dialogues import FileLoaderDialog,AnalysisDialog
-
-from ExportTabWidget import ExportTabWidget
-
-from numpy import linalg as la
-np.set_printoptions(threshold=np.inf)
-
 import time
 import itertools
+import pickle
+
+from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QProgressBar
+import numpy as np
+from numpy import linalg as la
+from matplotlib import cm
 
 from multi_accumulation import *
 from biochemistry import vdwRadius
-
-# NOTE: patched around selection
+from SasaWidgets import *
+from Canvas import *
+from Dialogues import FileLoaderDialog,AnalysisDialog
+from ExportTabWidget import ExportTabWidget
+from Plotters import *
+from ContactAnalyzer import *
+from ErrorBox import ErrorBox
+from LogPool import *
 from aroundPatch import AroundSelection
 
-from SasaWidgets import *
-
-import multiprocessing
 multiprocessing.log_to_stderr()
-
-# special class for multiprocessing logging
-from LogPool import *
-
+np.set_printoptions(threshold=np.inf)
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore");
 
 class MainWindow(QMainWindow, gui.Ui_MainWindow):
     def __init__(self, parent=None):

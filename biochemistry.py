@@ -7,9 +7,13 @@
 '''
 from __future__ import print_function
 import collections
+
 import numpy as np
-from read_db import dict_factory, read_residue_db
 from PyQt5.QtGui import QColor
+
+from read_db import dict_factory, read_residue_db
+
+
 compare = lambda x, y: collections.Counter(x) == collections.Counter(y)
 
 # NOTE: needed for sasa calculation, we should add more...

@@ -1,22 +1,23 @@
 from __future__ import print_function
-from PyQt5.QtWidgets import QWidget, QProgressBar,QGridLayout
-from PyQt5.QtCore import QRect
-import sip
-from Plotters import SimplePlotter
-from sasa_gui import *
-import numpy as np
-import MDAnalysis
-from multi_accumulation import chunks
-from biochemistry import vdwRadius
 import multiprocessing
-
-from numpy import linalg as la
-np.set_printoptions(threshold=np.inf)
+import sip
 from ctypes import cdll
 import ctypes
-from numpy.ctypeslib import ndpointer
 import time
 import itertools
+
+from PyQt5.QtWidgets import QWidget, QProgressBar,QGridLayout
+from PyQt5.QtCore import QRect
+import MDAnalysis
+import numpy as np
+from numpy import linalg as la
+from numpy.ctypeslib import ndpointer
+np.set_printoptions(threshold=np.inf)
+
+from Plotters import SimplePlotter
+from sasa_gui import *
+from multi_accumulation import chunks
+from biochemistry import vdwRadius
 
 # manage processes for SASA
 sasaProgressManager = multiprocessing.Manager()

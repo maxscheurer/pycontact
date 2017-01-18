@@ -1,11 +1,14 @@
 from __future__ import print_function
-import numpy as np
-import MDAnalysis
-from MDAnalysis.analysis import distances
-from biochemistry import *
 import math
 import time
 import multiprocessing
+
+import numpy as np
+import MDAnalysis
+from MDAnalysis.analysis import distances
+
+from biochemistry import *
+
 
 def find_between(s, first, last):
         try:

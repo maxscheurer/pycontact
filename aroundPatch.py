@@ -6,12 +6,13 @@
     Status: Development
     Patch for MDAnalysis AroundSelection to make it faster
 '''
+from ctypes import cdll
+import ctypes
 
 from MDAnalysis.core.Selection import *
 import numpy as np
-from ctypes import cdll
-import ctypes
 from numpy.ctypeslib import ndpointer
+
 aroundLibrary = cdll.LoadLibrary('./shared/libgridsearch.so')
 
 class AroundSelection(DistanceSelection):

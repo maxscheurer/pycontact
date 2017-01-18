@@ -10,7 +10,7 @@ from PyQt5.QtGui import (QColor, QPainter, QFont, QPixmap)
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import QSize
 import numpy as np
-# from settings import *
+
 from biochemistry import *
 from filters import *
 from LabelView import LabelView

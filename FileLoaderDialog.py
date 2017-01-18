@@ -1,6 +1,8 @@
 from PyQt5.QtWidgets import QDialog, QGridLayout, QPushButton, QLabel,QLineEdit,QDialogButtonBox, QFileDialog
 from PyQt5.QtCore import Qt
+
 from LoadConfiguration import Configuration
+
 class FileLoaderDialog(QDialog):
     def __init__(self, parent = None):
         super(FileLoaderDialog, self).__init__(parent)

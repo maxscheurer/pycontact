@@ -94,4 +94,3 @@ class Ui_SasaWidget(object):
         self.calcSasaButton.setText(_translate("SasaWidget", "Calculate"))
         self.label_2.setText(_translate("SasaWidget", "restriction:"))
         self.label_3.setText(_translate("SasaWidget", "selection 2:"))
-

@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QTabWidget, QWidget, QGridLayout, QLabel, QPushButton, QComboBox, QLineEdit
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
+
 from Plotters import *
 from ErrorBox import ErrorBox
 class ExportTabWidget(QTabWidget):
