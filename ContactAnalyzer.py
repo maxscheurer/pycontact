@@ -12,12 +12,13 @@ from __future__ import print_function
 import MDAnalysis
 from MDAnalysis.analysis import distances
 import itertools
-import re
-from biochemistry import *
+import re, os
+from biochemistry import (AccumulatedContact, AtomContact, AccumulationMapIndex, AtomType, HydrogenBond, AtomHBondType, TempContactAccumulate)
 from read_db import *
 from copy import deepcopy
 import time
 from aroundPatch import AroundSelection
+import numpy as np
 
 MDAnalysis.core.flags['use_periodic_selections'] = False
 MDAnalysis.core.flags['use_KDTree_routines'] = True

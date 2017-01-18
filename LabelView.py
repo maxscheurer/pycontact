@@ -5,22 +5,13 @@
     Version: 0.1a
     Status: Development
 '''
-import sys, sip, copy
-from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget, QDialog, QTabWidget, QButtonGroup,
-                             QLabel, QCheckBox, QPushButton, QMainWindow, QMenuBar, QComboBox,
-                             QLineEdit, QTextEdit, QGridLayout, QFileDialog, QAction, qApp, QHBoxLayout, QVBoxLayout)
-
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtGui import (QColor, QPainter, QFont)
-from PyQt5.QtWidgets import (QWidget, QPushButton, QRadioButton,
-                             QFrame, QApplication, QSizePolicy)
-from PyQt5.QtSvg import QSvgGenerator
-import numpy as np
-from settings import *
-from biochemistry import *
+import sip
+from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import (QWidget, QPushButton, QLabel, QDialog, QGridLayout)
+from PyQt5.Qt import Qt
+from biochemistry import ContactType
 from functools import partial
-from Plotters import *
+from Plotters import ContactPlotter
 
 class LabelView(QWidget):
     """docstring for AnalysisView"""
@@ -44,9 +35,7 @@ class LabelView(QWidget):
         self.buttonWidths = []
         for c in self.contacts:
             cindex = self.contacts.index(c)
-            # TODO: implement title in AccumulatedContact
             self.buttons.append(QPushButton(c.title))
-            # TODO: implement ContactType in AccumulatedContact
             stylesheet = "border: 0px solid #222222; background-color: " + ContactType.colors[c.determine_ctype()] + " ;"
             # stylesheet = "border: 0px solid #222222; background-color: " + ContactType.colors[3] + " ;"
             self.buttons[-1].setStyleSheet(stylesheet)

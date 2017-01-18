@@ -1,9 +1,8 @@
 from __future__ import print_function
 from PyQt5.QtWidgets import QDialog, QGridLayout, QPushButton, QLabel,QLineEdit,QDialogButtonBox, QFileDialog, QCheckBox
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QDoubleValidator, QRegExpValidator
+from PyQt5.QtGui import QDoubleValidator
 from LoadConfiguration import Configuration
-from PyQt5.QtCore import QRegExp
 class FileLoaderDialog(QDialog):
     def __init__(self, parent = None):
         super(FileLoaderDialog, self).__init__(parent)
