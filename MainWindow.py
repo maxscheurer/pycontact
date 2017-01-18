@@ -16,6 +16,7 @@ import copy
 from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QProgressBar
 from PyQt5.QtGui import QPaintEvent
+from PyQt5.Qt import Qt
 import numpy as np
 from numpy import linalg as la
 from matplotlib import cm
@@ -194,9 +195,9 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
 
     # progress of loading trajectory
     def setFrameNumber(self):
-    	self.progressWidget.setMax(self.analysis.totalFrameNumber)
+        self.progressWidget.setMax(self.analysis.totalFrameNumber)
 
-    def analyzeParallel(self,map1,map2):
+    def analyzeParallel(self, map1, map2):
         nproc = int(self.settingsView.coreBox.value())
         start = time.time()
         trajData = self.analysis.getTrajectoryData()
@@ -204,13 +205,13 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         results = []
         rank = 0
         manager = multiprocessing.Manager()
-        d=manager.list(trajData)
-        all_chunk = chunks(contResults,nproc)
+        d = manager.list(trajData)
+        all_chunk = chunks(contResults, nproc)
         pool = LoggingPool(nproc)
         print("Running on %d cores" % nproc)
         for c in all_chunk:
-            results.append( pool.apply_async( loop_frame, args=(c,map1,map2,d)) )
-            rank +=1
+            results.append(pool.apply_async(loop_frame, args=(c, map1, map2, d)))
+            rank += 1
         # TODO: might be important, but without, it's faster and until now, provides the same results
         pool.close()
         pool.join()
@@ -229,7 +230,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         for key in allkeys:
             accumulatedContactsDict[key] = []
             for frame_dict in frame_contacts_accumulated:
-                if not key in frame_dict:  # puts empty score TempContactAccumulate in dict
+                if key not in frame_dict:  # puts empty score TempContactAccumulate in dict
                     key1, key2 = makeKeyArraysFromKey(key)
                     emptyCont = TempContactAccumulate(key1, key2)
                     emptyCont.fscore = 0
@@ -444,9 +445,9 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
 
         # Update data for export
         self.exportWidget.setContacts(self.filteredContacts)
-        if self.maps != None:
-            self.exportWidget.setMaps(self.maps[0],self.maps[1])
-            self.exportWidget.setMapLabels(self.analysis.sel1text,self.analysis.sel2text)
+        if self.maps is not None:
+            self.exportWidget.setMaps(self.maps[0], self.maps[1])
+            self.exportWidget.setMapLabels(self.analysis.sel1text, self.analysis.sel2text)
         self.exportWidget.setThresholdAndNsPerFrame(self.painter.threshold, self.painter.nsPerFrame)
 
     # switch between weight functions
@@ -458,7 +459,8 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             self.showHide(True, False, True)
         elif radiobutton == FunctionType.linear:
             self.showHide(True, True, False)
-    #hiding and showing of weight function labels and textfields
+
+    # hiding and showing of weight function labels and textfields
     def showHide(self, first, second, third):
         self.sigX0Label.setHidden(first)
         self.sigX0Field.setHidden(first)
@@ -481,7 +483,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.linY1Label.setHidden(third)
         self.linY1Field.setHidden(third)
 
-    #display currenct function in preview window
+    # display currenct function in preview window
     def previewFunction(self):
         x = []
         y = []
@@ -581,7 +583,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
     def pushExport(self):
         self.exportWidget.valueUpdated.connect(self.handleExportUpdate)
         self.exportWidget.setContacts(self.filteredContacts)
-        if self.maps != None:
+        if self.maps is not None:
             self.exportWidget.setMaps(self.maps[0],self.maps[1])
             self.exportWidget.setMapLabels(self.analysis.sel1text,self.analysis.sel2text)
         self.exportWidget.setThresholdAndNsPerFrame(self.painter.threshold, self.painter.nsPerFrame)
@@ -605,7 +607,6 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.painter.rendered = False
         self.painter.update()
         self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
-
 
     def pushSave(self):
         fileName = QFileDialog.getSaveFileName(self, 'Export Path')
@@ -643,8 +644,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         col = QColorDialog.getColor()
         self.customColor = col
         if col.isValid():
-            self.settingsView.pickColorButton.setStyleSheet("QWidget { background-color: %s }"
-                                   % self.customColor.name())
+            self.settingsView.pickColorButton.setStyleSheet("QWidget { background-color: %s }" % self.customColor.name())
 
     def updateColors(self):
         if self.settingsView.bbscScoreRadioButton.isChecked():
@@ -662,6 +662,7 @@ class SettingsTabWidget(QTabWidget, Ui_settingsWindowWidget):
     def __init__(self, parent=None):
         super(QtWidgets.QTabWidget, self).__init__(parent)
         self.setupUi(self)
+
 
 class ColorScheme:
     custom, bbsc = range(2)

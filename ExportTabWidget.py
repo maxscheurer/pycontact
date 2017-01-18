@@ -1,38 +1,37 @@
-
 from PyQt5.QtWidgets import QTabWidget, QWidget, QGridLayout, QLabel, QPushButton, QComboBox, QLineEdit, QCheckBox
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 
 from Plotters import *
 from ErrorBox import ErrorBox
 
+
 class ExportTabWidget(QTabWidget):
 
     valueUpdated = pyqtSignal(str, str)
 
-    def __init__(self, parent = None):
-       super(ExportTabWidget, self).__init__(parent)
+    def __init__(self, parent=None):
+        super(ExportTabWidget, self).__init__(parent)
+        self.tab1 = QWidget()
+        self.tab2 = QWidget()
+        self.tab3 = QWidget()
+        self.tab4 = QWidget()
 
-       self.tab1 = QWidget()
-       self.tab2 = QWidget()
-       self.tab3 = QWidget()
-       self.tab4 = QWidget()
-
-       self.addTab(self.tab1, "View")
-       self.addTab(self.tab2, "Histogram")
-       self.addTab(self.tab3, "Contact Map")
-       self.addTab(self.tab4, "VMD")
-       self.tab1UI()
-       self.tab2UI()
-       self.tab3UI()
-       self.tab4UI()
-       self.setWindowTitle("Export")
-       self.contacts = []
-       self.threshold = 0
-       self.nsPerFrame = 0
-       self.map1 = None
-       self.map2 = None
-       self.label1 = ""
-       self.label2 = ""
+        self.addTab(self.tab1, "View")
+        self.addTab(self.tab2, "Histogram")
+        self.addTab(self.tab3, "Contact Map")
+        self.addTab(self.tab4, "VMD")
+        self.tab1UI()
+        self.tab2UI()
+        self.tab3UI()
+        self.tab4UI()
+        self.setWindowTitle("Export")
+        self.contacts = []
+        self.threshold = 0
+        self.nsPerFrame = 0
+        self.map1 = None
+        self.map2 = None
+        self.label1 = ""
+        self.label2 = ""
 
     def setThresholdAndNsPerFrame(self, currentThreshold, currentNsPerFrame):
         self.threshold = currentThreshold
@@ -56,7 +55,6 @@ class ExportTabWidget(QTabWidget):
         grid.addWidget(self.tab1.saveButton, 0, 1)
 
         grid.addWidget(self.tab1.formatBox, 2, 0)
-
 
     def tab2UI(self):
         self.grid1 = QGridLayout()
@@ -155,7 +153,7 @@ class ExportTabWidget(QTabWidget):
 
         self.tab4.button = QPushButton("Create tcl script")
         self.tab4.button.clicked.connect(self.createTclScriptVis)
-        self.grid3.addWidget(self.tab4.button,3,0,1,2)
+        self.grid3.addWidget(self.tab4.button, 3, 0, 1, 2)
 
         self.grid3.addWidget(additionalTextLabel1, 1, 0)
         self.grid3.addWidget(additionalTextLabel2, 2, 0)
@@ -191,7 +189,7 @@ class ExportTabWidget(QTabWidget):
         if self.tab2.histTypeBox.currentText() == "General Histogram":
             self.tab2.histPlot.plotGeneralHist(self.contacts, self.tab2.attributeBox.currentText(), self.threshold, self.nsPerFrame)
         elif self.tab2.histTypeBox.currentText() == "Bin per Contact":
-            self.tab2.histPlot.plotContactHist(self.contacts, self.tab2.attributeBox.currentText(), self.threshold, self.nsPerFrame,int(self.tab2.xTicksFontSizeField.text()))
+            self.tab2.histPlot.plotContactHist(self.contacts, self.tab2.attributeBox.currentText(), self.threshold, self.nsPerFrame, int(self.tab2.xTicksFontSizeField.text()))
 
         self.tab2.histPlot.update()
 
@@ -199,7 +197,7 @@ class ExportTabWidget(QTabWidget):
         sip.delete(self.tab3.mapPlot)
         self.tab3.mapPlot = MapPlotter(None, width=8, height=5, dpi=60)
         self.grid2.addWidget(self.tab3.mapPlot, 3, 0, 1, 4)
-        if self.map1 == None or self.map2 == None or self.contacts == None or len(self.contacts) == 0:
+        if self.map1 is None or self.map2 is None or self.contacts is None or len(self.contacts) == 0:
             box = ErrorBox("Please analyze the trajectory with the resid box checked for both atom selections!")
             box.exec_()
             return
@@ -216,10 +214,9 @@ class ExportTabWidget(QTabWidget):
     def setContacts(self, currentContacts):
         self.contacts = currentContacts
 
-    def setMaps(self, map1,map2):
+    def setMaps(self, map1, map2):
         self.map1 = map1
         self.map2 = map2
-
 
 # labels for the contact map
     def setMapLabels(self, label1, label2):
@@ -256,12 +253,12 @@ class ExportTabWidget(QTabWidget):
                         currentSel2.append(AccumulationMapIndex.vmdsel[index] + " " + item)
                     index += 1
                 currentSel2String = " and ".join(currentSel2)
-                add1 = ("" if self.tab4.additionalText1.text()=="" else (" and " + self.tab4.additionalText1.text()))
+                add1 = ("" if self.tab4.additionalText1.text() == "" else (" and " + self.tab4.additionalText1.text()))
                 add2 = ("" if self.tab4.additionalText2.text() == "" else (" and " + self.tab4.additionalText2.text()))
                 sel = "("+currentSel1String + add1 + ") or (" + currentSel2String + add2 + ")"
                 f.write('mol representation Licorice \n')
                 f.write('mol Color Name \n')
-                f.write('mol selection {%s} \n'%sel)
+                f.write('mol selection {%s} \n' % sel)
                 f.write('mol addrep top \n')
         else:
             total = []
