@@ -1,8 +1,13 @@
 from __future__ import print_function
 import os
 import re
-import sys
-from mdanalysis import *
+import sys, time
+from biochemistry import *
+import MDAnalysis
+from MDAnalysis.analysis import distances
+from copy import deepcopy
+import itertools
+import re
 
 from LogPool import *
 

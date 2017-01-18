@@ -8,7 +8,7 @@
 from __future__ import print_function
 from Canvas import *
 from Plotters import *
-from mdanalysis import *
+from ContactAnalyzer import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtWidgets import QProgressBar
 import warnings
@@ -16,11 +16,8 @@ with warnings.catch_warnings():
     warnings.simplefilter("ignore");
 
 import numpy as np
-from matplotlib import pyplot as plt
 from matplotlib import cm
 import pickle
-from matplotlib.mlab import bivariate_normal
-from mpl_toolkits.mplot3d import Axes3D
 from ErrorBox import ErrorBox
 
 #file loader
@@ -141,7 +138,6 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
 
     def exportSession(self):
         fileName = QFileDialog.getSaveFileName(self, 'Export file')
-        exportfile = ""
         filestring = fileName[0]
         if filestring == "":
             return
@@ -200,11 +196,12 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             msg.setDetailedText("Now click on Analysis to proceed")
             msg.exec_()
 
-
+    # progress of loading trajectory
     def handleTaskUpdated(self):
     	print(self.analysis.currentFrame)
     	self.progressWidget.setValue(self.analysis.currentFrame)
 
+    # progress of loading trajectory
     def setFrameNumber(self):
     	self.progressWidget.setMax(self.analysis.totalFrameNumber)
 
@@ -213,7 +210,6 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         start = time.time()
         trajData = self.analysis.getTrajectoryData()
         contResults = self.analysis.contactResults
-        tasks = []
         results = []
         rank = 0
         manager = multiprocessing.Manager()
@@ -272,7 +268,6 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             map1 = self.maps[0]
             map2 = self.maps[1]
             nproc = int(self.settingsView.coreBox.value())
-            frames = len(self.analysis.contactResults[0])
             if nproc == 1:
                 parallel = 0
             else:
@@ -671,35 +666,6 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
     def showContactAreaView(self):
         self.sasaView.show()
 
-
-    def visualize(self):
-        d = QDialog()
-        grid = QGridLayout()
-        d.setLayout(grid)
-
-        label = QLabel("Split selections for each contact")
-        self.splitVisCheckbox = QCheckBox()
-        grid.addWidget(label, 0, 0)
-        grid.addWidget(self.splitVisCheckbox, 0, 1)
-
-        self.additionalText1 = QLineEdit()
-        self.additionalText2 = QLineEdit()
-        additionalTextLabel1 = QLabel("Additional seltext for selection 1")
-        additionalTextLabel2 = QLabel("Additional seltext for selection 2")
-
-        button = QPushButton("Create tcl script")
-        button.clicked.connect(self.createTclScriptVis)
-        grid.addWidget(button,3,0,1,2)
-
-        grid.addWidget(additionalTextLabel1, 1, 0)
-        grid.addWidget(additionalTextLabel2, 2, 0)
-        grid.addWidget(self.additionalText1, 1, 1)
-        grid.addWidget(self.additionalText2, 2, 1)
-
-        d.setWindowTitle("Visualize in VMD")
-        d.resize(300, 150)
-        d.setWindowModality(Qt.ApplicationModal)
-        d.exec_()
 
 class SettingsTabWidget(QTabWidget, Ui_settingsWindowWidget):
     def __init__(self, parent=None):

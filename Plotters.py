@@ -21,7 +21,7 @@ from settings import *
 from biochemistry import *
 from filters import *
 from functools import partial
-from mdanalysis import AccumulationMapIndex
+from biochemistry import AccumulationMapIndex
 from matplotlib import cm
 
 class MplPlotter(FigureCanvas):

@@ -9,7 +9,9 @@
 import warnings
 warnings.filterwarnings("ignore")
 
-from MainWindow import *
+from MainWindow import MainWindow
+from PyQt5.QtWidgets import QApplication
+import sys
 def main():
     app = QApplication(sys.argv)
     window = MainWindow()

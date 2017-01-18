@@ -6,24 +6,14 @@
     Status: Development
 '''
 
-import sys, sip, copy
-from PyQt5.QtWidgets import (QApplication, QWidget, QDesktopWidget, QDialog, QTabWidget, QButtonGroup,
-                             QLabel, QCheckBox, QPushButton, QMainWindow, QMenuBar, QComboBox,
-                             QLineEdit, QTextEdit, QGridLayout, QFileDialog, QAction, qApp, QHBoxLayout, QVBoxLayout)
-
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtGui import (QColor, QPainter, QFont)
-from PyQt5.QtWidgets import (QWidget, QPushButton, QRadioButton,
-                             QFrame, QApplication, QSizePolicy)
-from PyQt5.QtSvg import QSvgGenerator
+from PyQt5.QtGui import (QColor, QPainter, QFont, QPixmap)
+from PyQt5.QtWidgets import QWidget
+from PyQt5.QtCore import QSize
 import numpy as np
-import gui
-from settings import *
+# from settings import *
 from biochemistry import *
 from filters import *
-from functools import partial
-from LabelView import *
+from LabelView import LabelView
 
 class ColorScheme:
     custom, bbsc = range(2)

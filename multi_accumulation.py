@@ -1,7 +1,8 @@
 from __future__ import print_function
 import numpy as np
 import MDAnalysis
-from mdanalysis import *
+from MDAnalysis.analysis import distances
+from biochemistry import *
 import math
 import time
 import multiprocessing
