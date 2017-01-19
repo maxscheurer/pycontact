@@ -62,7 +62,7 @@ class AtomType:
 # Main class for future implementation in PyContact
 # will replace the Contact class in PyContact
 class AccumulatedContact(object):
-    """docstring for AccumulatedContact"""
+    """Contains information about a contact accumulated from AtomContact to display in GUI"""
 
     def __init__(self, key1, key2):
         super(AccumulatedContact, self).__init__()
@@ -79,6 +79,7 @@ class AccumulatedContact(object):
         self.sc2 = 0
 
     def human_readable_title(self):
+        """returns the title of the AccumulatedContact to be displayed in contact's label"""
         total = []
         for key in [self.key1, self.key2]:
             titleDict = {}
@@ -106,7 +107,7 @@ class AccumulatedContact(object):
             total.append(finishedString)
         return " - ".join(total)
 
-    def addScore(self, newScore):
+    def addScore(self, newScore): 
         # append a score to the scoreArray, e.g. when a new frame score is added
         self.scoreArray.append(newScore)
 
