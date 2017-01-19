@@ -15,12 +15,14 @@ from biochemistry import *
 from filters import *
 from LabelView import LabelView
 
+
 class ColorScheme:
     custom, bbsc = range(2)
 
+
 class Canvas(QWidget):
     def __init__(self):
-        super(QWidget,self).__init__()
+        super(QWidget, self).__init__()
 
         self.initUI()
 
@@ -46,7 +48,7 @@ class Canvas(QWidget):
         # render pixmap to resolve performance issues
         if self.rendered:
             self.drawRenderedContact(event, qp)
-        elif self.rendered == False and self.contacts:
+        elif self.rendered is False and self.contacts:
             self.renderContact(False)
             self.rendered = True
 
@@ -65,7 +67,6 @@ class Canvas(QWidget):
 
         merge = self.merge
         offset = 10
-
 
         self.labelView.clean()
         self.labelView = LabelView(self.contacts)

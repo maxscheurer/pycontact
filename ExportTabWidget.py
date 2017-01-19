@@ -1,3 +1,5 @@
+import sip
+
 from PyQt5.QtWidgets import QTabWidget, QWidget, QGridLayout, QLabel, QPushButton, QComboBox, QLineEdit, QCheckBox
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 

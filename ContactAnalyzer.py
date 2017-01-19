@@ -11,7 +11,9 @@
 
 from __future__ import print_function
 import itertools
-import re, os, time
+import re
+import os
+import time
 from copy import deepcopy
 
 import MDAnalysis
@@ -43,11 +45,14 @@ class Analyzer(object):
         self.contactResults = self.analyze_psf_dcd(self.psf, self.dcd, self.cutoff, self.hbondcutoff,
                                                    self.hbondcutangle, self.sel1text, self.sel2text)
 
-    def runContactAnalysis(self,map1, map2):
+    def runContactAnalysis(self, map1, map2):
         self.finalAccumulatedContacts = self.analyze_contactResultsWithMaps(self.contactResults, map1, map2)
         return deepcopy(self.finalAccumulatedContacts)
 
-    def setTrajectoryData(self,resname_array,resid_array,name_array,type_array,segids,backbone,sel1text,sel2text):
+    def setTrajectoryData(
+            self, resname_array, resid_array, name_array,
+            type_array, segids, backbone,
+            sel1text, sel2text):
         self.resname_array = resname_array
         self.resid_array = resid_array
         self.name_array = name_array
@@ -58,10 +63,12 @@ class Analyzer(object):
         self.sel2text = sel2text
 
     def getTrajectoryData(self):
-        return [self.resname_array,self.resid_array,self.name_array,self.type_array,self.segids,self.backbone,self.sel1text,self.sel2text]
+        return [self.resname_array, self.resid_array, self.name_array,
+                self.type_array, self.segids, self.backbone, self.sel1text,
+                self.sel2text]
 
     # find a string in s between the strings first and last
-    def find_between(self,s, first, last):
+    def find_between(self, s, first, last):
         try:
             start = s.index(first) + len(first)
             end = s.index(last, start)
@@ -70,10 +77,10 @@ class Analyzer(object):
             return ""
 
     # weight function to score contact distances
-    def weight_function(self,value):
+    def weight_function(self, value):
         return (1.0) / (1.0 + np.exp(5.0 * (value - 4.0)))
 
-    ## maps contain information wether to consider an atom's field for contact accumulation
+    # maps contain information wether to consider an atom's field for contact accumulation
     # map1 and map2 contain six boolean values each, cf. AccumulationMapIndex
     # for a given contact, the corresponding value to a field is written to keys1 and keys2, respectively
     # example input:
@@ -81,9 +88,9 @@ class Analyzer(object):
     # map2 = [0,0,0,1,1,0], meaning that residue and resname should be used for contact accumulation
     # contact: idx1,idx2
     # results: (example!)
-    #	keys1=["none","none","none","14", "VAL", "none"]
-    #	keys2=["none","none","none","22", "ILE, "none"]
-    def makeKeyArraysFromMaps(self,map1, map2, contact):
+    # keys1=["none","none","none","14", "VAL", "none"]
+    # keys2=["none","none","none","22", "ILE, "none"]
+    def makeKeyArraysFromMaps(self, map1, map2, contact):
         idx1 = contact.idx1
         idx2 = contact.idx2
         counter = 0
@@ -129,7 +136,7 @@ class Analyzer(object):
     # convert a key back to two key arrays
     # cf. comments on makeKeyFromKeyArrays and makeKeyArraysFromMaps
     # "inverse" function of makeKeyFromKeyArrays
-    def makeKeyArraysFromKey(self,key):
+    def makeKeyArraysFromKey(self, key):
         keystring1, keystring2 = key.split("-")
         mapping = AccumulationMapIndex.mapping
         maximal = len(mapping)
@@ -190,15 +197,15 @@ class Analyzer(object):
                     key2.append(currentValue)
         return [key1, key2]
 
-    ## input two key arrays as explained above
-    #	example:
-    #	keys1=["none","none","none","14", "VAL", "none"]
-    #	keys2=["none","none","none","22", "ILE, "none"]
-    #	returns a human readable key with the mapping identifiers in AccumulationMapIndex
-    #	in the given example data:
-    #	key="r.14rn.VAL-r.22rn.ILE"
-    #	key is used to accumulated contacts in a dictionary (= a contact's unique identifier)
-    def makeKeyFromKeyArrays(self,key1, key2):
+    # input two key arrays as explained above
+    # example:
+    # keys1=["none","none","none","14", "VAL", "none"]
+    # keys2=["none","none","none","22", "ILE, "none"]
+    # returns a human readable key with the mapping identifiers in AccumulationMapIndex
+    # in the given example data:
+    # key="r.14rn.VAL-r.22rn.ILE"
+    # key is used to accumulated contacts in a dictionary (= a contact's unique identifier)
+    def makeKeyFromKeyArrays(self, key1, key2):
         key = ""
         itemcounter = 0
         for item in key1:
@@ -213,11 +220,11 @@ class Analyzer(object):
             itemcounter += 1
         return key
 
-    def analyze_psf_dcd(self,psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1text, sel2text):
+    def analyze_psf_dcd(self, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1text, sel2text):
         # reading topology/parameter CHARMM files for setting AtomTypes and AtomHBondTypes
         heavyatomlines = []
         heavyatoms = []
-        pars = open(os.path.dirname(os.path.abspath(__file__))+'/testpar.prm', 'r')
+        pars = open(os.path.dirname(os.path.abspath(__file__)) + '/testpar.prm', 'r')
         for line in pars:
             if re.match("MASS", line):
                 heavyatomlines.append(line.rstrip())
@@ -227,7 +234,7 @@ class Analyzer(object):
             # print(atomline, atype.htype)
             heavyatoms.append(atype)
 
-        ### config (GUI settings!)
+        # config (GUI settings!)
 
         # cutoff for contact measurement
         # cutoff = 5.0
@@ -235,7 +242,7 @@ class Analyzer(object):
         # hbondcutoff = 3.5
         # cutoff angle for hbond, check literature again
         # hbondcutangle = 120
-        ## selection texts (MDAnalysis format, not VMD!)
+        # selection texts (MDAnalysis format, not VMD!)
         # to scan for hydrogen bonds, please do NOT give selections without hydrogen atoms!
         # the computational effort is managed by the algorithm in an appropriate manner!
         # sel1text = "segid RN11"
@@ -247,13 +254,11 @@ class Analyzer(object):
         # dcd = "short.dcd"
         # dcd = "rpn11_ubq_50ns.dcd"
 
-        ## input maps for contact accumulation
+        # input maps for contact accumulation
         # boolean values, check AccumulationMapIndex for meaning!
         # map1 = [0,0,0,1,1,0]
         # map2 = [0,0,0,1,1,0]
 
-        ####### MAIN ALGORITHM
-        ######################
         # load psf and dcd file in memory
         u = MDAnalysis.Universe(psf, dcd)
 
@@ -320,9 +325,7 @@ class Analyzer(object):
                 # read AtomHBondType from heavyatoms list
                 type1 = next((x.htype for x in heavyatoms if x.name == self.type_array[convindex1]), AtomHBondType.none)
                 type2 = next((x.htype for x in heavyatoms if x.name == self.type_array[convindex2]), AtomHBondType.none)
-                ## HydrogenBondAlgorithm
-                # TODO: outsource to another file?
-                # elongates the current loop a lot...
+                # HydrogenBondAlgorithm
                 hydrogenBonds = []
                 if type1 != AtomHBondType.none and type2 != AtomHBondType.none:
                     if (type1 == AtomHBondType.both and type2 == AtomHBondType.both) or \
@@ -463,10 +466,10 @@ class Analyzer(object):
         print("trajectory with %d frames loaded" % len(u.trajectory))
         print("Selection 1: ", len(sel1.positions), ", Selection2: ", len(sel2.positions))
 
-        print("analyzeTime: ", stop-start)
+        print("analyzeTime: ", stop - start)
         return contactResults
 
-    def analyze_contactResultsWithMaps(self,contactResults, map1, map2):
+    def analyze_contactResultsWithMaps(self, contactResults, map1, map2):
         #################################################
         ######## contactResults evaluation
         # only depending on map1, map2
@@ -514,7 +517,7 @@ class Analyzer(object):
                         currentFrameAcc[key].bb2score += cont.weight
                     else:
                         currentFrameAcc[key].sc2score += cont.weight
-                if not key in allkeys:
+                if key not in allkeys:
                     allkeys.append(key)
             frame_contacts_accumulated.append(currentFrameAcc)
         accumulatedContactsDict = {}
@@ -529,7 +532,7 @@ class Analyzer(object):
         for key in allkeys:
             accumulatedContactsDict[key] = []
             for frame_dict in frame_contacts_accumulated:
-                if not key in frame_dict:  # puts empty score TempContactAccumulate in dict
+                if key not in frame_dict:  # puts empty score TempContactAccumulate in dict
                     key1, key2 = self.makeKeyArraysFromKey(key)
                     emptyCont = TempContactAccumulate(key1, key2)
                     emptyCont.fscore = 0
