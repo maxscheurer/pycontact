@@ -68,9 +68,10 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.settingsView.applySettingsButton.clicked.connect(self.updateSettings)
         self.settingsView.applyFilterButton.clicked.connect(self.updateFilters)
 
+# deprecated
         #alpha slider for color
-        self.alphaSlider.setValue(50)
-        self.alphaSlider.valueChanged.connect(self.alphaValueChanged)
+        # self.alphaSlider.setValue(50)
+        # self.alphaSlider.valueChanged.connect(self.alphaValueChanged)
 
         self.statisticsButton.clicked.connect(self.showStatistics)
 
@@ -370,11 +371,16 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             self.painter.rangeFilterActive = False
             self.filteredContacts = copy.deepcopy(self.contacts)
             # residue range filter
-            resrangeFilter = ResidueRangeFilter("resrange")
-            self.filteredContacts = resrangeFilter.filterResiduesByRange(self.filteredContacts, self.settingsView.residARangeField.text(), self.settingsView.residBRangeField.text())
+            range_filter = RangeFilter("resrange")
+            self.filteredContacts = range_filter.filterByRange(self.filteredContacts, self.settingsView.residARangeField.text(), self.settingsView.residBRangeField.text(),AccumulationMapIndex.resid)
+
+            self.filteredContacts = range_filter.filterByRange(self.filteredContacts, self.settingsView.atomAIndexField.text(), self.settingsView.atomBIndexField.text(),AccumulationMapIndex.index)
+
             # aminoacids name filter
-            aaFilter = NameFilter("name")
-            self.filteredContacts = aaFilter.filterResiduesByName(self.filteredContacts, self.settingsView.residANameField.text(), self.settingsView.residBNameField.text())
+            name_filter = NameFilter("name")
+            self.filteredContacts = name_filter.filterContactsByName(self.filteredContacts, self.settingsView.residANameField.text(), self.settingsView.residBNameField.text(),AccumulationMapIndex.resname)
+
+            self.filteredContacts = name_filter.filterContactsByName(self.filteredContacts, self.settingsView.atomANameField.text(), self.settingsView.atomBNameField.text(),AccumulationMapIndex.name)
             # range filter
             if rangeFilterActive:
                 self.painter.rangeFilterActive = True
@@ -634,8 +640,9 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.painter.update()
         self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
 
+# deprecated
     def alphaValueChanged(self):
-        self.painter.alphaFactor = self.alphaSlider.value()
+        self.painter.alphaFactor = 50
         self.painter.rendered = False
         self.painter.update()
         self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))

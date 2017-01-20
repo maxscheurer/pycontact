@@ -58,16 +58,6 @@
            </sizepolicy>
           </property>
           <layout class="QGridLayout" name="functionGridLayout">
-           <item row="0" column="0">
-            <widget class="QRadioButton" name="sigmoidRadioButton">
-             <property name="text">
-              <string>sigmoid</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
            <item row="0" column="2">
             <widget class="QRadioButton" name="linRadioButton">
              <property name="text">
@@ -89,197 +79,20 @@
              </property>
             </widget>
            </item>
+           <item row="0" column="0">
+            <widget class="QRadioButton" name="sigmoidRadioButton">
+             <property name="text">
+              <string>sigmoid</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
           </layout>
          </widget>
         </item>
        </layout>
-      </widget>
-     </item>
-     <item row="11" column="0" colspan="5">
-      <widget class="QTabWidget" name="filterAtomsResTabWidget">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="currentIndex">
-        <number>0</number>
-       </property>
-       <widget class="QWidget" name="atomFilterPage">
-        <attribute name="title">
-         <string>Atoms</string>
-        </attribute>
-        <widget class="QWidget" name="widget" native="true">
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>-10</y>
-           <width>561</width>
-           <height>131</height>
-          </rect>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_4">
-          <item row="3" column="1">
-           <widget class="QLineEdit" name="atomATypeField">
-            <property name="text">
-             <string>all</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="atomAIndexLabel">
-            <property name="text">
-             <string>range A:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="atomAIndexField">
-            <property name="text">
-             <string>all</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QLabel" name="atomBIndexLabel">
-            <property name="text">
-             <string>range B:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3">
-           <widget class="QLineEdit" name="atomBIndexField">
-            <property name="text">
-             <string>all</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="atomANameLabel">
-            <property name="text">
-             <string>names A:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="atomANameField">
-            <property name="text">
-             <string>all</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QLabel" name="atomBNameLabel">
-            <property name="text">
-             <string>names B:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="3">
-           <widget class="QLineEdit" name="atomBNameField">
-            <property name="text">
-             <string>all</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="atomATypeLabel">
-            <property name="text">
-             <string>types A:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="3">
-           <widget class="QLineEdit" name="atomBTypeField">
-            <property name="text">
-             <string>all</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="2">
-           <widget class="QLabel" name="atomBTypeLabel">
-            <property name="text">
-             <string>types B:</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </widget>
-       <widget class="QWidget" name="residueFilterPage">
-        <attribute name="title">
-         <string>Residues</string>
-        </attribute>
-        <widget class="QWidget" name="residueFilterContainer" native="true">
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>-10</y>
-           <width>561</width>
-           <height>91</height>
-          </rect>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_3">
-          <item row="0" column="0">
-           <widget class="QLabel" name="residARangeLabel">
-            <property name="text">
-             <string>range A:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="residARangeField">
-            <property name="text">
-             <string>all</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QLabel" name="residBRangeLabel">
-            <property name="text">
-             <string>range B:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3">
-           <widget class="QLineEdit" name="residBRangeField">
-            <property name="text">
-             <string>all</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="residANameLabel">
-            <property name="text">
-             <string>names A:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="residANameField">
-            <property name="text">
-             <string>all</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QLabel" name="residBNameLabel">
-            <property name="text">
-             <string>names B:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="3">
-           <widget class="QLineEdit" name="residBNameField">
-            <property name="text">
-             <string>all</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </widget>
       </widget>
      </item>
      <item row="12" column="0" colspan="5">
@@ -620,6 +433,165 @@
        <property name="text">
         <string>active</string>
        </property>
+      </widget>
+     </item>
+     <item row="11" column="0" colspan="5">
+      <widget class="QTabWidget" name="filterAtomsResTabWidget">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="atomFilterPage">
+        <attribute name="title">
+         <string>Atoms</string>
+        </attribute>
+        <widget class="QWidget" name="widget" native="true">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>-10</y>
+           <width>561</width>
+           <height>131</height>
+          </rect>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_4">
+          <item row="0" column="2">
+           <widget class="QLabel" name="atomBIndexLabel">
+            <property name="text">
+             <string>range 2:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="atomAIndexLabel">
+            <property name="text">
+             <string>range 1:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QLineEdit" name="atomBIndexField">
+            <property name="text">
+             <string>all</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="atomANameField">
+            <property name="text">
+             <string>all</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QLineEdit" name="atomBNameField">
+            <property name="text">
+             <string>all</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="atomANameLabel">
+            <property name="text">
+             <string>names 1:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QLabel" name="atomBNameLabel">
+            <property name="text">
+             <string>names 2:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="atomAIndexField">
+            <property name="text">
+             <string>all</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="residueFilterPage">
+        <attribute name="title">
+         <string>Residues</string>
+        </attribute>
+        <widget class="QWidget" name="residueFilterContainer" native="true">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>-10</y>
+           <width>561</width>
+           <height>91</height>
+          </rect>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="0" column="0">
+           <widget class="QLabel" name="residARangeLabel">
+            <property name="text">
+             <string>range 1:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="residARangeField">
+            <property name="text">
+             <string>all</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="residBRangeLabel">
+            <property name="text">
+             <string>range 2:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QLineEdit" name="residBRangeField">
+            <property name="text">
+             <string>all</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="residANameLabel">
+            <property name="text">
+             <string>names 1:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QLabel" name="residBNameLabel">
+            <property name="text">
+             <string>names 2:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QLineEdit" name="residBNameField">
+            <property name="text">
+             <string>all</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="residANameField">
+            <property name="text">
+             <string>all</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
       </widget>
      </item>
     </layout>

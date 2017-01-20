@@ -58,9 +58,7 @@ class AtomType:
         return tp
 
 
-## contains all information of a contact, mapped by key1/key2
-# Main class for future implementation in PyContact
-# will replace the Contact class in PyContact
+# contains all information of a contact, mapped by key1/key2
 class AccumulatedContact(object):
     """Contains information about a contact accumulated from AtomContact to display in GUI"""
 
@@ -107,7 +105,7 @@ class AccumulatedContact(object):
             total.append(finishedString)
         return " - ".join(total)
 
-    def addScore(self, newScore): 
+    def addScore(self, newScore):
         # append a score to the scoreArray, e.g. when a new frame score is added
         self.scoreArray.append(newScore)
 
@@ -135,8 +133,8 @@ class AccumulatedContact(object):
         self.contributingAtoms.append(contAtoms)  ## used for temporary accumulation of contacts in data analysis
 
     def setScores(self):
-    	self.mean_score()
-    	self.median_score()
+        self.mean_score()
+        self.median_score()
 
     def hbond_percentage(self):
         self.hbondFramesScan()
@@ -184,12 +182,12 @@ class AccumulatedContact(object):
         contactTime = 0
         i = 0
         for score in self.scoreArray:
-            if contactActive == False and score > threshold:
+            if contactActive is False and score > threshold:
                 contactActive = True
                 contactTime += ns_per_frame
-            elif contactActive == True and score > threshold:
+            elif contactActive is True and score > threshold:
                 contactTime += ns_per_frame
-            elif contactActive == True and score <= threshold:
+            elif contactActive is True and score <= threshold:
                 contactActive = False
                 lifeTimes.append(contactTime)
                 contactTime = 0

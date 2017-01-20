@@ -28,8 +28,9 @@ class Operator(object):
         elif operator == self.nequal:
             return (value1 != value2)
 
+
 class FrameFilter(object):
-    def __init__(self,name):
+    def __init__(self, name):
         self.name = name
 
     def extractFrameRange(self, contacts, range):
@@ -42,26 +43,34 @@ class FrameFilter(object):
             c.scoreArray = newScores
         return contacts
 
+
 class NameFilter(object):
+
     def __init__(self, name):
         self.name = name
 
-    def filterResiduesByName(self, contacts, resnameA, resnameB):
+    def filterContactsByName(self, contacts, nameA, nameB, mapindex):
         filtered = []
         for c in contacts:
             add = False
-            if resnameA.lower() != u'all' and resnameB.lower() != u'all':
-                splitA = resnameA.split(u",")
-                splitB = resnameB.split(u",")
-                if c.residueA.name in splitA and c.residueB.name in splitB:
+            try:
+                prop1 = c.key1[mapindex]
+                prop2 = c.key2[mapindex]
+            except:
+                filtered.append(c)
+                continue
+            if nameA.lower() != u'all' and nameB.lower() != u'all':
+                splitA = nameA.split(u",")
+                splitB = nameB.split(u",")
+                if prop1 in splitA and prop2 in splitB:
                     add = True
-            elif resnameA.lower() != u'all' and resnameB.lower() == u'all':
-                splitA = resnameA.split(u",")
-                if c.residueA.name in splitA:
+            elif nameA.lower() != u'all' and nameB.lower() == u'all':
+                splitA = nameA.split(u",")
+                if prop1 in splitA:
                     add = True
-            elif resnameA.lower() == u'all' and resnameB.lower() != u'all':
-                splitB = resnameB.split(u",")
-                if c.residueB.name in splitB:
+            elif nameA.lower() == u'all' and nameB.lower() != u'all':
+                splitB = nameB.split(u",")
+                if prop2 in splitB:
                     add = True
             else:
                 add = True
@@ -70,18 +79,19 @@ class NameFilter(object):
                 filtered.append(c)
         return filtered
 
-class ResidueRangeFilter(object):
+
+class RangeFilter(object):
     def __init__(self, name):
         self.name = name
 
-    def numberInRanges(self,number,ranges):
+    def numberInRanges(self, number, ranges):
         result = False
         for r in ranges:
             if number in r:
                 result = True
         return result
 
-    def filterResiduesByRange(self, contacts, residRangeA, residRangeB):
+    def filterByRange(self, contacts, residRangeA, residRangeB, mapindex):
         splitA = residRangeA.split(u",")
         splitB = residRangeB.split(u",")
 
@@ -92,25 +102,37 @@ class ResidueRangeFilter(object):
             aRanges = []
             for ran in splitA:
                 r = ran.split(u"-")
-                aRanges.append(range(int(r[0]),int(r[1])+1))
+                if len(r) == 1:
+                    aRanges.append(range(int(r[0]), int(r[0])+1))
+                else:
+                    aRanges.append(range(int(r[0]), int(r[1]) + 1))
         if notAllB:
-            bRanges =[]
+            bRanges = []
             for ran in splitB:
                 r = ran.split(u"-")
                 print(r)
-                bRanges.append(range(int(r[0]), int(r[1]) + 1))
+                if len(r) == 1:
+                    bRanges.append(range(int(r[0]), int(r[0])+1))
+                else:
+                    bRanges.append(range(int(r[0]), int(r[1]) + 1))
 
         filtered = []
         for c in contacts:
+            try:
+                prop1 = int(c.key1[mapindex])
+                prop2 = int(c.key2[mapindex])
+            except:
+                filtered.append(c)
+                continue
             add = False
             if notAllA and notAllB:
-                if self.numberInRanges(c.residueA.ident, aRanges) and self.numberInRanges(c.residueB.ident,bRanges):
+                if self.numberInRanges(prop1, aRanges) and self.numberInRanges(prop2, bRanges):
                     add = True
             elif notAllA and not notAllB:
-                if self.numberInRanges(c.residueA.ident, aRanges):
+                if self.numberInRanges(prop1, aRanges):
                     add = True
             elif not notAllA and notAllB:
-                if self.numberInRanges(c.residueB.ident,bRanges):
+                if self.numberInRanges(prop2, bRanges):
                     add = True
             else:
                 add = True
@@ -118,6 +140,7 @@ class ResidueRangeFilter(object):
             if add:
                 filtered.append(c)
         return filtered
+
 
 class BinaryFilter(object):
     def __init__(self, name, operator, value):
@@ -217,9 +240,9 @@ class Sorting(object):
         elif self.key == u"contact type":
             sortedContacts = sorted(contacts, key=lambda c: c.contactType, reverse=self.descending)
         elif self.key == u"resid A":
-            sortedContacts = sorted(contacts, key=lambda c: c.residueA.ident, reverse=self.descending)
+            sortedContacts = sorted(contacts, key=lambda c: prop1, reverse=self.descending)
         elif self.key == u"resid B":
-            sortedContacts = sorted(contacts, key=lambda c: c.residueB.ident, reverse=self.descending)
+            sortedContacts = sorted(contacts, key=lambda c: prop2, reverse=self.descending)
         elif self.key == u"total time":
             for con in contacts:
                 con.total_time(self.nspf,self.threshold)
