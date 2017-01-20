@@ -32,13 +32,13 @@ def vdwRadius(atomType):
 
 
 # type of Atom concerning it hbond behavior
-class AtomHBondType:
+cdef class AtomHBondType:
     don, acc, both, none = range(4)
     mapping = {"don": don, "acc": acc, "both": both, "none": none}
 
 
 # AtomType represents MASS entry for atoms in CHARMM topology and parameter files
-class AtomType:
+cdef class AtomType:
     def __init__(self, name, comment, htype):
         self.name = name  # name = atomtype in CHARMM file
         self.comment = comment  # properties/infos according to CHARMM file
@@ -61,7 +61,7 @@ class AtomType:
 ## contains all information of a contact, mapped by key1/key2
 # Main class for future implementation in PyContact
 # will replace the Contact class in PyContact
-class AccumulatedContact(object):
+cdef class AccumulatedContact(object):
     """Contains information about a contact accumulated from AtomContact to display in GUI"""
 
     def __init__(self, key1, key2):
@@ -107,7 +107,7 @@ class AccumulatedContact(object):
             total.append(finishedString)
         return " - ".join(total)
 
-    def addScore(self, newScore): 
+    def addScore(self, newScore):
         # append a score to the scoreArray, e.g. when a new frame score is added
         self.scoreArray.append(newScore)
 
@@ -135,8 +135,8 @@ class AccumulatedContact(object):
         self.contributingAtoms.append(contAtoms)  ## used for temporary accumulation of contacts in data analysis
 
     def setScores(self):
-    	self.mean_score()
-    	self.median_score()
+      self.mean_score()
+      self.median_score()
 
     def hbond_percentage(self):
         self.hbondFramesScan()
