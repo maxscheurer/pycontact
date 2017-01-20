@@ -13,19 +13,20 @@ import itertools
 import pickle
 import copy
 
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import (QMainWindow, QTabWidget, QButtonGroup,
+                             QLabel, QLineEdit, QDialog)
 from PyQt5.QtWidgets import QProgressBar
 from PyQt5.QtGui import QPaintEvent
 from PyQt5.Qt import Qt
 import numpy as np
-from numpy import linalg as la
-from matplotlib import cm
+# from numpy import linalg as la
+# from matplotlib import cm
 
 import gui
 from multi_accumulation import *
 from biochemistry import vdwRadius
 from SasaWidgets import *
-from Canvas import *
+from Canvas import Canvas
 from Dialogues import FileLoaderDialog, AnalysisDialog
 from ExportTabWidget import ExportTabWidget
 from Plotters import *
@@ -41,6 +42,8 @@ with warnings.catch_warnings():
 
 
 class MainWindow(QMainWindow, gui.Ui_MainWindow):
+    """PyContact Application Main Window with timeline"""
+
     def __init__(self, parent=None):
         self.config = None
         self.analysis = None
@@ -99,7 +102,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.setupFunctionBox()
         self.showFunctionSettings(FunctionType.sigmoid)
 
-        #apply color button
+        # apply color button
         self.settingsView.applyColorButton.clicked.connect(self.updateColors)
         self.colorScheme = ColorScheme.bbsc
 
@@ -173,12 +176,12 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             else:
                 parallel = 1
             print(', '.join("%s: %s" % item for item in attrs.items()))
-            self.analysis = Analyzer(self.config.psf,self.config.dcd, self.config.cutoff,self.config.hbondcutoff,self.config.hbondcutangle,self.config.sel1text,self.config.sel2text)
+            self.analysis = Analyzer(self.config.psf, self.config.dcd, self.config.cutoff, self.config.hbondcutoff, self.config.hbondcutangle, self.config.sel1text, self.config.sel2text)
             # self.connect(self.analysis, QtCore.SIGNAL('taskUpdated'),self.handleTaskUpdated)
             # self.connect(self.analysis, QtCore.SIGNAL('frameNumberSet'),self.setFrameNumber)
             # self.progressWidget.show()
             if parallel:
-                self.analysis.contactResults,self.analysis.resname_array,self.analysis.resid_array,self.analysis.name_array,self.analysis.type_array,self.analysis.segids,self.analysis.backbone,self.analysis.sel1text,self.analysis.sel2text = self.loadData_parallel(nproc)
+                self.analysis.contactResults, self.analysis.resname_array, self.analysis.resid_array, self.analysis.name_array, self.analysis.type_array, self.analysis.segids, self.analysis.backbone, self.analysis.sel1text, self.analysis.sel2text = self.loadData_parallel(nproc)
             else:
                 self.analysis.runFrameScan()
             msg = QMessageBox()
@@ -191,8 +194,8 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
 
     # progress of loading trajectory
     def handleTaskUpdated(self):
-    	print(self.analysis.currentFrame)
-    	self.progressWidget.setValue(self.analysis.currentFrame)
+        # print(self.analysis.currentFrame)
+        self.progressWidget.setValue(self.analysis.currentFrame)
 
     # progress of loading trajectory
     def setFrameNumber(self):
@@ -372,15 +375,15 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
             self.filteredContacts = copy.deepcopy(self.contacts)
             # residue range filter
             range_filter = RangeFilter("resrange")
-            self.filteredContacts = range_filter.filterByRange(self.filteredContacts, self.settingsView.residARangeField.text(), self.settingsView.residBRangeField.text(),AccumulationMapIndex.resid)
+            self.filteredContacts = range_filter.filterByRange(self.filteredContacts, self.settingsView.residARangeField.text(), self.settingsView.residBRangeField.text(), AccumulationMapIndex.resid)
 
-            self.filteredContacts = range_filter.filterByRange(self.filteredContacts, self.settingsView.atomAIndexField.text(), self.settingsView.atomBIndexField.text(),AccumulationMapIndex.index)
+            self.filteredContacts = range_filter.filterByRange(self.filteredContacts, self.settingsView.atomAIndexField.text(), self.settingsView.atomBIndexField.text(), AccumulationMapIndex.index)
 
             # aminoacids name filter
             name_filter = NameFilter("name")
-            self.filteredContacts = name_filter.filterContactsByName(self.filteredContacts, self.settingsView.residANameField.text(), self.settingsView.residBNameField.text(),AccumulationMapIndex.resname)
+            self.filteredContacts = name_filter.filterContactsByName(self.filteredContacts, self.settingsView.residANameField.text(), self.settingsView.residBNameField.text(), AccumulationMapIndex.resname)
 
-            self.filteredContacts = name_filter.filterContactsByName(self.filteredContacts, self.settingsView.atomANameField.text(), self.settingsView.atomBNameField.text(),AccumulationMapIndex.name)
+            self.filteredContacts = name_filter.filterContactsByName(self.filteredContacts, self.settingsView.atomANameField.text(), self.settingsView.atomBNameField.text(), AccumulationMapIndex.name)
             # range filter
             if rangeFilterActive:
                 self.painter.rangeFilterActive = True
@@ -528,7 +531,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.settingsView.show()
 
     def showStatistics(self):
-        if len(self.contacts) == 0 or self.contacts == None:
+        if len(self.contacts) == 0 or self.contacts is None:
             box = ErrorBox("No data loaded!")
             box.exec_()
             return
@@ -590,8 +593,8 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.exportWidget.valueUpdated.connect(self.handleExportUpdate)
         self.exportWidget.setContacts(self.filteredContacts)
         if self.maps is not None:
-            self.exportWidget.setMaps(self.maps[0],self.maps[1])
-            self.exportWidget.setMapLabels(self.analysis.sel1text,self.analysis.sel2text)
+            self.exportWidget.setMaps(self.maps[0], self.maps[1])
+            self.exportWidget.setMapLabels(self.analysis.sel1text, self.analysis.sel2text)
         self.exportWidget.setThresholdAndNsPerFrame(self.painter.threshold, self.painter.nsPerFrame)
         self.exportWidget.show()
 
