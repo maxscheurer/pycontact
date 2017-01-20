@@ -148,7 +148,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
             print("restricted: ", len(ressel.atoms))
             input_coords.append(selection.positions)
 
-        nprocs = 4#int(self.settingsView.coreBox.value())
+        nprocs = 8#int(self.settingsView.coreBox.value())
         input_chunks = chunks(input_coords,nprocs)
         pool = multiprocessing.Pool(nprocs)
         results = []
