@@ -305,7 +305,7 @@ class Analyzer(object):
             currentFrameContacts = []
             frame = ts.frame
             self.currentFrameNumber = ts.frame
-            print(frame)
+            # print(frame)
             result = np.ndarray(shape=(len(sel1.positions), len(sel2.positions)), dtype=float)
             # distarray is the distance matrix between all atoms in sel1 and sel2
             # row = sel1, column = sel2
@@ -553,8 +553,8 @@ class Analyzer(object):
                 acc.sc1 += tempContact.sc1score
                 acc.sc2 += tempContact.sc2score
             finalAccumulatedContacts.append(acc)
-            print(key, acc.bb1, acc.bb2, acc.sc1, acc.sc2)
-            print(len(acc.scoreArray))
+            # print(key, acc.bb1, acc.bb2, acc.sc1, acc.sc2)
+            # print(len(acc.scoreArray))
         stop = time.time()
         print(stop - start)
         return finalAccumulatedContacts
