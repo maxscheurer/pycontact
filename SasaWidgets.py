@@ -18,12 +18,13 @@ from Plotters import SimplePlotter
 from sasa_gui import *
 from multi_accumulation import chunks
 from biochemistry import vdwRadius
+from LogPool import *
 
 # manage processes for SASA
 sasaProgressManager = multiprocessing.Manager()
 sasaProgressDict = sasaProgressManager.dict()
 
-
+from cy_modules import cy_gridsearch
 
 def calculate_sasa_parallel(input_coords,natoms,pairdist,nprad,surfacePoints,probeRadius,pointstyle,restricted, restrictedList,rank):
     # load shared libraries
@@ -46,7 +47,9 @@ def calculate_sasa_parallel(input_coords,natoms,pairdist,nprad,surfacePoints,pro
         startC = time.time()
         # sasa_grid(const float *pos,int natoms, float pairdist, int allow_double_counting, int maxpairs, const float *radius,const int npts, double srad, int pointstyle)
         # point style: 0=spiral, 1=random
-        asa = search(npcoords, natoms, pairdist, 0, -1, nprad, surfacePoints, probeRadius, pointstyle, restricted,
+        # asa = search(npcoords, natoms, pairdist, 0, -1, nprad, surfacePoints, probeRadius, pointstyle, restricted,
+                    #  restrictedList)
+        asa = cy_gridsearch.cy_sasa(npcoords, natoms, pairdist, 0, -1, nprad, surfacePoints, probeRadius, pointstyle, restricted,
                      restrictedList)
         stopC = time.time()
         print("time for grid search: ", (stopC - startC))
@@ -138,7 +141,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
                 radius.append(vdwRadius(s.name[0]))
         natoms = len(selection)
         nprad = np.array(radius, dtype=np.float32)
-        restrictedList = np.array(restrictedList, dtype=np.uint32)
+        restrictedList = np.array(restrictedList, dtype=np.int32)
 
         # TODO: bug if selection is not static for all frames
         # TODO: dynamic allocation of positions in every frame!
@@ -150,7 +153,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
 
         nprocs = 8#int(self.settingsView.coreBox.value())
         input_chunks = chunks(input_coords,nprocs)
-        pool = multiprocessing.Pool(nprocs)
+        pool = LoggingPool(nprocs)
         results = []
         rank = 0
         trajLength = len(u.trajectory)
@@ -189,7 +192,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
 
             natoms2 = len(selection2)
             nprad = np.array(radius, dtype=np.float32)
-            restrictedList2 = np.array(restrictedList2, dtype=np.uint32)
+            restrictedList2 = np.array(restrictedList2, dtype=np.int32)
 
             input_coords2 = []
             for ts in u.trajectory:
@@ -197,7 +200,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
 
             nprocs = 8#int(self.settingsView.coreBox.value())
             input_chunks2 = chunks(input_coords2,nprocs)
-            pool = multiprocessing.Pool(nprocs)
+            pool = LoggingPool(nprocs)
             results = []
             rank = 0
             trajLength = len(u.trajectory)
