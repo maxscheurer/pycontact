@@ -42,7 +42,7 @@ vis.tcl
 
 #Misc#
 ######
-
+.cache
 .idea
 *.pyc
 __pycache__/*
