@@ -13,8 +13,9 @@ import itertools
 import pickle
 import copy
 
+import PyQt5.QtCore as QtCore
 from PyQt5.QtWidgets import (QMainWindow, QTabWidget, QButtonGroup,
-                             QLabel, QLineEdit, QDialog)
+                             QLabel, QLineEdit, QDialog, QApplication)
 from PyQt5.QtWidgets import QProgressBar
 from PyQt5.QtGui import QPaintEvent
 from PyQt5.Qt import Qt
@@ -43,6 +44,13 @@ with warnings.catch_warnings():
 
 class MainWindow(QMainWindow, gui.Ui_MainWindow):
     """PyContact Application Main Window with timeline"""
+
+    def closeEvent(self, event):
+        """ Closing application when Exit on MainWindow is clicked"""
+        print("Closing Application")
+        event.accept()
+        QApplication.quit()
+
 
     def __init__(self, parent=None):
         self.config = None
