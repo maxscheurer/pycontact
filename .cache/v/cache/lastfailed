@@ -1,0 +1,4 @@
+{
+  "tests/test_basic.py::PsfDcdReadingTest::test_import_dcd_file": true, 
+  "tests/test_basic.py::PsfDcdReadingTest::test_simple_analysis": true
+}
