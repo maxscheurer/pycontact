@@ -11,7 +11,7 @@ from __future__ import print_function
 
 import numpy as np
 
-from biochemistry import *
+from .Biochemistry import *
 
 
 class Operator(object):

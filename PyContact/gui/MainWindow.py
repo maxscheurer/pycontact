@@ -23,18 +23,19 @@ import numpy as np
 # from numpy import linalg as la
 # from matplotlib import cm
 
-import gui
-from multi_accumulation import *
-from biochemistry import vdwRadius
+from . import MainQtGui
+from ..core.multi_accumulation import *
+from ..core.biochemistry import vdwRadius
 from SasaWidgets import *
 from Canvas import Canvas
 from Dialogues import FileLoaderDialog, AnalysisDialog
 from ExportTabWidget import ExportTabWidget
 from Plotters import *
-from ContactAnalyzer import *
+from ..core.ContactAnalyzer import *
 from ErrorBox import ErrorBox
-from LogPool import *
-from aroundPatch import AroundSelection
+from ..core.LogPool import *
+from ..core.aroundPatch import AroundSelection
+import settings
 
 multiprocessing.log_to_stderr()
 np.set_printoptions(threshold=np.inf)
@@ -42,7 +43,7 @@ with warnings.catch_warnings():
     warnings.simplefilter("ignore")
 
 
-class MainWindow(QMainWindow, gui.Ui_MainWindow):
+class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow):
     """PyContact Application Main Window with timeline"""
 
     def closeEvent(self, event):
@@ -169,7 +170,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.updateFilters()
 
     def loadData_parallel(self, nprocs):
-        from multi_trajectory import run_load_parallel
+        from ..core.multi_trajectory import run_load_parallel
         # run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1text, sel2text)
         return run_load_parallel(nprocs,self.config.psf,self.config.dcd, self.config.cutoff,self.config.hbondcutoff,self.config.hbondcutangle,self.config.sel1text,self.config.sel2text)
 
@@ -676,7 +677,7 @@ class MainWindow(QMainWindow, gui.Ui_MainWindow):
         self.sasaView.show()
 
 
-class SettingsTabWidget(QTabWidget, Ui_settingsWindowWidget):
+class SettingsTabWidget(QTabWidget, settings.Ui_settingsWindowWidget):
     def __init__(self, parent=None):
         super(QtWidgets.QTabWidget, self).__init__(parent)
         self.setupUi(self)

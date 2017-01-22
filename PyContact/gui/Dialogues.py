@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QDialog, QGridLayout, QPushButton, QLabel,QLineEdit,
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QDoubleValidator
 
-from LoadConfiguration import Configuration
+from ..core.LoadConfiguration import Configuration
 
 class FileLoaderDialog(QDialog):
     def __init__(self, parent = None):

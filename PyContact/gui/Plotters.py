@@ -7,10 +7,10 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg \
 from matplotlib.figure import Figure
 from matplotlib import cm
 
-from settings import *
-from biochemistry import *
-from filters import *
-from biochemistry import AccumulationMapIndex
+# from ..settings import *
+# from ..core.Biochemistry import *
+from ..core.ContactFilters import *
+from ..core.Biochemistry import AccumulationMapIndex
 
 
 class MplPlotter(FigureCanvas):

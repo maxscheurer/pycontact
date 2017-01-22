@@ -13,7 +13,7 @@ from MDAnalysis.core.Selection import *
 import numpy as np
 # from numpy.ctypeslib import ndpointer
 
-from cy_modules import cy_gridsearch
+from ..cy_modules import cy_gridsearch
 
 # aroundLibrary = cdll.LoadLibrary('./shared/libgridsearch.so')
 

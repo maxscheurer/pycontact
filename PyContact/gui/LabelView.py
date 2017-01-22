@@ -13,8 +13,8 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import (QWidget, QPushButton, QLabel, QDialog, QGridLayout)
 from PyQt5.Qt import Qt
 
-from biochemistry import ContactType
-from Plotters import ContactPlotter
+from ..core.Biochemistry import ContactType
+from .Plotters import ContactPlotter
 
 class LabelView(QWidget):
     """docstring for AnalysisView"""

@@ -11,9 +11,9 @@ from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import QSize
 import numpy as np
 
-from biochemistry import *
-from filters import *
-from LabelView import LabelView
+from ..core.Biochemistry import *
+from ..core.ContactFilters import *
+from .LabelView import LabelView
 
 
 class ColorScheme:

@@ -23,7 +23,7 @@ import numpy as np
 # TODO: fix aroundPatch with gridsearch in C code using cython
 from aroundPatch import AroundSelection
 
-from read_db import *
+from ..db.DbReader import *
 from biochemistry import (AccumulatedContact, AtomContact, AccumulationMapIndex, AtomType, HydrogenBond, AtomHBondType, TempContactAccumulate)
 
 MDAnalysis.core.flags['use_periodic_selections'] = False

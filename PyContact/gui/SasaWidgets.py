@@ -13,12 +13,12 @@ import numpy as np
 from numpy import linalg as la
 # from numpy.ctypeslib import ndpointer
 
-from Plotters import SimplePlotter
+from .Plotters import SimplePlotter
 from sasa_gui import *
-from multi_accumulation import chunks
-from biochemistry import vdwRadius
-from LogPool import *
-from cy_modules import cy_gridsearch
+from ..core.multi_accumulation import chunks
+from ..core.Biochemistry import vdwRadius
+from ..core.LogPool import *
+from ..cy_modules import cy_gridsearch
 
 # manage processes for SASA
 sasaProgressManager = multiprocessing.Manager()
