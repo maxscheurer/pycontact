@@ -12,16 +12,16 @@ Tools for contact analysis of biomolecules
 
 ## Screenshots
 * Main Timeline Window
-![timeline](pyContactScreens/first_view_timeline.png?raw=true "Timeline view without filter")
+![timeline](screenshots/first_view_timeline.png?raw=true "Timeline view without filter")
 
 * Filtered Timeline
-![filtered](pyContactScreens/filtered_contacts.png?raw=true "Filtered contacts")
+![filtered](screenshots/filtered_contacts.png?raw=true "Filtered contacts")
 
 * Preferences Panel
-![pref](pyContactScreens/pref_panel.png?raw=true "Preferences")
+![pref](screenshots/pref_panel.png?raw=true "Preferences")
 
 * Histogram Panel
-![hist](pyContactScreens/histogram_panel_new.png?raw=true "Histogram export")
+![hist](screenshots/histogram_panel_new.png?raw=true "Histogram export")
 
 ## About
 Authors: Maximilian Scheurer and Peter Rodenkirch
