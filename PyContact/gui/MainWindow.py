@@ -14,8 +14,10 @@ import pickle
 import copy
 
 import PyQt5.QtCore as QtCore
+from PyQt5.QtCore import QRect
 from PyQt5.QtWidgets import (QMainWindow, QTabWidget, QButtonGroup,
-                             QLabel, QLineEdit, QDialog, QApplication, QMessageBox)
+                             QLabel, QLineEdit, QDialog, QApplication, QMessageBox,
+                             QGridLayout)
 from PyQt5.QtWidgets import QProgressBar
 from PyQt5.QtGui import QPaintEvent
 from PyQt5.Qt import Qt
@@ -679,7 +681,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow):
 
 class SettingsTabWidget(QTabWidget, settings.Ui_settingsWindowWidget):
     def __init__(self, parent=None):
-        super(QtWidgets.QTabWidget, self).__init__(parent)
+        super(QTabWidget, self).__init__(parent)
         self.setupUi(self)
 
 
