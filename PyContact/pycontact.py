@@ -10,7 +10,7 @@ import sys
 
 from PyQt5.QtWidgets import QApplication
 
-from PyContact.gui.MainWindow import MainWindow
+from .gui.MainWindow import MainWindow
 
 warnings.filterwarnings("ignore")
 

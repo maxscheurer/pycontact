@@ -8,7 +8,7 @@ import itertools
 import MDAnalysis
 from MDAnalysis.analysis import distances
 
-from biochemistry import *
+from Biochemistry import *
 from LogPool import *
 
 def weight_function(value):

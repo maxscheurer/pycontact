@@ -9,7 +9,8 @@ from Cython.Build import cythonize
 extensions = [Extension("PyContact.cy_modules.cy_gridsearch",
                         ["PyContact/cy_modules/cy_gridsearch.pyx"], language="c++",
                         extra_compile_args=["-std=c++11"],
-                        extra_link_args=["-std=c++11"]),
+                        extra_link_args=["-std=c++11"],
+                        include_dirs=[".", "PyContact/cy_modules/src"])
               ]
 
 setup(
@@ -42,11 +43,12 @@ setup(
     packages=find_packages(),
 
     install_requires = ['numpy','matplotlib','mdanalysis'],
+    cmdclass = {'build_ext': build_ext},
     ext_modules = cythonize(extensions),
 
     entry_points={
         'console_scripts': [
-            'pycontact=pycontact:main',
+            'pycontact=PyContact.pycontact:main',
         ],
     },
 

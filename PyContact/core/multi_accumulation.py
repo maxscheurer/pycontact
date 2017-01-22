@@ -7,7 +7,7 @@ import numpy as np
 import MDAnalysis
 from MDAnalysis.analysis import distances
 
-from biochemistry import *
+from .Biochemistry import *
 
 
 def find_between(s, first, last):

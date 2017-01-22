@@ -25,8 +25,8 @@ import numpy as np
 
 from . import MainQtGui
 from ..core.multi_accumulation import *
-from ..core.biochemistry import vdwRadius
-from SasaWidgets import *
+from ..core.Biochemistry import vdwRadius
+from SasaWidgets import (SasaWidget, ProgessWidget)
 from Canvas import Canvas
 from Dialogues import FileLoaderDialog, AnalysisDialog
 from ExportTabWidget import ExportTabWidget

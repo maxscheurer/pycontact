@@ -1,5 +1,5 @@
 import numpy as np
-from biochemistry import *
+from Biochemistry import *
 import numpy as np
 
 class Operator:
