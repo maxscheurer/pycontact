@@ -49,3 +49,8 @@ __pycache__/*
 __pycache__/gui.cpython-35.pyc
 shared/libgridsearch.so.dSYM/*
 cy_modules/cy_gridsearch.c*
+
+#setuptools build directories
+build/
+dist/
+pycontact.egg-info/
