@@ -15,7 +15,7 @@ import copy
 
 import PyQt5.QtCore as QtCore
 from PyQt5.QtWidgets import (QMainWindow, QTabWidget, QButtonGroup,
-                             QLabel, QLineEdit, QDialog, QApplication)
+                             QLabel, QLineEdit, QDialog, QApplication, QMessageBox)
 from PyQt5.QtWidgets import QProgressBar
 from PyQt5.QtGui import QPaintEvent
 from PyQt5.Qt import Qt

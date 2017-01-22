@@ -4,7 +4,6 @@
 #include <math.h>
 #include "ResizeArray.h"
 #include <vector>
-// #include "utilities.h"
 
 #define FALSE   0
 #define TRUE    1
@@ -83,7 +82,7 @@ void find_minmax(const float *pos, int n, const int *on,
     return;
   }
 
-  printf("x1 %f\n",pos[0]);
+  // printf("x1 %f\n",pos[0]);
   // initialize min/max to first 'on' atom, and advance the counter.
   pos += 3*i;
   x1 = x2 = pos[0];
@@ -213,10 +212,10 @@ GridSearchPair *vmd_gridsearch1(const float *pos,int natoms, const int *on,
   int paircount = 0;
   int maxpairsreached = 0;
   sqdist = pairdist * pairdist;
-  printf("nc: %d \n",natoms);
+  // printf("nc: %d \n",natoms);
   // find bounding box for selected atoms, and number of atoms in selection.
   find_minmax(pos, natoms, on, min, max, &numon);
-  printf("minmaxfound: %d,%f, min %f max %f\n",numon,sqdist,min[0],max[0]);
+  // printf("minmaxfound: %d,%f, min %f max %f\n",numon,sqdist,min[0],max[0]);
   // do sanity checks and complain if we've got bogus atom coordinates,
   // we shouldn't ever have density higher than 0.1 atom/A^3, but we'll
   // be generous and allow much higher densities.
@@ -253,8 +252,8 @@ GridSearchPair *vmd_gridsearch1(const float *pos,int natoms, const int *on,
     totb = xytotb * zb;
     newpairdist = pairdist * 1.26f; // cbrt(2) is about 1.26
   } while (totb > MAXBOXES || totb < 1); // check for integer wraparound too
-  printf("boxbuild\n");
-  printf("totb %d\n", totb);
+  // printf("boxbuild\n");
+  // printf("totb %d\n", totb);
   // 2. Sort each atom into appropriate bins
   boxatom = (int **) calloc(1, totb*sizeof(int *));
   numinbox = (int *) calloc(1, totb*sizeof(int));
@@ -325,7 +324,7 @@ GridSearchPair *vmd_gridsearch1(const float *pos,int natoms, const int *on,
   head = (GridSearchPair *) malloc(sizeof(GridSearchPair));
   head->next = NULL;
   cur = head;
-  printf("pairlist\n");
+  // printf("pairlist\n");
   // wkfmsgtimer *msgt = wkf_msg_timer_create(5);
   for (aindex = 0; (aindex < totb) && (!maxpairsreached); aindex++) {
     // printf("%d\n", aindex);
@@ -572,7 +571,7 @@ struct FindWithinData {
 };
 
 #define MAXGRIDDIM 31
-extern "C" int* find_within(const float *xyz, int *flgs, const int *others, int num, float r) {
+static int* find_within(const float *xyz, int *flgs, int *others, int num, float r) {
   int i;
   float xmin, xmax, ymin, ymax, zmin, zmax;
   float oxmin, oymin, ozmin, oxmax, oymax, ozmax;

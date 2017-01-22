@@ -1,8 +1,8 @@
 from __future__ import print_function
 import multiprocessing
 import sip
-from ctypes import cdll
-import ctypes
+# from ctypes import cdll
+# import ctypes
 import time
 import itertools
 
@@ -11,49 +11,52 @@ from PyQt5.QtCore import QRect
 import MDAnalysis
 import numpy as np
 from numpy import linalg as la
-from numpy.ctypeslib import ndpointer
-np.set_printoptions(threshold=np.inf)
+# from numpy.ctypeslib import ndpointer
 
 from Plotters import SimplePlotter
 from sasa_gui import *
 from multi_accumulation import chunks
 from biochemistry import vdwRadius
 from LogPool import *
+from cy_modules import cy_gridsearch
 
 # manage processes for SASA
 sasaProgressManager = multiprocessing.Manager()
 sasaProgressDict = sasaProgressManager.dict()
+np.set_printoptions(threshold=np.inf)
 
-from cy_modules import cy_gridsearch
 
-def calculate_sasa_parallel(input_coords,natoms,pairdist,nprad,surfacePoints,probeRadius,pointstyle,restricted, restrictedList,rank):
+def calculate_sasa_parallel(input_coords, natoms, pairdist, nprad,
+                            surfacePoints,probeRadius, pointstyle,
+                            restricted, restrictedList, rank):
+    # TODO: remove, deprecated
     # load shared libraries
-    cgrid = cdll.LoadLibrary('./shared/libgridsearch.so')
-    search = cgrid.sasa_grid
-    search.restype = ctypes.c_double
-    search.argtypes = [ndpointer(ctypes.c_float, flags="C_CONTIGUOUS"), ctypes.c_int, ctypes.c_float, ctypes.c_int,
-                       ctypes.c_int, \
-                       ndpointer(ctypes.c_float, flags="C_CONTIGUOUS"), ctypes.c_int, ctypes.c_double, ctypes.c_int,
-                       ctypes.c_int, ndpointer(ctypes.c_uint32, flags="C_CONTIGUOUS")]
+    # cgrid = cdll.LoadLibrary('./shared/libgridsearch.so')
+    # search = cgrid.sasa_grid
+    # search.restype = ctypes.c_double
+    # search.argtypes = [ndpointer(ctypes.c_float, flags="C_CONTIGUOUS"), ctypes.c_int, ctypes.c_float, ctypes.c_int,
+                    #    ctypes.c_int, \
+                    #    ndpointer(ctypes.c_float, flags="C_CONTIGUOUS"), ctypes.c_int, ctypes.c_double, ctypes.c_int,
+                    #    ctypes.c_int, ndpointer(ctypes.c_int, flags="C_CONTIGUOUS")]
 
     temp_sasa = []
     frames_processed = 0
     sasaProgressDict[rank] = frames_processed
-    print(len(input_coords))
+    # print(len(input_coords))
     for c in input_coords:
         coords = np.reshape(c, (1, natoms * 3))
         npcoords = np.array(coords, dtype=np.float32)
-        print("start C")
+        # print("start C")
         startC = time.time()
         # sasa_grid(const float *pos,int natoms, float pairdist, int allow_double_counting, int maxpairs, const float *radius,const int npts, double srad, int pointstyle)
         # point style: 0=spiral, 1=random
         # asa = search(npcoords, natoms, pairdist, 0, -1, nprad, surfacePoints, probeRadius, pointstyle, restricted,
                     #  restrictedList)
-        asa = cy_gridsearch.cy_sasa(npcoords, natoms, pairdist, 0, -1, nprad, surfacePoints, probeRadius, pointstyle, restricted,
-                     restrictedList)
+        asa = cy_gridsearch.cy_sasa(npcoords, natoms, pairdist, 0, -1, nprad, surfacePoints, probeRadius,
+                                    pointstyle, restricted, restrictedList)
         stopC = time.time()
-        print("time for grid search: ", (stopC - startC))
-        print("asa:", asa)
+        # print("time for grid search: ", (stopC - startC))
+        # print("asa:", asa)
         temp_sasa.append(asa)
         frames_processed += 1
         sasaProgressDict[rank] = frames_processed
@@ -148,7 +151,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         input_coords = []
         for ts in u.trajectory:
             ressel = u.select_atoms(resseltext)
-            print("restricted: ", len(ressel.atoms))
+            # print("restricted: ", len(ressel.atoms))
             input_coords.append(selection.positions)
 
         nprocs = 8#int(self.settingsView.coreBox.value())
@@ -245,7 +248,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
                 self.sasaProgressBar.setValue(progress)
 
             if int(progress) == 100:
-                print("finished")
+                # print("finished")
                 for each in sasaProgressDict.keys():
                     sasaProgressDict[each]=0
                 progress = 0
