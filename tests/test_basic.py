@@ -2,8 +2,8 @@ from unittest import TestCase
 import sys
 from os import path
 sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
-from ..ContactAnalyzer import *
-from ..aroundPatch import AroundSelection
+from PyContact.core.ContactAnalyzer import *
+from PyContact.core.aroundPatch import AroundSelection
 import MDAnalysis as mda
 
 class PsfDcdReadingTest(TestCase):
