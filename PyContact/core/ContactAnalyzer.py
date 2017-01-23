@@ -21,10 +21,10 @@ from MDAnalysis.analysis import distances
 import numpy as np
 
 # TODO: fix aroundPatch with gridsearch in C code using cython
-from aroundPatch import AroundSelection
+from .aroundPatch import AroundSelection
 
 from ..db.DbReader import *
-from Biochemistry import (AccumulatedContact, AtomContact, AccumulationMapIndex, AtomType, HydrogenBond, AtomHBondType, TempContactAccumulate)
+from .Biochemistry import (AccumulatedContact, AtomContact, AccumulationMapIndex, AtomType, HydrogenBond, AtomHBondType, TempContactAccumulate)
 
 MDAnalysis.core.flags['use_periodic_selections'] = False
 MDAnalysis.core.flags['use_KDTree_routines'] = True

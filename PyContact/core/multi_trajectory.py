@@ -8,8 +8,8 @@ import itertools
 import MDAnalysis
 from MDAnalysis.analysis import distances
 
-from Biochemistry import *
-from LogPool import *
+from .Biochemistry import *
+from .LogPool import *
 
 def weight_function(value):
     return (1.0) / (1.0 + np.exp(5.0 * (value - 4.0)))
