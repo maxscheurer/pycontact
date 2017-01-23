@@ -6,5 +6,3 @@ python:
 install:
     - pip-$PYVER install cython
     - $PYTHON setup.py install
-# command to run tests
-script: pytest
