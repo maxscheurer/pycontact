@@ -1,6 +1,6 @@
 language: python
 python:
-  - "3.5"
+  - "2.7"
 # command to install dependencies
 install:
     - if [[ $TRAVIS_PYTHON_VERSION == 3.5 ]]; then pip install pyqt5; fi
