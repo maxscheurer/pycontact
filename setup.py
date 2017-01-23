@@ -44,6 +44,8 @@ setup(
     cmdclass = {'build_ext': build_ext},
     ext_modules = cythonize(extensions),
 
+
+    package_data = {'PyContact': ['exampleData/defaultsession','core/testpar.prm']},
     entry_points={
         'console_scripts': [
             'pycontact=PyContact.pycontact:main',
