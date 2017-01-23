@@ -4,12 +4,13 @@ from os import path
 sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
 from PyContact.core.ContactAnalyzer import *
 from PyContact.core.aroundPatch import AroundSelection
+from PyContact.exampleData.datafiles import DCD, PSF
 import MDAnalysis as mda
 
 class PsfDcdReadingTest(TestCase):
     def setUp(self):
-        self.dcdfile = "../short.dcd"
-        self.psffile = "../rpn11_ubq_interface-ionized.psf"
+        self.dcdfile = DCD
+        self.psffile = PSF
 
     def tearDown(self):
         del self.dcdfile
