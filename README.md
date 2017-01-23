@@ -1,5 +1,5 @@
 # PyContact
-[![Build Status](https://travis-ci.com/maxscheurer/pycontact.svg?token=Xyntx2ELmeydq8pgqs8t&branch=master)](https://travis-ci.com/maxscheurer/pycontact)
+[![Build Status](https://travis-ci.com/maxscheurer/pycontact.svg?token=Xyntx2ELmeydq8pgqs8t&branch=develop)](https://travis-ci.com/maxscheurer/pycontact)
 
 
 Tools for contact analysis of biomolecules from Molecular Dynamics simulations.
