@@ -13,7 +13,8 @@ before_install:
     - sudo apt-get -qq update
     - sudo apt-get install -y mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev
     - sudo apt-get install -y qt56declarative
-    - export QMAKE=/usr/lib/x86_64-linux-gnu/qt5/bin/qmake
+    - source /opt/qt56/bin/qt56-env.sh
+#    - export QMAKE=/usr/lib/x86_64-linux-gnu/qt5/bin/qmake
 install:
     - export DISPLAY=:99.0
     - sh -e /etc/init.d/xvfb start
@@ -29,7 +30,7 @@ install:
     # PyQt5
     - tar xzf /downloads/pyqt5.tar.gz --keep-newer-files
     - pushd PyQt5_gpl-5.7.1
-    - python configure.py -c --confirm-license --no-designer-plugin --qmake $QMAKE
+    - python configure.py -c --confirm-license --no-designer-plugin
     - make
     - sudo make install
     - popd
