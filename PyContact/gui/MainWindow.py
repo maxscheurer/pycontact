@@ -17,7 +17,7 @@ import PyQt5.QtCore as QtCore
 from PyQt5.QtCore import QRect
 from PyQt5.QtWidgets import (QMainWindow, QTabWidget, QButtonGroup,
                              QLabel, QLineEdit, QDialog, QApplication, QMessageBox,
-                             QGridLayout)
+                             QGridLayout, QFileDialog)
 from PyQt5.QtWidgets import QProgressBar
 from PyQt5.QtGui import QPaintEvent
 from PyQt5.Qt import Qt
@@ -38,6 +38,7 @@ from ErrorBox import ErrorBox
 from ..core.LogPool import *
 from ..core.aroundPatch import AroundSelection
 import settings
+from ..exampleData.datafiles import DEFAULTSESSION
 
 multiprocessing.log_to_stderr()
 np.set_printoptions(threshold=np.inf)
@@ -161,7 +162,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow):
 
     def loadDefault(self):
         # importDict = pickle.load(open("defaultsession", "rb"))
-        importDict = pickle.load(open("defaultsession", "rb"))
+        importDict = pickle.load(open(DEFAULTSESSION, "rb"))
         self.contacts = importDict["contacts"]
         arguments = importDict["analyzer"][0:-1]
         trajArgs = importDict["trajectory"]
