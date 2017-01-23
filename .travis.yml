@@ -12,7 +12,7 @@ before_install:
     - sudo add-apt-repository ppa:ubuntu-sdk-team/ppa -y
     - sudo apt-get -qq update
     - sudo apt-get install -y mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev
-    - sudo apt-get install -y qt5-default qttools5-dev-tools
+    - sudo apt-get install -y qtdeclarative5-dev
 install:
     - export DISPLAY=:99.0
     - sh -e /etc/init.d/xvfb start
