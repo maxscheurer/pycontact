@@ -1,10 +1,11 @@
 language: python
 python:
-  - "2.7"
   - "3.5"
 # command to install dependencies
 install:
+    - if [[ $TRAVIS_PYTHON_VERSION == 3.5 ]]; then pip install pyqt5; fi
     - pip install cython
     - python setup.py install
+    - python setup.py build_ext -i
 script:
     - pytest
