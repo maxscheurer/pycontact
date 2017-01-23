@@ -4,5 +4,5 @@ python:
   - "3.5"
 # command to install dependencies
 install:
-    - pip-$PYVER install cython
-    - $PYTHON setup.py install
+    - pip install cython
+    - python setup.py install
