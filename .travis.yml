@@ -9,10 +9,10 @@ before_install:
     - curl -L https://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.7.1/PyQt5_gpl-5.7.1.tar.gz -o /downloads/pyqt5.tar.gz
     - sudo mkdir -p /builds
     - sudo chmod a+rw /builds
-    - sudo apt-add-repository ppa:canonical-qt5-edgers/ubuntu1204-qt5
+    - sudo add-apt-repository ppa:beineri/opt-qt562
     - sudo apt-get -qq update
     - sudo apt-get install -y mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev
-    - sudo apt-get install -y qtdeclarative5-dev
+    - sudo apt-get install -y qt56declarative
     - export QMAKE=/usr/lib/x86_64-linux-gnu/qt5/bin/qmake
 install:
     - export DISPLAY=:99.0
@@ -29,7 +29,7 @@ install:
     # PyQt5
     - tar xzf /downloads/pyqt5.tar.gz --keep-newer-files
     - pushd PyQt5_gpl-5.7.1
-    - python configure.py -c --confirm-license --no-designer-plugin -e QtCore -e QtGui -e QtTest
+    - python configure.py -c --confirm-license --no-designer-plugin --qmake $QMAKE
     - make
     - sudo make install
     - popd
