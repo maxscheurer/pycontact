@@ -38,7 +38,7 @@ install:
     - popd
     - if [[ $TRAVIS_PYTHON_VERSION == 3.5 ]]; then pip install pyqt5; fi
     - pip install cython
-    - python setup.py build_ext -i
-    - pip install -v .
+    - sudo python setup.py build_ext -i
+    - sudo pip install -v .
 script:
     - pytest
