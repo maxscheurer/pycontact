@@ -9,6 +9,7 @@ before_install:
     - curl -L https://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.7.1/PyQt5_gpl-5.7.1.tar.gz -o /downloads/pyqt5.tar.gz
     - sudo mkdir -p /builds
     - sudo chmod a+rw /builds
+    - sudo add-apt-repository ppa:ubuntu-sdk-team/ppa
     - sudo apt-get -qq update
     - sudo apt-get install -y mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev
     - sudo apt-get install -y qt5-default qttools5-dev-tools
