@@ -12,7 +12,7 @@ before_install:
     - sudo add-apt-repository ppa:beineri/opt-qt562 -y
     - sudo apt-get -qq update
     - sudo apt-get install -y mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev
-    - sudo apt-get install -y qt56declarative
+    - sudo apt-get install -y qt56declarative-dev
     - source /opt/qt56/bin/qt56-env.sh
 #    - export QMAKE=/usr/lib/x86_64-linux-gnu/qt5/bin/qmake
 install:
@@ -30,15 +30,15 @@ install:
     # PyQt5
     - tar xzf /downloads/pyqt5.tar.gz --keep-newer-files
     - pushd PyQt5_gpl-5.7.1
-    - python configure.py -c --confirm-license --no-designer-plugin
+    - python configure.py -c --confirm-license --no-designer-plugin -e QtWidgets -e QtCore -e QtGui
     - make
     - sudo make install
     - popd
     # Builds Complete
     - popd
     - if [[ $TRAVIS_PYTHON_VERSION == 3.5 ]]; then pip install pyqt5; fi
-    - pip install cython
-    - sudo python setup.py build_ext -i
+    - sudo pip install cython
+    - python setup.py build_ext -i
     - sudo pip install -v .
 script:
     - pytest
