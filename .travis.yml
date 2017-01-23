@@ -38,6 +38,6 @@ install:
     - if [[ $TRAVIS_PYTHON_VERSION == 3.5 ]]; then pip install pyqt5; fi
     - pip install cython
     - python setup.py build_ext -i
-    - pip install -v
+    - python setup.py install
 script:
     - pytest
