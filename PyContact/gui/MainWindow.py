@@ -14,7 +14,7 @@ import pickle
 import copy
 
 import PyQt5.QtCore as QtCore
-from PyQt5.QtCore import QRect
+from PyQt5.QtCore import QRect, pyqtSlot, QObject
 from PyQt5.QtWidgets import (QMainWindow, QTabWidget, QButtonGroup,
                              QLabel, QLineEdit, QDialog, QApplication, QMessageBox,
                              QGridLayout, QFileDialog)
@@ -22,8 +22,6 @@ from PyQt5.QtWidgets import QProgressBar
 from PyQt5.QtGui import QPaintEvent
 from PyQt5.Qt import Qt
 import numpy as np
-# from numpy import linalg as la
-# from matplotlib import cm
 
 from . import MainQtGui
 from ..core.multi_accumulation import *
@@ -46,7 +44,7 @@ with warnings.catch_warnings():
     warnings.simplefilter("ignore")
 
 
-class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow):
+class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
     """PyContact Application Main Window with timeline"""
 
     def closeEvent(self, event):
@@ -120,7 +118,9 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow):
 
         self.actionDefault.triggered.connect(self.loadDefault)
 
-        self.progressWidget = ProgessWidget("Progress")
+        # self.progressWidget = ProgessWidget("Analysis progress")
+        # self.progressWidget.show()
+        # self.progressWidget.hide()
 
         self.exportWidget = ExportTabWidget()
 
@@ -128,6 +128,8 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow):
 
         self.updateSettings()
         self.updateFilters()
+
+        self.analysis_state = False
 
     def importSession(self):
         fnames = QFileDialog.getOpenFileNames(self, "Open file")
@@ -207,11 +209,13 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow):
     # progress of loading trajectory
     def handleTaskUpdated(self):
         # print(self.analysis.currentFrame)
-        self.progressWidget.setValue(self.analysis.currentFrame)
+        # self.progressWidget.setValue(self.analysis.currentFrame)
+        self.progressBar.setValue(self.analysis.currentFrame)
 
     # progress of loading trajectory
     def setFrameNumber(self):
-        self.progressWidget.setMax(self.analysis.totalFrameNumber)
+        # self.progressWidget.setMax(self.analysis.totalFrameNumber)
+        self.progressBar.setMax(self.analysis.totalFrameNumber)
 
     def analyzeParallel(self, map1, map2):
         nproc = int(self.settingsView.coreBox.value())
@@ -226,11 +230,15 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow):
         pool = LoggingPool(nproc)
         print("Running on %d cores" % nproc)
         for c in all_chunk:
-            results.append(pool.apply_async(loop_frame, args=(c, map1, map2, d)))
+            results.append(pool.apply_async(loop_frame, args=(c, map1, map2, d, rank)))
             rank += 1
         # TODO: might be important, but without, it's faster and until now, provides the same results
+        self.totalFramesToProcess = len(contResults)
+        self.analysis_state = True
+        self.analysisEventListener()
         pool.close()
         pool.join()
+        self.analysis_state = False
         stop = time.time()
         print("time: ", str(stop-start), rank)
         print(str(len(c)), rank)
@@ -268,7 +276,34 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow):
         # print(stop - start)
         glob_stop = time.time()
         print(glob_stop - start)
+        # self.progressWidget.hide()
         return finalAccumulatedContacts
+
+    @pyqtSlot()
+    def updateAnalyzedFrames(self):
+        self.progressBar.setValue(100* float(self.value) / float(self.totalFramesToProcess))
+        self.value += 1
+
+    def analysisEventListener(self):
+        while self.analysis_state:
+            progress = 0
+            for each in analysisProgressDict.keys():
+                progress += analysisProgressDict[each]
+                # sasaProgressDict[each] = 0
+            progress = float(progress) / float(self.totalFramesToProcess) * 100
+            # if (101 - self.sasaProgressBar.value()) < progress:
+            #     self.sasaProgressBar.update_bar(101 - self.sasaProgressBar.value())
+            if progress > 0:
+                # print(progress)
+                self.progressBar.setValue(progress)
+
+            if int(progress) == 100:
+                # print("finished")
+                for each in analysisProgressDict.keys():
+                    analysisProgressDict[each]=0
+                progress = 0
+                self.progressBar.setValue(0)
+                self.analysis_state = False
 
     def analyzeDataPushed(self):
         self.maps, result = AnalysisDialog.getMapping()
@@ -284,7 +319,16 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow):
             if parallel:
                 self.contacts = self.analyzeParallel(map1, map2)
             else:
+                # self.totalFramesToProcess = len(contResults)
+                # self.analysis_state = True
+                # self.analysisEventListener()
+                # self.connect(self.analysis, SIGNAL("frameUpdate()"),self.progressBar,SLOT("updateAnalyzedFrames()"))
+                self.value = 0
+                self.totalFramesToProcess = len(self.analysis.contactResults)
+                self.analysis.frameUpdate.connect(self.updateAnalyzedFrames)
                 self.contacts = self.analysis.runContactAnalysis(map1, map2)
+                # self.analysis_state = False
+
             # for cont in self.contacts:
                 # cont.setScores()
             self.updateSettings()

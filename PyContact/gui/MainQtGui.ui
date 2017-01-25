@@ -46,23 +46,31 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="6">
-     <widget class="QPushButton" name="openPreferencesButton">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
+    <item row="1" column="2">
+     <widget class="QLabel" name="label_3">
       <property name="text">
-       <string>Preferences</string>
+       <string>None</string>
       </property>
      </widget>
     </item>
-    <item row="0" column="3">
-     <widget class="QPushButton" name="analysisButton">
+    <item row="0" column="4">
+     <widget class="QPushButton" name="statisticsButton">
       <property name="text">
-       <string>Analyze</string>
+       <string>Statistics</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string>None</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="7">
+     <widget class="QPushButton" name="contactAreaButton">
+      <property name="text">
+       <string>Contact areas</string>
       </property>
      </widget>
     </item>
@@ -86,17 +94,17 @@
       </widget>
      </widget>
     </item>
-    <item row="0" column="7">
-     <widget class="QPushButton" name="contactAreaButton">
+    <item row="0" column="3">
+     <widget class="QPushButton" name="analysisButton">
       <property name="text">
-       <string>Contact areas</string>
+       <string>Analyze</string>
       </property>
      </widget>
     </item>
-    <item row="0" column="4">
-     <widget class="QPushButton" name="statisticsButton">
+    <item row="1" column="0">
+     <widget class="QLabel" name="label">
       <property name="text">
-       <string>Statistics</string>
+       <string>Current selections:</string>
       </property>
      </widget>
     </item>
@@ -113,37 +121,38 @@
       </property>
      </widget>
     </item>
+    <item row="0" column="6">
+     <widget class="QPushButton" name="openPreferencesButton">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Preferences</string>
+      </property>
+     </widget>
+    </item>
     <item row="0" column="2">
-     <spacer name="horizontalSpacer">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
+     <widget class="QProgressBar" name="progressBar">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
       </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>40</width>
-        <height>20</height>
-       </size>
+      <property name="value">
+       <number>0</number>
       </property>
-     </spacer>
-    </item>
-    <item row="1" column="0">
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>Current selections:</string>
+      <property name="textVisible">
+       <bool>true</bool>
       </property>
-     </widget>
-    </item>
-    <item row="1" column="1">
-     <widget class="QLabel" name="label_2">
-      <property name="text">
-       <string>None</string>
+      <property name="invertedAppearance">
+       <bool>false</bool>
       </property>
-     </widget>
-    </item>
-    <item row="1" column="2">
-     <widget class="QLabel" name="label_3">
-      <property name="text">
-       <string>None</string>
+      <property name="format">
+       <string>%p%</string>
       </property>
      </widget>
     </item>

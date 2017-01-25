@@ -8,7 +8,8 @@ import MDAnalysis
 from MDAnalysis.analysis import distances
 
 from .Biochemistry import *
-
+analysisProgressManager = multiprocessing.Manager()
+analysisProgressDict = analysisProgressManager.dict()
 
 def find_between(s, first, last):
         try:
@@ -160,7 +161,7 @@ def makeKeyFromKeyArrays(key1, key2):
             itemcounter += 1
         return key
 
-def loop_frame(contacts,map1,map2,trajArgs):
+def loop_frame(contacts,map1,map2,trajArgs,rank):
     allkeys = []
     results = []
     global backbone
@@ -169,6 +170,7 @@ def loop_frame(contacts,map1,map2,trajArgs):
     global resid_array
     global resname_array
     global segids
+    frames_processed = 0
     backbone,type_array,name_array,resid_array,resname_array,segids = trajArgs[5],trajArgs[3],trajArgs[2],trajArgs[1],trajArgs[0],trajArgs[4]
     for frame in contacts:
         currentFrameAcc = {}
@@ -203,6 +205,8 @@ def loop_frame(contacts,map1,map2,trajArgs):
             if not key in allkeys:
                 allkeys.append(key)
         results.append(currentFrameAcc)
+        frames_processed += 1
+        analysisProgressDict[rank] = frames_processed
     return [allkeys,results]
 
 

@@ -19,6 +19,7 @@ from copy import deepcopy
 import MDAnalysis
 from MDAnalysis.analysis import distances
 import numpy as np
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject
 
 # TODO: fix aroundPatch with gridsearch in C code using cython
 from .aroundPatch import AroundSelection
@@ -30,8 +31,9 @@ MDAnalysis.core.flags['use_periodic_selections'] = False
 MDAnalysis.core.flags['use_KDTree_routines'] = True
 
 
-class Analyzer(object):
+class Analyzer(QObject):
     """docstring for Analyzer"""
+    frameUpdate = pyqtSignal()
 
     def __init__(self, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1text, sel2text):
         super(Analyzer, self).__init__()
@@ -522,6 +524,7 @@ class Analyzer(object):
                 if key not in allkeys:
                     allkeys.append(key)
             frame_contacts_accumulated.append(currentFrameAcc)
+            self.frameUpdate.emit()
         accumulatedContactsDict = {}
         stop = time.time()
         print(stop - start)

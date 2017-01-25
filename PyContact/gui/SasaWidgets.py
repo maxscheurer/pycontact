@@ -6,7 +6,7 @@ import sip
 import time
 import itertools
 
-from PyQt5.QtWidgets import QWidget, QProgressBar,QGridLayout
+from PyQt5.QtWidgets import QWidget, QProgressBar, QGridLayout, QLabel
 from PyQt5.QtCore import QRect
 import MDAnalysis
 import numpy as np
@@ -256,8 +256,6 @@ class SasaWidget(QWidget, Ui_SasaWidget):
             # time.sleep(0.2)
 
 
-
-
 class PbWidget(QProgressBar):
     def __init__(self, parent=None, total=100):
         super(PbWidget, self).__init__()
@@ -278,18 +276,27 @@ class PbWidget(QProgressBar):
     def closeEvent(self, event):
         self._active = False
 
+# does not work, is not used...
 class ProgessWidget(QWidget):
     def __init__(self, title):
         super(QWidget, self).__init__()
-        grid = QGridLayout()
-        self.title = title
-        self.setGeometry(QRect(20, 40, 120, 80))
+        self.grid = QGridLayout()
+        label = QLabel("blabla")
+        # self.setLayout(self.grid)
+        self.setWindowTitle(title)
+        self.setGeometry(QRect(100, 100, 400, 400))
         self.progress = QProgressBar(self)
-        self.progress.setGeometry(0,0,80,60)
-        self.progress.setGeometry(0, 0, 80, 60)
-        grid.addWidget(self.progress, 0,0)
-        self.setLayout(grid)
+        sip.delete(self.progress)
+        self.progress = PbWidget(total=100)
+        self.progress.setProperty("value", 0)
+        self.progress.setTextVisible(True)
+        self.progress.setInvertedAppearance(False)
+        self.progress.setObjectName("progress")
+        self.grid.addWidget(self.progress, 1, 1, 1, 1)
 
+        # self.progress.setGeometry(0, 0, 200, 100)
+        # self.grid.addWidget(self.progress, 0, 0)
+        # self.grid.addWidget(label, 1, 1)
 
     def setMax(self, maxi):
         self.progress.setRange(0, maxi - 1)
