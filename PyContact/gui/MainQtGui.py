@@ -154,4 +154,3 @@ class Ui_MainWindow(object):
         self.actionDefault.setText(_translate("MainWindow", "Default"))
         self.actionDefault.setShortcut(_translate("MainWindow", "Ctrl+Shift+D"))
         self.actionShow_Info.setText(_translate("MainWindow", "Show Info"))
-
