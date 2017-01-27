@@ -257,7 +257,7 @@ class Analyzer(QObject):
             self.resid_array.append(atom.resid)
             self.name_array.append(atom.name)
             self.type_array.append(atom.type)
-            self.bonds.append(atom.bonds)
+            # self.bonds.append(atom.bonds)
             self.segids.append(atom.segid)
         for atom in backbone_sel:
             self.backbone.append(atom.index)
@@ -318,8 +318,11 @@ class Analyzer(QObject):
                             (type1 == AtomHBondType.both and type2 == AtomHBondType.don):
                         # print("hbond? %s - %s" % (type_array[convindex1], type_array[convindex2]))
                         # search for hatom, check numbering in bond!!!!!!!!!!
-                        b1 = self.bonds[convindex1]
-                        b2 = self.bonds[convindex2]
+                        # b1 = self.bonds[convindex1]
+                        # b2 = self.bonds[convindex2]
+
+                        b1 = all_sel[convindex1].bonds
+                        b2 = all_sel[convindex2].bonds
                         # search for hydrogen atoms bound to atom 1
                         bondcount1 = 0
                         hydrogenAtomsBoundToAtom1 = []
