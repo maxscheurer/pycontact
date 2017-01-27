@@ -238,35 +238,12 @@ class Analyzer(QObject):
             # print(atomline, atype.htype)
             heavyatoms.append(atype)
 
-        # config (GUI settings!)
-
-        # cutoff for contact measurement
-        # cutoff = 5.0
-        # cutoff for H-A distance, usually 3-3.5?(check in literature again!)
-        # hbondcutoff = 3.5
-        # cutoff angle for hbond, check literature again
-        # hbondcutangle = 120
-        # selection texts (MDAnalysis format, not VMD!)
-        # to scan for hydrogen bonds, please do NOT give selections without hydrogen atoms!
-        # the computational effort is managed by the algorithm in an appropriate manner!
-        # sel1text = "segid RN11"
-        # sel2text = "segid UBQ"
-
-        # input psf file (GUI: file picker)
-        # psf = "rpn11_ubq_interface-ionized.psf"
-        # input dcd file (GUI: file picker)
-        # dcd = "short.dcd"
-        # dcd = "rpn11_ubq_50ns.dcd"
-
-        # input maps for contact accumulation
-        # boolean values, check AccumulationMapIndex for meaning!
-        # map1 = [0,0,0,1,1,0]
-        # map2 = [0,0,0,1,1,0]
-
         # load psf and dcd file in memory
         u = MDAnalysis.Universe(psf, dcd)
 
+
         all_sel = u.select_atoms("all")
+        # all_sel = u.select_atoms("%s or %s or name H.*" % (sel1text, sel2text))
         backbone_sel = u.select_atoms("backbone")
         self.resname_array = []
         self.resid_array = []
