@@ -241,7 +241,7 @@ class Analyzer(QObject):
         # load psf and dcd file in memory
         u = MDAnalysis.Universe(psf, dcd)
 
-
+# TODO: think about doing u.select_atoms(sel1text + " or " + sel2text)
         all_sel = u.select_atoms("all")
         # all_sel = u.select_atoms("%s or %s or name H.*" % (sel1text, sel2text))
         backbone_sel = u.select_atoms("backbone")
@@ -257,7 +257,7 @@ class Analyzer(QObject):
             self.resid_array.append(atom.resid)
             self.name_array.append(atom.name)
             self.type_array.append(atom.type)
-            # self.bonds.append(atom.bonds)
+            self.bonds.append(atom.bonds)
             self.segids.append(atom.segid)
         for atom in backbone_sel:
             self.backbone.append(atom.index)
@@ -318,45 +318,15 @@ class Analyzer(QObject):
                             (type1 == AtomHBondType.both and type2 == AtomHBondType.don):
                         # print("hbond? %s - %s" % (type_array[convindex1], type_array[convindex2]))
                         # search for hatom, check numbering in bond!!!!!!!!!!
-                        # b1 = self.bonds[convindex1]
-                        # b2 = self.bonds[convindex2]
+                        b1 = self.bonds[convindex1]
+                        b2 = self.bonds[convindex2]
 
-                        b1 = all_sel[convindex1].bonds
-                        b2 = all_sel[convindex2].bonds
+                        # b1 = all_sel[convindex1].bonds
+                        # b2 = all_sel[convindex2].bonds
                         # search for hydrogen atoms bound to atom 1
                         bondcount1 = 0
                         hydrogenAtomsBoundToAtom1 = []
-                        # old code, wrong!
-                        # for b in b1.types():
-                        #     hydrogen = next((x for x in b if x.startswith("H")), 0)
-                        #     # print(b)
-                        #     if hydrogen != 0:
-                        #         # print("h bond to atom1")
-                        #         bondindices1 = b1.to_indices()[bondcount1]
-                        #         print(bondindices1)
-                        #         # for j in bondindices1:
-                        #         #     print(self.type_array[j+1])
-                        #         hydrogenidx = next(
-                        #             ((j + 1) for j in bondindices1 if self.type_array[j + 1].startswith("H")), -1)
-                        #         if hydrogenidx != -1:
-                        #             # print(type_array[hydrogenidx])
-                        #             hydrogenAtomsBoundToAtom1.append(hydrogenidx)
-                        #     bondcount1 += 1
-                        # # search for hydrogen atoms bound to atom 2
-                        # bondcount2 = 0
-                        # hydrogenAtomsBoundToAtom2 = []
-                        # for b in b2.types():
-                        #     hydrogen = next((x for x in b if x.startswith("H")), 0)
-                        #     # print(b)
-                        #     if hydrogen != 0:
-                        #         # print("h bond to atom2")
-                        #         bondindices2 = b2.to_indices()[bondcount2]
-                        #         hydrogenidx = next(
-                        #             ((k + 1) for k in bondindices2 if self.type_array[k + 1].startswith("H")), -1)
-                        #         if hydrogenidx != -1:
-                        #             # print(type_array[hydrogenidx])
-                        #             hydrogenAtomsBoundToAtom2.append(hydrogenidx)
-                        #     bondcount2 += 1
+
                         # new code
                         for bnd in b1:
                             b = bnd.type
