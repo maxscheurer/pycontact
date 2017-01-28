@@ -321,16 +321,12 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             if parallel:
                 self.contacts = self.analyzeParallel(map1, map2)
             else:
-                # self.totalFramesToProcess = len(contResults)
-                # self.analysis_state = True
-                # self.analysisEventListener()
-                # self.connect(self.analysis, SIGNAL("frameUpdate()"),self.progressBar,SLOT("updateAnalyzedFrames()"))
                 self.value = 0
                 self.totalFramesToProcess = len(self.analysis.contactResults)
                 self.analysis.frameUpdate.connect(self.updateAnalyzedFrames)
                 self.contacts = self.analysis.runContactAnalysis(map1, map2)
                 # self.analysis_state = False
-
+            self.progressBar.setValue(0)
             # for cont in self.contacts:
                 # cont.setScores()
             self.updateSettings()
