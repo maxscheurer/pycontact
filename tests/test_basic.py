@@ -27,6 +27,10 @@ class PsfDcdReadingTest(TestCase):
         map2 = [0, 0, 0, 1, 1, 0]
         analyzer.runContactAnalysis(map1, map2)
         self.assertEqual(len(analyzer.finalAccumulatedContacts), 148)
+        hbond_sum = 0
+        for c in analyzer.finalAccumulatedContacts:
+            hbond_sum += c.hbond_percentage()
+        self.assertEqual(hbond_sum,606.0)
 
     def test_around_selection_patch(self):
         univ = mda.Universe(self.psffile,self.dcdfile)
