@@ -208,6 +208,9 @@ class AccumulatedContact(object):
     def setContactType(self):
         self.contactType = self.determine_ctype()
 
+    def contactTypeAsShortcut(self):
+        return ContactType.shortcut[self.determine_ctype()]
+
     def determine_ctype(self):
         #only works if both maps contain resname
         r1 = self.key1[AccumulationMapIndex.resname].lower()
@@ -317,6 +320,7 @@ class AccumulationMapIndex():
 
 class ContactType:
     saltbr, hydrophobic, hbond, other = range(4)
+    shortcut = ["saltbr","hydrophobic","hbond","other"]
     colors = ["rgba(255, 0,0, 50)", "rgba(0, 0,255, 50)", "rgba(255, 0 ,255, 50)", "rgba(255, 255 ,255, 50)"]
     qcolors = [QColor(255, 0, 0, 50), QColor(0, 0, 255, 50), QColor(255, 0, 255, 50), QColor(255, 255, 255, 50)]
 
