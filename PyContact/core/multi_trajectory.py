@@ -93,57 +93,94 @@ def loop_trajectory(sel1c,sel2c,indices1,indices2,config,suppl):
                     # search for hatom, check numbering in bond!!!!!!!!!!
                     b1 = bonds[convindex1]
                     b2 = bonds[convindex2]
-                    # search for hydrogen atoms bound to atom 1
                     bondcount1 = 0
                     hydrogenAtomsBoundToAtom1 = []
+                    # new code
                     for b in b1.types:
+                        # b = bnd.type
                         hydrogen = next((x for x in b if x.startswith("H")), 0)
-                        # print b
+                        # print(b)
                         if hydrogen != 0:
-                            # print "h bond to atom1"
+                            # print("h bond to atom1")
                             bondindices1 = b1.to_indices()[bondcount1]
+                            # print bondindices1
+                            # for j in bondindices1:
+                            #     print(self.type_array[j+1])
                             hydrogenidx = next(
-                                ((j + 1) for j in bondindices1 if type_array[j + 1].startswith("H")), -1)
+                                (j for j in bondindices1 if type_array[j].startswith("H")), -1)
                             if hydrogenidx != -1:
-                                # print type_array[hydrogenidx]
+                                # print(self.type_array[hydrogenidx])
                                 hydrogenAtomsBoundToAtom1.append(hydrogenidx)
                         bondcount1 += 1
                     # search for hydrogen atoms bound to atom 2
                     bondcount2 = 0
                     hydrogenAtomsBoundToAtom2 = []
                     for b in b2.types:
+                        # b = bnd2.type
                         hydrogen = next((x for x in b if x.startswith("H")), 0)
-                        # print b
+                        # print(b)
                         if hydrogen != 0:
-                            # print "h bond to atom2"
+                            # print("h bond to atom2")
                             bondindices2 = b2.to_indices()[bondcount2]
                             hydrogenidx = next(
-                                ((k + 1) for k in bondindices2 if type_array[k + 1].startswith("H")), -1)
+                                (k for k in bondindices2 if type_array[k].startswith("H")), -1)
                             if hydrogenidx != -1:
-                                # print type_array[hydrogenidx]
+                                # print(type_array[hydrogenidx])
                                 hydrogenAtomsBoundToAtom2.append(hydrogenidx)
                         bondcount2 += 1
-                    # check hbond criteria for hydrogen atoms bound to first atom
-                    for global_hatom in hydrogenAtomsBoundToAtom1:
-                        conv_hatom = np.where(indices1[frame] == global_hatom)[0][0]
-                        typeHeavy = next((x.htype for x in heavyatoms if x.name == type_array[convindex2]),
-                                         AtomHBondType.none)
-                        if typeHeavy == AtomHBondType.acc and (distarray[conv_hatom, idx2] <= hbondcutoff):
-                            donorPosition = s1[idx1]
-                            hydrogenPosition = s1[conv_hatom]
-                            acceptorPosition = s2[idx2]
-                            v1 = hydrogenPosition - acceptorPosition
-                            v2 = hydrogenPosition - donorPosition
-                            v1norm = np.linalg.norm(v1)
-                            v2norm = np.linalg.norm(v2)
-                            dot = np.dot(v1, v2)
-                            angle = np.degrees(np.arccos(dot / (v1norm * v2norm)))
-                            if angle >= hbondcutangle:
-                                dist = distarray[conv_hatom, idx2]
-                                new_hbond = HydrogenBond(convindex1, convindex2, global_hatom, dist, angle,
-                                                         hbondcutoff,
-                                                         hbondcutangle)
-                                hydrogenBonds.append(new_hbond)
+
+                    #old code, most probably wrong!
+                    # search for hydrogen atoms bound to atom 1
+                    # bondcount1 = 0
+                    # hydrogenAtomsBoundToAtom1 = []
+                    # for b in b1.types:
+                    #     hydrogen = next((x for x in b if x.startswith("H")), 0)
+                    #     # print b
+                    #     if hydrogen != 0:
+                    #         # print "h bond to atom1"
+                    #         bondindices1 = b1.to_indices()[bondcount1]
+                    #         hydrogenidx = next(
+                    #             ((j + 1) for j in bondindices1 if type_array[j + 1].startswith("H")), -1)
+                    #         if hydrogenidx != -1:
+                    #             # print type_array[hydrogenidx]
+                    #             hydrogenAtomsBoundToAtom1.append(hydrogenidx)
+                    #     bondcount1 += 1
+                    # # search for hydrogen atoms bound to atom 2
+                    # bondcount2 = 0
+                    # hydrogenAtomsBoundToAtom2 = []
+                    # for b in b2.types:
+                    #     hydrogen = next((x for x in b if x.startswith("H")), 0)
+                    #     # print b
+                    #     if hydrogen != 0:
+                    #         # print "h bond to atom2"
+                    #         bondindices2 = b2.to_indices()[bondcount2]
+                    #         hydrogenidx = next(
+                    #             ((k + 1) for k in bondindices2 if type_array[k + 1].startswith("H")), -1)
+                    #         if hydrogenidx != -1:
+                    #             # print type_array[hydrogenidx]
+                    #             hydrogenAtomsBoundToAtom2.append(hydrogenidx)
+                    #     bondcount2 += 1
+                    # # check hbond criteria for hydrogen atoms bound to first atom
+                    # for global_hatom in hydrogenAtomsBoundToAtom1:
+                    #     conv_hatom = np.where(indices1[frame] == global_hatom)[0][0]
+                    #     typeHeavy = next((x.htype for x in heavyatoms if x.name == type_array[convindex2]),
+                    #                      AtomHBondType.none)
+                    #     if typeHeavy == AtomHBondType.acc and (distarray[conv_hatom, idx2] <= hbondcutoff):
+                    #         donorPosition = s1[idx1]
+                    #         hydrogenPosition = s1[conv_hatom]
+                    #         acceptorPosition = s2[idx2]
+                    #         v1 = hydrogenPosition - acceptorPosition
+                    #         v2 = hydrogenPosition - donorPosition
+                    #         v1norm = np.linalg.norm(v1)
+                    #         v2norm = np.linalg.norm(v2)
+                    #         dot = np.dot(v1, v2)
+                    #         angle = np.degrees(np.arccos(dot / (v1norm * v2norm)))
+                    #         if angle >= hbondcutangle:
+                    #             dist = distarray[conv_hatom, idx2]
+                    #             new_hbond = HydrogenBond(convindex1, convindex2, global_hatom, dist, angle,
+                    #                                      hbondcutoff,
+                    #                                      hbondcutangle)
+                    #             hydrogenBonds.append(new_hbond)
                             # print str(convindex1) + " " + str(convindex2)
                             # print "hbond found: %d,%d,%d"%(convindex1,global_hatom,convindex2)
                             # print angle
