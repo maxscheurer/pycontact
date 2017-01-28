@@ -281,11 +281,13 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
     @pyqtSlot()
     def updateAnalyzedFrames(self):
+        QApplication.processEvents()
         self.progressBar.setValue(100* float(self.value) / float(self.totalFramesToProcess))
         self.value += 1
 
     def analysisEventListener(self):
         while self.analysis_state:
+            QApplication.processEvents()
             progress = 0
             for each in analysisProgressDict.keys():
                 progress += analysisProgressDict[each]
