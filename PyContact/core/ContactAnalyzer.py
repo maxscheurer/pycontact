@@ -44,6 +44,8 @@ class Analyzer(QObject):
         self.hbondcutangle = hbondcutangle
         self.sel1text = sel1text
         self.sel2text = sel2text
+        self.lastMap1 = []
+        self.lastMap2 = []
 
     def runFrameScan(self):
         self.contactResults = self.analyze_psf_dcd(self.psf, self.dcd, self.cutoff, self.hbondcutoff,
@@ -51,6 +53,8 @@ class Analyzer(QObject):
 
     def runContactAnalysis(self, map1, map2):
         self.finalAccumulatedContacts = self.analyze_contactResultsWithMaps(self.contactResults, map1, map2)
+        self.lastMap1 = map1
+        self.lastMap2 = map2
         return deepcopy(self.finalAccumulatedContacts)
 
     def setTrajectoryData(

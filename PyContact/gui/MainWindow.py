@@ -121,6 +121,8 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         # self.progressWidget = ProgessWidget("Analysis progress")
         # self.progressWidget.show()
         # self.progressWidget.hide()
+        self.currentSelection1 = "-"
+        self.currentSelection2 = "-"
 
         self.exportWidget = ExportTabWidget()
 
@@ -130,6 +132,13 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.updateFilters()
 
         self.analysis_state = False
+
+    def updateSelectionLabels(self, sel1, sel2):
+        self.currentSelection1 = sel1
+        self.currentSelection2 = sel2
+        self.selection1label.setText(sel1)
+        self.selection2label.setText(sel2)
+
 
     def importSession(self):
         fnames = QFileDialog.getOpenFileNames(self, "Open file")
@@ -141,9 +150,11 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.contacts = importDict["contacts"]
         arguments = importDict["analyzer"][0:-1]
         trajArgs = importDict["trajectory"]
+        self.maps = importDict["maps"]
         self.analysis = Analyzer(*arguments)
         self.analysis.contactResults = importDict["analyzer"][-1]
         self.analysis.setTrajectoryData(*trajArgs)
+        self.updateSelectionLabels(arguments[5],arguments[6])
         self.updateSettings()
         self.updateFilters()
 
@@ -153,10 +164,12 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         if filestring == "":
             return
         if self.contacts is not None and self.analysis is not None:
+            self.setInfoLabel("Exporting current session...")
             analyzerArgs = [self.analysis.psf, self.analysis.dcd, self.analysis.cutoff, self.analysis.hbondcutoff, self.analysis.hbondcutangle, self.analysis.sel1text, self.analysis.sel2text,self.analysis.contactResults]
             trajArgs = self.analysis.getTrajectoryData()
-            exportDict = {"contacts":self.contacts,"analyzer":analyzerArgs,"trajectory":trajArgs}
+            exportDict = {"contacts":self.contacts,"analyzer":analyzerArgs,"trajectory":trajArgs,"maps":[self.analysis.lastMap1,self.analysis.lastMap2]}
             pickle.dump(exportDict, open(filestring, "wb"))
+            self.cleanInfoLabel()
         else:
             box = ErrorBox("No data to export.")
             box.exec_()
@@ -168,9 +181,11 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.contacts = importDict["contacts"]
         arguments = importDict["analyzer"][0:-1]
         trajArgs = importDict["trajectory"]
+        self.maps = importDict["maps"]
         self.analysis = Analyzer(*arguments)
         self.analysis.contactResults = importDict["analyzer"][-1]
         self.analysis.setTrajectoryData(*trajArgs)
+        self.updateSelectionLabels(arguments[5],arguments[6])
         self.updateSettings()
         self.updateFilters()
 
@@ -182,6 +197,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
     def loadDataPushed(self):
         self.config,result = FileLoaderDialog.getConfig()
         if result == 1:
+            self.setInfoLabel("Loading trajectory and running atomic contact analysis...")
             attrs = vars(self.config)
             nproc = int(self.settingsView.coreBox.value())
             # do not allow multiprocessing unless the trajectory has enough frames
@@ -194,17 +210,19 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             # self.connect(self.analysis, QtCore.SIGNAL('taskUpdated'),self.handleTaskUpdated)
             # self.connect(self.analysis, QtCore.SIGNAL('frameNumberSet'),self.setFrameNumber)
             # self.progressWidget.show()
+            QApplication.processEvents()
             if parallel:
                 self.analysis.contactResults, self.analysis.resname_array, self.analysis.resid_array, self.analysis.name_array, self.analysis.type_array, self.analysis.segids, self.analysis.backbone, self.analysis.sel1text, self.analysis.sel2text = self.loadData_parallel(nproc)
             else:
                 self.analysis.runFrameScan()
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Information)
-            msg.setText("Data loaded: %f frames scanned." % len(self.analysis.contactResults))
-            msg.setInformativeText("")
-            msg.setWindowTitle("Data loaded")
-            msg.setDetailedText("Now click on Analysis to proceed")
-            msg.exec_()
+            # msg = QMessageBox()
+            # msg.setIcon(QMessageBox.Information)
+            # msg.setText("Data loaded: %f frames scanned." % len(self.analysis.contactResults))
+            # msg.setInformativeText("")
+            # msg.setWindowTitle("Data loaded")
+            # msg.setDetailedText("Now click on Analysis to proceed")
+            # msg.exec_()
+            self.setInfoLabel("%d frames loaded." % len(self.analysis.contactResults))
 
     # progress of loading trajectory
     def handleTaskUpdated(self):
@@ -307,9 +325,16 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
                 self.progressBar.setValue(0)
                 self.analysis_state = False
 
+    def setInfoLabel(self,txt):
+        self.statusLabel.setText(txt)
+
+    def cleanInfoLabel(self):
+        self.setInfoLabel("-")
+
     def analyzeDataPushed(self):
         self.maps, result = AnalysisDialog.getMapping()
         if result == 1:
+            self.setInfoLabel("Analyzing contacts...")
             map1 = self.maps[0]
             map2 = self.maps[1]
             nproc = int(self.settingsView.coreBox.value())
@@ -319,6 +344,8 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
                 parallel = 1
 
             if parallel:
+                self.analysis.lastMap1 = map1
+                self.analysis.lastMap2 = map2
                 self.contacts = self.analyzeParallel(map1, map2)
             else:
                 self.value = 0
@@ -327,10 +354,13 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
                 self.contacts = self.analysis.runContactAnalysis(map1, map2)
                 # self.analysis_state = False
             self.progressBar.setValue(0)
+            self.setInfoLabel("Updating timeline...")
+            QApplication.processEvents()
             # for cont in self.contacts:
                 # cont.setScores()
             self.updateSettings()
             self.updateFilters()
+            self.cleanInfoLabel()
 
     def setupFunctionBox(self):
         # sig
