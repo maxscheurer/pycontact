@@ -8,6 +8,9 @@ from Cython.Build import cythonize
 
 extensions = [Extension("PyContact.cy_modules.cy_gridsearch",
                         ["PyContact/cy_modules/cy_gridsearch.pyx"], language="c++",
+                        include_dirs=[".", "PyContact/cy_modules/src"]),
+              Extension("PyContact.cy_modules.wrap_vmd",
+                        ["PyContact/cy_modules/wrap_vmd.pyx"], language="c++",
                         include_dirs=[".", "PyContact/cy_modules/src"])
               ]
 
