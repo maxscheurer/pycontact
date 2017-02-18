@@ -42,6 +42,7 @@ vis.tcl
 
 #Misc#
 ######
+*.npz
 .cache
 .idea
 *.pyc

@@ -4,13 +4,15 @@ from os import path
 sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
 from PyContact.core.ContactAnalyzer import *
 from PyContact.core.aroundPatch import AroundSelection
-from PyContact.exampleData.datafiles import DCD, PSF
+from PyContact.exampleData.datafiles import DCD, PSF, TPR, XTC
 import MDAnalysis as mda
 
 class PsfDcdReadingTest(TestCase):
     def setUp(self):
         self.dcdfile = DCD
         self.psffile = PSF
+        self.tpr = TPR
+        self.xtc = XTC
 
     def tearDown(self):
         del self.dcdfile
@@ -18,6 +20,11 @@ class PsfDcdReadingTest(TestCase):
 
     def test_import_dcd_file(self):
         mda.Universe(self.psffile,self.dcdfile)
+
+    def test_import_xtc_file(self):
+        #seg_0_Protein_chain_U
+        #seg_1_Protein_chain_R
+        mda.Universe(self.tpr,self.xtc)
 
     def test_simple_analysis(self):
         analyzer = Analyzer(self.psffile, self.dcdfile, 5.0, 2.5, 120, "segid RN11", "segid UBQ")

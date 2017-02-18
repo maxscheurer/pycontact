@@ -223,6 +223,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             # msg.setDetailedText("Now click on Analysis to proceed")
             # msg.exec_()
             self.setInfoLabel("%d frames loaded." % len(self.analysis.contactResults))
+            self.updateSelectionLabels(self.config.sel1text, self.config.sel2text)
 
     # progress of loading trajectory
     def handleTaskUpdated(self):
