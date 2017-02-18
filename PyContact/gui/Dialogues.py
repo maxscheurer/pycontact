@@ -9,16 +9,16 @@ from ..core.LoadConfiguration import Configuration
 class FileLoaderDialog(QDialog):
     def __init__(self, parent = None):
         super(FileLoaderDialog, self).__init__(parent)
-
+        self.setWindowTitle("Load Data")
         self.psf = ""
         self.dcd = ""
 
         grid = QGridLayout(self)
 
-        buttonPsf = QPushButton("PSF")
+        buttonPsf = QPushButton("Topology")
         buttonPsf.clicked.connect(self.pick_psf)
 
-        buttonDcd = QPushButton("DCD")
+        buttonDcd = QPushButton("Trajectory")
         buttonDcd.clicked.connect(self.pick_dcd)
 
         grid.addWidget(buttonPsf,0,0)
@@ -64,12 +64,12 @@ class FileLoaderDialog(QDialog):
         grid.addWidget(buttons,6,0)
 
     def pick_psf(self):
-        psfname = QFileDialog.getOpenFileNames(self, "Open psf")
+        psfname = QFileDialog.getOpenFileNames(self, "Open topology")
         for file in psfname[0]:
             self.psf = file
             break
     def pick_dcd(self):
-        dcdname = QFileDialog.getOpenFileNames(self, "Open dcd")
+        dcdname = QFileDialog.getOpenFileNames(self, "Open trajectory")
         for file in dcdname[0]:
             self.dcd = file
             break
