@@ -9,6 +9,7 @@
 from PyQt5.QtGui import (QColor, QPainter, QFont, QPixmap, QMouseEvent, QCursor, QPen, QPaintEvent)
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import QSize, QRect
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject
 from PyQt5 import Qt
 import numpy as np
 
@@ -21,7 +22,8 @@ class ColorScheme:
     custom, bbsc = range(2)
 
 
-class Canvas(QWidget):
+class Canvas(QWidget, QObject):
+    clickedRowSignal = pyqtSignal()
     def __init__(self):
         super(QWidget, self).__init__()
 
@@ -37,6 +39,7 @@ class Canvas(QWidget):
             self.rendered = False
             self.update()
             self.paintEvent(QPaintEvent(QRect(0, 0, self.sizeX, self.sizeY)))
+            self.clickedRowSignal.emit()
 
     def mouseReleaseEvent(self, event):
         # print(event.pos())

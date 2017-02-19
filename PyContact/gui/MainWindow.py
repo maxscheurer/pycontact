@@ -141,10 +141,16 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.vmdpanel = VMDControlPanel()
         self.vmdpanel.show()
 
+        self.painter.clickedRowSignal.connect(self.updateVMDSelections)
+
     def switchedToVisMode(self):
         if self.visModeButton.isChecked():
             pass
 
+    @pyqtSlot()
+    def updateVMDSelections(self):
+        self.vmdpanel.updateSelections(self.analysis.sel1text, self.analysis.sel2text,
+                                       [self.contacts[self.painter.globalClickedRow]])
 
     def updateSelectionLabels(self, sel1, sel2):
         self.currentSelection1 = sel1

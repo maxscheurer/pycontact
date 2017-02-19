@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QPushButton, QComboBox
 from PyQt5 import QtCore
 
 from Dialogues import TopoTrajLoaderDialog
+from ..core.Biochemistry import *
 
 #from ..cy_modules import wrap_vmd as vmd
 
@@ -34,14 +35,21 @@ class VMDCommands():
     def styleBackbone():
         return """
         mol addrep 0
-        mol modstyle 0 0 NewCartoon 0.300000 10.000000 4.100000 0
-        mol modselect 0 0 backbone
-        mol modcolor 0 0 Chain
+        mol modstyle top 0 NewCartoon 0.300000 10.000000 4.100000 0
+        mol modselect top 0 backbone
+        mol modcolor top 0 Chain
         """
 
     @staticmethod
+    def addSelection(sel, colorID):
+        return "mol addrep 0 \n \
+        mol modstyle top 0 Licorice 0.300000 12.000000 12.000000 \n \
+        mol modselect top 0 (%s) \n \
+        mol modcolor top 0 ColorID %d \n" % (sel, colorID)
+
+    @staticmethod
     def removeReps():
-        return "mol delrep 0 all"
+        return "mol delrep 0 0"
 
     @staticmethod
     def resetView():
@@ -138,6 +146,36 @@ class VMDControlPanel(QWidget):
         if result == 1:
             self.prepareVMDWithTopoTraj(cfg[0], cfg[1])
 
+    def updateSelections(self, main_sel1, main_sel2, cont_list):
+        for x in range(10):
+            self.vmd.send_command(self.vmd.commands.removeReps())
+        sel1 = self.vmd.commands.translateSelections(main_sel1) + " and ("
+        sel2 = self.vmd.commands.translateSelections(main_sel2) + " and ("
+        for cont in cont_list:
+            currentSel1 = []
+            index = 0
+            for item in cont.key1:
+                if item != "none":
+                    currentSel1.append(AccumulationMapIndex.vmdsel[index] + " " + item)
+                index += 1
+            currentSel1String = " and ".join(currentSel1)
+            sel1 += currentSel1String + " or "
+            currentSel2 = []
+            index = 0
+            for item in cont.key2:
+                if item != "none":
+                    currentSel2.append(AccumulationMapIndex.vmdsel[index] + " " + item)
+                index += 1
+            currentSel2String = " and ".join(currentSel2)
+            sel2 += currentSel2String + " or "
+        sel1 = sel1[:-3] + ")"
+        sel2 = sel2[:-3] + ")"
+
+        print(self.vmd.commands.addSelection(sel1, 3))
+        self.vmd.send_command(self.vmd.commands.addSelection(sel1, 3))
+        self.vmd.send_command(self.vmd.commands.addSelection(sel2, 4))
+        self.vmd.send_command(self.vmd.commands.styleBackbone())
+        self.vmd.send_command(self.vmd.commands.resetView())
 
     def updateInfoLabel(self, txt):
         self.infoLabel.setText(txt)
@@ -172,5 +210,5 @@ class VMDControlPanel(QWidget):
         self.vmd.stop()
 
     def sendCommand(self):
-        self.vmd.send_command(self.commandField.text().strip())
+        self.vmd.send_command(self.commandField.text())
         self.commandField.setText("")
