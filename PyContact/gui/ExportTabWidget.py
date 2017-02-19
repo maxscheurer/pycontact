@@ -1,6 +1,6 @@
 import sip
-
-from PyQt5.QtWidgets import QTabWidget, QWidget, QGridLayout, QLabel, QPushButton, QComboBox, QLineEdit, QCheckBox
+import os
+from PyQt5.QtWidgets import QTabWidget, QWidget, QGridLayout, QLabel, QPushButton, QComboBox, QLineEdit, QCheckBox, QFileDialog
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 
 from Plotters import *
@@ -169,7 +169,9 @@ class ExportTabWidget(QTabWidget):
         self.grid4 = QGridLayout()
         self.tab5.setLayout(self.grid4)
 
-        self.checkboxdict = {"contactTypeAsShortcut": "Contact Type", "hbond_percentage": "HBond Percentage"}
+        self.checkboxdict = {"mean_score": "Mean Score",
+                             "hbond_percentage": "HBond Percentage",
+                             "contactTypeAsShortcut": "Contact Type"}
         self.checkboxes = []
         self.keys = self.checkboxdict.keys()
 
@@ -187,34 +189,37 @@ class ExportTabWidget(QTabWidget):
             startLine += 1
 
         self.tab5.button = QPushButton("Export to text")
-        self.tab5.button.clicked.connect(self.createTextFile)
-        self.grid4.addWidget(self.tab5.button, startLine, 4)
+        self.tab5.button.clicked.connect(self.saveText)
+        self.grid4.addWidget(self.tab5.button, startLine, 5)
 
-    def createTextFile(self):
-        boxIndex = 0
-        requestedParameters = []
-        for box in self.checkboxes:
-            if box.isChecked():
-                requestedParameters.append(self.keys[boxIndex])
-            boxIndex += 1
+    def saveText(self):
+        fileName = QFileDialog.getSaveFileName(self, 'Export Path')
+        if len(fileName[0]) > 0:
+            path, file_extension = os.path.splitext(fileName[0])
+            boxIndex = 0
+            requestedParameters = []
+            for box in self.checkboxes:
+                if box.isChecked():
+                    requestedParameters.append(self.keys[boxIndex])
+                boxIndex += 1
 
-        tableHeadings = []
-        for par in requestedParameters:
-            tableHeadings.append(self.checkboxdict[par])
-        # TODO: add file picker
-        f = open("textExport.txt", "w")
-        row_format = "{:>20}" * (len(requestedParameters) + 1)
-        f.write(row_format.format("", *tableHeadings))
-        f.write("\n")
+            tableHeadings = []
+            for par in requestedParameters:
+                tableHeadings.append(self.checkboxdict[par])
 
-        for c in self.contacts:
-            currentContactProperties = []
-            for p in requestedParameters:
-                exec("propertyToAdd = c." + p + "()")
-                currentContactProperties.append(propertyToAdd)
-            f.write(row_format.format(c.human_readable_title(), *currentContactProperties))
+            f = open(path + ".txt", "w")
+            row_format = "{:>20}" * (len(requestedParameters) + 1)
+            f.write(row_format.format("", *tableHeadings))
             f.write("\n")
-        f.close()
+
+            for c in self.contacts:
+                currentContactProperties = []
+                for p in requestedParameters:
+                    exec("propertyToAdd = c." + p + "()")
+                    currentContactProperties.append(propertyToAdd)
+                f.write(row_format.format(c.human_readable_title(), *currentContactProperties))
+                f.write("\n")
+            f.close()
 
     def saveHist(self):
         self.plotHist()
