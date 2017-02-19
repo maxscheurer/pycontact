@@ -6,6 +6,55 @@ from PyQt5.QtGui import QDoubleValidator
 
 from ..core.LoadConfiguration import Configuration
 
+
+class TopoTrajLoaderDialog(QDialog):
+    def __init__(self, parent = None):
+        super(TopoTrajLoaderDialog, self).__init__(parent)
+        self.setWindowTitle("Load Data")
+        self.psf = ""
+        self.dcd = ""
+
+        grid = QGridLayout(self)
+
+        buttonPsf = QPushButton("Topology")
+        buttonPsf.clicked.connect(self.pick_psf)
+
+        buttonDcd = QPushButton("Trajectory")
+        buttonDcd.clicked.connect(self.pick_dcd)
+
+        grid.addWidget(buttonPsf,0,0)
+        grid.addWidget(buttonDcd,0,1)
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
+            Qt.Horizontal, self)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        grid.addWidget(buttons,1,0)
+
+    def pick_psf(self):
+        psfname = QFileDialog.getOpenFileNames(self, "Open topology")
+        for file in psfname[0]:
+            self.psf = file
+            break
+    def pick_dcd(self):
+        dcdname = QFileDialog.getOpenFileNames(self, "Open trajectory")
+        for file in dcdname[0]:
+            self.dcd = file
+            break
+
+    def configuration(self):
+        config = [self.psf, self.dcd]
+        return config
+
+    # static method to create the dialog and return (date, time, accepted)
+    @staticmethod
+    def getConfig(parent = None):
+        dialog = TopoTrajLoaderDialog(parent)
+        result = dialog.exec_()
+        config = dialog.configuration()
+        return (config, result == QDialog.Accepted)
+
+
 class FileLoaderDialog(QDialog):
     def __init__(self, parent = None):
         super(FileLoaderDialog, self).__init__(parent)
