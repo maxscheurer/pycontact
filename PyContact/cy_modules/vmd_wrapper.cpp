@@ -10,25 +10,24 @@ using namespace std;
 vmdsock_t vmdsock;
 
 
-static void start_vmd(int pt) {
+static void start_vmd(int pt, char* vmdcommand) {
   int port = pt;
-  vmdsock = newvmdsock("vmd", port);
+  vmdsock = newvmdsock(vmdcommand, port);
   vmdstream vmdscript(vmdsock);
-
-  //draw a sphere
-  vmdscript << "draw sphere { 0 0 0 } radius 0.5" << endl;
-
-  //render to a file
-  // vmdscript << "render snapshot sphere.tga" << endl;
-
-  //quit vmd and exit
-  //
-  //
-  //
 }
 
 static void stop_vmd() {
-  // vmdscript << "quit" << endl;
-  // vmdscript.flush();
+  vmdstream vmdscript(vmdsock);
+  vmdscript << "quit" << endl;
+  vmdscript.flush();
   closevmdsock(vmdsock);
+}
+
+static void send(char * command) {
+  cout << command << endl;
+  vmdstream vmdscript(vmdsock);
+  vmdscript << command << endl;
+  vmdscript.flush();
+  vmdscript << "pwd" << endl;
+  vmdscript.flush();
 }

@@ -37,6 +37,7 @@ from ..core.LogPool import *
 from ..core.aroundPatch import AroundSelection
 import settings
 from ..exampleData.datafiles import DEFAULTSESSION
+from VMDControlPanel import VMDControlPanel
 
 multiprocessing.log_to_stderr()
 np.set_printoptions(threshold=np.inf)
@@ -132,6 +133,9 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.updateFilters()
 
         self.analysis_state = False
+
+        self.vmdpanel = VMDControlPanel()
+        self.vmdpanel.show()
 
     def updateSelectionLabels(self, sel1, sel2):
         self.currentSelection1 = sel1
