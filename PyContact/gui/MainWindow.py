@@ -134,8 +134,17 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
         self.analysis_state = False
 
+        self.visModeButton.setCheckable(True)
+        self.visModeButton.setChecked(False)
+        self.visModeButton.clicked.connect(self.switchedToVisMode)
+
         self.vmdpanel = VMDControlPanel()
         self.vmdpanel.show()
+
+    def switchedToVisMode(self):
+        if self.visModeButton.isChecked():
+            pass
+
 
     def updateSelectionLabels(self, sel1, sel2):
         self.currentSelection1 = sel1

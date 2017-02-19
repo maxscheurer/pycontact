@@ -6,9 +6,10 @@
     Status: Development
 '''
 
-from PyQt5.QtGui import (QColor, QPainter, QFont, QPixmap)
+from PyQt5.QtGui import (QColor, QPainter, QFont, QPixmap, QMouseEvent, QCursor, QPen, QPaintEvent)
 from PyQt5.QtWidgets import QWidget
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QSize, QRect
+from PyQt5 import Qt
 import numpy as np
 
 from ..core.Biochemistry import *
@@ -26,6 +27,26 @@ class Canvas(QWidget):
 
         self.initUI()
 
+    def mousePressEvent(self, event):
+        pos = event.pos()
+        x, y = pos.x(), pos.y()
+        self.clickedRow = -1
+        if self.vismode and x > self.timeLineXOrigin and x < self.endOfTimeLine:
+            self.clickedRow = int(y/self.rowh)
+            print("clickedRow: " + str(self.clickedRow))
+            self.rendered = False
+            self.update()
+            self.paintEvent(QPaintEvent(QRect(0, 0, self.sizeX, self.sizeY)))
+
+    def mouseReleaseEvent(self, event):
+        # print(event.pos())
+        pass
+
+    def mouseMoveEvent(self, event):
+        # print(event.pos())
+        pass
+
+
     def initUI(self):
         self.contacts = 0
         self.sizeX = 0
@@ -39,6 +60,14 @@ class Canvas(QWidget):
         self.range = [0, 0]
         self.rangeFilterActive = False
         self.showHbondScores = False
+        self.vismode = True
+        self.timeLineXOrigin = 0
+        self.clickedRow = -1
+        self.globalClickedRow = -1
+        self.timeLineXOrigin = 0
+        self.rowh = 1
+        self.endOfTimeLine = 0
+
 
     def paintEvent(self, event):
 
@@ -78,6 +107,16 @@ class Canvas(QWidget):
         startx = np.max(self.labelView.buttonWidths) + 15
         orig_startx = startx
 
+        if self.vismode:
+            textoffset += 15
+            start_text += 15
+            startx += 15
+            orig_startx += 15
+
+        print(orig_startx)
+        self.timeLineXOrigin = orig_startx
+        self.rowh = rowheight
+
         # self.sizeX = (len(self.contacts[0].scoreArray) + startx) * offset
         # self.sizeY = len(self.contacts) * rowheight
         if self.rangeFilterActive:
@@ -99,6 +138,7 @@ class Canvas(QWidget):
         p.fillRect(0, 0, self.sizeX, self.sizeY, whiteColor)
 
         row = 0
+        rownumber = 0
         self.alphaFactor = 50
         for c in self.contacts:
             bbScColor = BackboneSidechainContactType.colors[c.determineBackboneSidechainType()]
@@ -128,16 +168,24 @@ class Canvas(QWidget):
                 if alpha > 255:
                     alpha = 255
                 if self.colorScheme == ColorScheme.bbsc:
+                    # pass
                     p.setBrush(QColor(bbScColor[0], bbScColor[1], bbScColor[2], alpha))
                 elif self.colorScheme == ColorScheme.custom:
                     color = QColor(self.customColor)
                     color.setAlpha(alpha)
                     p.setBrush(color)
+
+                if rownumber == self.clickedRow:
+                    p.setPen(QColor(250, 50, 50))
+                else:
+                    p.setPen(QColor(0, 0, 0))
                 p.drawRect(startx, row, offset, 20)
                 startx += offset
                 i += merge
+            self.endOfTimeLine = startx
             startx = orig_startx
             row += rowheight
+            rownumber += 1
 
         if generator:
             row = 0
@@ -154,6 +202,8 @@ class Canvas(QWidget):
                 row += rowheight
 
         p.end()
+        self.globalClickedRow = self.clickedRow
+        self.clickedRow = -1
 
     def drawRenderedContact(self, event, qp):
         qp.drawPixmap(0, 0, self.sizeX, self.sizeY, self.pixmap)

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'MainQtGui.ui'
 #
-# Created by: PyQt5 UI code generator 5.7
+# Created by: PyQt5 UI code generator 5.8
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -18,10 +18,10 @@ class Ui_MainWindow(object):
         self.gridLayout.setObjectName("gridLayout")
         self.contactAreaButton = QtWidgets.QPushButton(self.centralwidget)
         self.contactAreaButton.setObjectName("contactAreaButton")
-        self.gridLayout.addWidget(self.contactAreaButton, 0, 7, 1, 1)
+        self.gridLayout.addWidget(self.contactAreaButton, 0, 8, 1, 1)
         self.statisticsButton = QtWidgets.QPushButton(self.centralwidget)
         self.statisticsButton.setObjectName("statisticsButton")
-        self.gridLayout.addWidget(self.statisticsButton, 0, 5, 1, 1)
+        self.gridLayout.addWidget(self.statisticsButton, 0, 6, 1, 1)
         self.mergeSlider = QtWidgets.QSlider(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -47,7 +47,7 @@ class Ui_MainWindow(object):
         self.progressBar.setTextVisible(True)
         self.progressBar.setInvertedAppearance(False)
         self.progressBar.setObjectName("progressBar")
-        self.gridLayout.addWidget(self.progressBar, 0, 3, 1, 1)
+        self.gridLayout.addWidget(self.progressBar, 0, 4, 1, 1)
         self.zoomSliderLabel = QtWidgets.QLabel(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -63,10 +63,10 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.openPreferencesButton.sizePolicy().hasHeightForWidth())
         self.openPreferencesButton.setSizePolicy(sizePolicy)
         self.openPreferencesButton.setObjectName("openPreferencesButton")
-        self.gridLayout.addWidget(self.openPreferencesButton, 0, 6, 1, 1)
+        self.gridLayout.addWidget(self.openPreferencesButton, 0, 7, 1, 1)
         self.analysisButton = QtWidgets.QPushButton(self.centralwidget)
         self.analysisButton.setObjectName("analysisButton")
-        self.gridLayout.addWidget(self.analysisButton, 0, 4, 1, 1)
+        self.gridLayout.addWidget(self.analysisButton, 0, 5, 1, 1)
         self.scrollArea = QtWidgets.QScrollArea(self.centralwidget)
         self.scrollArea.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustIgnored)
         self.scrollArea.setWidgetResizable(True)
@@ -75,9 +75,9 @@ class Ui_MainWindow(object):
         self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 1118, 623))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
-        self.gridLayout.addWidget(self.scrollArea, 2, 0, 1, 8)
+        self.gridLayout.addWidget(self.scrollArea, 2, 0, 1, 9)
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.gridLayout.addItem(spacerItem, 0, 2, 1, 1)
+        self.gridLayout.addItem(spacerItem, 0, 3, 1, 1)
         self.infoWidget = QtWidgets.QWidget(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -121,7 +121,10 @@ class Ui_MainWindow(object):
         self.selection2.setSizePolicy(sizePolicy)
         self.selection2.setObjectName("selection2")
         self.gridLayout_2.addWidget(self.selection2, 0, 4, 1, 1)
-        self.gridLayout.addWidget(self.infoWidget, 3, 0, 1, 8)
+        self.gridLayout.addWidget(self.infoWidget, 3, 0, 1, 9)
+        self.visModeButton = QtWidgets.QPushButton(self.centralwidget)
+        self.visModeButton.setObjectName("visModeButton")
+        self.gridLayout.addWidget(self.visModeButton, 0, 2, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -178,6 +181,7 @@ class Ui_MainWindow(object):
         self.selection2label.setText(_translate("MainWindow", "-"))
         self.statusLabel.setText(_translate("MainWindow", "-"))
         self.selection2.setText(_translate("MainWindow", "Selection 2:"))
+        self.visModeButton.setText(_translate("MainWindow", "Vismode"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.menuAbout.setTitle(_translate("MainWindow", "About"))
         self.actionOpen.setText(_translate("MainWindow", "Open"))
