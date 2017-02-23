@@ -5,6 +5,7 @@ sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
 from PyContact.core.ContactAnalyzer import *
 from PyContact.core.aroundPatch import AroundSelection
 from PyContact.exampleData.datafiles import DCD, PSF, TPR, XTC
+from PyContact.core.multi_trajectory import run_load_parallel
 import MDAnalysis as mda
 
 class PsfDcdReadingTest(TestCase):
@@ -38,6 +39,15 @@ class PsfDcdReadingTest(TestCase):
         for c in analyzer.finalAccumulatedContacts:
             hbond_sum += c.hbond_percentage()
         self.assertEqual(hbond_sum,606.0)
+
+        analyzer.contactResults, analyzer.resname_array, analyzer.resid_array, analyzer.name_array, analyzer.type_array, analyzer.segids, analyzer.backbone, analyzer.sel1text, analyzer.sel2text = run_load_parallel(4, self.psffile, self.dcdfile, 5.0, 2.5, 120, "segid RN11", "segid UBQ")
+        self.assertEqual(len(analyzer.contactResults), 50)
+
+        hbond_sum = 0
+        for c in analyzer.finalAccumulatedContacts:
+            hbond_sum += c.hbond_percentage()
+        self.assertEqual(hbond_sum,606.0)
+
 
     def test_around_selection_patch(self):
         univ = mda.Universe(self.psffile,self.dcdfile)

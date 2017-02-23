@@ -382,7 +382,7 @@ class Analyzer(QObject):
                                 angle = np.degrees(np.arccos(dot / (v1norm * v2norm)))
                                 # print(angle)
                                 if angle >= hbondcutangle:
-                                    print("new hbond")
+                                    # print("new hbond")
                                     dist = distarray[conv_hatom, idx2]
                                     new_hbond = HydrogenBond(convindex1, convindex2, global_hatom, dist, angle,
                                                              hbondcutoff,
