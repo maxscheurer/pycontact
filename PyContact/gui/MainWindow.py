@@ -145,7 +145,12 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
     def switchedToVisMode(self):
         if self.visModeButton.isChecked():
-            pass
+            self.vismode = True
+        else:
+            self.vismode = False
+        self.painter.switchToVisMode(self.vismode)
+        self.updateSettings()
+        self.updateFilters()
 
     @pyqtSlot()
     def updateVMDSelections(self):

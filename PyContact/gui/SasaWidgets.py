@@ -19,6 +19,8 @@ from ..core.multi_accumulation import chunks
 from ..core.Biochemistry import vdwRadius
 from ..core.LogPool import *
 from ..cy_modules import cy_gridsearch
+from Dialogues import TopoTrajLoaderDialog
+from ErrorBox import ErrorBox
 
 # manage processes for SASA
 sasaProgressManager = multiprocessing.Manager()
@@ -27,17 +29,8 @@ np.set_printoptions(threshold=np.inf)
 
 
 def calculate_sasa_parallel(input_coords, natoms, pairdist, nprad,
-                            surfacePoints,probeRadius, pointstyle,
+                            surfacePoints, probeRadius, pointstyle,
                             restricted, restrictedList, rank):
-    # TODO: remove, deprecated
-    # load shared libraries
-    # cgrid = cdll.LoadLibrary('./shared/libgridsearch.so')
-    # search = cgrid.sasa_grid
-    # search.restype = ctypes.c_double
-    # search.argtypes = [ndpointer(ctypes.c_float, flags="C_CONTIGUOUS"), ctypes.c_int, ctypes.c_float, ctypes.c_int,
-                    #    ctypes.c_int, \
-                    #    ndpointer(ctypes.c_float, flags="C_CONTIGUOUS"), ctypes.c_int, ctypes.c_double, ctypes.c_int,
-                    #    ctypes.c_int, ndpointer(ctypes.c_int, flags="C_CONTIGUOUS")]
 
     temp_sasa = []
     frames_processed = 0
@@ -70,6 +63,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
 
         self.state = True
         self.name = None
+        self.psf, self. dcd = "", ""
 
         sip.delete(self.sasaProgressBar)
         self.sasaProgressBar = PbWidget(total=100)
@@ -82,7 +76,13 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         self.graphGridLayout.addWidget(self.previewPlot)
 
         self.calcSasaButton.clicked.connect(self.calculateSasa)
+        self.loadDataButton.clicked.connect(self.loadData)
+        # self.loadDataButton.setText("")
 
+        self.topoloader = TopoTrajLoaderDialog()
+
+    def loadData(self):
+        self.psf, self. dcd = self.topoloader.getConfig()
 
     def calculateSasa(self):
         print("calculate SASA")
@@ -93,11 +93,15 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         # dcd = "/home/max/Projects/pycontact/short.dcd"
 
         # Rafaels COH3 DOC3
-        psf = "/mnt/workspace/pycontactData/nowater.psf"
-        dcd = "/mnt/workspace/pycontactData/trajectory_short.dcd"
+        # psf = "/mnt/workspace/pycontactData/nowater.psf"
+        # dcd = "/mnt/workspace/pycontactData/trajectory_short.dcd"
 
         # load psf and trajectory, make lists with radii and coordinates
-        u = MDAnalysis.Universe(psf, dcd)
+        if self.psf == "" or self.dcd == "":
+            e = ErrorBox("Please choose a topology and trajectory file!")
+            e.exec_()
+            return
+        u = MDAnalysis.Universe(self.psf, self.dcd)
 
         probeRadius = 1.4
 
@@ -154,7 +158,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
             # print("restricted: ", len(ressel.atoms))
             input_coords.append(selection.positions)
 
-        nprocs = 8#int(self.settingsView.coreBox.value())
+        nprocs = self.coreBox.value()
         input_chunks = chunks(input_coords,nprocs)
         pool = LoggingPool(nprocs)
         results = []

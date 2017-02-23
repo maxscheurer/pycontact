@@ -72,7 +72,7 @@ class Canvas(QWidget, QObject):
         self.range = [0, 0]
         self.rangeFilterActive = False
         self.showHbondScores = False
-        self.vismode = True
+        self.vismode = False
         self.timeLineXOrigin = 0
         self.clickedRow = -1
         self.offset = -1
@@ -80,6 +80,10 @@ class Canvas(QWidget, QObject):
         self.timeLineXOrigin = 0
         self.rowh = 1
         self.endOfTimeLine = 0
+
+    def switchToVisMode(self, vismode):
+        self.vismode = vismode
+        self.labelView.vismode = vismode
 
 
     def paintEvent(self, event):

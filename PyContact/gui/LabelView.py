@@ -22,12 +22,15 @@ class LabelView(QWidget):
     def __init__(self, contacts):
         super(QWidget,self).__init__()
         self.contacts = contacts
-        self.vismode = True
+        self.vismode = False
         self.initUI()
 
     def clean(self):
         allLabels = self.findChildren(QPushButton)
         for child in allLabels:
+            sip.delete(child)
+        allBoxes = self.findChildren(QCheckBox)
+        for child in allBoxes:
             sip.delete(child)
 
     def initUI(self):
