@@ -146,6 +146,10 @@ class VMDControlPanel(QWidget):
         if result == 1:
             self.prepareVMDWithTopoTraj(cfg[0], cfg[1])
 
+    def gotoVMDFrame(self, frame):
+        self.vmd.send_command(self.vmd.commands.gotoFrame(frame))
+
+
     def updateSelections(self, main_sel1, main_sel2, cont_list):
         for x in range(10):
             self.vmd.send_command(self.vmd.commands.removeReps())
@@ -172,10 +176,10 @@ class VMDControlPanel(QWidget):
         sel2 = sel2[:-3] + ")"
 
         print(self.vmd.commands.addSelection(sel1, 3))
-        self.vmd.send_command(self.vmd.commands.addSelection(sel1, 3))
-        self.vmd.send_command(self.vmd.commands.addSelection(sel2, 4))
-        self.vmd.send_command(self.vmd.commands.styleBackbone())
-        self.vmd.send_command(self.vmd.commands.resetView())
+        # self.vmd.send_command(self.vmd.commands.addSelection(sel1, 3))
+        # self.vmd.send_command(self.vmd.commands.addSelection(sel2, 4))
+        # self.vmd.send_command(self.vmd.commands.styleBackbone())
+        # self.vmd.send_command(self.vmd.commands.resetView())
 
     def updateInfoLabel(self, txt):
         self.infoLabel.setText(txt)

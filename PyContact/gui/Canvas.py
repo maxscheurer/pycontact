@@ -24,6 +24,8 @@ class ColorScheme:
 
 class Canvas(QWidget, QObject):
     clickedRowSignal = pyqtSignal()
+    clickedColumnSignal = pyqtSignal()
+
     def __init__(self):
         super(QWidget, self).__init__()
 
@@ -35,11 +37,12 @@ class Canvas(QWidget, QObject):
         self.clickedRow = -1
         if self.vismode and x > self.timeLineXOrigin and x < self.endOfTimeLine:
             self.clickedRow = int(y/self.rowh)
+            self.clickedColumn = int((x-self.timeLineXOrigin)/self.offset)
             print("clickedRow: " + str(self.clickedRow))
             self.rendered = False
             self.update()
             self.paintEvent(QPaintEvent(QRect(0, 0, self.sizeX, self.sizeY)))
-            self.clickedRowSignal.emit()
+            # self.clickedRowSignal.emit()
 
     def mouseReleaseEvent(self, event):
         # print(event.pos())
@@ -47,7 +50,13 @@ class Canvas(QWidget, QObject):
 
     def mouseMoveEvent(self, event):
         # print(event.pos())
-        pass
+        pos = event.pos()
+        x, y = pos.x(), pos.y()
+        self.clickedColumn = -1
+        if self.vismode and x > self.timeLineXOrigin and x < self.endOfTimeLine:
+            self.clickedColumn = int((x-self.timeLineXOrigin)/self.offset)
+            print("clicked on frame %d",self.clickedColumn)
+            # self.clickedColumnSignal.emit()
 
 
     def initUI(self):
@@ -63,13 +72,18 @@ class Canvas(QWidget, QObject):
         self.range = [0, 0]
         self.rangeFilterActive = False
         self.showHbondScores = False
-        self.vismode = True
+        self.vismode = False
         self.timeLineXOrigin = 0
         self.clickedRow = -1
+        self.offset = -1
         self.globalClickedRow = -1
         self.timeLineXOrigin = 0
         self.rowh = 1
         self.endOfTimeLine = 0
+
+    def switchToVisMode(self, vismode):
+        self.vismode = vismode
+        self.labelView.vismode = vismode
 
 
     def paintEvent(self, event):
@@ -185,6 +199,7 @@ class Canvas(QWidget, QObject):
                 p.drawRect(startx, row, offset, 20)
                 startx += offset
                 i += merge
+            self.offset = offset
             self.endOfTimeLine = startx
             startx = orig_startx
             row += rowheight

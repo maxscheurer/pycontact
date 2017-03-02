@@ -145,7 +145,12 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
     def switchedToVisMode(self):
         if self.visModeButton.isChecked():
-            pass
+            self.vismode = True
+        else:
+            self.vismode = False
+        self.painter.switchToVisMode(self.vismode)
+        self.updateSettings()
+        self.updateFilters()
 
     @pyqtSlot()
     def updateVMDSelections(self):
@@ -162,9 +167,11 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
     def importSession(self):
         fnames = QFileDialog.getOpenFileNames(self, "Open file")
         importfile = ""
-        for file in fnames[0]:
-            importfile = file
+        for f in fnames[0]:
+            importfile = f
             break
+        if importfile == "" or len(fnames) == 0:
+            return
         importDict = pickle.load(open(importfile, "rb"))
         self.contacts = importDict["contacts"]
         arguments = importDict["analyzer"][0:-1]

@@ -5,6 +5,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QDoubleValidator
 
 from ..core.LoadConfiguration import Configuration
+from HelpButton import HelpButton
 
 
 class TopoTrajLoaderDialog(QDialog):
@@ -22,6 +23,8 @@ class TopoTrajLoaderDialog(QDialog):
         buttonDcd = QPushButton("Trajectory")
         buttonDcd.clicked.connect(self.pick_dcd)
 
+        helpButton = HelpButton()
+
         grid.addWidget(buttonPsf,0,0)
         grid.addWidget(buttonDcd,0,1)
         buttons = QDialogButtonBox(
@@ -30,6 +33,7 @@ class TopoTrajLoaderDialog(QDialog):
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
         grid.addWidget(buttons,1,0)
+        grid.addWidget(helpButton,2,0)
 
     def pick_psf(self):
         psfname = QFileDialog.getOpenFileNames(self, "Open topology")
