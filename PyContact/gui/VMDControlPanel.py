@@ -70,7 +70,7 @@ class VMDTcp():
         self.tcpClientSocket.connect(self.ADDR)
 
     def start(self):
-        subprocess.Popen(["vmd","-e",self.rctl])
+        subprocess.Popen(["/Applications/VMD\ 1.9.2.app/Contents/vmd/vmd_MACOSXX86","-e",self.rctl])
         try:
             self.attemptConnection()
         except:
