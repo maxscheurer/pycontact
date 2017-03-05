@@ -39,7 +39,7 @@ class Ui_SasaWidget(object):
         self.sasaGraphWidget = QtWidgets.QWidget(self.gridLayoutWidget)
         self.sasaGraphWidget.setObjectName("sasaGraphWidget")
         self.gridLayoutWidget_2 = QtWidgets.QWidget(self.sasaGraphWidget)
-        self.gridLayoutWidget_2.setGeometry(QtCore.QRect(0, 0, 521, 291))
+        self.gridLayoutWidget_2.setGeometry(QtCore.QRect(0, 0, 521, 271))
         self.gridLayoutWidget_2.setObjectName("gridLayoutWidget_2")
         self.graphGridLayout = QtWidgets.QGridLayout(self.gridLayoutWidget_2)
         self.graphGridLayout.setContentsMargins(0, 0, 0, 0)

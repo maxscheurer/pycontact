@@ -71,23 +71,17 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         self.sasaProgressBar.setTextVisible(True)
         self.sasaProgressBar.setInvertedAppearance(False)
         self.sasaProgressBar.setObjectName("sasaProgressBar")
-        self.gridLayout.addWidget(self.sasaProgressBar, 4, 1, 1, 1)
         self.previewPlot = SimplePlotter(None, width=5, height=2, dpi=60)
         self.graphGridLayout.addWidget(self.previewPlot)
-
+        self.gridLayout.addWidget(self.sasaProgressBar, 7, 1, 1, 1)
         self.calcSasaButton.clicked.connect(self.calculateSasa)
         self.loadDataButton.clicked.connect(self.loadData)
-        # self.loadDataButton.setText("")
-
         self.topoloader = TopoTrajLoaderDialog()
 
     def loadData(self):
         loadedData = self.topoloader.getConfig()
         self.psf = loadedData[0][0]
         self.dcd = loadedData[0][1]
-
-        print(self.psf)
-        print(self.dcd)
 
     def calculateSasa(self):
         print("calculate SASA")
