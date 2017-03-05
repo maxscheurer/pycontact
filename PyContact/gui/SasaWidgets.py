@@ -82,7 +82,12 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         self.topoloader = TopoTrajLoaderDialog()
 
     def loadData(self):
-        self.psf, self. dcd = self.topoloader.getConfig()
+        loadedData = self.topoloader.getConfig()
+        self.psf = loadedData[0][0]
+        self.dcd = loadedData[0][1]
+
+        print(self.psf)
+        print(self.dcd)
 
     def calculateSasa(self):
         print("calculate SASA")
@@ -101,6 +106,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
             e = ErrorBox("Please choose a topology and trajectory file!")
             e.exec_()
             return
+
         u = MDAnalysis.Universe(self.psf, self.dcd)
 
         probeRadius = 1.4
@@ -154,7 +160,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         # TODO: dynamic allocation of positions in every frame!
         input_coords = []
         for ts in u.trajectory:
-            ressel = u.select_atoms(resseltext)
+            # ressel = u.select_atoms(resseltext)
             # print("restricted: ", len(ressel.atoms))
             input_coords.append(selection.positions)
 
