@@ -401,11 +401,6 @@ GridSearchPair *vmd_gridsearch1(const float *pos,int natoms, const int *on,
   return cur;
 }
 
-
-static int test_function(int i) {
-  return i;
-}
-
 static double sasa_grid(const float *pos,int natoms, float pairdist, int allow_double_counting, int maxpairs, const float *radius,const int npts, double srad, int pointstyle, int restricted, const int* restrictedList) {
   int on[natoms];
   fill_n(on,natoms,1);
