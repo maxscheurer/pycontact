@@ -205,7 +205,6 @@ class SasaWidget(QWidget, Ui_SasaWidget):
             for ts in u.trajectory:
                 input_coords2.append(selection2.positions)
 
-            nprocs = 8#int(self.settingsView.coreBox.value())
             input_chunks2 = chunks(input_coords2,nprocs)
             pool = LoggingPool(nprocs)
             results = []
