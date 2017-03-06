@@ -144,6 +144,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
                     restrictedList.append(0)
                 radius.append(vdwRadius(s.name[0]))
         else:
+            restrictedList = [0]
             for s in selection.atoms:
                 radius.append(vdwRadius(s.name[0]))
         natoms = len(selection)
