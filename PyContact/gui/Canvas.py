@@ -42,7 +42,7 @@ class Canvas(QWidget, QObject):
             self.rendered = False
             self.update()
             self.paintEvent(QPaintEvent(QRect(0, 0, self.sizeX, self.sizeY)))
-            # self.clickedRowSignal.emit()
+            self.clickedRowSignal.emit()
 
     def mouseReleaseEvent(self, event):
         # print(event.pos())
@@ -56,7 +56,7 @@ class Canvas(QWidget, QObject):
         if self.vismode and x > self.timeLineXOrigin and x < self.endOfTimeLine:
             self.clickedColumn = int((x-self.timeLineXOrigin)/self.offset)
             print("clicked on frame %d",self.clickedColumn)
-            # self.clickedColumnSignal.emit()
+            self.clickedColumnSignal.emit()
 
 
     def initUI(self):
@@ -75,6 +75,7 @@ class Canvas(QWidget, QObject):
         self.vismode = False
         self.timeLineXOrigin = 0
         self.clickedRow = -1
+        self.clickedColumn = -1
         self.offset = -1
         self.globalClickedRow = -1
         self.timeLineXOrigin = 0

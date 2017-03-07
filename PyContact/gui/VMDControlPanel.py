@@ -41,15 +41,22 @@ class VMDCommands():
         """
 
     @staticmethod
-    def addSelection(sel, colorID):
-        return "mol addrep 0 \n \
-        mol modstyle top 0 Licorice 0.300000 12.000000 12.000000 \n \
-        mol modselect top 0 (%s) \n \
-        mol modcolor top 0 ColorID %d \n" % (sel, colorID)
+    def addSelection(sel, representations, colorID):
+        idx = str(len(representations))
+        representations.append(sel)
+        return ["""
+        mol addrep top
+        mol modstyle %s top Licorice
+        mol modselect %s top (%s)
+        mol modcolor %s top ColorID %d
+        """ % (idx, idx, sel, idx, colorID), representations]
 
     @staticmethod
-    def removeReps():
-        return "mol delrep 0 0"
+    def removeReps(index):
+        # delrep rep_number molecule_number
+        return """
+        mol delrep %s top
+        """ % index
 
     @staticmethod
     def resetView():
@@ -70,7 +77,7 @@ class VMDTcp():
         self.tcpClientSocket.connect(self.ADDR)
 
     def start(self):
-        subprocess.Popen(["/Applications/VMD\ 1.9.2.app/Contents/vmd/vmd_MACOSXX86","-e",self.rctl])
+        subprocess.Popen(["vmd","-e",self.rctl])
         try:
             self.attemptConnection()
         except:
@@ -83,13 +90,13 @@ class VMDTcp():
         self.send_command("quit")
         self.tcpClientSocket.close()
 
-
 class VMDControlPanel(QWidget):
     """docstring for VMDControlPanel"""
 
     def __init__(self):
         super(QWidget,self).__init__()
         self.initUI()
+        self.representations = []
 
 
     def initUI(self):
@@ -132,13 +139,17 @@ class VMDControlPanel(QWidget):
         self.grid.addWidget(self.commandField, 1, 0, 1, 2)
         self.vmd = VMDTcp()
 
+    def addRep(self, txt):
+        self.representations.append(txt)
+
     def prepareVMDWithTopoTraj(self,top,traj):
         self.vmd.send_command("mol new %s"  % top)
-        self.vmd.send_command(self.vmd.commands.removeReps())
+        self.vmd.send_command(self.vmd.commands.removeReps(0))
         self.vmd.send_command("mol addfile %s waitfor all" % traj)
         self.vmd.send_command(self.vmd.commands.styleBackbone())
         self.vmd.send_command(self.vmd.commands.resetView())
         self.vmd.send_command(self.vmd.commands.gotoFrame(0))
+        self.addRep("initialBB")
 
     def loadTopoTraj(self):
         topoloader = TopoTrajLoaderDialog()
@@ -149,10 +160,11 @@ class VMDControlPanel(QWidget):
     def gotoVMDFrame(self, frame):
         self.vmd.send_command(self.vmd.commands.gotoFrame(frame))
 
-
     def updateSelections(self, main_sel1, main_sel2, cont_list):
-        for x in range(10):
-            self.vmd.send_command(self.vmd.commands.removeReps())
+        for s in reversed(range(1, len(self.representations) + 1)):
+            self.vmd.send_command(self.vmd.commands.removeReps(s))
+        self.representations = self.representations[:1]
+
         sel1 = self.vmd.commands.translateSelections(main_sel1) + " and ("
         sel2 = self.vmd.commands.translateSelections(main_sel2) + " and ("
         for cont in cont_list:
@@ -175,9 +187,11 @@ class VMDControlPanel(QWidget):
         sel1 = sel1[:-3] + ")"
         sel2 = sel2[:-3] + ")"
 
-        print(self.vmd.commands.addSelection(sel1, 3))
-        # self.vmd.send_command(self.vmd.commands.addSelection(sel1, 3))
-        # self.vmd.send_command(self.vmd.commands.addSelection(sel2, 4))
+        # print(self.vmd.commands.addSelection(sel1, 3))
+        sel1command, self.representations = self.vmd.commands.addSelection(sel1, self.representations, 3)
+        self.vmd.send_command(sel1command)
+        sel2command, self.representations = self.vmd.commands.addSelection(sel2, self.representations, 4)
+        self.vmd.send_command(sel2command)
         # self.vmd.send_command(self.vmd.commands.styleBackbone())
         # self.vmd.send_command(self.vmd.commands.resetView())
 
@@ -205,6 +219,7 @@ class VMDControlPanel(QWidget):
 
 
     def pushStopVMD(self):
+        self.representations = []
         self.updateInfoLabel("VMD stopped.")
         self.connectButton.setEnabled(False)
         self.startButton.setEnabled(True)

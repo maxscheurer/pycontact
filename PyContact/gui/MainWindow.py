@@ -142,6 +142,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.vmdpanel.show()
 
         self.painter.clickedRowSignal.connect(self.updateVMDSelections)
+        self.painter.clickedColumnSignal.connect(self.updateVMDFrame)
 
     def switchedToVisMode(self):
         if self.visModeButton.isChecked():
@@ -156,6 +157,10 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
     def updateVMDSelections(self):
         self.vmdpanel.updateSelections(self.analysis.sel1text, self.analysis.sel2text,
                                        [self.contacts[self.painter.globalClickedRow]])
+
+    @pyqtSlot()
+    def updateVMDFrame(self):
+        self.vmdpanel.gotoVMDFrame(self.painter.clickedColumn)
 
     def updateSelectionLabels(self, sel1, sel2):
         self.currentSelection1 = sel1
