@@ -72,7 +72,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.scrollArea.setWidget(self.painter)
         # deprecated
         # self.actionOpen.triggered.connect(self.pushOpen)
-        self.actionExport.triggered.connect(self.pushExport)
+        self.actionExportData.triggered.connect(self.pushExport)
         self.actionLoad_Data.triggered.connect(self.loadDataPushed)
         self.actionExport_Session.triggered.connect(self.exportSession)
         self.actionImport_Session.triggered.connect(self.importSession)
@@ -82,14 +82,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.settingsView.applySettingsButton.clicked.connect(self.updateSettings)
         self.settingsView.applyFilterButton.clicked.connect(self.updateFilters)
 
-# deprecated
-        #alpha slider for color
-        # self.alphaSlider.setValue(50)
-        # self.alphaSlider.valueChanged.connect(self.alphaValueChanged)
-
         self.statisticsButton.clicked.connect(self.showStatistics)
-
-        self.openPreferencesButton.clicked.connect(self.openPrefs)
 
         #color picker
         self.settingsView.pickColorButton.clicked.connect(self.showColorPicker)
@@ -101,7 +94,10 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
 
         #contact area button
-        self.contactAreaButton.clicked.connect(self.showContactAreaView)
+        self.actionContact_Area_Calculations.triggered.connect(self.showContactAreaView)
+
+        # preferences
+        self.actionPreferences.triggered.connect(self.openPrefs)
 
         #button group for weight functions
         self.functionButtonGroup = QButtonGroup()
@@ -119,14 +115,11 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
         self.actionDefault.triggered.connect(self.loadDefault)
 
-        # self.progressWidget = ProgessWidget("Analysis progress")
-        # self.progressWidget.show()
-        # self.progressWidget.hide()
         self.currentSelection1 = "-"
         self.currentSelection2 = "-"
 
+        # setup of extra widgets
         self.exportWidget = ExportTabWidget()
-
         self.sasaView = SasaWidget()
 
         self.updateSettings()
@@ -139,10 +132,17 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.visModeButton.clicked.connect(self.switchedToVisMode)
 
         self.vmdpanel = VMDControlPanel()
-        self.vmdpanel.show()
+        self.actionVMD_Remote_Control.triggered.connect(self.showVMDControlPanel)
 
         self.painter.clickedRowSignal.connect(self.updateVMDSelections)
         self.painter.clickedColumnSignal.connect(self.updateVMDFrame)
+
+    def showVMDControlPanel(self):
+        self.vmdpanel.show()
+
+    def showContactAreaView(self):
+        self.sasaView.show()
+
 
     def switchedToVisMode(self):
         if self.visModeButton.isChecked():
@@ -779,10 +779,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             self.colorScheme = ColorScheme.custom
         self.updateSettings()
         self.updateFilters()
-
-    def showContactAreaView(self):
-        self.sasaView.show()
-
 
 class SettingsTabWidget(QTabWidget, settings.Ui_settingsWindowWidget):
     def __init__(self, parent=None):
