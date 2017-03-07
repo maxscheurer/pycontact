@@ -18,14 +18,9 @@ class LogExceptions(object):
             result = self.__callable(*args, **kwargs)
 
         except Exception as e:
-            # Here we add some debugging help. If multiprocessing's
-            # debugging is on, it will arrange to log the traceback
             error(traceback.format_exc())
-            # Re-raise the original exception so the Pool worker can
-            # clean up
             raise
 
-        # It was fine, give a normal answer
         return result
 
 class LoggingPool(Pool):

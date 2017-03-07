@@ -1,32 +1,13 @@
-'''
-    Authors: Maximilian Scheurer, Peter Rodenkirch
-    Date created: Nov 2016
-    Python Version: 2.7
-    Version: 0.1a
-    Status: Development
-    Patch for MDAnalysis AroundSelection to make it faster
-'''
-# from ctypes import cdll
-# import ctypes
-
 from MDAnalysis.core.Selection import *
 import numpy as np
-# from numpy.ctypeslib import ndpointer
 
 from ..cy_modules import cy_gridsearch
-
-# aroundLibrary = cdll.LoadLibrary('./shared/libgridsearch.so')
 
 class AroundSelection(DistanceSelection):
     token = 'around'
     precedence = 1
 
     def __init__(self, parser, tokens):
-        # self.findw = aroundLibrary.find_within
-        # find_within(const float *xyz, int *flgs, const int *others, int num, float r)
-        # self.findw.argtypes = [ndpointer(ctypes.c_float, flags="C_CONTIGUOUS"), ndpointer(ctypes.c_int, flags="C_CONTIGUOUS"), ndpointer(ctypes.c_int, flags="C_CONTIGUOUS"), ctypes.c_int,\
-        #  ctypes.c_float]
-
         super(AroundSelection, self).__init__()
         self.cutoff = float(tokens.popleft())
         self.sel = parser.parse_expression(self.precedence)
@@ -37,20 +18,15 @@ class AroundSelection(DistanceSelection):
         Limitations: always ignores periodicity
         """
 
-        # NOTE: Max' custom version of around search
+        # NOTE: custom version of around search
         custom = 1
         sel = self.sel.apply(group)
         # All atoms in group that aren't in sel
         sys = group[~np.in1d(group.indices, sel.indices)]
         if custom:
             # print("custom KD tree running")
-
-            # print sel.indices
             syspos = sys.positions
             selpos = sel.positions
-
-            # coords = np.reshape(syspos, (1, np.size(syspos,0) * 3))
-            # print "coord ", coords.size/3
 
             sys_ones = np.ones(np.size(syspos, 0), dtype=np.int32)
             sys_zeros = np.zeros(np.size(syspos, 0), dtype=np.int32)
@@ -63,7 +39,6 @@ class AroundSelection(DistanceSelection):
             others = np.concatenate((sys_zeros, sel_ones), axis=0)
 
             atom_number = flgs.size
-            # self.findw.restype = ndpointer(ctypes.c_int,shape=(atom_number,))
             result = cy_gridsearch.cy_find_within(all_positions, flgs, others, atom_number, self.cutoff)
 
             real_result = result[0:np.size(syspos,0)]

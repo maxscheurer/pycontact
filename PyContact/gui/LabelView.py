@@ -1,11 +1,3 @@
-'''
-    Authors: Maximilian Scheurer, Peter Rodenkirch
-    Date created: May 2016
-    Python Version: 2.7
-    Version: 0.1a
-    Status: Development
-'''
-
 import sip
 from functools import partial
 

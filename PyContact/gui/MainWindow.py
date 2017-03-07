@@ -1,15 +1,7 @@
-'''
-    Authors: Maximilian Scheurer, Peter Rodenkirch
-    Date created: May 2016
-    Python Version: 2.7
-    Version: 0.1a
-    Status: Development
-'''
 from __future__ import print_function
 import multiprocessing
 import warnings
 import time
-import itertools
 import pickle
 import copy
 
@@ -17,10 +9,9 @@ import PyQt5.QtCore as QtCore
 from PyQt5.QtCore import QRect, pyqtSlot, QObject
 from PyQt5.QtWidgets import (QMainWindow, QTabWidget, QButtonGroup,
                              QLabel, QLineEdit, QDialog, QApplication, QMessageBox,
-                             QGridLayout, QFileDialog)
-from PyQt5.QtWidgets import QProgressBar
+                             QGridLayout, QFileDialog, QColorDialog, QProgressBar)
 from PyQt5.QtGui import QPaintEvent
-from PyQt5.Qt import Qt
+from PyQt5.Qt import Qt, QColor
 import numpy as np
 
 from . import MainQtGui
@@ -38,6 +29,7 @@ from ..core.aroundPatch import AroundSelection
 import settings
 from ..exampleData.datafiles import DEFAULTSESSION
 from VMDControlPanel import VMDControlPanel
+from ..core.DataHandler import DataHandler
 
 multiprocessing.log_to_stderr()
 np.set_printoptions(threshold=np.inf)
@@ -54,7 +46,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         event.accept()
         QApplication.quit()
 
-
     def __init__(self, parent=None):
         self.config = None
         self.analysis = None
@@ -70,8 +61,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         # painter contains both labels and frame boxes for drawing
         self.painter = Canvas()
         self.scrollArea.setWidget(self.painter)
-        # deprecated
-        # self.actionOpen.triggered.connect(self.pushOpen)
         self.actionExportData.triggered.connect(self.pushExport)
         self.actionLoad_Data.triggered.connect(self.loadDataPushed)
         self.actionExport_Session.triggered.connect(self.exportSession)
@@ -81,34 +70,19 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.settingsView = SettingsTabWidget()
         self.settingsView.applySettingsButton.clicked.connect(self.updateSettings)
         self.settingsView.applyFilterButton.clicked.connect(self.updateFilters)
-
+        # statistics
         self.statisticsButton.clicked.connect(self.showStatistics)
-
-        #color picker
+        # color picker
         self.settingsView.pickColorButton.clicked.connect(self.showColorPicker)
         self.customColor = QColor(230, 50, 0)
         self.settingsView.pickColorButton.setStyleSheet("QWidget { background-color: %s }" % self.customColor.name())
 
-        #analysis button
+        # analysis button
         self.analysisButton.clicked.connect(self.analyzeDataPushed)
-
-
-        #contact area button
+        # contact area button
         self.actionContact_Area_Calculations.triggered.connect(self.showContactAreaView)
-
         # preferences
         self.actionPreferences.triggered.connect(self.openPrefs)
-
-        #button group for weight functions
-        self.functionButtonGroup = QButtonGroup()
-        self.currentFunctionType = FunctionType.sigmoid
-        self.functionButtonGroup.buttonClicked[int].connect(self.showFunctionSettings)
-        self.functionButtonGroup.addButton(self.settingsView.sigmoidRadioButton, 0)
-        self.functionButtonGroup.addButton(self.settingsView.rectRadioButton, 1)
-        self.functionButtonGroup.addButton(self.settingsView.linRadioButton, 2)
-        self.setupFunctionBox()
-        self.showFunctionSettings(FunctionType.sigmoid)
-
         # apply color button
         self.settingsView.applyColorButton.clicked.connect(self.updateColors)
         self.colorScheme = ColorScheme.bbsc
@@ -143,7 +117,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
     def showContactAreaView(self):
         self.sasaView.show()
 
-
     def switchedToVisMode(self):
         if self.visModeButton.isChecked():
             self.vismode = True
@@ -170,7 +143,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.selection1label.setText(sel1)
         self.selection2label.setText(sel2)
 
-
     def importSession(self):
         fnames = QFileDialog.getOpenFileNames(self, "Open file")
         importfile = ""
@@ -179,15 +151,12 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             break
         if importfile == "" or len(fnames) == 0:
             return
-        importDict = pickle.load(open(importfile, "rb"))
-        self.contacts = importDict["contacts"]
-        arguments = importDict["analyzer"][0:-1]
-        trajArgs = importDict["trajectory"]
-        self.maps = importDict["maps"]
+
+        self.contacts, arguments, trajArgs, self.maps, contactResults = DataHandler.importSessionFromFile(importfile)
         self.analysis = Analyzer(*arguments)
-        self.analysis.contactResults = importDict["analyzer"][-1]
+        self.analysis.contactResults = contactResults
         self.analysis.setTrajectoryData(*trajArgs)
-        self.updateSelectionLabels(arguments[5],arguments[6])
+        self.updateSelectionLabels(arguments[5], arguments[6])
         self.updateSettings()
         self.updateFilters()
 
@@ -209,64 +178,42 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             return
 
     def loadDefault(self):
-        # importDict = pickle.load(open("defaultsession", "rb"))
-        importDict = pickle.load(open(DEFAULTSESSION, "rb"))
-        self.contacts = importDict["contacts"]
-        arguments = importDict["analyzer"][0:-1]
-        trajArgs = importDict["trajectory"]
-        self.maps = importDict["maps"]
+        self.contacts, arguments, trajArgs, self.maps, contactResults = DataHandler.importSessionFromFile(DEFAULTSESSION)
         self.analysis = Analyzer(*arguments)
-        self.analysis.contactResults = importDict["analyzer"][-1]
+        self.analysis.contactResults = contactResults
         self.analysis.setTrajectoryData(*trajArgs)
-        self.updateSelectionLabels(arguments[5],arguments[6])
+        self.updateSelectionLabels(arguments[5], arguments[6])
         self.updateSettings()
         self.updateFilters()
 
     def loadData_parallel(self, nprocs):
         from ..core.multi_trajectory import run_load_parallel
-        # run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1text, sel2text)
         return run_load_parallel(nprocs,self.config.psf,self.config.dcd, self.config.cutoff,self.config.hbondcutoff,self.config.hbondcutangle,self.config.sel1text,self.config.sel2text)
 
     def loadDataPushed(self):
         self.config,result = FileLoaderDialog.getConfig()
         if result == 1:
             self.setInfoLabel("Loading trajectory and running atomic contact analysis...")
-            attrs = vars(self.config)
             nproc = int(self.settingsView.coreBox.value())
-            # do not allow multiprocessing unless the trajectory has enough frames
             if nproc == 1:
                 parallel = 0
             else:
                 parallel = 1
-            print(', '.join("%s: %s" % item for item in attrs.items()))
             self.analysis = Analyzer(self.config.psf, self.config.dcd, self.config.cutoff, self.config.hbondcutoff, self.config.hbondcutangle, self.config.sel1text, self.config.sel2text)
-            # self.connect(self.analysis, QtCore.SIGNAL('taskUpdated'),self.handleTaskUpdated)
-            # self.connect(self.analysis, QtCore.SIGNAL('frameNumberSet'),self.setFrameNumber)
-            # self.progressWidget.show()
             QApplication.processEvents()
             if parallel:
                 self.analysis.contactResults, self.analysis.resname_array, self.analysis.resid_array, self.analysis.name_array, self.analysis.type_array, self.analysis.segids, self.analysis.backbone, self.analysis.sel1text, self.analysis.sel2text = self.loadData_parallel(nproc)
             else:
                 self.analysis.runFrameScan()
-            # msg = QMessageBox()
-            # msg.setIcon(QMessageBox.Information)
-            # msg.setText("Data loaded: %f frames scanned." % len(self.analysis.contactResults))
-            # msg.setInformativeText("")
-            # msg.setWindowTitle("Data loaded")
-            # msg.setDetailedText("Now click on Analysis to proceed")
-            # msg.exec_()
             self.setInfoLabel("%d frames loaded." % len(self.analysis.contactResults))
             self.updateSelectionLabels(self.config.sel1text, self.config.sel2text)
 
     # progress of loading trajectory
     def handleTaskUpdated(self):
-        # print(self.analysis.currentFrame)
-        # self.progressWidget.setValue(self.analysis.currentFrame)
         self.progressBar.setValue(self.analysis.currentFrame)
 
     # progress of loading trajectory
     def setFrameNumber(self):
-        # self.progressWidget.setMax(self.analysis.totalFrameNumber)
         self.progressBar.setMax(self.analysis.totalFrameNumber)
 
     def analyzeParallel(self, map1, map2):
@@ -284,7 +231,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         for c in all_chunk:
             results.append(pool.apply_async(loop_frame, args=(c, map1, map2, d, rank)))
             rank += 1
-        # TODO: might be important, but without, it's faster and until now, provides the same results
         self.totalFramesToProcess = len(contResults)
         self.analysis_state = True
         self.analysisEventListener()
@@ -292,7 +238,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         pool.join()
         self.analysis_state = False
         stop = time.time()
-        print("time: ", str(stop-start), rank)
+        print("time: ", str(stop - start), rank)
         print(str(len(c)), rank)
         allkeys = []
         frame_contacts_accumulated = []
@@ -395,71 +341,9 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             self.progressBar.setValue(0)
             self.setInfoLabel("Updating timeline...")
             QApplication.processEvents()
-            # for cont in self.contacts:
-                # cont.setScores()
             self.updateSettings()
             self.updateFilters()
             self.cleanInfoLabel()
-
-    def setupFunctionBox(self):
-        # sig
-        self.sigX0Label = QLabel("x0: ", self.settingsView)
-        self.sigX0Field = QLineEdit("1", self.settingsView)
-        self.settingsView.functionGridLayout.addWidget(self.sigX0Label, 1, 0)
-        self.settingsView.functionGridLayout.addWidget(self.sigX0Field, 1, 1)
-
-        self.sigLLabel = QLabel("L: ", self.settingsView)
-        self.sigLField = QLineEdit("1", self.settingsView)
-        self.settingsView.functionGridLayout.addWidget(self.sigLLabel, 1, 2)
-        self.settingsView.functionGridLayout.addWidget(self.sigLField, 1, 3)
-
-        self.sigKLabel = QLabel("k: ", self.settingsView)
-        self.sigKField = QLineEdit("1", self.settingsView)
-        self.settingsView.functionGridLayout.addWidget(self.sigKLabel, 2, 0)
-        self.settingsView.functionGridLayout.addWidget(self.sigKField, 2, 1)
-
-        self.sigY0Label = QLabel("y0: ", self.settingsView)
-        self.sigY0Field = QLineEdit("0", self.settingsView)
-        self.settingsView.functionGridLayout.addWidget(self.sigY0Label, 2, 2)
-        self.settingsView.functionGridLayout.addWidget(self.sigY0Field, 2, 3)
-
-        # rect
-        self.rectX0Label = QLabel("x0: ", self.settingsView)
-        self.rectX0Field = QLineEdit("1", self.settingsView)
-        self.settingsView.functionGridLayout.addWidget(self.rectX0Label, 1, 0)
-        self.settingsView.functionGridLayout.addWidget(self.rectX0Field, 1, 1)
-
-        self.rectX1Label = QLabel("x1: ", self.settingsView)
-        self.rectX1Field = QLineEdit("2", self.settingsView)
-        self.settingsView.functionGridLayout.addWidget(self.rectX1Label, 1, 2)
-        self.settingsView.functionGridLayout.addWidget(self.rectX1Field, 1, 3)
-
-        self.rectHLabel = QLabel("h: ", self.settingsView)
-        self.rectHField = QLineEdit("1", self.settingsView)
-        self.settingsView.functionGridLayout.addWidget(self.rectHLabel, 2, 0)
-        self.settingsView.functionGridLayout.addWidget(self.rectHField, 2, 1)
-
-        self.rectY0Label = QLabel("y0: ", self.settingsView)
-        self.rectY0Field = QLineEdit("0", self.settingsView)
-        self.settingsView.functionGridLayout.addWidget(self.rectY0Label, 2, 2)
-        self.settingsView.functionGridLayout.addWidget(self.rectY0Field, 2, 3)
-
-        # lin
-        self.linY0Label = QLabel("y0: ", self.settingsView)
-        self.linY0Field = QLineEdit("0", self.settingsView)
-        self.settingsView.functionGridLayout.addWidget(self.linY0Label, 1, 0)
-        self.settingsView.functionGridLayout.addWidget(self.linY0Field, 1, 1)
-
-        self.linY1Label = QLabel("y1: ", self.settingsView)
-        self.linY1Field = QLineEdit("1", self.settingsView)
-        self.settingsView.functionGridLayout.addWidget(self.linY1Label, 1, 2)
-        self.settingsView.functionGridLayout.addWidget(self.linY1Field, 1, 3)
-
-        # preview
-        self.previewPlot = SimplePlotter(None, width=5, height=2, dpi=60)
-        self.settingsView.functionGridLayout.addWidget(self.previewPlot, 3, 0, 1, 4)
-
-        self.settingsView.previewButton.clicked.connect(self.previewFunction)
 
     def updateSettings(self):
         self.painter.nsPerFrame = float(self.settingsView.nsPerFrameField.text())
@@ -471,7 +355,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
 
     def updateFilters(self):
-        print("filter update")
         self.painter.labelView.clean()
         self.painter.showHbondScores = False
         # total time filter
@@ -582,74 +465,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             self.exportWidget.setMapLabels(self.analysis.sel1text, self.analysis.sel2text)
         self.exportWidget.setThresholdAndNsPerFrame(self.painter.threshold, self.painter.nsPerFrame)
 
-    # switch between weight functions
-    def showFunctionSettings(self, radiobutton):
-        self.currentFunctionType = radiobutton
-        if radiobutton == FunctionType.sigmoid:
-            self.showHide(False, True, True)
-        elif radiobutton == FunctionType.rect:
-            self.showHide(True, False, True)
-        elif radiobutton == FunctionType.linear:
-            self.showHide(True, True, False)
-
-    # hiding and showing of weight function labels and textfields
-    def showHide(self, first, second, third):
-        self.sigX0Label.setHidden(first)
-        self.sigX0Field.setHidden(first)
-        self.sigLLabel.setHidden(first)
-        self.sigLField.setHidden(first)
-        self.sigKLabel.setHidden(first)
-        self.sigKField.setHidden(first)
-        self.sigY0Label.setHidden(first)
-        self.sigY0Field.setHidden(first)
-        self.rectX0Label.setHidden(second)
-        self.rectX0Field.setHidden(second)
-        self.rectX1Label.setHidden(second)
-        self.rectX1Field.setHidden(second)
-        self.rectHLabel.setHidden(second)
-        self.rectHField.setHidden(second)
-        self.rectY0Label.setHidden(second)
-        self.rectY0Field.setHidden(second)
-        self.linY0Label.setHidden(third)
-        self.linY0Field.setHidden(third)
-        self.linY1Label.setHidden(third)
-        self.linY1Field.setHidden(third)
-
-    # display currenct function in preview window
-    def previewFunction(self):
-        x = []
-        y = []
-        if self.currentFunctionType == FunctionType.sigmoid:
-            x0 = float(self.sigX0Field.text())
-            L = float(self.sigLField.text())
-            k = float(self.sigKField.text())
-            y0 = float(self.sigY0Field.text())
-            if len(self.contacts) > 0:
-                sig = SigmoidWeightFunction("sig", np.arange(0, len(self.contacts[0].scoreArray), 1), x0, L, k, y0)
-                x = np.arange(0, len(self.contacts[0].scoreArray), 1)
-                y = sig.previewFunction()
-        elif self.currentFunctionType == FunctionType.rect:
-            x0 = float(self.rectX0Field.text())
-            x1 = float(self.rectX1Field.text())
-            h = float(self.rectHField.text())
-            y0 = float(self.rectY0Field.text())
-            if len(self.contacts) > 0:
-                rect = RectangularWeightFunction("rect", np.arange(0, len(self.contacts[0].scoreArray), 1), x0, x1, h, y0)
-                x = np.arange(0, len(self.contacts[0].scoreArray), 1)
-                y = rect.previewFunction()
-        elif self.currentFunctionType == FunctionType.linear:
-            y0 = float(self.linY0Field.text())
-            y1 = float(self.linY1Field.text())
-            if len(self.contacts) > 0:
-                lin = LinearWeightFunction("rect", np.arange(0, len(self.contacts[0].scoreArray), 1), y0, y1)
-                x = np.arange(0, len(self.contacts[0].scoreArray), 1)
-                y = lin.previewFunction()
-        sip.delete(self.previewPlot)
-        self.previewPlot = SimplePlotter(None, width=5, height=2, dpi=60)
-        self.settingsView.functionGridLayout.addWidget(self.previewPlot, 3, 0, 1, 4)
-        self.previewPlot.plot(x, y)
-        self.previewPlot.update()
-
     def openPrefs(self):
         self.settingsView.show()
 
@@ -701,7 +516,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         info = QLabel("Developers: Maximilian Scheurer and Peter Rodenkirch")
         info2 = QLabel("Departments: TCBG, University of Illinois at Urbana-Champaign; BZH Heidelberg University")
         mail = QLabel("Contact: mscheurer@ks.uiuc.edu, rodenkirch@stud.uni-heidelberg.de")
-        copyright = QLabel("Version 0.1.1a, January 2017")
+        copyright = QLabel("Version 0.1.1a, March 2017")
 
         grid.addWidget(info, 0, 0)
         grid.addWidget(info2, 1, 0)
@@ -767,13 +582,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.painter.update()
         self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
 
-# deprecated
-    def alphaValueChanged(self):
-        self.painter.alphaFactor = 50
-        self.painter.rendered = False
-        self.painter.update()
-        self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
-
     def showColorPicker(self):
         col = QColorDialog.getColor()
         self.customColor = col
@@ -787,6 +595,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             self.colorScheme = ColorScheme.custom
         self.updateSettings()
         self.updateFilters()
+
 
 class SettingsTabWidget(QTabWidget, settings.Ui_settingsWindowWidget):
     def __init__(self, parent=None):

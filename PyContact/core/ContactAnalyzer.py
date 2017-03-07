@@ -1,14 +1,3 @@
-'''
-    Authors: Maximilian Scheurer, Peter Rodenkirch
-    Date created: May 2016
-    Python Version: 2.7
-    Version: 0.1a
-    Status: Development
-'''
-# md analysis implementation for contact search
-# May 2016
-# Author: Maximilian Scheurer, mscheurer@ks.uiuc.edu
-
 from __future__ import print_function
 import itertools
 import re

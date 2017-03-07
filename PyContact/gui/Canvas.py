@@ -1,11 +1,3 @@
-'''
-    Authors: Maximilian Scheurer, Peter Rodenkirch
-    Date created: May 2016
-    Python Version: 2.7
-    Version: 0.1a
-    Status: Development
-'''
-
 from PyQt5.QtGui import (QColor, QPainter, QFont, QPixmap, QMouseEvent, QCursor, QPen, QPaintEvent)
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import QSize, QRect

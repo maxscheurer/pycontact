@@ -1,8 +1,6 @@
 from __future__ import print_function
 import multiprocessing
 import sip
-# from ctypes import cdll
-# import ctypes
 import time
 import itertools
 
