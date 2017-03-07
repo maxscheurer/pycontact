@@ -155,12 +155,14 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
     @pyqtSlot()
     def updateVMDSelections(self):
-        self.vmdpanel.updateSelections(self.analysis.sel1text, self.analysis.sel2text,
-                                       [self.contacts[self.painter.globalClickedRow]])
+        if self.vmdpanel.connected:
+            self.vmdpanel.updateSelections(self.analysis.sel1text, self.analysis.sel2text,
+                                           [self.contacts[self.painter.globalClickedRow]])
 
     @pyqtSlot()
     def updateVMDFrame(self):
-        self.vmdpanel.gotoVMDFrame(self.painter.clickedColumn)
+        if self.vmdpanel.connected:
+            self.vmdpanel.gotoVMDFrame(self.painter.clickedColumn)
 
     def updateSelectionLabels(self, sel1, sel2):
         self.currentSelection1 = sel1
@@ -364,6 +366,11 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.setInfoLabel("-")
 
     def analyzeDataPushed(self):
+        if self.analysis is None:
+            box = ErrorBox("No data loaded. Click on \"Files -> Import Trajectory Data\" and load your MD trajectory.")
+            box.exec_()
+            return
+
         self.maps, result = AnalysisDialog.getMapping()
         if result == 1:
             self.setInfoLabel("Analyzing contacts...")
@@ -648,7 +655,8 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
     def showStatistics(self):
         if len(self.contacts) == 0 or self.contacts is None:
-            box = ErrorBox("No data loaded!")
+            box = ErrorBox("No contact scores accumulated! If you have not loaded your trajectory yet, click on \"Files -> Load Trajectory Data\". Then,\
+                           click on \"Accumulate Scores\" and run the analysis.")
             box.exec_()
             return
         d = QDialog()

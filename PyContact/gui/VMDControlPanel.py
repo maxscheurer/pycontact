@@ -97,6 +97,7 @@ class VMDControlPanel(QWidget):
         super(QWidget,self).__init__()
         self.initUI()
         self.representations = []
+        self.connected = False
 
 
     def initUI(self):
@@ -131,9 +132,9 @@ class VMDControlPanel(QWidget):
 
 # just for testing purposes
         self.commandButton = QPushButton("Send command")
-        self.commandButton.clicked.connect(self.sendCommand)
-        self.grid.addWidget(self.commandButton, 2, 0)
-        self.commandButton.setEnabled(False)
+        # self.commandButton.clicked.connect(self.sendCommand)
+        # self.grid.addWidget(self.commandButton, 2, 0)
+        # self.commandButton.setEnabled(False)
 
         self.commandField = QLineEdit()
         self.grid.addWidget(self.commandField, 1, 0, 1, 2)
@@ -203,6 +204,7 @@ class VMDControlPanel(QWidget):
             self.vmd.attemptConnection()
             self.updateInfoLabel("Connection established")
             self.loadTopoTrajButton.setEnabled(True)
+            self.connected = True
         except Exception as e:
              self.updateInfoLabel("Could not connect to VMD!\nTry to connect using the Connect button\n when VMD is opened.")
 
@@ -216,6 +218,7 @@ class VMDControlPanel(QWidget):
             self.updateInfoLabel("Could not connect to VMD!\nTry to connect using the Connect button\n when VMD is opened.")
         else:
             self.loadTopoTrajButton.setEnabled(True)
+            self.connected = True
 
 
     def pushStopVMD(self):
@@ -227,6 +230,7 @@ class VMDControlPanel(QWidget):
         self.commandButton.setEnabled(False)
         self.loadTopoTrajButton.setEnabled(False)
         self.vmd.stop()
+        self.connected = False
 
     def sendCommand(self):
         self.vmd.send_command(self.commandField.text())
