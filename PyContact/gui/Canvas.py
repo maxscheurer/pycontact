@@ -36,7 +36,7 @@ class Canvas(QWidget, QObject):
         x, y = pos.x(), pos.y()
         self.clickedRow = -1
         if self.vismode and x > self.timeLineXOrigin and x < self.endOfTimeLine:
-            self.clickedRow = int(y/self.rowh)
+            self.clickedRow = int(y/self.rowh - 1) # -1 because of frame number line
             self.clickedColumn = int((x-self.timeLineXOrigin)/self.offset)
             print("clickedRow: " + str(self.clickedRow))
             self.rendered = False
@@ -139,10 +139,10 @@ class Canvas(QWidget, QObject):
         if self.rangeFilterActive:
             self.sizeX = startx + (len(self.contacts[0].scoreArray) + merge * 2) * offset / merge
         else:
-            self.sizeX = startx + (len(
-                self.contacts[0].scoreArray[self.range[0]:self.range[1]]) + merge * 2) * offset / merge
+            self.sizeX = startx + (len(self.contacts[0].scoreArray[self.range[0]:self.range[1]]) + merge * 2) * offset / merge
 
-        self.sizeY = len(self.contacts) * rowheight
+        # add one row for frame numbers
+        self.sizeY = (len(self.contacts)+1) * rowheight
 
         self.pixmap = QPixmap(QSize(self.sizeX, self.sizeY))
         p = QPainter()
@@ -156,8 +156,9 @@ class Canvas(QWidget, QObject):
 
         row = 0
         rownumber = 0
-        self.alphaFactor = 50
+        print("merge value",merge)
         for c in self.contacts:
+            self.alphaFactor = 50
             bbScColor = BackboneSidechainContactType.colors[c.determineBackboneSidechainType()]
             i = 0
             if not self.showHbondScores:
@@ -172,6 +173,14 @@ class Canvas(QWidget, QObject):
                     rangedScores = hbarray
                 else:
                     rangedScores = hbarray[self.range[0]:self.range[1]]
+            if rownumber == 0:
+                # show the frame numbers on top
+                p.setFont(QFont('Arial', 8))
+                p.drawText(start_text,row + textoffset + 2.0, "Frame:")
+                for l in range(0,len(rangedScores)/merge+1,10)[1:]:
+                    p.drawText(startx+(l-1)*offset,row + textoffset + 2.0, str(l*merge))
+                self.labelView.move(0,rowheight)
+                row += rowheight
             while i < len(rangedScores):
                 p.setPen(blackColor)
                 merged_score = 0

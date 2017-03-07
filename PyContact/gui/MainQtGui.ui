@@ -41,7 +41,10 @@
        <number>1</number>
       </property>
       <property name="maximum">
-       <number>10</number>
+       <number>99</number>
+      </property>
+      <property name="singleStep">
+       <number>5</number>
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -215,7 +218,7 @@
      </spacer>
     </item>
     <item row="2" column="6" colspan="3">
-     <widget class="QFrame" name="frame">
+     <widget class="QFrame" name="filterFrame">
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
       </property>
@@ -224,7 +227,7 @@
       </property>
       <layout class="QGridLayout" name="gridLayout_3">
        <item row="0" column="3">
-        <widget class="QLabel" name="label">
+        <widget class="QLabel" name="toLabel">
          <property name="maximumSize">
           <size>
            <width>30</width>
@@ -246,6 +249,13 @@
          </property>
          <property name="text">
           <string>Timeline range</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1" colspan="4">
+        <widget class="Line" name="sepLine2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
          </property>
         </widget>
        </item>
@@ -306,13 +316,6 @@
           </size>
          </property>
         </spacer>
-       </item>
-       <item row="2" column="1" colspan="4">
-        <widget class="Line" name="line_2">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
        </item>
       </layout>
      </widget>
