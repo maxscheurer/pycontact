@@ -20,7 +20,29 @@ class Canvas(QWidget, QObject):
         super(QWidget, self).__init__()
 
         self.clickedRow = 0
-        self.initUI()
+        self.clickedColumn = 0
+        self.rendered = False
+        self.contacts = 0
+        self.sizeX = 0
+        self.sizeY = 0
+        self.rendered = False
+        self.pixmap = 0
+        self.merge = 1
+        self.labelView = LabelView([])
+        self.alphaFactor = 50
+        self.contacts = []
+        self.range = [0, 0]
+        self.rangeFilterActive = False
+        self.showHbondScores = False
+        self.vismode = False
+        self.timeLineXOrigin = 0
+        self.clickedRow = -1
+        self.clickedColumn = -1
+        self.offset = -1
+        self.globalClickedRow = -1
+        self.timeLineXOrigin = 0
+        self.rowh = 1
+        self.endOfTimeLine = 0
 
     def mousePressEvent(self, event):
         pos = event.pos()
@@ -45,38 +67,13 @@ class Canvas(QWidget, QObject):
         x, y = pos.x(), pos.y()
         self.clickedColumn = -1
         if self.vismode and self.timeLineXOrigin < x < self.endOfTimeLine:
-            self.clickedColumn = int((x-self.timeLineXOrigin)/self.offset)
+            self.clickedColumn = int((x - self.timeLineXOrigin) / self.offset)
             # print("clicked on frame %d",self.clickedColumn)
             self.clickedColumnSignal.emit()
-
-
-    def initUI(self):
-        self.contacts = 0
-        self.sizeX = 0
-        self.sizeY = 0
-        self.rendered = False
-        self.pixmap = 0
-        self.merge = 1
-        self.labelView = LabelView([])
-        self.alphaFactor = 50
-        self.contacts = []
-        self.range = [0, 0]
-        self.rangeFilterActive = False
-        self.showHbondScores = False
-        self.vismode = False
-        self.timeLineXOrigin = 0
-        self.clickedRow = -1
-        self.clickedColumn = -1
-        self.offset = -1
-        self.globalClickedRow = -1
-        self.timeLineXOrigin = 0
-        self.rowh = 1
-        self.endOfTimeLine = 0
 
     def switchToVisMode(self, vismode):
         self.vismode = vismode
         self.labelView.vismode = vismode
-
 
     def paintEvent(self, event):
 
@@ -85,7 +82,7 @@ class Canvas(QWidget, QObject):
 
         # render pixmap to resolve performance issues
         if self.rendered:
-            self.drawRenderedContact(event, qp)
+            self.drawRenderedContact(qp)
         elif self.rendered is False and self.contacts:
             self.renderContact(False)
             self.rendered = True
@@ -131,7 +128,8 @@ class Canvas(QWidget, QObject):
         if self.rangeFilterActive:
             self.sizeX = startx + (len(self.contacts[0].scoreArray) + merge * 2) * offset / merge
         else:
-            self.sizeX = startx + (len(self.contacts[0].scoreArray[self.range[0]:self.range[1]]) + merge * 2) * offset / merge
+            self.sizeX = startx + (len(self.contacts[0].scoreArray[self.range[0]:self.range[1]]) + merge * 2) \
+                                  * offset / merge
 
         # add one row for frame numbers
         self.sizeY = (len(self.contacts)+1) * rowheight
@@ -148,7 +146,7 @@ class Canvas(QWidget, QObject):
 
         row = 0
         rownumber = 0
-        print("merge value",merge)
+        print("merge value", merge)
         for c in self.contacts:
             self.alphaFactor = 50
             bbScColor = BackboneSidechainContactType.colors[c.determineBackboneSidechainType()]
@@ -168,10 +166,10 @@ class Canvas(QWidget, QObject):
             if rownumber == 0:
                 # show the frame numbers on top
                 p.setFont(QFont('Arial', 8))
-                p.drawText(start_text,row + textoffset + 2.0, "Frame:")
-                for l in range(0,len(rangedScores)/merge+1,10)[1:]:
-                    p.drawText(startx+(l-1)*offset,row + textoffset + 2.0, str(l*merge))
-                self.labelView.move(0,rowheight)
+                p.drawText(start_text, row + textoffset + 2.0, "Frame:")
+                for l in range(0, len(rangedScores) / merge + 1, 10)[1:]:
+                    p.drawText(startx + (l - 1) * offset, row + textoffset + 2.0, str(l * merge))
+                self.labelView.move(0, rowheight)
                 row += rowheight
             while i < len(rangedScores):
                 p.setPen(blackColor)
@@ -181,7 +179,7 @@ class Canvas(QWidget, QObject):
                         break
                     x = rangedScores[i + j]
                     merged_score += x
-                merged_score = merged_score / merge
+                merged_score /= merge
                 alpha = merged_score * self.alphaFactor
                 if alpha > 255:
                     alpha = 255
@@ -224,5 +222,5 @@ class Canvas(QWidget, QObject):
         self.globalClickedRow = self.clickedRow
         self.clickedRow = -1
 
-    def drawRenderedContact(self, event, qp):
+    def drawRenderedContact(self, qp):
         qp.drawPixmap(0, 0, self.sizeX, self.sizeY, self.pixmap)
