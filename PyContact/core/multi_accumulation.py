@@ -1,15 +1,11 @@
 from __future__ import print_function
 import math
-import time
 import multiprocessing
-
-import numpy as np
-import MDAnalysis
-from MDAnalysis.analysis import distances
 
 from .Biochemistry import *
 analysisProgressManager = multiprocessing.Manager()
 analysisProgressDict = analysisProgressManager.dict()
+
 
 def find_between(s, first, last):
         try:
@@ -18,6 +14,7 @@ def find_between(s, first, last):
             return s[start:end]
         except ValueError:
             return ""
+
 
 def makeKeyArraysFromKey(key):
     keystring1, keystring2 = key.split("-")
@@ -79,6 +76,7 @@ def makeKeyArraysFromKey(key):
                 key2.append(currentValue)
     return [key1, key2]
 
+
 def chunks_old(l, n):
     """Yield successive n-sized chunks from l."""
     ratio = int(math.floor(len(l)/n))
@@ -91,16 +89,18 @@ def chunks_old(l, n):
             yield l[i:i+ratio]
         current_chunk += 1
 
+
 def chunks(seq, num):
-  avg = len(seq) / float(num)
-  out = []
-  last = 0.0
+    avg = len(seq) / float(num)
+    out = []
+    last = 0.0
 
-  while last < len(seq):
-    out.append(seq[int(last):int(last + avg)])
-    last += avg
+    while last < len(seq):
+        out.append(seq[int(last):int(last + avg)])
+        last += avg
 
-  return out
+    return out
+
 
 def makeKeyArraysFromMaps(map1, map2, contact):
     # global type_array,name_array,resid_array,resname_array,segids
@@ -146,6 +146,7 @@ def makeKeyArraysFromMaps(map1, map2, contact):
         counter += 1
     return [keys1, keys2]
 
+
 def makeKeyFromKeyArrays(key1, key2):
         key = ""
         itemcounter = 0
@@ -161,7 +162,8 @@ def makeKeyFromKeyArrays(key1, key2):
             itemcounter += 1
         return key
 
-def loop_frame(contacts,map1,map2,trajArgs,rank):
+
+def loop_frame(contacts, map1, map2, trajArgs, rank):
     allkeys = []
     results = []
     global backbone
@@ -171,7 +173,9 @@ def loop_frame(contacts,map1,map2,trajArgs,rank):
     global resname_array
     global segids
     frames_processed = 0
-    backbone,type_array,name_array,resid_array,resname_array,segids = trajArgs[5],trajArgs[3],trajArgs[2],trajArgs[1],trajArgs[0],trajArgs[4]
+    backbone, type_array, name_array, resid_array, resname_array, segids = trajArgs[5], trajArgs[3], trajArgs[2],\
+                                                                           trajArgs[1], trajArgs[0], trajArgs[4]
+
     for frame in contacts:
         currentFrameAcc = {}
         for cont in frame:
@@ -202,9 +206,9 @@ def loop_frame(contacts,map1,map2,trajArgs,rank):
                     currentFrameAcc[key].bb2score += cont.weight
                 else:
                     currentFrameAcc[key].sc2score += cont.weight
-            if not key in allkeys:
+            if not (key in allkeys):
                 allkeys.append(key)
         results.append(currentFrameAcc)
         frames_processed += 1
         analysisProgressDict[rank] = frames_processed
-    return [allkeys,results]
+    return [allkeys, results]

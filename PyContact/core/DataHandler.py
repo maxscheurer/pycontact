@@ -1,7 +1,7 @@
 import pickle
 
 
-class DataHandler():
+class DataHandler:
     """docstring"""
 
     @staticmethod
