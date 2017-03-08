@@ -295,7 +295,7 @@ def run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1t
     results = []
     rank = 0
     for c in zip(sel1c,sel2c,sel1ind,sel2ind):
-        results.append( pool.apply_async( loop_trajectory, args=(c[0],c[1],c[2],c[3],[cutoff, hbondcutoff, hbondcutangle],[type_array,bonds,heavyatoms,name_array])) )
+        results.append(pool.apply_async( loop_trajectory, args=(c[0],c[1],c[2],c[3],[cutoff, hbondcutoff, hbondcutangle],[type_array,bonds,heavyatoms,name_array])) )
         rank +=1
     # TODO: might be important, but without, it's faster and until now, provides the same results
     pool.close()

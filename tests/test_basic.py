@@ -29,24 +29,26 @@ class PsfDcdReadingTest(TestCase):
 
     def test_simple_analysis(self):
         analyzer = Analyzer(self.psffile, self.dcdfile, 5.0, 2.5, 120, "segid RN11", "segid UBQ")
-        analyzer.runFrameScan()
+        analyzer.runFrameScan(1)
         self.assertEqual(len(analyzer.contactResults), 50)
         map1 = [0, 0, 0, 1, 1, 0]
         map2 = [0, 0, 0, 1, 1, 0]
-        analyzer.runContactAnalysis(map1, map2)
+        analyzer.runContactAnalysis(map1, map2, 1)
         self.assertEqual(len(analyzer.finalAccumulatedContacts), 148)
         hbond_sum = 0
         for c in analyzer.finalAccumulatedContacts:
             hbond_sum += c.hbond_percentage()
-        self.assertEqual(hbond_sum,606.0)
+        self.assertEqual(hbond_sum, 606.0)
 
-        analyzer.contactResults, analyzer.resname_array, analyzer.resid_array, analyzer.name_array, analyzer.type_array, analyzer.segids, analyzer.backbone, analyzer.sel1text, analyzer.sel2text = run_load_parallel(4, self.psffile, self.dcdfile, 5.0, 2.5, 120, "segid RN11", "segid UBQ")
+        # multicore test
+        analyzer.runFrameScan(4)
         self.assertEqual(len(analyzer.contactResults), 50)
-
+        analyzer.runContactAnalysis(map1, map2, 4)
+        self.assertEqual(len(analyzer.finalAccumulatedContacts), 148)
         hbond_sum = 0
         for c in analyzer.finalAccumulatedContacts:
             hbond_sum += c.hbond_percentage()
-        self.assertEqual(hbond_sum,606.0)
+        self.assertEqual(hbond_sum, 606.0)
 
 
     def test_around_selection_patch(self):
