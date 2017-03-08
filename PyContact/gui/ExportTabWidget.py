@@ -5,6 +5,7 @@ from PyQt5.QtCore import pyqtSignal, pyqtSlot
 
 from Plotters import *
 from ErrorBox import ErrorBox
+from ErrorMessages import ErrorMessages
 
 
 class ExportTabWidget(QTabWidget):
@@ -259,12 +260,12 @@ class ExportTabWidget(QTabWidget):
         self.tab3.mapPlot = MapPlotter(None, width=8, height=5, dpi=60)
         self.grid2.addWidget(self.tab3.mapPlot, 3, 0, 1, 4)
         if self.map1 is None or self.map2 is None or self.contacts is None or len(self.contacts) == 0:
-            box = ErrorBox("Please analyze the trajectory with the resid box checked for both atom selections!")
+            box = ErrorBox(ErrorMessages.RESID_REQUIRED)
             box.exec_()
             return
         res = self.tab3.mapPlot.plotMap(self.contacts, self.map1, self.map2,self.label1,self.label2,self.tab3.attributeBox.currentText(), self.threshold, self.nsPerFrame)
         if res == -1:
-            box = ErrorBox("Please analyze the trajectory with the resid box checked for both atom selections!")
+            box = ErrorBox(ErrorMessages.RESID_REQUIRED)
             box.exec_()
         self.tab3.mapPlot.update()
 
@@ -286,7 +287,7 @@ class ExportTabWidget(QTabWidget):
 
     def createTclScriptVis(self):
         if len(self.contacts) == 0:
-            box = ErrorBox("No data loaded or no filtered contacts available.")
+            box = ErrorBox(ErrorMessages.NOCONTACTS)
             box.exec_()
             return
         f = open('vis.tcl', 'w')

@@ -19,6 +19,7 @@ from ..core.LogPool import *
 from ..cy_modules import cy_gridsearch
 from Dialogues import TopoTrajLoaderDialog
 from ErrorBox import ErrorBox
+from ErrorMessages import ErrorMessages
 
 # manage processes for SASA
 sasaProgressManager = multiprocessing.Manager()
@@ -95,7 +96,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
 
         # load psf and trajectory, make lists with radii and coordinates
         if self.psf == "" or self.dcd == "":
-            e = ErrorBox("Please choose a topology and trajectory file!")
+            e = ErrorBox(ErrorMessages.CHOOSEFILE)
             e.exec_()
             return
 

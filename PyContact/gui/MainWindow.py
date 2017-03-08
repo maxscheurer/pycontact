@@ -24,6 +24,7 @@ from ExportTabWidget import ExportTabWidget
 from Plotters import *
 from ..core.ContactAnalyzer import *
 from ErrorBox import ErrorBox
+from ErrorMessages import ErrorMessages
 from ..core.LogPool import *
 from ..core.aroundPatch import AroundSelection
 import settings
@@ -173,7 +174,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             pickle.dump(exportDict, open(filestring, "wb"))
             self.cleanInfoLabel()
         else:
-            box = ErrorBox("No data to export.")
+            box = ErrorBox(ErrorMessages.NOEXPDATA)
             box.exec_()
             return
 
@@ -313,7 +314,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
     def analyzeDataPushed(self):
         if self.analysis is None:
-            box = ErrorBox("No data loaded. Click on \"Files -> Import Trajectory Data\" and load your MD trajectory.")
+            box = ErrorBox(ErrorMessages.NODATA_PROMPTLOAD)
             box.exec_()
             return
 
@@ -470,8 +471,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
     def showStatistics(self):
         if len(self.contacts) == 0 or self.contacts is None:
-            box = ErrorBox("No contact scores accumulated! If you have not loaded your trajectory yet, click on \"Files -> Load Trajectory Data\". Then,\
-                           click on \"Accumulate Scores\" and run the analysis.")
+            box = ErrorBox(ErrorMessages.NOSCORES_PROMPTANALYSIS)
             box.exec_()
             return
         d = QDialog()
