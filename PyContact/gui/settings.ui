@@ -713,50 +713,16 @@
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_2">
-     <item row="1" column="0">
-      <widget class="QLabel" name="thresholdLabel">
-       <property name="text">
-        <string>Threshold:</string>
+     <item row="2" column="1">
+      <widget class="QSpinBox" name="coreBox">
+       <property name="minimum">
+        <number>1</number>
        </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLineEdit" name="thresholdField">
-       <property name="text">
-        <string>0.0</string>
+       <property name="maximum">
+        <number>64</number>
        </property>
-       <property name="clearButtonEnabled">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="2">
-      <widget class="QPushButton" name="applySettingsButton">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Apply</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="nsPerFrameField">
-       <property name="text">
-        <string>1.0</string>
-       </property>
-       <property name="clearButtonEnabled">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="nsPerFrameLabel">
-       <property name="text">
-        <string>Nanoseconds per frame:</string>
+       <property name="value">
+        <number>4</number>
        </property>
       </widget>
      </item>
@@ -773,16 +739,40 @@
        </property>
       </spacer>
      </item>
-     <item row="2" column="1">
-      <widget class="QSpinBox" name="coreBox">
-       <property name="minimum">
-        <number>1</number>
+     <item row="1" column="0">
+      <widget class="QLabel" name="thresholdLabel">
+       <property name="text">
+        <string>Threshold:</string>
        </property>
-       <property name="maximum">
-        <number>64</number>
+      </widget>
+     </item>
+     <item row="6" column="2">
+      <widget class="QPushButton" name="applySettingsButton">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
-       <property name="value">
-        <number>4</number>
+       <property name="text">
+        <string>Apply</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="thresholdField">
+       <property name="text">
+        <string>0.0</string>
+       </property>
+       <property name="clearButtonEnabled">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="nsPerFrameLabel">
+       <property name="text">
+        <string>Nanoseconds per frame:</string>
        </property>
       </widget>
      </item>
@@ -804,6 +794,16 @@
       <widget class="QLineEdit" name="scoreFunctionField">
        <property name="text">
         <string>1.0 / (1.0 + np.exp(5.0 * (d - 4.0)))</string>
+       </property>
+       <property name="clearButtonEnabled">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="nsPerFrameField">
+       <property name="text">
+        <string>1.0</string>
        </property>
        <property name="clearButtonEnabled">
         <bool>true</bool>

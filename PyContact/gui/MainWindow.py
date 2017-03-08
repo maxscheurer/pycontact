@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import (QMainWindow, QTabWidget, QButtonGroup,
                              QGridLayout, QFileDialog, QColorDialog, QProgressBar)
 from PyQt5.QtGui import QPaintEvent
 from PyQt5.Qt import Qt, QColor
+from PyQt5.QtGui import QIntValidator
 import numpy as np
 
 from . import MainQtGui
@@ -57,7 +58,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.setupUi(self)
 
         self.setWindowTitle("pyContact")
-        # self.mergeSlider.valueChanged.connect(self.mergeValueChanged)
 
         # painter contains both labels and frame boxes for drawing
         self.painter = Canvas()
@@ -77,6 +77,11 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.settingsView.pickColorButton.clicked.connect(self.showColorPicker)
         self.customColor = QColor(230, 50, 0)
         self.settingsView.pickColorButton.setStyleSheet("QWidget { background-color: %s }" % self.customColor.name())
+
+        # frames stride
+        posIntValidator = QIntValidator()
+        posIntValidator.setBottom(1)
+        self.frameStrideField.setValidator(posIntValidator)
 
         # analysis button
         self.analysisButton.clicked.connect(self.analyzeDataPushed)
@@ -262,6 +267,12 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             self.cleanInfoLabel()
 
     def updateSettings(self):
+        stride = int(self.frameStrideField.text())
+        if stride < 1:
+            stride = 1
+            QApplication.processEvents()
+            self.frameStrideField.setText(str(stride))
+        self.painter.merge = stride
         self.painter.nsPerFrame = float(self.settingsView.nsPerFrameField.text())
         self.painter.threshold = float(self.settingsView.thresholdField.text())
         self.painter.rendered = False
@@ -487,12 +498,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
                 generator.setSize(self.painter.size())
                 generator.setViewBox(self.painter.rect())
                 self.painter.renderContact(generator)
-        self.painter.rendered = False
-        self.painter.update()
-        self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
-
-    def mergeValueChanged(self):
-        self.painter.merge = self.mergeSlider.value()
         self.painter.rendered = False
         self.painter.update()
         self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
