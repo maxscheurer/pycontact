@@ -20,7 +20,8 @@ from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject
 from .aroundPatch import AroundSelection
 
 from ..db.DbReader import *
-from .Biochemistry import (AccumulatedContact, AtomContact, AccumulationMapIndex, AtomType, HydrogenBond, AtomHBondType, TempContactAccumulate)
+from .Biochemistry import (AccumulatedContact, AtomContact, AccumulationMapIndex, AtomType, HydrogenBond, AtomHBondType,
+                           TempContactAccumulate)
 
 MDAnalysis.core.flags['use_periodic_selections'] = False
 MDAnalysis.core.flags['use_KDTree_routines'] = True
@@ -41,18 +42,33 @@ class Analyzer(QObject):
         self.sel2text = sel2text
         self.lastMap1 = []
         self.lastMap2 = []
+        self.contactResults = []
+        self.contactResults = []
+        self.resname_array = []
+        self.resid_array = []
+        self.name_array = []
+        self.type_array = []
+        self.segids = []
+        self.backbone = []
+        self.finalAccumulatedContacts = []
+        self.bonds = []
+        self.totalFrameNumber = 0
+        self.currentFrameNumber = 0
 
     def runFrameScan(self, nproc):
         if nproc == 1:
-            self.contactResults = self.analyze_psf_dcd(self.psf, self.dcd, self.cutoff, self.hbondcutoff, self.hbondcutangle, self.sel1text, self.sel2text)
+            self.contactResults = self.analyze_psf_dcd(self.psf, self.dcd, self.cutoff, self.hbondcutoff,
+                                                       self.hbondcutangle, self.sel1text, self.sel2text)
         else:
-            self.contactResults, self.resname_array, self.resid_array, self.name_array, self.type_array, self.segids, self.backbone = run_load_parallel(nproc, self.psf, self.dcd, self.cutoff, self.hbondcutoff, self.hbondcutangle, self.sel1text, self.sel2text)
+            self.contactResults, self.resname_array, self.resid_array, self.name_array, self.type_array, self.segids, \
+                            self.backbone = run_load_parallel(nproc, self.psf, self.dcd, self.cutoff, self.hbondcutoff,
+                                                              self.hbondcutangle, self.sel1text, self.sel2text)
 
     def runContactAnalysis(self, map1, map2, nproc):
         if nproc == 1:
             self.finalAccumulatedContacts = self.analyze_contactResultsWithMaps(self.contactResults, map1, map2)
         else:
-            self.finalAccumulatedContacts = self.analyze_contactResultsWithMaps_Parallel(self.contactResults, map1, map2, nproc)
+            self.finalAccumulatedContacts = self.analyze_contactResultsWithMaps_Parallel(map1, map2, nproc)
 
         self.lastMap1 = map1
         self.lastMap2 = map2
@@ -77,7 +93,8 @@ class Analyzer(QObject):
                 self.sel2text]
 
     # find a string in s between the strings first and last
-    def find_between(self, s, first, last):
+    @staticmethod
+    def find_between(s, first, last):
         try:
             start = s.index(first) + len(first)
             end = s.index(last, start)
@@ -86,8 +103,9 @@ class Analyzer(QObject):
             return ""
 
     # weight function to score contact distances
-    def weight_function(self, value):
-        return (1.0) / (1.0 + np.exp(5.0 * (value - 4.0)))
+    @staticmethod
+    def weight_function(value):
+        return 1.0 / (1.0 + np.exp(5.0 * (value - 4.0)))
 
     # maps contain information wether to consider an atom's field for contact accumulation
     # map1 and map2 contain six boolean values each, cf. AccumulationMapIndex
@@ -214,7 +232,8 @@ class Analyzer(QObject):
     # in the given example data:
     # key="r.14rn.VAL-r.22rn.ILE"
     # key is used to accumulated contacts in a dictionary (= a contact's unique identifier)
-    def makeKeyFromKeyArrays(self, key1, key2):
+    @staticmethod
+    def makeKeyFromKeyArrays(key1, key2):
         key = ""
         itemcounter = 0
         for item in key1:
@@ -254,7 +273,6 @@ class Analyzer(QObject):
         self.resid_array = []
         self.name_array = []
         self.type_array = []
-        self.bonds = []
         self.segids = []
         self.backbone = []
         for atom in all_sel.atoms:
@@ -302,7 +320,8 @@ class Analyzer(QObject):
             for idx1, idx2 in itertools.izip(contacts[0], contacts[1]):
                 convindex1 = indices1[idx1]  # idx1 converted to global atom indexing
                 convindex2 = indices2[idx2]  # idx2 converted to global atom indexing
-                # jump out of loop if hydrogen contacts are found, only contacts between heavy atoms are considered, hydrogen bonds can still be detected!
+                # jump out of loop if hydrogen contacts are found, only contacts between heavy atoms are considered,
+                # hydrogen bonds can still be detected!
                 if re.match("H(.*)", self.name_array[convindex1]) or re.match("H(.*)", self.name_array[convindex2]):
                     continue
                     # distance between atom1 and atom2
@@ -429,17 +448,18 @@ class Analyzer(QObject):
         print("Selection 1: ", len(sel1.positions), ", Selection2: ", len(sel2.positions))
 
         print("analyzeTime: ", stop - start)
-        pickle.dump(contactResults, open("single_results.dat","w"))
+        pickle.dump(contactResults, open("single_results.dat", "w"))
         return contactResults
 
     def analyze_contactResultsWithMaps(self, contactResults, map1, map2):
         #################################################
-        ######## contactResults evaluation
+        # contactResults evaluation
         # only depending on map1, map2
-        # part can be run without running the contact analysis algorithm again, as it just prepares the results for displaying
+        # part can be run without running the contact analysis algorithm again,
+        # as it just prepares the results for displaying
         #################################################
 
-        ### Data structure to process:
+        # Data structure to process:
         # contactResults (list of frames)
         # ---> frame (list of AtomContacts)
         # --------> AtomContact
@@ -523,9 +543,8 @@ class Analyzer(QObject):
         print(stop - start)
         return finalAccumulatedContacts
 
-
     # PARALLEL CODE
-    def analyze_contactResultsWithMaps_Parallel(self, contactResults, map1, map2, nproc):
+    def analyze_contactResultsWithMaps_Parallel(self, map1, map2, nproc):
         start = time.time()
         trajData = self.getTrajectoryData()
         contResults = self.contactResults
