@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QAbstractButton
 from PyQt5.QtGui import QPixmap, QImage, QPainter
 
+
 class PicButton(QAbstractButton):
     def __init__(self, pixmap, parent=None):
         super(PicButton, self).__init__(parent)
@@ -14,6 +15,7 @@ class PicButton(QAbstractButton):
 
     def sizeHint(self):
         return self.pixmap.size()
+
 
 class HelpButton(PicButton):
     def __init__(self, parent=None):

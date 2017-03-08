@@ -1,5 +1,3 @@
-import warnings
-
 from PyQt5.QtWidgets import QSizePolicy
 import numpy as np
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg \
@@ -7,8 +5,6 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg \
 from matplotlib.figure import Figure
 from matplotlib import cm
 
-# from ..settings import *
-# from ..core.Biochemistry import *
 from ..core.ContactFilters import *
 from ..core.Biochemistry import AccumulationMapIndex
 
@@ -57,7 +53,7 @@ class ContactPlotter(MplPlotter):
         self.axes.set_ylabel("score")
 
 
-class ContactPlotParameters():
+class ContactPlotParameters:
     mean, median, lifetime, median_life_time, hbond_percentage = range(5)
     mapping = ["Mean Score", "Median Score", "Mean Lifetime", "Median Lifetime", "Hbond percentage"]
 
@@ -81,13 +77,13 @@ class HistPlotter(MplPlotter):
             for c in currentContacts:
                 values.append(c.median_life_time(nsPerFrame, threshold))
 
-        valuesNp = np.array(values, dtype = float)
+        valuesNp = np.array(values, dtype=float)
         self.axes.hist(valuesNp, bins=20)
         self.axes.set_ylabel("N")
         self.axes.set_xlabel(attribute + " bins")
         self.fig.subplots_adjust(bottom=0.2, top=0.95, left=0.15, right=0.85)
 
-    def plotContactHist(self, currentContacts, attribute, threshold, nsPerFrame,xticksfontsize):
+    def plotContactHist(self, currentContacts, attribute, threshold, nsPerFrame, xticksfontsize):
         values = []
         titles = []
 
@@ -112,8 +108,8 @@ class HistPlotter(MplPlotter):
                 values.append(c.hbond_percentage())
                 titles.append(c.title)
 
-        valuesNp = np.array(values, dtype = float)
-        titlesNp = np.array(titles, dtype = str)
+        valuesNp = np.array(values, dtype=float)
+        titlesNp = np.array(titles, dtype=str)
 
         x = range(len(currentContacts))
         h = self.axes.bar(x, valuesNp, color="red")

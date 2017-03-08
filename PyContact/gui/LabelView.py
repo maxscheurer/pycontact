@@ -8,13 +8,17 @@ from PyQt5.Qt import Qt
 from ..core.Biochemistry import ContactType
 from .Plotters import ContactPlotter
 
+
 class LabelView(QWidget):
     """docstring for AnalysisView"""
 
     def __init__(self, contacts):
-        super(QWidget,self).__init__()
+        super(QWidget, self).__init__()
         self.contacts = contacts
         self.vismode = False
+        self.buttons = []
+        self.checkboxes = []
+        self.buttonWidths = []
         self.initUI()
 
     def clean(self):
@@ -30,9 +34,6 @@ class LabelView(QWidget):
         textoffset = 5
         rowheight = 22
         row = 0
-        self.buttons = []
-        self.checkboxes = []
-        self.buttonWidths = []
         checkboxOffset = 0
         if self.vismode:
             checkboxOffset = 15
@@ -40,7 +41,8 @@ class LabelView(QWidget):
         for c in self.contacts:
             cindex = self.contacts.index(c)
             self.buttons.append(QPushButton(c.title))
-            stylesheet = "border: 0px solid #222222; background-color: " + ContactType.colors[c.determine_ctype()] + " ;"
+            stylesheet = "border: 0px solid #222222; background-color: " + ContactType.colors[c.determine_ctype()] \
+                         + " ;"
             # stylesheet = "border: 0px solid #222222; background-color: " + ContactType.colors[3] + " ;"
             self.buttons[-1].setStyleSheet(stylesheet)
             self.buttons[-1].clicked.connect(partial(self.handleButton, data=cindex))
@@ -52,7 +54,7 @@ class LabelView(QWidget):
             if self.vismode:
                 self.checkboxes.append(QCheckBox())
                 self.checkboxes[-1].setParent(self)
-                self.checkboxes[-1].move(start_text, row + textoffset -2.0)
+                self.checkboxes[-1].move(start_text, row + textoffset - 2.0)
                 self.checkboxes[-1].show()
             row += rowheight
 
