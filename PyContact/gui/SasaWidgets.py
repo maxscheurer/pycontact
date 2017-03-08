@@ -40,10 +40,6 @@ def calculate_sasa_parallel(input_coords, natoms, pairdist, nprad,
         npcoords = np.array(coords, dtype=np.float32)
         # print("start C")
         startC = time.time()
-        # sasa_grid(const float *pos,int natoms, float pairdist, int allow_double_counting, int maxpairs, const float *radius,const int npts, double srad, int pointstyle)
-        # point style: 0=spiral, 1=random
-        # asa = search(npcoords, natoms, pairdist, 0, -1, nprad, surfacePoints, probeRadius, pointstyle, restricted,
-                    #  restrictedList)
         asa = cy_gridsearch.cy_sasa(npcoords, natoms, pairdist, 0, -1, nprad, surfacePoints, probeRadius,
                                     pointstyle, restricted, restrictedList)
         stopC = time.time()
@@ -109,14 +105,13 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         seltext = self.sasaSelection1TextField.text()
         seltext2 = self.sasaSelection2TextField.text()
         resseltext = self.sasaRestrictionTextField.text()
-        perres = 0
 
         # 0=spiral, 1=random (VMD)
         pointstyle = 1
         # number of points to approximate the sphere
         surfacePoints = 50
         # pair distance
-        pairdist = 2 * (2.0 + 1.4)
+        pairdist = 2.0 * (2.0 + 1.4)
 
         if resseltext != "":
             restricted = 1
@@ -125,11 +120,12 @@ class SasaWidget(QWidget, Ui_SasaWidget):
 
         selection = u.select_atoms(seltext)
 
-        if perres:
-            resids = sorted(set(selection.resids))
-            segs = sorted(set(selection.segids))
-        else:
-            pass
+        # not used at the moment
+        # if perres:
+        #     resids = sorted(set(selection.resids))
+        #     segs = sorted(set(selection.segids))
+        # else:
+        #     pass
 
         natoms = len(selection.atoms)
         radius = []
@@ -159,14 +155,14 @@ class SasaWidget(QWidget, Ui_SasaWidget):
             input_coords.append(selection.positions)
 
         nprocs = self.coreBox.value()
-        input_chunks = chunks(input_coords,nprocs)
+        input_chunks = chunks(input_coords, nprocs)
         pool = LoggingPool(nprocs)
         results = []
         rank = 0
         trajLength = len(u.trajectory)
         self.totalFramesToProcess = trajLength
         for input_coords_chunk in input_chunks:
-            results.append(pool.apply_async(calculate_sasa_parallel, args=(input_coords_chunk,natoms,pairdist,nprad,surfacePoints,probeRadius,pointstyle,restricted, restrictedList,rank)))
+            results.append(pool.apply_async(calculate_sasa_parallel, args=(input_coords_chunk, natoms, pairdist, nprad, surfacePoints, probeRadius, pointstyle, restricted, restrictedList, rank)))
             rank += 1
         print("ranks", rank)
         self.state = True
@@ -178,6 +174,8 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         all_sasas = []
         for r in results:
             all_sasas.extend(r.get())
+
+        del radius
 
         if self.calculateContactAreaCheckbox.isChecked():
             print("Calculate contact area")
@@ -193,26 +191,26 @@ class SasaWidget(QWidget, Ui_SasaWidget):
                         restrictedList2.append(1)
                     else:
                         restrictedList2.append(0)
-                    radius.append(vdwRadius(s.name[0]))
+                    radius2.append(vdwRadius(s.name[0]))
             else:
                 print("You need a restricted selection for contact areas!")
 
             natoms2 = len(selection2)
-            nprad = np.array(radius, dtype=np.float32)
+            nprad = np.array(radius2, dtype=np.float32)
             restrictedList2 = np.array(restrictedList2, dtype=np.int32)
 
             input_coords2 = []
             for ts in u.trajectory:
                 input_coords2.append(selection2.positions)
 
-            input_chunks2 = chunks(input_coords2,nprocs)
+            input_chunks2 = chunks(input_coords2, nprocs)
             pool = LoggingPool(nprocs)
             results = []
             rank = 0
             trajLength = len(u.trajectory)
             self.totalFramesToProcess = trajLength
             for input_coords_chunk2 in input_chunks2:
-                results.append(pool.apply_async(calculate_sasa_parallel, args=(input_coords_chunk2,natoms2,pairdist,nprad,surfacePoints,probeRadius,pointstyle,restricted, restrictedList2,rank)))
+                results.append(pool.apply_async(calculate_sasa_parallel, args=(input_coords_chunk2, natoms2, pairdist, nprad, surfacePoints, probeRadius, pointstyle, restricted, restrictedList2, rank)))
                 rank += 1
             print("ranks", rank)
             self.state = True
@@ -225,18 +223,17 @@ class SasaWidget(QWidget, Ui_SasaWidget):
                 all_sasas2.extend(r.get())
 
             diff_list = []
-            for sasa_value1, sasa_value2 in zip(all_sasas,all_sasas2):
-                diff_list.append(sasa_value1-sasa_value2)
+            for sasa_value1, sasa_value2 in zip(all_sasas, all_sasas2):
+                diff_list.append(sasa_value1 - sasa_value2)
             all_sasas = diff_list
 
         sip.delete(self.previewPlot)
         self.previewPlot = SimplePlotter(None, width=5, height=2, dpi=60)
-        self.previewPlot.plot(np.arange(0,trajLength,1),all_sasas)
+        self.previewPlot.plot(np.arange(0, trajLength, 1), all_sasas)
         self.previewPlot.axes.set_xlabel("frame")
         self.previewPlot.axes.set_ylabel(r'SASA [A$^\circ$^2]')
         self.graphGridLayout.addWidget(self.previewPlot)
         self.previewPlot.update()
-
 
     def sasaEventListener(self):
         while self.state:
