@@ -44,7 +44,7 @@ class Canvas(QWidget, QObject):
         pos = event.pos()
         x, y = pos.x(), pos.y()
         self.clickedColumn = -1
-        if self.vismode and x > self.timeLineXOrigin and x < self.endOfTimeLine:
+        if self.vismode and self.timeLineXOrigin < x < self.endOfTimeLine:
             self.clickedColumn = int((x-self.timeLineXOrigin)/self.offset)
             # print("clicked on frame %d",self.clickedColumn)
             self.clickedColumnSignal.emit()
