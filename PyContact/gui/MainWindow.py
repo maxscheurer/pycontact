@@ -213,29 +213,29 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
     #     self.progressBar.setValue(100* float(self.value) / float(self.totalFramesToProcess))
     #     self.value += 1
 
-    def analysisEventListener(self):
-        while self.analysis_state:
-            QApplication.processEvents()
-            progress = 0
-            for each in analysisProgressDict.keys():
-                progress += analysisProgressDict[each]
-                # sasaProgressDict[each] = 0
-            progress = float(progress) / float(self.totalFramesToProcess) * 100
-            # if (101 - self.sasaProgressBar.value()) < progress:
-            #     self.sasaProgressBar.update_bar(101 - self.sasaProgressBar.value())
-            if progress > 0:
-                # print(progress)
-                self.progressBar.setValue(progress)
+    # def analysisEventListener(self):
+    #     while self.analysis_state:
+    #         QApplication.processEvents()
+    #         progress = 0
+    #         for each in analysisProgressDict.keys():
+    #             progress += analysisProgressDict[each]
+    #             # sasaProgressDict[each] = 0
+    #         progress = float(progress) / float(self.totalFramesToProcess) * 100
+    #         # if (101 - self.sasaProgressBar.value()) < progress:
+    #         #     self.sasaProgressBar.update_bar(101 - self.sasaProgressBar.value())
+    #         if progress > 0:
+    #             # print(progress)
+    #             self.progressBar.setValue(progress)
+    #
+    #         if int(progress) == 100:
+    #             # print("finished")
+    #             for each in analysisProgressDict.keys():
+    #                 analysisProgressDict[each]=0
+    #             progress = 0
+    #             self.progressBar.setValue(0)
+    #             self.analysis_state = False
 
-            if int(progress) == 100:
-                # print("finished")
-                for each in analysisProgressDict.keys():
-                    analysisProgressDict[each]=0
-                progress = 0
-                self.progressBar.setValue(0)
-                self.analysis_state = False
-
-    def setInfoLabel(self,txt):
+    def setInfoLabel(self, txt):
         self.statusLabel.setText(txt)
 
     def cleanInfoLabel(self):
@@ -254,9 +254,9 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             map2 = self.maps[1]
             nproc = int(self.settingsView.coreBox.value())
             self.contacts = self.analysis.runContactAnalysis(map1, map2, nproc)
-            # self.progressBar.setValue(0)
+            self.progressBar.setValue(0)
             self.setInfoLabel("Updating timeline...")
-            # QApplication.processEvents()
+            QApplication.processEvents()
             self.updateSettings()
             self.updateFilters()
             self.cleanInfoLabel()
