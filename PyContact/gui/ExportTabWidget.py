@@ -1,7 +1,7 @@
 import sip
 import os
 from PyQt5.QtWidgets import QTabWidget, QWidget, QGridLayout, QLabel, QPushButton, QComboBox, QLineEdit, QCheckBox, QFileDialog
-from PyQt5.QtCore import pyqtSignal, pyqtSlot
+from PyQt5.QtCore import pyqtSignal
 
 from Plotters import *
 from ErrorBox import ErrorBox
@@ -14,11 +14,18 @@ class ExportTabWidget(QTabWidget):
 
     def __init__(self, parent=None):
         super(ExportTabWidget, self).__init__(parent)
+        self.checkboxes = []
+        self.keys = []
+        self.checkboxdict = []
         self.tab1 = QWidget()
         self.tab2 = QWidget()
         self.tab3 = QWidget()
         self.tab4 = QWidget()
         self.tab5 = QWidget()
+        self.grid1 = QGridLayout()
+        self.grid2 = QGridLayout()
+        self.grid3 = QGridLayout()
+        self.grid4 = QGridLayout()
 
         self.addTab(self.tab1, "View")
         self.addTab(self.tab2, "Histogram")
@@ -63,7 +70,6 @@ class ExportTabWidget(QTabWidget):
         grid.addWidget(self.tab1.formatBox, 2, 0)
 
     def tab2UI(self):
-        self.grid1 = QGridLayout()
         self.tab2.setLayout(self.grid1)
 
         self.tab2.histPlot = HistPlotter(None, width=8, height=5, dpi=60)
@@ -111,7 +117,6 @@ class ExportTabWidget(QTabWidget):
         self.grid1.addWidget(self.tab2.formatBox, 1, 2)
 
     def tab3UI(self):
-        self.grid2 = QGridLayout()
         self.tab3.setLayout(self.grid2)
 
         self.tab3.mapPlot = MapPlotter(None, width=8, height=5, dpi=60)
@@ -144,7 +149,6 @@ class ExportTabWidget(QTabWidget):
         self.grid2.addWidget(self.tab3.attributeBox, 0, 1)
 
     def tab4UI(self):
-        self.grid3 = QGridLayout()
         self.tab4.setLayout(self.grid3)
 
         label = QLabel("Split selections for each contact")
@@ -167,13 +171,11 @@ class ExportTabWidget(QTabWidget):
         self.grid3.addWidget(self.tab4.additionalText2, 2, 1)
 
     def tab5UI(self):
-        self.grid4 = QGridLayout()
         self.tab5.setLayout(self.grid4)
 
         self.checkboxdict = {"mean_score": "Mean Score",
                              "hbond_percentage": "HBond Percentage",
                              "contactTypeAsShortcut": "Contact Type"}
-        self.checkboxes = []
         self.keys = self.checkboxdict.keys()
 
         propertyLabel = QLabel("Select properties to export")
