@@ -13,22 +13,23 @@ class Operator(object):
 
     def compare(self, value1, value2, operator):
         if operator == self.greater:
-            return (value1 > value2)
+            return value1 > value2
         elif operator == self.smaller:
-            return (value1 < value2)
+            return value1 < value2
         elif operator == self.equal:
-            return (value1 == value2)
+            return value1 == value2
         elif operator == self.nequal:
-            return (value1 != value2)
+            return value1 != value2
 
 
 class FrameFilter(object):
     def __init__(self, name):
         self.name = name
 
-    def extractFrameRange(self, contacts, range):
-        lower = range[0]
-        upper = range[1]
+    @staticmethod
+    def extractFrameRange(contacts, frameRange):
+        lower = frameRange[0]
+        upper = frameRange[1]
         for c in contacts:
             newScores = c.scoreArray[lower:upper]
             newAtoms = c.contributingAtoms[lower:upper]
@@ -42,14 +43,15 @@ class NameFilter(object):
     def __init__(self, name):
         self.name = name
 
-    def filterContactsByName(self, contacts, nameA, nameB, mapindex):
+    @staticmethod
+    def filterContactsByName(contacts, nameA, nameB, mapindex):
         filtered = []
         for c in contacts:
             add = False
             try:
                 prop1 = c.key1[mapindex]
                 prop2 = c.key2[mapindex]
-            except:
+            except IndexError:
                 filtered.append(c)
                 continue
             if nameA.lower() != u'all' and nameB.lower() != u'all':
@@ -77,7 +79,8 @@ class RangeFilter(object):
     def __init__(self, name):
         self.name = name
 
-    def numberInRanges(self, number, ranges):
+    @staticmethod
+    def numberInRanges(number, ranges):
         result = False
         for r in ranges:
             if number in r:
@@ -114,7 +117,7 @@ class RangeFilter(object):
             try:
                 prop1 = int(c.key1[mapindex])
                 prop2 = int(c.key2[mapindex])
-            except:
+            except IndexError:
                 filtered.append(c)
                 continue
             add = False
@@ -141,8 +144,9 @@ class BinaryFilter(object):
         self.operator = Operator.mapping[operator]
         self.value = value
 
-    def filterContacts(self,contacts):
+    def filterContacts(self, contacts):
         pass
+
 
 class OnlyFilter(object):
     def __init__(self, name, operator, value):
@@ -169,11 +173,12 @@ class OnlyFilter(object):
                     filtered.append(c)
         return filtered
 
+
 class TotalTimeFilter(BinaryFilter):
-    def __init__(self,name, operator, value):
+    def __init__(self, name, operator, value):
         super(TotalTimeFilter, self).__init__(name, operator, value)
 
-    def filterContacts(self,contacts):
+    def filterContacts(self, contacts):
         filtered = []
         op = Operator()
         for c in contacts:
@@ -181,6 +186,7 @@ class TotalTimeFilter(BinaryFilter):
                 filtered.append(c)
         print(unicode(len(filtered)))
         return filtered
+
 
 # filter compares contact score of every frame, only adds contact if true for all frames
 class ScoreFilter(BinaryFilter):
@@ -208,17 +214,21 @@ class ScoreFilter(BinaryFilter):
                     filtered.append(c)
         return filtered
 
+
 class SortingOrder(object):
     ascending, descending = range(2)
     mapping = {u"asc": ascending, u"desc": descending}
+
 
 class Sorting(object):
     def __init__(self, name, key, descending):
         self.name = name
         self. key = key
         self.descending = descending
+        self.threshold = 0
+        self.nspf = 0
 
-    def setThresholdAndNsPerFrame(self,threshold,nspf):
+    def setThresholdAndNsPerFrame(self, threshold, nspf):
         self.threshold = threshold
         self.nspf = nspf
 
@@ -238,7 +248,7 @@ class Sorting(object):
             sortedContacts = sorted(contacts, key=lambda c: prop2, reverse=self.descending)
         elif self.key == u"total time":
             for con in contacts:
-                con.total_time(self.nspf,self.threshold)
+                con.total_time(self.nspf, self.threshold)
             sortedContacts = sorted(contacts, key=lambda c: c.ttime, reverse=self.descending)
         elif self.key == u"mean lifetime":
             for con in contacts:
@@ -249,76 +259,3 @@ class Sorting(object):
                 con.median_life_time(self.nspf, self.threshold)
             sortedContacts = sorted(contacts, key=lambda c: c.medianLifeTime, reverse=self.descending)
         return sortedContacts
-
-class WeightFunction(object):
-    def __init__(self, name, x):
-        self.name = name
-        self.x = x
-
-    def weightContactFrames(self, contacts):
-        for c in contacts:
-            weighted = self.function(self.x) * c.scoreArray
-            c.scoreArray = weighted
-        return contacts
-
-    def previewFunction(self):
-        return self.function(self.x)
-
-    def function(self, x):
-        pass
-
-class SigmoidWeightFunction(WeightFunction):
-    # x: x values
-    # x0: turning point
-    # L: upper limit
-    # k: "slope"
-    def __init__(self, name, x, x0, L, k, y0):
-        super(SigmoidWeightFunction, self).__init__(name, x)
-        self.x0 = x0
-        self.L = L
-        self.k = k
-        self.y0 = y0
-
-    def function(self,x):
-        y = (self.L)/(1+np.exp(-self.k*(x-self.x0))) + self.y0
-        return y
-
-    def previewFunction(self):
-        return self.function(self.x)
-
-
-class RectangularWeightFunction(WeightFunction):
-    #x: x values
-    #x0: lower rect limit x value
-    #x1: upper rect limit x value
-    #h: rectangle height
-    def __init__(self, name, x, x0, x1, h, y0):
-        super(RectangularWeightFunction, self).__init__(name, x)
-        self.x0 = x0
-        self.x1 = x1
-        self.h = h
-        self.y0 = y0
-
-    def function(self, x):
-        y = np.zeros(len(x))
-        y.fill(self.y0)
-        y[self.x0:self.x1] = self.h
-        return y
-
-class LinearWeightFunction(WeightFunction):
-    #x: x values
-    #x0: lower rect limit x value
-    #x1: upper rect limit x value
-    #h: rectangle height
-    def __init__(self, name, x, f0, f1):
-        super(LinearWeightFunction, self).__init__(name, x)
-        self.f0 = f0
-        self.f1 = f1
-
-    def function(self, x):
-        a = (self.f1-self.f0)/x[-1]
-        y = a * x + self.f0
-        return y
-
-class FunctionType(object):
-    sigmoid, rect, linear = range(3)
