@@ -48,10 +48,11 @@ class NameFilter(object):
         filtered = []
         for c in contacts:
             add = False
+            # TODO: probably replace with if/else
             try:
                 prop1 = c.key1[mapindex]
                 prop2 = c.key2[mapindex]
-            except IndexError:
+            except Exception:
                 filtered.append(c)
                 continue
             if nameA.lower() != u'all' and nameB.lower() != u'all':
@@ -114,10 +115,11 @@ class RangeFilter(object):
 
         filtered = []
         for c in contacts:
+            # TODO: probably replace with if/else
             try:
                 prop1 = int(c.key1[mapindex])
                 prop2 = int(c.key2[mapindex])
-            except IndexError:
+            except Exception:
                 filtered.append(c)
                 continue
             add = False

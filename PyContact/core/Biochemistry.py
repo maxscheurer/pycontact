@@ -47,7 +47,7 @@ class AtomType:
         comment = spl[1][1:]
         try:
             htype = spl[2]
-        except IndexError:
+        except Exception:
             htype = "none"
         tp = AtomType(name, comment, AtomHBondType.mapping[htype])
         return tp
@@ -227,13 +227,13 @@ class AccumulatedContact(object):
         try:
             sc1 = str(read_residue_db("scpolarity", "name", r1)[0]["scpolarity"])
             scpol1 = SideChainPolarity.mapping[sc1]
-        except IndexError:
+        except Exception:
             scpol1 = SideChainPolarity.other
 
         try:
             sc2 = str(read_residue_db("scpolarity", "name", r2)[0]["scpolarity"])
             scpol2 = SideChainPolarity.mapping[sc2]
-        except IndexError:
+        except Exception:
             scpol2 = SideChainPolarity.other
 
         # hydrogen bonds: donor, acceptor, both
