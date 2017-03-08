@@ -4,7 +4,7 @@ import sip
 import time
 import itertools
 
-from PyQt5.QtWidgets import QWidget, QProgressBar, QGridLayout, QLabel
+from PyQt5.QtWidgets import QWidget, QProgressBar, QGridLayout, QLabel, QApplication
 from PyQt5.QtCore import QRect
 import MDAnalysis
 import numpy as np
@@ -237,6 +237,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
 
     def sasaEventListener(self):
         while self.state:
+            QApplication.processEvents()
             progress = 0
             for each in sasaProgressDict.keys():
                 progress += sasaProgressDict[each]
