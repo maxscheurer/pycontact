@@ -275,31 +275,3 @@ class PbWidget(QProgressBar):
 
     def closeEvent(self, event):
         self._active = False
-
-# does not work, is not used...
-class ProgessWidget(QWidget):
-    def __init__(self, title):
-        super(QWidget, self).__init__()
-        self.grid = QGridLayout()
-        label = QLabel("blabla")
-        # self.setLayout(self.grid)
-        self.setWindowTitle(title)
-        self.setGeometry(QRect(100, 100, 400, 400))
-        self.progress = QProgressBar(self)
-        sip.delete(self.progress)
-        self.progress = PbWidget(total=100)
-        self.progress.setProperty("value", 0)
-        self.progress.setTextVisible(True)
-        self.progress.setInvertedAppearance(False)
-        self.progress.setObjectName("progress")
-        self.grid.addWidget(self.progress, 1, 1, 1, 1)
-
-        # self.progress.setGeometry(0, 0, 200, 100)
-        # self.grid.addWidget(self.progress, 0, 0)
-        # self.grid.addWidget(label, 1, 1)
-
-    def setMax(self, maxi):
-        self.progress.setRange(0, maxi - 1)
-
-    def setValue(self, value):
-        self.progress.setValue(value)
