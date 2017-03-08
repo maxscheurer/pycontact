@@ -448,7 +448,7 @@ class Analyzer(QObject):
         print("Selection 1: ", len(sel1.positions), ", Selection2: ", len(sel2.positions))
 
         print("analyzeTime: ", stop - start)
-        pickle.dump(contactResults, open("single_results.dat", "w"))
+        # pickle.dump(contactResults, open("single_results.dat", "w"))
         return contactResults
 
     def analyze_contactResultsWithMaps(self, contactResults, map1, map2):

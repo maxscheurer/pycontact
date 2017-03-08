@@ -57,7 +57,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.setupUi(self)
 
         self.setWindowTitle("pyContact")
-        self.mergeSlider.valueChanged.connect(self.mergeValueChanged)
+        # self.mergeSlider.valueChanged.connect(self.mergeValueChanged)
 
         # painter contains both labels and frame boxes for drawing
         self.painter = Canvas()
