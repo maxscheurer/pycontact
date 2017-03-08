@@ -1,15 +1,11 @@
 from __future__ import print_function
-import multiprocessing
 import sip
 import time
-import itertools
 
-from PyQt5.QtWidgets import QWidget, QProgressBar, QGridLayout, QLabel, QApplication
-from PyQt5.QtCore import QRect
+
+from PyQt5.QtWidgets import QWidget, QProgressBar, QApplication
 import MDAnalysis
 import numpy as np
-from numpy import linalg as la
-# from numpy.ctypeslib import ndpointer
 
 from .Plotters import SimplePlotter
 from sasa_gui import *
@@ -39,10 +35,10 @@ def calculate_sasa_parallel(input_coords, natoms, pairdist, nprad,
         coords = np.reshape(c, (1, natoms * 3))
         npcoords = np.array(coords, dtype=np.float32)
         # print("start C")
-        startC = time.time()
+        # startC = time.time()
         asa = cy_gridsearch.cy_sasa(npcoords, natoms, pairdist, 0, -1, nprad, surfacePoints, probeRadius,
                                     pointstyle, restricted, restrictedList)
-        stopC = time.time()
+        # stopC = time.time()
         # print("time for grid search: ", (stopC - startC))
         # print("asa:", asa)
         temp_sasa.append(asa)
@@ -81,7 +77,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
     def calculateSasa(self):
         print("calculate SASA")
 
-        ### test data ###
+        # test data:
         # psf = "rpn11_ubq_interface-ionized.psf"
         # pdb = "rpn11_ubq_interface-ionized.pdb"
         # dcd = "/home/max/Projects/pycontact/short.dcd"
@@ -127,7 +123,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         # else:
         #     pass
 
-        natoms = len(selection.atoms)
+        # natoms = len(selection.atoms)
         radius = []
         restrictedList = []
         if restricted:
@@ -162,7 +158,9 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         trajLength = len(u.trajectory)
         self.totalFramesToProcess = trajLength
         for input_coords_chunk in input_chunks:
-            results.append(pool.apply_async(calculate_sasa_parallel, args=(input_coords_chunk, natoms, pairdist, nprad, surfacePoints, probeRadius, pointstyle, restricted, restrictedList, rank)))
+            results.append(pool.apply_async(calculate_sasa_parallel, args=(input_coords_chunk, natoms, pairdist, nprad,
+                                                                           surfacePoints, probeRadius, pointstyle,
+                                                                           restricted, restrictedList, rank)))
             rank += 1
         print("ranks", rank)
         self.state = True
@@ -181,7 +179,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
             print("Calculate contact area")
             selection2 = u.select_atoms(seltext2)
 
-            natoms2 = len(selection2.atoms)
+            # natoms2 = len(selection2.atoms)
             radius2 = []
             restrictedList2 = []
             if restricted:
@@ -210,7 +208,10 @@ class SasaWidget(QWidget, Ui_SasaWidget):
             trajLength = len(u.trajectory)
             self.totalFramesToProcess = trajLength
             for input_coords_chunk2 in input_chunks2:
-                results.append(pool.apply_async(calculate_sasa_parallel, args=(input_coords_chunk2, natoms2, pairdist, nprad, surfacePoints, probeRadius, pointstyle, restricted, restrictedList2, rank)))
+                results.append(pool.apply_async(calculate_sasa_parallel, args=(input_coords_chunk2, natoms2, pairdist,
+                                                                               nprad, surfacePoints, probeRadius,
+                                                                               pointstyle, restricted, restrictedList2,
+                                                                               rank)))
                 rank += 1
             print("ranks", rank)
             self.state = True
@@ -251,13 +252,13 @@ class SasaWidget(QWidget, Ui_SasaWidget):
             if int(progress) == 100:
                 # print("finished")
                 for each in sasaProgressDict.keys():
-                    sasaProgressDict[each]=0
-                progress = 0
+                    sasaProgressDict[each] = 0
+                # progress = 0
                 self.state = False
 
 
 class PbWidget(QProgressBar):
-    def __init__(self, parent=None, total=100):
+    def __init__(self, total=100):
         super(PbWidget, self).__init__()
         self.setMinimum(0)
         self.setMaximum(total)
@@ -269,7 +270,7 @@ class PbWidget(QProgressBar):
             value = self.value() + to_add_number
             self.setValue(value)
             qApp.processEvents()
-            if (not self._active or value >= self.maximum()):
+            if not self._active or value >= self.maximum():
                 break
         self._active = False
 
