@@ -31,18 +31,6 @@ class ConvBond(object):
     """docstring for ConvBond"""
     def __init__(self, bonds):
         super(ConvBond, self).__init__()
-        # old code!
-        # print bonds.types()
-        # self.types = deepcopy(bonds.types())
-        # types returns a non-redundant list of bond types for the bond, i.e.
-        # if the same type of bond occurs twice, it is only returned once!
-        # try:
-        #     self.types = deepcopy(bonds.types())
-        #     # print type(self.types)
-        # except IndexError:
-        #     # atom has no bonds
-        #     self.types = []
-        # self.indices = deepcopy(bonds.to_indices())
         self.types = []
         self.indices = []
         for b in bonds:
@@ -139,38 +127,6 @@ def loop_trajectory(sel1c,sel2c,indices1,indices2,config,suppl):
                                 hydrogenAtomsBoundToAtom2.append(hydrogenidx)
                         bondcount2 += 1
 
-                    #old code, most probably wrong!
-                    # search for hydrogen atoms bound to atom 1
-                    # bondcount1 = 0
-                    # hydrogenAtomsBoundToAtom1 = []
-                    # for b in b1.types:
-                    #     hydrogen = next((x for x in b if x.startswith("H")), 0)
-                    #     # print b
-                    #     if hydrogen != 0:
-                    #         # print "h bond to atom1"
-                    #         bondindices1 = b1.to_indices()[bondcount1]
-                    #         hydrogenidx = next(
-                    #             ((j + 1) for j in bondindices1 if type_array[j + 1].startswith("H")), -1)
-                    #         if hydrogenidx != -1:
-                    #             # print type_array[hydrogenidx]
-                    #             hydrogenAtomsBoundToAtom1.append(hydrogenidx)
-                    #     bondcount1 += 1
-                    # # search for hydrogen atoms bound to atom 2
-                    # bondcount2 = 0
-                    # hydrogenAtomsBoundToAtom2 = []
-                    # for b in b2.types:
-                    #     hydrogen = next((x for x in b if x.startswith("H")), 0)
-                    #     # print b
-                    #     if hydrogen != 0:
-                    #         # print "h bond to atom2"
-                    #         bondindices2 = b2.to_indices()[bondcount2]
-                    #         hydrogenidx = next(
-                    #             ((k + 1) for k in bondindices2 if type_array[k + 1].startswith("H")), -1)
-                    #         if hydrogenidx != -1:
-                    #             # print type_array[hydrogenidx]
-                    #             hydrogenAtomsBoundToAtom2.append(hydrogenidx)
-                    #     bondcount2 += 1
-                    # # check hbond criteria for hydrogen atoms bound to first atom
                     for global_hatom in hydrogenAtomsBoundToAtom1:
                         conv_hatom = np.where(indices1[frame] == global_hatom)[0][0]
                         typeHeavy = next((x.htype for x in heavyatoms if x.name == type_array[convindex2]),

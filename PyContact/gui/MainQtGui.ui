@@ -147,7 +147,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Zoom:</string>
+          <string>Stride:</string>
          </property>
         </widget>
        </item>

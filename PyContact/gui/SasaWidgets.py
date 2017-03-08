@@ -253,7 +253,6 @@ class SasaWidget(QWidget, Ui_SasaWidget):
                     sasaProgressDict[each]=0
                 progress = 0
                 self.state = False
-            # time.sleep(0.2)
 
 
 class PbWidget(QProgressBar):
