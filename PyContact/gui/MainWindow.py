@@ -70,7 +70,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         # settings and filters
         self.settingsView = SettingsTabWidget()
         self.settingsView.applySettingsButton.clicked.connect(self.updateSettings)
-        self.settingsView.applyFilterButton.clicked.connect(self.updateFilters)
+        self.applyFilterButton.clicked.connect(self.updateFilters)
         # statistics
         self.statisticsButton.clicked.connect(self.showStatistics)
         # color picker
@@ -267,12 +267,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             self.cleanInfoLabel()
 
     def updateSettings(self):
-        stride = int(self.frameStrideField.text())
-        if stride < 1:
-            stride = 1
-            QApplication.processEvents()
-            self.frameStrideField.setText(str(stride))
-        self.painter.merge = stride
         self.painter.nsPerFrame = float(self.settingsView.nsPerFrameField.text())
         self.painter.threshold = float(self.settingsView.thresholdField.text())
         self.painter.rendered = False
@@ -282,20 +276,27 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
 
     def updateFilters(self):
+        stride = int(self.frameStrideField.text())
+        if stride < 1:
+            stride = 1
+            QApplication.processEvents()
+            self.frameStrideField.setText(str(stride))
+        print("stride: ", stride)
+        self.painter.merge = stride
         self.painter.labelView.clean()
         self.painter.showHbondScores = False
         # total time filter
-        totalTimeActive = self.settingsView.activeTotalTimeCheckbox.isChecked()
-        scoreActive = self.settingsView.activeScoreCheckbox.isChecked()
-        sortingActive = self.settingsView.activeSortingBox.isChecked()
-        onlyActive = self.settingsView.onlyBoxActiveCheckbox.isChecked()
+        totalTimeActive = self.activeTotalTimeCheckbox.isChecked()
+        scoreActive = self.activeScoreCheckbox.isChecked()
+        sortingActive = self.activeSortingBox.isChecked()
+        onlyActive = self.onlyBoxActiveCheckbox.isChecked()
         filterActive = (totalTimeActive or scoreActive or sortingActive or onlyActive)
-        weightActive = self.settingsView.functionActiveCheckbox.isChecked()
+        weightActive = False
         # only filter given range
-        rangeFilterActive = self.settingsView.filterRangeCheckbox.isChecked()
+        rangeFilterActive = self.filterRangeCheckbox.isChecked()
         if len(self.contacts) > 0:
-            lower = int(self.settingsView.lowerRangeField.text()) - 1
-            upper = self.settingsView.upperRangeField.text()
+            lower = int(self.lowerRangeField.text()) - 1
+            upper = self.upperRangeField.text()
             if upper == "end":
                 upper = len(self.contacts[0].scoreArray)
             else:
@@ -308,15 +309,15 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             self.filteredContacts = copy.deepcopy(self.contacts)
             # residue range filter
             range_filter = RangeFilter("resrange")
-            self.filteredContacts = range_filter.filterByRange(self.filteredContacts, self.settingsView.residARangeField.text(), self.settingsView.residBRangeField.text(), AccumulationMapIndex.resid)
+            self.filteredContacts = range_filter.filterByRange(self.filteredContacts, self.residARangeField.text(), self.residBRangeField.text(), AccumulationMapIndex.resid)
 
-            self.filteredContacts = range_filter.filterByRange(self.filteredContacts, self.settingsView.atomAIndexField.text(), self.settingsView.atomBIndexField.text(), AccumulationMapIndex.index)
+            self.filteredContacts = range_filter.filterByRange(self.filteredContacts, self.atomAIndexField.text(), self.atomBIndexField.text(), AccumulationMapIndex.index)
 
             # aminoacids name filter
             name_filter = NameFilter("name")
-            self.filteredContacts = name_filter.filterContactsByName(self.filteredContacts, self.settingsView.residANameField.text(), self.settingsView.residBNameField.text(), AccumulationMapIndex.resname)
+            self.filteredContacts = name_filter.filterContactsByName(self.filteredContacts, self.residANameField.text(), self.residBNameField.text(), AccumulationMapIndex.resname)
 
-            self.filteredContacts = name_filter.filterContactsByName(self.filteredContacts, self.settingsView.atomANameField.text(), self.settingsView.atomBNameField.text(), AccumulationMapIndex.name)
+            self.filteredContacts = name_filter.filterContactsByName(self.filteredContacts, self.atomANameField.text(), self.atomBNameField.text(), AccumulationMapIndex.name)
             # range filter
             if rangeFilterActive:
                 self.painter.rangeFilterActive = True
@@ -350,23 +351,23 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             # other filters
             if filterActive:
                     if totalTimeActive:
-                        operator = self.settingsView.compareTotalTimeDropdown.currentText()
-                        value = float(self.settingsView.totalTimeField.text())
+                        operator = self.compareTotalTimeDropdown.currentText()
+                        value = float(self.totalTimeField.text())
                         filter = TotalTimeFilter("tottime", operator, value)
                         self.filteredContacts = filter.filterContacts(self.filteredContacts)
                     if scoreActive:
-                        operator = self.settingsView.compareScoreDropdown.currentText()
-                        value = float(self.settingsView.scoreField.text())
-                        filter = ScoreFilter("score", operator, value, self.settingsView.meanDropdown.currentText())
+                        operator = self.compareScoreDropdown.currentText()
+                        value = float(self.scoreField.text())
+                        filter = ScoreFilter("score", operator, value, self.meanDropdown.currentText())
                         self.filteredContacts = filter.filterContacts(self.filteredContacts)
                     if sortingActive:
-                        key = self.settingsView.sortingKeyDropdown.currentText()
-                        descending = SortingOrder.mapping[self.settingsView.sortingOrderDropdown.currentText()]
+                        key = self.sortingKeyDropdown.currentText()
+                        descending = SortingOrder.mapping[self.sortingOrderDropdown.currentText()]
                         sorter = Sorting("sorting", key, descending)
-                        sorter.setThresholdAndNsPerFrame(float(self.settingsView.thresholdField.text()), float(self.settingsView.nsPerFrameField.text()))
+                        sorter.setThresholdAndNsPerFrame(float(self.thresholdField.text()), float(self.nsPerFrameField.text()))
                         self.filteredContacts = sorter.sortContacts(self.filteredContacts)
                     if onlyActive:
-                        key = self.settingsView.selectOnlyToolbox.currentText()
+                        key = self.selectOnlyToolbox.currentText()
                         only = OnlyFilter("only", key, 0)
                         self.filteredContacts = only.filterContacts(self.filteredContacts)
                         if key == "hbonds":

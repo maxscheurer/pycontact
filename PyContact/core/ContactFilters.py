@@ -199,17 +199,17 @@ class ScoreFilter(BinaryFilter):
     def filterContacts(self, contacts):
         filtered = []
         op = Operator()
-        if self.ftype == u"mean":
+        if self.ftype == u"Mean":
             for c in contacts:
                 mean = c.mean_score()
                 if op.compare(mean, self.value, self.operator):
                     filtered.append(c)
-        elif self.ftype == u"median":
+        elif self.ftype == u"Median":
             for c in contacts:
                 med = c.median_score()
                 if op.compare(med, self.value, self.operator):
                     filtered.append(c)
-        elif self.ftype == u"hbond perc.":
+        elif self.ftype == u"HB \%":
             for c in contacts:
                 med = c.hbond_percentage()
                 if op.compare(med, self.value, self.operator):
