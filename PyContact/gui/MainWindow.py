@@ -1,15 +1,12 @@
 from __future__ import print_function
 import multiprocessing
 import warnings
-import time
-import pickle
 import copy
 
 import PyQt5.QtCore as QtCore
 from PyQt5.QtCore import QRect, pyqtSlot, QObject
-from PyQt5.QtWidgets import (QMainWindow, QTabWidget, QButtonGroup,
-                             QLabel, QLineEdit, QDialog, QApplication, QMessageBox,
-                             QGridLayout, QFileDialog, QColorDialog, QProgressBar)
+from PyQt5.QtWidgets import (QMainWindow, QTabWidget, QLabel, QDialog,
+                             QApplication, QGridLayout, QFileDialog, QColorDialog)
 from PyQt5.QtGui import QPaintEvent
 from PyQt5.Qt import Qt, QColor
 from PyQt5.QtGui import QIntValidator
@@ -107,6 +104,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
         self.analysis_state = False
 
+        self.vismode = False
         self.visModeButton.setCheckable(True)
         self.visModeButton.setChecked(False)
         self.visModeButton.clicked.connect(self.switchedToVisMode)
@@ -173,9 +171,12 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             return
         if self.contacts is not None and self.analysis is not None:
             self.setInfoLabel("Exporting current session...")
-            analyzerArgs = [self.analysis.psf, self.analysis.dcd, self.analysis.cutoff, self.analysis.hbondcutoff, self.analysis.hbondcutangle, self.analysis.sel1text, self.analysis.sel2text,self.analysis.contactResults]
+            analyzerArgs = [self.analysis.psf, self.analysis.dcd, self.analysis.cutoff, self.analysis.hbondcutoff,
+                            self.analysis.hbondcutangle, self.analysis.sel1text, self.analysis.sel2text,
+                            self.analysis.contactResults]
             trajArgs = self.analysis.getTrajectoryData()
-            exportDict = {"contacts":self.contacts,"analyzer":analyzerArgs,"trajectory":trajArgs,"maps":[self.analysis.lastMap1,self.analysis.lastMap2]}
+            exportDict = {"contacts": self.contacts, "analyzer": analyzerArgs, "trajectory": trajArgs,
+                          "maps": [self.analysis.lastMap1, self.analysis.lastMap2]}
             pickle.dump(exportDict, open(filestring, "wb"))
             self.cleanInfoLabel()
         else:
@@ -184,7 +185,8 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             return
 
     def loadDefault(self):
-        self.contacts, arguments, trajArgs, self.maps, contactResults = DataHandler.importSessionFromFile(DEFAULTSESSION)
+        self.contacts, arguments, trajArgs, self.maps, contactResults = \
+            DataHandler.importSessionFromFile(DEFAULTSESSION)
         self.analysis = Analyzer(*arguments)
         self.analysis.contactResults = contactResults
         self.analysis.setTrajectoryData(*trajArgs)
@@ -197,7 +199,8 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         if result == 1:
             self.setInfoLabel("Loading trajectory and running atomic contact analysis...")
             nproc = int(self.settingsView.coreBox.value())
-            self.analysis = Analyzer(self.config.psf, self.config.dcd, self.config.cutoff, self.config.hbondcutoff, self.config.hbondcutangle, self.config.sel1text, self.config.sel2text)
+            self.analysis = Analyzer(self.config.psf, self.config.dcd, self.config.cutoff, self.config.hbondcutoff,
+                                     self.config.hbondcutangle, self.config.sel1text, self.config.sel2text)
             QApplication.processEvents()
             self.analysis.runFrameScan(nproc)
             self.setInfoLabel("%d frames loaded." % len(self.analysis.contactResults))
@@ -309,15 +312,21 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             self.filteredContacts = copy.deepcopy(self.contacts)
             # residue range filter
             range_filter = RangeFilter("resrange")
-            self.filteredContacts = range_filter.filterByRange(self.filteredContacts, self.residARangeField.text(), self.residBRangeField.text(), AccumulationMapIndex.resid)
+            self.filteredContacts = range_filter.filterByRange(self.filteredContacts, self.residARangeField.text(),
+                                                               self.residBRangeField.text(), AccumulationMapIndex.resid)
 
-            self.filteredContacts = range_filter.filterByRange(self.filteredContacts, self.atomAIndexField.text(), self.atomBIndexField.text(), AccumulationMapIndex.index)
+            self.filteredContacts = range_filter.filterByRange(self.filteredContacts, self.atomAIndexField.text(),
+                                                               self.atomBIndexField.text(), AccumulationMapIndex.index)
 
             # aminoacids name filter
             name_filter = NameFilter("name")
-            self.filteredContacts = name_filter.filterContactsByName(self.filteredContacts, self.residANameField.text(), self.residBNameField.text(), AccumulationMapIndex.resname)
+            self.filteredContacts = name_filter.filterContactsByName(self.filteredContacts, self.residANameField.text(),
+                                                                     self.residBNameField.text(),
+                                                                     AccumulationMapIndex.resname)
 
-            self.filteredContacts = name_filter.filterContactsByName(self.filteredContacts, self.atomANameField.text(), self.atomBNameField.text(), AccumulationMapIndex.name)
+            self.filteredContacts = name_filter.filterContactsByName(self.filteredContacts, self.atomANameField.text(),
+                                                                     self.atomBNameField.text(),
+                                                                     AccumulationMapIndex.name)
             # range filter
             if rangeFilterActive:
                 self.painter.rangeFilterActive = True
@@ -364,7 +373,8 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
                         key = self.sortingKeyDropdown.currentText()
                         descending = SortingOrder.mapping[self.sortingOrderDropdown.currentText()]
                         sorter = Sorting("sorting", key, descending)
-                        sorter.setThresholdAndNsPerFrame(float(self.thresholdField.text()), float(self.nsPerFrameField.text()))
+                        sorter.setThresholdAndNsPerFrame(float(self.thresholdField.text()),
+                                                         float(self.nsPerFrameField.text()))
                         self.filteredContacts = sorter.sortContacts(self.filteredContacts)
                     if onlyActive:
                         key = self.selectOnlyToolbox.currentText()
@@ -507,7 +517,8 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         col = QColorDialog.getColor()
         self.customColor = col
         if col.isValid():
-            self.settingsView.pickColorButton.setStyleSheet("QWidget { background-color: %s }" % self.customColor.name())
+            self.settingsView.pickColorButton.setStyleSheet("QWidget { background-color: %s }" %
+                                                            self.customColor.name())
 
     def updateColors(self):
         if self.settingsView.bbscScoreRadioButton.isChecked():
