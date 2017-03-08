@@ -1,6 +1,7 @@
 import sip
 import os
-from PyQt5.QtWidgets import QTabWidget, QWidget, QGridLayout, QLabel, QPushButton, QComboBox, QLineEdit, QCheckBox, QFileDialog
+from PyQt5.QtWidgets import QTabWidget, QWidget, QGridLayout, QLabel, QPushButton, QComboBox, QLineEdit, QCheckBox, \
+    QFileDialog
 from PyQt5.QtCore import pyqtSignal
 
 from Plotters import *
@@ -251,9 +252,11 @@ class ExportTabWidget(QTabWidget):
         self.tab2.histPlot = HistPlotter(None, width=8, height=5, dpi=60)
         self.grid1.addWidget(self.tab2.histPlot, 3, 0, 1, 4)
         if self.tab2.histTypeBox.currentText() == "General Histogram":
-            self.tab2.histPlot.plotGeneralHist(self.contacts, self.tab2.attributeBox.currentText(), self.threshold, self.nsPerFrame)
+            self.tab2.histPlot.plotGeneralHist(self.contacts, self.tab2.attributeBox.currentText(), self.threshold,
+                                               self.nsPerFrame)
         elif self.tab2.histTypeBox.currentText() == "Bin per Contact":
-            self.tab2.histPlot.plotContactHist(self.contacts, self.tab2.attributeBox.currentText(), self.threshold, self.nsPerFrame, int(self.tab2.xTicksFontSizeField.text()))
+            self.tab2.histPlot.plotContactHist(self.contacts, self.tab2.attributeBox.currentText(), self.threshold,
+                                               self.nsPerFrame, int(self.tab2.xTicksFontSizeField.text()))
 
         self.tab2.histPlot.update()
 
@@ -265,7 +268,8 @@ class ExportTabWidget(QTabWidget):
             box = ErrorBox(ErrorMessages.RESID_REQUIRED)
             box.exec_()
             return
-        res = self.tab3.mapPlot.plotMap(self.contacts, self.map1, self.map2,self.label1,self.label2,self.tab3.attributeBox.currentText(), self.threshold, self.nsPerFrame)
+        res = self.tab3.mapPlot.plotMap(self.contacts, self.map1, self.map2, self.label1, self.label2,
+                                        self.tab3.attributeBox.currentText(), self.threshold, self.nsPerFrame)
         if res == -1:
             box = ErrorBox(ErrorMessages.RESID_REQUIRED)
             box.exec_()
