@@ -1,11 +1,9 @@
-from PyQt5.QtGui import (QColor, QPainter, QFont, QPixmap, QMouseEvent, QCursor, QPen, QPaintEvent)
+from PyQt5.QtGui import (QColor, QPainter, QFont, QPixmap, QPaintEvent)
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import QSize, QRect
-from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject
-from PyQt5 import Qt
+from PyQt5.QtCore import pyqtSignal, QObject
 import numpy as np
 
-from ..core.Biochemistry import *
 from ..core.ContactFilters import *
 from .LabelView import LabelView
 
@@ -21,15 +19,16 @@ class Canvas(QWidget, QObject):
     def __init__(self):
         super(QWidget, self).__init__()
 
+        self.clickedRow = 0
         self.initUI()
 
     def mousePressEvent(self, event):
         pos = event.pos()
         x, y = pos.x(), pos.y()
         self.clickedRow = -1
-        if self.vismode and x > self.timeLineXOrigin and x < self.endOfTimeLine:
-            self.clickedRow = int(y/self.rowh - 1) # -1 because of frame number line
-            self.clickedColumn = int((x-self.timeLineXOrigin)/self.offset)
+        if self.vismode and self.timeLineXOrigin < x < self.endOfTimeLine:
+            self.clickedRow = int(y / self.rowh - 1)  # -1 because of frame number line
+            self.clickedColumn = int((x - self.timeLineXOrigin) / self.offset)
             print("clickedRow: " + str(self.clickedRow))
             self.rendered = False
             self.update()
