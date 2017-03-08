@@ -46,9 +46,7 @@ class Analyzer(QObject):
         if nproc == 1:
             self.contactResults = self.analyze_psf_dcd(self.psf, self.dcd, self.cutoff, self.hbondcutoff, self.hbondcutangle, self.sel1text, self.sel2text)
         else:
-            # parallel code is somewhat wrong, thus turned off
-            self.contactResults = self.analyze_psf_dcd(self.psf, self.dcd, self.cutoff, self.hbondcutoff, self.hbondcutangle, self.sel1text, self.sel2text)
-            # self.contactResults, self.resname_array, self.resid_array, self.name_array, self.type_array, self.segids, self.backbone = run_load_parallel(nproc, self.psf, self.dcd, self.cutoff, self.hbondcutoff, self.hbondcutangle, self.sel1text, self.sel2text)
+            self.contactResults, self.resname_array, self.resid_array, self.name_array, self.type_array, self.segids, self.backbone = run_load_parallel(nproc, self.psf, self.dcd, self.cutoff, self.hbondcutoff, self.hbondcutangle, self.sel1text, self.sel2text)
 
     def runContactAnalysis(self, map1, map2, nproc):
         if nproc == 1:
@@ -354,6 +352,7 @@ class Analyzer(QObject):
                         # search for hydrogen atoms bound to atom 2
                         bondcount2 = 0
                         hydrogenAtomsBoundToAtom2 = []
+                        # print(b2)
                         for bnd2 in b2:
                             b = bnd2.type
                             hydrogen = next((x for x in b if x.startswith("H")), 0)
@@ -430,7 +429,7 @@ class Analyzer(QObject):
         print("Selection 1: ", len(sel1.positions), ", Selection2: ", len(sel2.positions))
 
         print("analyzeTime: ", stop - start)
-        # pickle.dump(contactResults, open("single_results.dat","w"))
+        pickle.dump(contactResults, open("single_results.dat","w"))
         return contactResults
 
     def analyze_contactResultsWithMaps(self, contactResults, map1, map2):

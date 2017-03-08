@@ -4,7 +4,7 @@ import re
 import sys, time
 from copy import deepcopy
 import itertools
-import pickle
+# import pickle
 
 import MDAnalysis
 from MDAnalysis.analysis import distances
@@ -31,14 +31,23 @@ class ConvBond(object):
     """docstring for ConvBond"""
     def __init__(self, bonds):
         super(ConvBond, self).__init__()
+        # old code!
         # print bonds.types()
         # self.types = deepcopy(bonds.types())
-        try:
-            self.types = deepcopy(bonds.types())
-            # print type(self.types)
-        except IndexError, e:
-            self.types = []
-        self.indices = deepcopy(bonds.to_indices())
+        # types returns a non-redundant list of bond types for the bond, i.e.
+        # if the same type of bond occurs twice, it is only returned once!
+        # try:
+        #     self.types = deepcopy(bonds.types())
+        #     # print type(self.types)
+        # except IndexError:
+        #     # atom has no bonds
+        #     self.types = []
+        # self.indices = deepcopy(bonds.to_indices())
+        self.types = []
+        self.indices = []
+        for b in bonds:
+            self.indices.append(deepcopy(b.indices))
+            self.types.append(deepcopy(b.type))
 
     def types(self):
         return self.types
@@ -90,7 +99,7 @@ def loop_trajectory(sel1c,sel2c,indices1,indices2,config,suppl):
                         (type1 == AtomHBondType.acc and type2 == AtomHBondType.both) or \
                         (type1 == AtomHBondType.don and type2 == AtomHBondType.both) or \
                         (type1 == AtomHBondType.both and type2 == AtomHBondType.don):
-                    # print "hbond? %s - %s" % (type_array[convindex1], type_array[convindex2])
+                    # print("hbond? %s - %s" % (type_array[convindex1], type_array[convindex2]))
                     # search for hatom, check numbering in bond!!!!!!!!!!
                     b1 = bonds[convindex1]
                     b2 = bonds[convindex2]
