@@ -603,7 +603,7 @@
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QComboBox" name="comboBox_2">
+           <widget class="QComboBox" name="meanDropdown">
             <property name="maximumSize">
              <size>
               <width>70</width>
