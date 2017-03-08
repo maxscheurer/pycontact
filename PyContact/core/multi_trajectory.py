@@ -308,4 +308,4 @@ def run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1t
         print(len(rn))
         allContacts.extend(rn)
     print("frames: ", len(allContacts))
-    return [allContacts,resname_array,resid_array,name_array,type_array,segids,backbone,sel1text,sel2text]
+    return [allContacts, resname_array, resid_array, name_array, type_array, segids, backbone]

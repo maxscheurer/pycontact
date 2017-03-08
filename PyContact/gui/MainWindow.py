@@ -187,102 +187,31 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.updateSettings()
         self.updateFilters()
 
-    def loadData_parallel(self, nprocs):
-        from ..core.multi_trajectory import run_load_parallel
-        return run_load_parallel(nprocs,self.config.psf,self.config.dcd, self.config.cutoff,self.config.hbondcutoff,self.config.hbondcutangle,self.config.sel1text,self.config.sel2text)
-
     def loadDataPushed(self):
-        self.config,result = FileLoaderDialog.getConfig()
+        self.config, result = FileLoaderDialog.getConfig()
         if result == 1:
             self.setInfoLabel("Loading trajectory and running atomic contact analysis...")
             nproc = int(self.settingsView.coreBox.value())
-            if nproc == 1:
-                parallel = 0
-            else:
-                parallel = 1
             self.analysis = Analyzer(self.config.psf, self.config.dcd, self.config.cutoff, self.config.hbondcutoff, self.config.hbondcutangle, self.config.sel1text, self.config.sel2text)
             QApplication.processEvents()
-            if parallel:
-                self.analysis.contactResults, self.analysis.resname_array, self.analysis.resid_array, self.analysis.name_array, self.analysis.type_array, self.analysis.segids, self.analysis.backbone, self.analysis.sel1text, self.analysis.sel2text = self.loadData_parallel(nproc)
-            else:
-                self.analysis.runFrameScan()
+            self.analysis.runFrameScan(nproc)
             self.setInfoLabel("%d frames loaded." % len(self.analysis.contactResults))
             self.updateSelectionLabels(self.config.sel1text, self.config.sel2text)
 
     # progress of loading trajectory
-    def handleTaskUpdated(self):
-        self.progressBar.setValue(self.analysis.currentFrame)
+    # def handleTaskUpdated(self):
+    #     self.progressBar.setValue(self.analysis.currentFrame)
 
     # progress of loading trajectory
-    def setFrameNumber(self):
-        self.progressBar.setMax(self.analysis.totalFrameNumber)
+    # def setFrameNumber(self):
+    #     self.progressBar.setMax(self.analysis.totalFrameNumber)
 
-    def analyzeParallel(self, map1, map2):
-        nproc = int(self.settingsView.coreBox.value())
-        start = time.time()
-        trajData = self.analysis.getTrajectoryData()
-        contResults = self.analysis.contactResults
-        results = []
-        rank = 0
-        manager = multiprocessing.Manager()
-        d = manager.list(trajData)
-        all_chunk = chunks(contResults, nproc)
-        pool = LoggingPool(nproc)
-        print("Running on %d cores" % nproc)
-        for c in all_chunk:
-            results.append(pool.apply_async(loop_frame, args=(c, map1, map2, d, rank)))
-            rank += 1
-        self.totalFramesToProcess = len(contResults)
-        self.analysis_state = True
-        self.analysisEventListener()
-        pool.close()
-        pool.join()
-        self.analysis_state = False
-        stop = time.time()
-        print("time: ", str(stop - start), rank)
-        print(str(len(c)), rank)
-        allkeys = []
-        frame_contacts_accumulated = []
-        print(len(results))
-        for res in results:
-            rn = res.get()
-            allkeys.extend(rn[0])
-            frame_contacts_accumulated.extend(rn[1])
-        accumulatedContactsDict = {}
-        #   start = time.time()
-        for key in allkeys:
-            accumulatedContactsDict[key] = []
-            for frame_dict in frame_contacts_accumulated:
-                if key not in frame_dict:  # puts empty score TempContactAccumulate in dict
-                    key1, key2 = makeKeyArraysFromKey(key)
-                    emptyCont = TempContactAccumulate(key1, key2)
-                    emptyCont.fscore = 0
-                    frame_dict[key] = emptyCont
-                accumulatedContactsDict[key].append(frame_dict[key])
-        finalAccumulatedContacts = []  # list of AccumulatedContacts
-        for key in accumulatedContactsDict:
-            key1, key2 = makeKeyArraysFromKey(key)
-            acc = AccumulatedContact(key1, key2)
-            for tempContact in accumulatedContactsDict[key]:
-                acc.addScore(tempContact.fscore)
-                acc.addContributingAtoms(tempContact.contributingAtomContacts)
-                acc.bb1 += tempContact.bb1score
-                acc.bb2 += tempContact.bb2score
-                acc.sc1 += tempContact.sc1score
-                acc.sc2 += tempContact.sc2score
-            finalAccumulatedContacts.append(acc)
-        # stop = time.time()
-        # print(stop - start)
-        glob_stop = time.time()
-        print(glob_stop - start)
-        # self.progressWidget.hide()
-        return finalAccumulatedContacts
-
-    @pyqtSlot()
-    def updateAnalyzedFrames(self):
-        QApplication.processEvents()
-        self.progressBar.setValue(100* float(self.value) / float(self.totalFramesToProcess))
-        self.value += 1
+# deprecated?
+    # @pyqtSlot()
+    # def updateAnalyzedFrames(self):
+    #     QApplication.processEvents()
+    #     self.progressBar.setValue(100* float(self.value) / float(self.totalFramesToProcess))
+    #     self.value += 1
 
     def analysisEventListener(self):
         while self.analysis_state:
@@ -324,24 +253,10 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             map1 = self.maps[0]
             map2 = self.maps[1]
             nproc = int(self.settingsView.coreBox.value())
-            if nproc == 1:
-                parallel = 0
-            else:
-                parallel = 1
-
-            if parallel:
-                self.analysis.lastMap1 = map1
-                self.analysis.lastMap2 = map2
-                self.contacts = self.analyzeParallel(map1, map2)
-            else:
-                self.value = 0
-                self.totalFramesToProcess = len(self.analysis.contactResults)
-                self.analysis.frameUpdate.connect(self.updateAnalyzedFrames)
-                self.contacts = self.analysis.runContactAnalysis(map1, map2)
-                # self.analysis_state = False
-            self.progressBar.setValue(0)
+            self.contacts = self.analysis.runContactAnalysis(map1, map2, nproc)
+            # self.progressBar.setValue(0)
             self.setInfoLabel("Updating timeline...")
-            QApplication.processEvents()
+            # QApplication.processEvents()
             self.updateSettings()
             self.updateFilters()
             self.cleanInfoLabel()
