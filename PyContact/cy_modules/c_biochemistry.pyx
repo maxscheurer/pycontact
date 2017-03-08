@@ -52,7 +52,7 @@ cdef class AtomType:
         comment = spl[1][1:]
         try:
             htype = spl[2]
-        except:
+        except IndexError:
             htype = "none"
         tp = AtomType(name, comment, AtomHBondType.mapping[htype])
         return tp
@@ -77,6 +77,11 @@ cdef class AccumulatedContact(object):
         self.sc1 = 0
         self.bb2 = 0
         self.sc2 = 0
+        self.atom1contactsBy = []
+        self.atom2contactsBy = []
+        self.backboneSideChainType = []
+        self.ttime = 0
+        self.meanLifeTime = 0
 
     def human_readable_title(self):
         """returns the title of the AccumulatedContact to be displayed in contact's label"""
@@ -98,9 +103,9 @@ cdef class AccumulatedContact(object):
             segnameString = ("%s %s" % (AccumulationMapIndex.mapping[AccumulationMapIndex.segid],
                                         str(titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.segid]])) if
                              titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.segid]] != "" else "")
-            list = [residueString, atomIndexString, atomNameString, segnameString]
+            tempList = [residueString, atomIndexString, atomNameString, segnameString]
             finishedList = []
-            for string in list:
+            for string in tempList:
                 if string != "":
                     finishedList.append(string)
             finishedString = " , ".join(finishedList)
