@@ -4,7 +4,8 @@ import collections
 import numpy as np
 from PyQt5.QtGui import QColor
 
-from ..db.DbReader import dict_factory, read_residue_db
+# from ..db.DbReader import dict_factory, read_residue_db
+from ..db.DbReader import read_residue_db
 
 
 compare = lambda x, y: collections.Counter(x) == collections.Counter(y)
@@ -19,6 +20,7 @@ vdwRadii = {"H": 1.0,
             "Mg": 1.73,
             "P": 1.8,
             "S": 1.899999976158142}
+
 
 def vdwRadius(atomType):
         return vdwRadii.get(atomType, 1.5)
@@ -45,7 +47,7 @@ class AtomType:
         comment = spl[1][1:]
         try:
             htype = spl[2]
-        except:
+        except IndexError:
             htype = "none"
         tp = AtomType(name, comment, AtomHBondType.mapping[htype])
         return tp
@@ -68,6 +70,16 @@ class AccumulatedContact(object):
         self.sc1 = 0
         self.bb2 = 0
         self.sc2 = 0
+        self.atom1contactsBy = []
+        self.atom2contactsBy = []
+        self.backboneSideChainType = []
+        self.hbondFrames = []
+        self.ttime = 0
+        self.meanLifeTime = 0
+        self.medianLifeTime = 0
+        self.meanScore = 0
+        self.medianScore = 0
+        self.contactType = 0
 
     def human_readable_title(self):
         """returns the title of the AccumulatedContact to be displayed in contact's label"""
@@ -89,9 +101,9 @@ class AccumulatedContact(object):
             segnameString = ("%s %s" % (AccumulationMapIndex.mapping[AccumulationMapIndex.segid],
                                         str(titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.segid]])) if
                              titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.segid]] != "" else "")
-            list = [residueString, atomIndexString, atomNameString, segnameString]
+            tempList = [residueString, atomIndexString, atomNameString, segnameString]
             finishedList = []
-            for string in list:
+            for string in tempList:
                 if string != "":
                     finishedList.append(string)
             finishedString = " , ".join(finishedList)
@@ -113,9 +125,11 @@ class AccumulatedContact(object):
         else:
             self.atom2contactsBy = BackboneSidechainType.contactsSc
 
-        if self.atom1contactsBy == BackboneSidechainType.contactsBb and self.atom2contactsBy == BackboneSidechainType.contactsBb:
+        if self.atom1contactsBy == BackboneSidechainType.contactsBb \
+                and self.atom2contactsBy == BackboneSidechainType.contactsBb:
             self.backboneSideChainType = BackboneSidechainContactType.bb_only
-        elif self.atom1contactsBy == BackboneSidechainType.contactsSc and self.atom2contactsBy == BackboneSidechainType.contactsSc:
+        elif self.atom1contactsBy == BackboneSidechainType.contactsSc \
+                and self.atom2contactsBy == BackboneSidechainType.contactsSc:
             self.backboneSideChainType = BackboneSidechainContactType.sc_only
         else:
             self.backboneSideChainType = BackboneSidechainContactType.both
@@ -123,7 +137,7 @@ class AccumulatedContact(object):
 
     def addContributingAtoms(self, contAtoms):
         # append a list of contributing atom to the contributingAtoms list, e.g. when a new frame is added
-        self.contributingAtoms.append(contAtoms)  ## used for temporary accumulation of contacts in data analysis
+        self.contributingAtoms.append(contAtoms)  # used for temporary accumulation of contacts in data analysis
 
     def setScores(self):
         self.mean_score()
@@ -158,7 +172,7 @@ class AccumulatedContact(object):
         mean = 0
         for score in self.scoreArray:
             mean += score
-        mean = mean / len(self.scoreArray)
+        mean /= len(self.scoreArray)
         self.meanScore = mean
         return mean
 
@@ -188,7 +202,6 @@ class AccumulatedContact(object):
         return lifeTimes
 
     def hbondFramesScan(self):
-        self.hbondFrames = []
         for frameList in self.contributingAtoms:
             currentFrame = 0
             for contAtoms in frameList:
@@ -205,22 +218,22 @@ class AccumulatedContact(object):
         return ContactType.shortcut[self.determine_ctype()]
 
     def determine_ctype(self):
-        #only works if both maps contain resname
+        # only works if both maps contain resname
         r1 = self.key1[AccumulationMapIndex.resname].lower()
         r2 = self.key2[AccumulationMapIndex.resname].lower()
         # if r1 == "none" or r2 == "none":
-            # return ContactType.other
+        #     return ContactType.other
         self.determineBackboneSidechainType()
         try:
             sc1 = str(read_residue_db("scpolarity", "name", r1)[0]["scpolarity"])
             scpol1 = SideChainPolarity.mapping[sc1]
-        except:
+        except IndexError:
             scpol1 = SideChainPolarity.other
 
         try:
             sc2 = str(read_residue_db("scpolarity", "name", r2)[0]["scpolarity"])
             scpol2 = SideChainPolarity.mapping[sc2]
-        except:
+        except IndexError:
             scpol2 = SideChainPolarity.other
 
         # hydrogen bonds: donor, acceptor, both
@@ -231,7 +244,8 @@ class AccumulatedContact(object):
                 ishbond = 1
                 break
 
-        if self.atom1contactsBy == BackboneSidechainType.contactsSc and self.atom2contactsBy == BackboneSidechainType.contactsSc:
+        if self.atom1contactsBy == BackboneSidechainType.contactsSc \
+                and self.atom2contactsBy == BackboneSidechainType.contactsSc:
             # check for saltbridge
             if (scpol1 == SideChainPolarity.positive and scpol2 == SideChainPolarity.negative) or \
                     (scpol2 == SideChainPolarity.positive and scpol1 == SideChainPolarity.negative):
@@ -242,7 +256,6 @@ class AccumulatedContact(object):
                     return ContactType.hydrophobic
             if ishbond == 1:
                 return ContactType.hbond
-
 
             return ContactType.other
 
@@ -260,14 +273,14 @@ class TempContactAccumulate(object):
     def __init__(self, key1, key2):
         super(TempContactAccumulate, self).__init__()
         self.fscore = 0  # score of current frame
-        self.contributingAtomContacts = []  # contrib. atoms, later appended to AccumulatedContact's contributingAtoms list
+        self.contributingAtomContacts = []  # contrib. atoms,
+        # later appended to AccumulatedContact's contributingAtoms list
         self.key1 = key1
         self.key2 = key2
         self.bb1score = 0
         self.bb2score = 0
         self.sc1score = 0
         self.sc2score = 0
-
 
 
 # contains infos about an atom-atom contact
@@ -304,22 +317,26 @@ class HydrogenBond:
             self.donorIndex, self.acceptorIndex, self.hydrogenIndex, self.acceptorHydrogenDistance, self.angle,
             self.usedCutoffDist, self.usedCutoffAngle))
 
-## enum and mapping for atom properties
+
+# enum and mapping for atom properties
 # used to dynamically define keys and have a bijective nomenclature for all properties
-class AccumulationMapIndex():
+class AccumulationMapIndex:
     index, atype, name, resid, resname, segid = range(6)
     mapping = ["i.", "t.", "nm.", "r.", "rn.", "s."]
     vmdsel = ["index", "type", "name", "resid", "resname", "segname"]
 
+
 class ContactType:
     saltbr, hydrophobic, hbond, other = range(4)
-    shortcut = ["saltbr","hydrophobic","hbond","other"]
+    shortcut = ["saltbr", "hydrophobic", "hbond", "other"]
     colors = ["rgba(255, 0,0, 50)", "rgba(0, 0,255, 50)", "rgba(255, 0 ,255, 50)", "rgba(255, 255 ,255, 50)"]
     qcolors = [QColor(255, 0, 0, 50), QColor(0, 0, 255, 50), QColor(255, 0, 255, 50), QColor(255, 255, 255, 50)]
+
 
 class SideChainPolarity:
     nonpolar, positive, negative, polar, other = range(5)
     mapping = {"nonpolar": nonpolar, "positive": positive, "negative": negative, "polar": polar, "other": other}
+
 
 class BackboneSidechainType:
     contactsBb, contactsSc = range(2)
@@ -327,8 +344,11 @@ class BackboneSidechainType:
 
 class BackboneSidechainContactType:
     bb_only, both, sc_only = range(3)
-    mapping = [[BackboneSidechainType.contactsBb, BackboneSidechainType.contactsBb],[BackboneSidechainType.contactsBb, BackboneSidechainType.contactsSc], [BackboneSidechainType.contactsSc, BackboneSidechainType.contactsSc]]
-    colors = [[0,200,200],[200,200,0],[0,200,0]]
+    mapping = [[BackboneSidechainType.contactsBb, BackboneSidechainType.contactsBb],
+               [BackboneSidechainType.contactsBb, BackboneSidechainType.contactsSc],
+               [BackboneSidechainType.contactsSc, BackboneSidechainType.contactsSc]]
+    colors = [[0, 200, 200], [200, 200, 0], [0, 200, 0]]
+
 
 def mean_score_of_contactArray(contacts):
     meanList = []
@@ -336,8 +356,9 @@ def mean_score_of_contactArray(contacts):
         meanList = np.concatenate((meanList, c.scoreArray), axis=0)
     return np.mean(meanList)
 
+
 def median_score_of_contactArray(contacts):
     medianList = []
     for c in contacts:
-        medianList = np.concatenate((medianList,c.scoreArray),axis=0)
+        medianList = np.concatenate((medianList, c.scoreArray), axis=0)
     return np.median(medianList)
