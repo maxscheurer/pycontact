@@ -167,8 +167,15 @@ class Canvas(QWidget, QObject):
                 # show the frame numbers on top
                 p.setFont(QFont('Arial', 8))
                 p.drawText(start_text, row + textoffset + 2.0, "Frame:")
-                for l in range(0, len(rangedScores) / merge + 1, 10)[1:]:
-                    p.drawText(startx + (l - 1) * offset, row + textoffset + 2.0, str(l * merge))
+
+                off = 0
+                if self.range[0] != 0:
+                    off = 1
+                for l in range(self.range[0] + off, self.range[1] + 1, 10)[off:]:
+                    if l == 0:
+                        continue
+                    print(l)
+                    p.drawText(startx + (l - 1 - self.range[0]) * offset, row + textoffset + 2.0, str(l * merge))
                 self.labelView.move(0, rowheight)
                 row += rowheight
             while i < len(rangedScores):
