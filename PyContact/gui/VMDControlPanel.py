@@ -96,10 +96,10 @@ class VMDControlPanel(QWidget):
 
     def __init__(self):
         super(QWidget, self).__init__()
+        self.grid = QGridLayout()
         self.initUI()
         self.representations = []
         self.connected = False
-        self.grid = QGridLayout()
         self.commandButton = None
         self.commandField = None
 
