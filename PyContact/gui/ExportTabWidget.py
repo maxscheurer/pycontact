@@ -175,15 +175,17 @@ class ExportTabWidget(QTabWidget):
         self.tab5.setLayout(self.grid4)
 
         self.checkboxdict = {"mean_score": "Mean Score",
-                             "hbond_percentage": "HBond Percentage",
-                             "contactTypeAsShortcut": "Contact Type"}
-        self.keys = self.checkboxdict.keys()
+                             "hbond_percentage": "HBond Percentage", "median_score": "Median Score",
+                             "contactTypeAsShortcut": "Contact Type",
+                             "getScoreArray": "Score List", "hbondFramesScan": "Hydrogen Bond Frames"}
+        # let's define the key order ourselves
+        self.keys = ["contactTypeAsShortcut", "mean_score", "median_score", "hbond_percentage", "getScoreArray", "hbondFramesScan"]
 
         propertyLabel = QLabel("Select properties to export")
         self.grid4.addWidget(propertyLabel, 0, 0)
 
         startLine = 1
-        for box in self.checkboxdict.keys():
+        for box in self.keys:
             checkBox = QCheckBox()
             checkBox.setChecked(True)
             boxLabel = QLabel(self.checkboxdict[box])
@@ -212,7 +214,7 @@ class ExportTabWidget(QTabWidget):
                 tableHeadings.append(self.checkboxdict[par])
 
             f = open(path + ".txt", "w")
-            row_format = "{:>20}" * (len(requestedParameters) + 1)
+            row_format = " {:>20} " * (len(requestedParameters) + 1)
             f.write(row_format.format("", *tableHeadings))
             f.write("\n")
 
@@ -220,6 +222,8 @@ class ExportTabWidget(QTabWidget):
                 currentContactProperties = []
                 for p in requestedParameters:
                     exec("propertyToAdd = c." + p + "()")
+                    if isinstance(propertyToAdd, float):
+                        propertyToAdd = "{0:.3f}".format(propertyToAdd)
                     currentContactProperties.append(propertyToAdd)
                 f.write(row_format.format(c.human_readable_title(), *currentContactProperties))
                 f.write("\n")

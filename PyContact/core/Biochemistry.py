@@ -81,6 +81,9 @@ class AccumulatedContact(object):
         self.medianScore = 0
         self.contactType = 0
 
+    def getScoreArray(self):
+        return self.scoreArray
+
     def human_readable_title(self):
         """returns the title of the AccumulatedContact to be displayed in contact's label"""
         total = []
@@ -202,6 +205,7 @@ class AccumulatedContact(object):
         return lifeTimes
 
     def hbondFramesScan(self):
+        self.hbondFrames = []
         for frameList in self.contributingAtoms:
             currentFrame = 0
             for contAtoms in frameList:
