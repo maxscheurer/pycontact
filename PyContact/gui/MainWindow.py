@@ -6,7 +6,7 @@ import copy
 import PyQt5.QtCore as QtCore
 from PyQt5.QtCore import QRect, pyqtSlot, QObject
 from PyQt5.QtWidgets import (QMainWindow, QTabWidget, QLabel, QDialog,
-                             QApplication, QGridLayout, QFileDialog, QColorDialog)
+                             QApplication, QGridLayout, QFileDialog, QColorDialog, QWidget)
 from PyQt5.QtGui import QPaintEvent
 from PyQt5.Qt import Qt, QColor
 from PyQt5.QtGui import QIntValidator
@@ -25,7 +25,7 @@ from ErrorBox import ErrorBox
 from ErrorMessages import ErrorMessages
 from ..core.LogPool import *
 from ..core.aroundPatch import AroundSelection
-import settings
+import Preferences
 from ..exampleData.datafiles import DEFAULTSESSION
 from VMDControlPanel import VMDControlPanel
 from ..core.DataHandler import DataHandler
@@ -65,7 +65,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.actionImport_Session.triggered.connect(self.importSession)
         self.actionShow_Info.triggered.connect(self.showDeveloperInfo)
         # settings and filters
-        self.settingsView = SettingsTabWidget()
+        self.settingsView = PreferencesWidget()
         self.settingsView.applySettingsButton.clicked.connect(self.updateSettings)
         self.applyFilterButton.clicked.connect(self.updateFilters)
         # statistics
@@ -86,8 +86,8 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.actionContact_Area_Calculations.triggered.connect(self.showContactAreaView)
         # preferences
         self.actionPreferences.triggered.connect(self.openPrefs)
-        # apply color button
-        self.settingsView.applyColorButton.clicked.connect(self.updateColors)
+
+        # apply color button, outdated?
         self.colorScheme = ColorScheme.bbsc
 
         self.actionDefault.triggered.connect(self.loadDefault)
@@ -270,6 +270,10 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             self.cleanInfoLabel()
 
     def updateSettings(self):
+        if self.settingsView.bbscScoreRadioButton.isChecked():
+            self.colorScheme = ColorScheme.bbsc
+        elif self.settingsView.customColorRadioButton.isChecked():
+            self.colorScheme = ColorScheme.custom
         self.painter.nsPerFrame = float(self.settingsView.nsPerFrameField.text())
         self.painter.threshold = float(self.settingsView.thresholdField.text())
         self.painter.rendered = False
@@ -520,18 +524,10 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             self.settingsView.pickColorButton.setStyleSheet("QWidget { background-color: %s }" %
                                                             self.customColor.name())
 
-    def updateColors(self):
-        if self.settingsView.bbscScoreRadioButton.isChecked():
-            self.colorScheme = ColorScheme.bbsc
-        elif self.settingsView.customColorRadioButton.isChecked():
-            self.colorScheme = ColorScheme.custom
-        self.updateSettings()
-        self.updateFilters()
 
-
-class SettingsTabWidget(QTabWidget, settings.Ui_settingsWindowWidget):
+class PreferencesWidget(QTabWidget, Preferences.Ui_PreferencesPanel):
     def __init__(self, parent=None):
-        super(QTabWidget, self).__init__(parent)
+        super(QWidget, self).__init__(parent)
         self.setupUi(self)
 
 
