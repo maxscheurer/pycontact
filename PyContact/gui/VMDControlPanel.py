@@ -11,21 +11,20 @@ from ..core.Biochemistry import *
 # from ..cy_modules import wrap_vmd as vmd
 
 
-class VMDCommands():
+class VMDCommands:
 
     @staticmethod
     def translateSelections(mdanalysis_text):
-        txt = mdanalysis_text.replace("segid","segname")
-        txt = txt.replace("-"," to ")
-        #around x y--> within x of y
+        txt = mdanalysis_text.replace("segid", "segname")
+        txt = txt.replace("-", " to ")
+        # around x y--> within x of y
         lst = txt.split(" ")
         idcs = [i for i, j in enumerate(lst) if j == 'around']
         for idx in idcs:
-            lst.insert(idx+2,"of")
+            lst.insert(idx + 2, "of")
         txt = " ".join(lst)
-        txt = txt.replace("around","within")
+        txt = txt.replace("around", "within")
         return txt
-
 
     @staticmethod
     def gotoFrame(frame):
@@ -63,7 +62,7 @@ class VMDCommands():
         return "display resetview"
 
 
-class VMDTcp():
+class VMDTcp:
     """Interface to VMD via tcp"""
     def __init__(self):
         self.commands = VMDCommands()
@@ -71,37 +70,40 @@ class VMDTcp():
         self.HOST = 'localhost'
         self.PORT = 5050
         self.ADDR = (self.HOST, self.PORT)
+        self.tcpClientSocket = None
 
     def attemptConnection(self):
         self.tcpClientSocket = socket(AF_INET, SOCK_STREAM)
         self.tcpClientSocket.connect(self.ADDR)
 
     def start(self):
-        subprocess.Popen(["vmd","-e",self.rctl])
+        subprocess.Popen(["vmd", "-e", self.rctl])
         try:
             self.attemptConnection()
-        except:
+        except ConnectionError:
             return -1
 
-    def send_command(self,cmd):
-        self.tcpClientSocket.send(str(cmd+"\n"))
+    def send_command(self, cmd):
+        self.tcpClientSocket.send(str(cmd + "\n"))
 
     def stop(self):
         self.send_command("quit")
         self.tcpClientSocket.close()
 
+
 class VMDControlPanel(QWidget):
     """docstring for VMDControlPanel"""
 
     def __init__(self):
-        super(QWidget,self).__init__()
+        super(QWidget, self).__init__()
         self.initUI()
         self.representations = []
         self.connected = False
-
+        self.grid = QGridLayout()
+        self.commandButton = None
+        self.commandField = None
 
     def initUI(self):
-        self.grid = QGridLayout()
         self.setLayout(self.grid)
         self.setWindowTitle("VMD Control Panel")
         self.resize(640, 444)
@@ -130,7 +132,7 @@ class VMDControlPanel(QWidget):
         self.grid.addWidget(self.stopButton, 0, 2)
         self.stopButton.setEnabled(False)
 
-# just for testing purposes
+        # just for testing purposes
         self.commandButton = QPushButton("Send command")
         # self.commandButton.clicked.connect(self.sendCommand)
         # self.grid.addWidget(self.commandButton, 2, 0)
@@ -143,8 +145,8 @@ class VMDControlPanel(QWidget):
     def addRep(self, txt):
         self.representations.append(txt)
 
-    def prepareVMDWithTopoTraj(self,top,traj):
-        self.vmd.send_command("mol new %s"  % top)
+    def prepareVMDWithTopoTraj(self, top, traj):
+        self.vmd.send_command("mol new %s" % top)
         self.vmd.send_command(self.vmd.commands.removeReps(0))
         self.vmd.send_command("mol addfile %s waitfor all" % traj)
         self.vmd.send_command(self.vmd.commands.styleBackbone())
@@ -205,21 +207,22 @@ class VMDControlPanel(QWidget):
             self.updateInfoLabel("Connection established")
             self.loadTopoTrajButton.setEnabled(True)
             self.connected = True
-        except Exception as e:
-             self.updateInfoLabel("Could not connect to VMD!\nTry to connect using the Connect button\n when VMD is opened.")
+        except ConnectionError:
+            self.updateInfoLabel("Could not connect to VMD!\nTry to connect using the Connect"
+                                 " button\n when VMD is opened.")
 
     def pushStartVMD(self):
         self.startButton.setEnabled(False)
         self.stopButton.setEnabled(True)
         self.commandButton.setEnabled(True)
-        res = self.vmd.start()
-        if res == -1:
+        response = self.vmd.start()
+        if response == -1:
             self.connectButton.setEnabled(True)
-            self.updateInfoLabel("Could not connect to VMD!\nTry to connect using the Connect button\n when VMD is opened.")
+            self.updateInfoLabel("Could not connect to VMD!\nTry to connect using the Connect button\n "
+                                 "when VMD is opened.")
         else:
             self.loadTopoTrajButton.setEnabled(True)
             self.connected = True
-
 
     def pushStopVMD(self):
         self.representations = []
