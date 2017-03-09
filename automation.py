@@ -11,7 +11,7 @@ dcdfile = job[1]
 name = job[2]
 
 analyzer = Analyzer(psffile, dcdfile, 5.0, 2.5, 120, "segid LIG", "resname TIP3")
-analyzer.runFrameScan()
+analyzer.runFrameScan(8)
 map1 = [0, 0, 0, 1, 0, 0]
 map2 = [0, 0, 0, 0, 1, 0]
 contacts = analyzer.runContactAnalysis(map1, map2)

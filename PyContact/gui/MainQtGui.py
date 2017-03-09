@@ -118,7 +118,7 @@ class Ui_MainWindow(object):
         self.toLabel = QtWidgets.QLabel(self.filterFrame)
         self.toLabel.setMaximumSize(QtCore.QSize(25, 16777215))
         font = QtGui.QFont()
-        font.setItalic(True)
+        font.setItalic(False)
         self.toLabel.setFont(font)
         self.toLabel.setObjectName("toLabel")
         self.gridLayout_3.addWidget(self.toLabel, 2, 2, 1, 1)
