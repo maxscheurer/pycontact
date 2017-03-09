@@ -675,6 +675,41 @@
               <height>16777215</height>
              </size>
             </property>
+            <item>
+             <property name="text">
+              <string>mean</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>median</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>bb/sc type</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>contact type</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>total time</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>mean lifetime</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>median lifetime</string>
+             </property>
+            </item>
            </widget>
           </item>
           <item row="2" column="3">
@@ -698,7 +733,28 @@
            </widget>
           </item>
           <item row="3" column="1" colspan="2">
-           <widget class="QComboBox" name="selectOnlyToolbox"/>
+           <widget class="QComboBox" name="selectOnlyToolbox">
+            <item>
+             <property name="text">
+              <string>hbonds</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>hydrophobic</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>saltbridges</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>unknown</string>
+             </property>
+            </item>
+           </widget>
           </item>
           <item row="3" column="3">
            <widget class="QCheckBox" name="onlyBoxActiveCheckbox">

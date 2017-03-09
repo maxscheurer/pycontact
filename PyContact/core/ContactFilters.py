@@ -219,7 +219,7 @@ class ScoreFilter(BinaryFilter):
 
 class SortingOrder(object):
     ascending, descending = range(2)
-    mapping = {u"asc": ascending, u"desc": descending}
+    mapping = {u"asc.": ascending, u"desc.": descending}
 
 
 class Sorting(object):

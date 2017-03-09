@@ -373,8 +373,8 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
                         key = self.sortingKeyDropdown.currentText()
                         descending = SortingOrder.mapping[self.sortingOrderDropdown.currentText()]
                         sorter = Sorting("sorting", key, descending)
-                        sorter.setThresholdAndNsPerFrame(float(self.thresholdField.text()),
-                                                         float(self.nsPerFrameField.text()))
+                        sorter.setThresholdAndNsPerFrame(float(self.settingsView.thresholdField.text()),
+                                                         float(self.settingsView.nsPerFrameField.text()))
                         self.filteredContacts = sorter.sortContacts(self.filteredContacts)
                     if onlyActive:
                         key = self.selectOnlyToolbox.currentText()
