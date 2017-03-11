@@ -160,6 +160,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.analysis = Analyzer(*arguments)
         self.analysis.contactResults = contactResults
         self.analysis.setTrajectoryData(*trajArgs)
+        self.analysis.finalAccumulatedContacts = self.contacts
         self.updateSelectionLabels(arguments[5], arguments[6])
         self.updateSettings()
         self.updateFilters()
@@ -171,13 +172,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             return
         if self.contacts is not None and self.analysis is not None:
             self.setInfoLabel("Exporting current session...")
-            analyzerArgs = [self.analysis.psf, self.analysis.dcd, self.analysis.cutoff, self.analysis.hbondcutoff,
-                            self.analysis.hbondcutangle, self.analysis.sel1text, self.analysis.sel2text,
-                            self.analysis.contactResults]
-            trajArgs = self.analysis.getTrajectoryData()
-            exportDict = {"contacts": self.contacts, "analyzer": analyzerArgs, "trajectory": trajArgs,
-                          "maps": [self.analysis.lastMap1, self.analysis.lastMap2]}
-            pickle.dump(exportDict, open(filestring, "wb"))
+            DataHandler.writeSessionToFile(filestring, self.analysis)
             self.cleanInfoLabel()
         else:
             box = ErrorBox(ErrorMessages.NOEXPDATA)
@@ -190,6 +185,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.analysis = Analyzer(*arguments)
         self.analysis.contactResults = contactResults
         self.analysis.setTrajectoryData(*trajArgs)
+        self.analysis.finalAccumulatedContacts = self.contacts
         self.updateSelectionLabels(arguments[5], arguments[6])
         self.updateSettings()
         self.updateFilters()
