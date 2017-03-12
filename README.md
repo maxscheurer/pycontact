@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.com/maxscheurer/pycontact.svg?token=Xyntx2ELmeydq8pgqs8t&branch=develop)](https://travis-ci.com/maxscheurer/pycontact)
 
 
-Tools for contact analysis of biomolecules from Molecular Dynamics simulations.
+Tools for contact analysis of biomolecules from Molecular Dynamics simulation trajectories.
 
 ## Installation
 ### Download
@@ -28,18 +28,10 @@ Simply run `python setup.py install`.
 * for visualization: latest version of [VMD](http://www.ks.uiuc.edu/Development/Download/download.cgi?PackageName=VMD)
 
 
-## Screenshots
-* Main Timeline Window
-![timeline](screenshots/first_view_timeline.png?raw=true "Timeline view without filter")
-
-* Filtered Timeline
-![filtered](screenshots/filtered_contacts.png?raw=true "Filtered contacts")
-
-* Preferences Panel
-![pref](screenshots/pref_panel.png?raw=true "Preferences")
-
-* Histogram Panel
-![hist](screenshots/histogram_panel_new.png?raw=true "Histogram export")
+## Scripting
+Analysis can also be performed by using PyContact as a plain python package. In this way,
+you automate analysis (reading trajectories and running contact score accumulation) from your python script and
+later on visualize it in the GUI.
 
 ## About
 Authors: Maximilian Scheurer and Peter Rodenkirch
