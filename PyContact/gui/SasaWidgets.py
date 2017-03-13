@@ -70,6 +70,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         self.gridLayout.addWidget(self.sasaProgressBar, 8, 1, 1, 2)
         self.calcSasaButton.clicked.connect(self.calculateSasa)
         self.loadDataButton.clicked.connect(self.loadData)
+        self.clearDataButton.clicked.connect(self.clearData)
         self.savePlotButton.clicked.connect(self.savePlot)
         self.exportDataButton.clicked.connect(self.exportData)
         self.topoloader = TopoTrajLoaderDialog()
@@ -82,6 +83,20 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         loadedData = self.topoloader.getConfig()
         self.psf = loadedData[0][0]
         self.dcd = loadedData[0][1]
+
+    def clearData(self):
+        self.psf = ""
+        self.dcd = ""
+        self.allSasas = []
+        self.totalFramesToProcess = 0
+        self.sasaProgressBar.setProperty("value", 0)
+        sip.delete(self.previewPlot)
+        self.previewPlot = SimplePlotter(None, width=5, height=2, dpi=60)
+        self.graphGridLayout.addWidget(self.previewPlot)
+        self.sasaSelection1TextField.setText("")
+        self.sasaSelection2TextField.setText("")
+        self.sasaRestrictionTextField.setText("")
+
 
     def savePlot(self):
         fileName = QFileDialog.getSaveFileName(self, 'Export Path')

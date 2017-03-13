@@ -5,7 +5,7 @@ import copy
 
 import PyQt5.QtCore as QtCore
 from PyQt5.QtCore import QRect, pyqtSlot, QObject
-from PyQt5.QtWidgets import (QMainWindow, QTabWidget, QLabel, QDialog,
+from PyQt5.QtWidgets import (QMainWindow, QTabWidget, QLabel, QDialog, QProgressBar,
                              QApplication, QGridLayout, QFileDialog, QColorDialog, QWidget)
 from PyQt5.QtGui import QPaintEvent
 from PyQt5.Qt import Qt, QColor
@@ -207,12 +207,12 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             self.updateSelectionLabels(self.config.sel1text, self.config.sel2text)
 
     # progress of loading trajectory
-    # def handleTaskUpdated(self):
-    #     self.progressBar.setValue(self.analysis.currentFrame)
+    def handleTaskUpdated(self):
+        self.progressBar.setValue(self.analysis.currentFrame)
 
     # progress of loading trajectory
-    # def setFrameNumber(self):
-    #     self.progressBar.setMax(self.analysis.totalFrameNumber)
+    def setFrameNumber(self):
+        self.progressBar.setMax(self.analysis.totalFrameNumber)
 
 # deprecated?
     @pyqtSlot(float)
