@@ -569,14 +569,12 @@ class Analyzer(QObject):
     # PARALLEL CODE
     def analyze_contactResultsWithMaps_Parallel(self, map1, map2, nproc):
         start = time.time()
-        trajData = self.getTrajectoryData()
-        contResults = self.contactResults
         self.totalFramesToProcess = len(self.contactResults)
         results = []
         rank = 0
         manager = multiprocessing.Manager()
-        d = manager.list(trajData)
-        all_chunk = chunks(contResults, nproc)
+        d = manager.list(self.getTrajectoryData())
+        all_chunk = chunks(self.contactResults, nproc)
         pool = LoggingPool(nproc)
         print("Running on %d cores" % nproc)
         for c in all_chunk:
@@ -599,7 +597,7 @@ class Analyzer(QObject):
             allkeys.extend(rn[0])
             frame_contacts_accumulated.extend(rn[1])
         accumulatedContactsDict = {}
-        #   start = time.time()
+        start = time.time()
         for key in allkeys:
             accumulatedContactsDict[key] = []
             for frame_dict in frame_contacts_accumulated:
