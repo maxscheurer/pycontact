@@ -199,3 +199,6 @@ class SimplePlotter(MplPlotter):
 
     def saveFigure(self, path, outputFormat):
         self.fig.savefig(path + "." + outputFormat, format=outputFormat)
+
+    def clearFigure(self):
+        self.fig.clf()

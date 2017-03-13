@@ -104,6 +104,13 @@
           </widget>
          </item>
          <item>
+          <widget class="QPushButton" name="clearDataButton">
+           <property name="text">
+            <string>Clear Data</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="savePlotButton">
            <property name="text">
             <string>Save Plot</string>
