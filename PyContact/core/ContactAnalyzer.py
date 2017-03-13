@@ -368,7 +368,7 @@ class Analyzer(QObject):
                                 # for j in bondindices1:
                                 #     print(self.type_array[j+1])
                                 hydrogenidx = next(
-                                    (j for j in bondindices1 if self.type_array[j].startswith("H")), -1)
+                                    (j for j in bondindices1 if self.name_array[j].startswith("H")), -1)
                                 if hydrogenidx != -1:
                                     # print(self.type_array[hydrogenidx])
                                     hydrogenAtomsBoundToAtom1.append(hydrogenidx)
@@ -385,7 +385,7 @@ class Analyzer(QObject):
                                 # print("h bond to atom2")
                                 bondindices2 = b2.to_indices()[bondcount2]
                                 hydrogenidx = next(
-                                    (k for k in bondindices2 if self.type_array[k].startswith("H")), -1)
+                                    (k for k in bondindices2 if self.name_array[k].startswith("H")), -1)
                                 if hydrogenidx != -1:
                                     # print(type_array[hydrogenidx])
                                     hydrogenAtomsBoundToAtom2.append(hydrogenidx)
