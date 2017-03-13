@@ -206,42 +206,11 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             self.setInfoLabel("%d frames loaded." % len(self.analysis.contactResults))
             self.updateSelectionLabels(self.config.sel1text, self.config.sel2text)
 
-    # progress of loading trajectory
-    def handleTaskUpdated(self):
-        self.progressBar.setValue(self.analysis.currentFrame)
-
-    # progress of loading trajectory
-    def setFrameNumber(self):
-        self.progressBar.setMax(self.analysis.totalFrameNumber)
-
-# deprecated?
     @pyqtSlot(float)
     def updateAnalyzedFrames(self, value):
-        print("Updating frames", value)
+        # print("Updating frames", value)
         self.progressBar.setValue(100 * value)
         QApplication.processEvents()
-
-    # def analysisEventListener(self):
-    #     while self.analysis_state:
-    #         QApplication.processEvents()
-    #         progress = 0
-    #         for each in analysisProgressDict.keys():
-    #             progress += analysisProgressDict[each]
-    #             # sasaProgressDict[each] = 0
-    #         progress = float(progress) / float(self.totalFramesToProcess) * 100
-    #         # if (101 - self.sasaProgressBar.value()) < progress:
-    #         #     self.sasaProgressBar.update_bar(101 - self.sasaProgressBar.value())
-    #         if progress > 0:
-    #             # print(progress)
-    #             self.progressBar.setValue(progress)
-    #
-    #         if int(progress) == 100:
-    #             # print("finished")
-    #             for each in analysisProgressDict.keys():
-    #                 analysisProgressDict[each]=0
-    #             progress = 0
-    #             self.progressBar.setValue(0)
-    #             self.analysis_state = False
 
     def setInfoLabel(self, txt):
         self.statusLabel.setText(txt)

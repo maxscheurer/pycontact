@@ -54,6 +54,8 @@ class Analyzer(QObject):
         self.bonds = []
         self.totalFrameNumber = 0
         self.currentFrameNumber = 0
+        self.analysis_state = False
+        self.totalFramesToProcess = 1
 
     def runFrameScan(self, nproc):
         if nproc == 1:
@@ -549,11 +551,27 @@ class Analyzer(QObject):
         print(stop - start)
         return finalAccumulatedContacts
 
+    def analysisEventListener(self):
+        while self.analysis_state:
+            progress = 0
+            for each in analysisProgressDict.keys():
+                progress += analysisProgressDict[each]
+            progress = float(progress) / float(self.totalFramesToProcess)
+            if progress > 0:
+                self.frameUpdate.emit(progress)
+
+            if progress == 1.0:
+                for each in analysisProgressDict.keys():
+                    analysisProgressDict[each] = 0
+                progress = 0
+                self.analysis_state = False
+
     # PARALLEL CODE
     def analyze_contactResultsWithMaps_Parallel(self, map1, map2, nproc):
         start = time.time()
         trajData = self.getTrajectoryData()
         contResults = self.contactResults
+        self.totalFramesToProcess = len(self.contactResults)
         results = []
         rank = 0
         manager = multiprocessing.Manager()
@@ -565,11 +583,11 @@ class Analyzer(QObject):
             results.append(pool.apply_async(loop_frame, args=(c, map1, map2, d, rank)))
             rank += 1
         # self.totalFramesToProcess = len(contResults)
-        # self.analysis_state = True
-        # self.analysisEventListener()
+        self.analysis_state = True
+        self.analysisEventListener()
         pool.close()
         pool.join()
-        # self.analysis_state = False
+        self.analysis_state = False
         stop = time.time()
         print("time: ", str(stop - start), rank)
         print(str(len(c)), rank)
