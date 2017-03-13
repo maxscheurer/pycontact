@@ -5,7 +5,7 @@ import copy
 
 import PyQt5.QtCore as QtCore
 from PyQt5.QtCore import QRect, pyqtSlot, QObject
-from PyQt5.QtWidgets import (QMainWindow, QTabWidget, QLabel, QDialog,
+from PyQt5.QtWidgets import (QMainWindow, QTabWidget, QLabel, QDialog, QProgressBar,
                              QApplication, QGridLayout, QFileDialog, QColorDialog, QWidget)
 from PyQt5.QtGui import QPaintEvent
 from PyQt5.Qt import Qt, QColor
@@ -207,41 +207,41 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             self.updateSelectionLabels(self.config.sel1text, self.config.sel2text)
 
     # progress of loading trajectory
-    # def handleTaskUpdated(self):
-    #     self.progressBar.setValue(self.analysis.currentFrame)
+    def handleTaskUpdated(self):
+        self.progressBar.setValue(self.analysis.currentFrame)
 
     # progress of loading trajectory
-    # def setFrameNumber(self):
-    #     self.progressBar.setMax(self.analysis.totalFrameNumber)
+    def setFrameNumber(self):
+        self.progressBar.setMax(self.analysis.totalFrameNumber)
 
 # deprecated?
-    # @pyqtSlot()
-    # def updateAnalyzedFrames(self):
-    #     QApplication.processEvents()
-    #     self.progressBar.setValue(100* float(self.value) / float(self.totalFramesToProcess))
-    #     self.value += 1
+    @pyqtSlot()
+    def updateAnalyzedFrames(self):
+        QApplication.processEvents()
+        self.progressBar.setValue(100 * float(self.value) / float(self.totalFramesToProcess))
+        self.value += 1
 
-    # def analysisEventListener(self):
-    #     while self.analysis_state:
-    #         QApplication.processEvents()
-    #         progress = 0
-    #         for each in analysisProgressDict.keys():
-    #             progress += analysisProgressDict[each]
-    #             # sasaProgressDict[each] = 0
-    #         progress = float(progress) / float(self.totalFramesToProcess) * 100
-    #         # if (101 - self.sasaProgressBar.value()) < progress:
-    #         #     self.sasaProgressBar.update_bar(101 - self.sasaProgressBar.value())
-    #         if progress > 0:
-    #             # print(progress)
-    #             self.progressBar.setValue(progress)
-    #
-    #         if int(progress) == 100:
-    #             # print("finished")
-    #             for each in analysisProgressDict.keys():
-    #                 analysisProgressDict[each]=0
-    #             progress = 0
-    #             self.progressBar.setValue(0)
-    #             self.analysis_state = False
+    def analysisEventListener(self):
+        while self.analysis_state:
+            QApplication.processEvents()
+            progress = 0
+            for each in analysisProgressDict.keys():
+                progress += analysisProgressDict[each]
+                # sasaProgressDict[each] = 0
+            progress = float(progress) / float(self.totalFramesToProcess) * 100
+            if (101 - self.sasaProgressBar.value()) < progress:
+                self.sasaProgressBar.update_bar(101 - self.sasaProgressBar.value())
+            if progress > 0:
+                # print(progress)
+                self.progressBar.setValue(progress)
+
+            if int(progress) == 100:
+               # print("finished")
+                for each in analysisProgressDict.keys():
+                    analysisProgressDict[each]=0
+                progress = 0
+                self.progressBar.setValue(0)
+                self.analysis_state = False
 
     def setInfoLabel(self, txt):
         self.statusLabel.setText(txt)
@@ -523,6 +523,27 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         if col.isValid():
             self.settingsView.pickColorButton.setStyleSheet("QWidget { background-color: %s }" %
                                                             self.customColor.name())
+
+
+class PbWidget(QProgressBar):
+    def __init__(self, total=100):
+        super(PbWidget, self).__init__()
+        self.setMinimum(0)
+        self.setMaximum(total)
+        self._active = False
+
+    def update_bar(self, to_add_number):
+        while True:
+            time.sleep(0.01)
+            value = self.value() + to_add_number
+            self.setValue(value)
+            qApp.processEvents()
+            if not self._active or value >= self.maximum():
+                break
+        self._active = False
+
+    def closeEvent(self, event):
+        self._active = False
 
 
 class PreferencesWidget(QTabWidget, Preferences.Ui_PreferencesPanel):
