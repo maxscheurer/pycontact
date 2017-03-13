@@ -215,11 +215,11 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
     #     self.progressBar.setMax(self.analysis.totalFrameNumber)
 
 # deprecated?
-    # @pyqtSlot()
-    # def updateAnalyzedFrames(self):
-    #     QApplication.processEvents()
-    #     self.progressBar.setValue(100* float(self.value) / float(self.totalFramesToProcess))
-    #     self.value += 1
+    @pyqtSlot(float)
+    def updateAnalyzedFrames(self, value):
+        print("Updating frames", value)
+        self.progressBar.setValue(100 * value)
+        QApplication.processEvents()
 
     # def analysisEventListener(self):
     #     while self.analysis_state:
@@ -257,6 +257,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
         self.maps, result = AnalysisDialog.getMapping()
         if result == 1:
+            self.analysis.frameUpdate.connect(self.updateAnalyzedFrames)
             self.setInfoLabel("Analyzing contacts...")
             map1 = self.maps[0]
             map2 = self.maps[1]

@@ -29,7 +29,7 @@ MDAnalysis.core.flags['use_KDTree_routines'] = True
 
 class Analyzer(QObject):
     """docstring for Analyzer"""
-    frameUpdate = pyqtSignal()
+    frameUpdate = pyqtSignal(float)
 
     def __init__(self, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1text, sel2text):
         super(Analyzer, self).__init__()
@@ -475,6 +475,8 @@ class Analyzer(QObject):
         # list of all contacts keys (= unique identifiers, determined by the given maps)
         start = time.time()
         allkeys = []
+        total = len(contactResults)
+        counter = 1
         for frame in contactResults:
             currentFrameAcc = {}
             for cont in frame:
@@ -506,7 +508,8 @@ class Analyzer(QObject):
                 if key not in allkeys:
                     allkeys.append(key)
             frame_contacts_accumulated.append(currentFrameAcc)
-            self.frameUpdate.emit()
+            self.frameUpdate.emit(float(counter) / float(total))
+            counter += 1
         accumulatedContactsDict = {}
         stop = time.time()
         print(stop - start)
