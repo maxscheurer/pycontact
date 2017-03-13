@@ -92,6 +92,9 @@ class Analyzer(QObject):
                 self.type_array, self.segids, self.backbone, self.sel1text,
                 self.sel2text]
 
+    def getFilePaths(self):
+        return self.psf, self.dcd
+
     # find a string in s between the strings first and last
     @staticmethod
     def find_between(s, first, last):

@@ -196,3 +196,6 @@ class SimplePlotter(MplPlotter):
         self.axes.set_xlabel("x")
         self.axes.set_ylabel("f(x)")
         self.axes.xaxis.set_label_position('top')
+
+    def saveFigure(self, path, outputFormat):
+        self.fig.savefig(path + "." + outputFormat, format=outputFormat)

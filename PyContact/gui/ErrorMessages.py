@@ -12,3 +12,5 @@ class ErrorMessages():
     RESID_REQUIRED = "Please analyze the trajectory with the resid box checked for both atom selections!"
 
     NOCONTACTS = "No data loaded or no filtered contacts available."
+
+    FILE_NOT_FOUND = "Attempt to load trajectory failed. File does not exist."

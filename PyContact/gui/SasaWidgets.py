@@ -1,9 +1,10 @@
 from __future__ import print_function
 import sip
 import time
+import os
 
 
-from PyQt5.QtWidgets import QWidget, QProgressBar, QApplication
+from PyQt5.QtWidgets import QWidget, QProgressBar, QApplication, QFileDialog
 import MDAnalysis
 import numpy as np
 
@@ -55,6 +56,8 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         self.state = True
         self.name = None
         self.psf, self. dcd = "", ""
+        self.allSasas = []
+        self.totalFramesToProcess = 0
 
         sip.delete(self.sasaProgressBar)
         self.sasaProgressBar = PbWidget(total=100)
@@ -64,15 +67,47 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         self.sasaProgressBar.setObjectName("sasaProgressBar")
         self.previewPlot = SimplePlotter(None, width=5, height=2, dpi=60)
         self.graphGridLayout.addWidget(self.previewPlot)
-        self.gridLayout.addWidget(self.sasaProgressBar, 7, 1, 1, 1)
+        self.gridLayout.addWidget(self.sasaProgressBar, 8, 1, 1, 2)
         self.calcSasaButton.clicked.connect(self.calculateSasa)
         self.loadDataButton.clicked.connect(self.loadData)
+        self.savePlotButton.clicked.connect(self.savePlot)
+        self.exportDataButton.clicked.connect(self.exportData)
         self.topoloader = TopoTrajLoaderDialog()
+
+    def setFilePaths(self, *argv):
+        self.psf = argv[0][0]
+        self.dcd = argv[0][1]
 
     def loadData(self):
         loadedData = self.topoloader.getConfig()
         self.psf = loadedData[0][0]
         self.dcd = loadedData[0][1]
+
+    def savePlot(self):
+        fileName = QFileDialog.getSaveFileName(self, 'Export Path')
+        if len(fileName[0]) > 0:
+            path, file_extension = os.path.splitext(fileName[0])
+            if file_extension == "":
+                file_extension = ".png"
+            file_extension = file_extension[1:]
+            try:
+                self.previewPlot.saveFigure(path, file_extension)
+            except ValueError:
+                box = ErrorBox("File format " + file_extension + " is not supported.\nPlease choose from eps, pdf, pgf,"
+                                                                 " png, ps, raw, rgba, svg, svgz. ")
+                box.exec_()
+
+    def exportData(self):
+        fileName = QFileDialog.getSaveFileName(self, 'Export Path')
+        if len(fileName[0]) > 0:
+            path, file_extension = os.path.splitext(fileName[0])
+            if file_extension == "":
+                file_extension = ".dat"
+
+            f = open(path + file_extension, "w")
+            for i in range(self.totalFramesToProcess):
+                f.write(str(i) + "\t" + str(self.allSasas[i]) + "\n")
+            f.close()
 
     def calculateSasa(self):
         print("calculate SASA")
@@ -92,7 +127,12 @@ class SasaWidget(QWidget, Ui_SasaWidget):
             e.exec_()
             return
 
-        u = MDAnalysis.Universe(self.psf, self.dcd)
+        try:
+            u = MDAnalysis.Universe(self.psf, self.dcd)
+        except IOError:
+            e = ErrorBox(ErrorMessages.FILE_NOT_FOUND)
+            e.exec_()
+            return
 
         probeRadius = 1.4
 
@@ -169,9 +209,8 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         pool.join()
 
         self.state = False
-        all_sasas = []
         for r in results:
-            all_sasas.extend(r.get())
+            self.allSasas.extend(r.get())
 
         del radius
 
@@ -226,11 +265,11 @@ class SasaWidget(QWidget, Ui_SasaWidget):
             diff_list = []
             for sasa_value1, sasa_value2 in zip(all_sasas, all_sasas2):
                 diff_list.append(sasa_value1 - sasa_value2)
-            all_sasas = diff_list
+            self.allSasas = diff_list
 
         sip.delete(self.previewPlot)
         self.previewPlot = SimplePlotter(None, width=5, height=2, dpi=60)
-        self.previewPlot.plot(np.arange(0, trajLength, 1), all_sasas)
+        self.previewPlot.plot(np.arange(0, trajLength, 1), self.allSasas)
         self.previewPlot.axes.set_xlabel("frame")
         self.previewPlot.axes.set_ylabel(r'SASA [A$^\circ$^2]')
         self.graphGridLayout.addWidget(self.previewPlot)

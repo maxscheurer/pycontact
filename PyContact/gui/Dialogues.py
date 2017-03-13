@@ -5,6 +5,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QDoubleValidator
 
 from ..core.LoadConfiguration import Configuration
+from PyContact.core.ContactAnalyzer import Analyzer
 from HelpButton import HelpButton
 
 
@@ -25,15 +26,15 @@ class TopoTrajLoaderDialog(QDialog):
 
         helpButton = HelpButton()
 
-        grid.addWidget(buttonPsf,0,0)
-        grid.addWidget(buttonDcd,0,1)
+        grid.addWidget(buttonPsf, 0, 0)
+        grid.addWidget(buttonDcd, 0, 1)
         buttons = QDialogButtonBox(
             QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
             Qt.Horizontal, self)
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
-        grid.addWidget(buttons,1,0)
-        grid.addWidget(helpButton,2,0)
+        grid.addWidget(buttons, 1, 0)
+        grid.addWidget(helpButton, 2, 0)
 
     def pick_psf(self):
         psfname = QFileDialog.getOpenFileNames(self, "Open topology")

@@ -120,6 +120,8 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
     def showContactAreaView(self):
         self.sasaView.show()
+        if self.analysis:
+            self.sasaView.setFilePaths(self.analysis.getFilePaths())
 
     def switchedToVisMode(self):
         if self.visModeButton.isChecked():
@@ -161,6 +163,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.analysis.contactResults = contactResults
         self.analysis.setTrajectoryData(*trajArgs)
         self.analysis.finalAccumulatedContacts = self.contacts
+        self.sasaView.setFilePaths(*self.analysis.getFilePaths())
         self.updateSelectionLabels(arguments[5], arguments[6])
         self.updateSettings()
         self.updateFilters()
@@ -186,6 +189,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.analysis.contactResults = contactResults
         self.analysis.setTrajectoryData(*trajArgs)
         self.analysis.finalAccumulatedContacts = self.contacts
+        self.sasaView.setFilePaths(*self.analysis.getFilePaths())
         self.updateSelectionLabels(arguments[5], arguments[6])
         self.updateSettings()
         self.updateFilters()
