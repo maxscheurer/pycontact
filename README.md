@@ -15,7 +15,8 @@ Afterwards, run `python setup.py install`
 to build and install PyContact.
 
 ### Python 3.5
-Simply run `python setup.py install`.
+MDAnalysis does currently NOT support DCD files in Python 3 and is not well tested.
+
 
 **Dependency list**:
   * Qt5
