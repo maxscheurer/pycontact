@@ -99,9 +99,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.exportWidget = ExportTabWidget()
         self.sasaView = SasaWidget()
 
-        self.updateSettings()
-        self.updateFilters()
-
         self.analysis_state = False
 
         self.vismode = False
@@ -114,6 +111,8 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
         self.painter.clickedRowSignal.connect(self.updateVMDSelections)
         self.painter.clickedColumnSignal.connect(self.updateVMDFrame)
+        self.updateSettings()
+        self.updateFilters()
 
     def showVMDControlPanel(self):
         self.vmdpanel.show()
@@ -126,6 +125,8 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
     def switchedToVisMode(self):
         if self.visModeButton.isChecked():
             self.vismode = True
+            # conversions with clicked frames are not allowed
+            self.frameStrideField.setText("1")
         else:
             self.vismode = False
         self.painter.switchToVisMode(self.vismode)
@@ -136,7 +137,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
     def updateVMDSelections(self):
         if self.vmdpanel.connected:
             self.vmdpanel.updateSelections(self.analysis.sel1text, self.analysis.sel2text,
-                                           [self.contacts[self.painter.globalClickedRow]])
+                                           [self.filteredContacts[self.painter.globalClickedRow]])
 
     @pyqtSlot()
     def updateVMDFrame(self):
@@ -253,6 +254,8 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
 
     def updateFilters(self):
+        if self.vismode is True:
+            self.frameStrideField.setText("1")
         stride = int(self.frameStrideField.text())
         if stride < 1:
             stride = 1

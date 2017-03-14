@@ -15,7 +15,7 @@ class LabelView(QWidget):
     def __init__(self, contacts):
         super(QWidget, self).__init__()
         self.contacts = contacts
-        self.vismode = False
+        # self.vismode = False
         self.buttons = []
         self.checkboxes = []
         self.buttonWidths = []
@@ -35,8 +35,9 @@ class LabelView(QWidget):
         rowheight = 22
         row = 0
         checkboxOffset = 0
-        if self.vismode:
-            checkboxOffset = 15
+        # next version...
+        # if self.vismode:
+        #     checkboxOffset = 15
 
         for c in self.contacts:
             cindex = self.contacts.index(c)
@@ -51,11 +52,12 @@ class LabelView(QWidget):
             self.buttons[-1].setFont(QFont('Arial', 9))
             self.buttons[-1].show()
             self.buttonWidths.append(self.buttons[-1].width())
-            if self.vismode:
-                self.checkboxes.append(QCheckBox())
-                self.checkboxes[-1].setParent(self)
-                self.checkboxes[-1].move(start_text, row + textoffset - 2.0)
-                self.checkboxes[-1].show()
+            # next version
+            # if self.vismode:
+            #     self.checkboxes.append(QCheckBox())
+            #     self.checkboxes[-1].setParent(self)
+            #     self.checkboxes[-1].move(start_text, row + textoffset - 2.0)
+            #     self.checkboxes[-1].show()
             row += rowheight
 
     def handleButton(self, data):

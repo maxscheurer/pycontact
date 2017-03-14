@@ -80,7 +80,7 @@ class VMDTcp:
         subprocess.Popen(["vmd", "-e", self.rctl])
         try:
             self.attemptConnection()
-        except ConnectionError:
+        except Exception:
             return -1
 
     def send_command(self, cmd):
@@ -100,8 +100,6 @@ class VMDControlPanel(QWidget):
         self.initUI()
         self.representations = []
         self.connected = False
-        self.commandButton = None
-        self.commandField = None
 
     def initUI(self):
         self.setLayout(self.grid)
@@ -207,7 +205,7 @@ class VMDControlPanel(QWidget):
             self.updateInfoLabel("Connection established")
             self.loadTopoTrajButton.setEnabled(True)
             self.connected = True
-        except ConnectionError:
+        except Exception:
             self.updateInfoLabel("Could not connect to VMD!\nTry to connect using the Connect"
                                  " button\n when VMD is opened.")
 

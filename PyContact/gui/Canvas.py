@@ -51,14 +51,13 @@ class Canvas(QWidget, QObject):
         if self.vismode and self.timeLineXOrigin < x < self.endOfTimeLine:
             self.clickedRow = int(y / self.rowh - 1)  # -1 because of frame number line
             self.clickedColumn = int((x - self.timeLineXOrigin) / self.offset)
-            print("clickedRow: " + str(self.clickedRow))
+            # print("clickedRow: " + str(self.clickedRow))
             self.rendered = False
             self.update()
             self.paintEvent(QPaintEvent(QRect(0, 0, self.sizeX, self.sizeY)))
             self.clickedRowSignal.emit()
 
     def mouseReleaseEvent(self, event):
-        # print(event.pos())
         pass
 
     def mouseMoveEvent(self, event):
@@ -73,7 +72,7 @@ class Canvas(QWidget, QObject):
 
     def switchToVisMode(self, vismode):
         self.vismode = vismode
-        self.labelView.vismode = vismode
+        # self.labelView.vismode = vismode
 
     def paintEvent(self, event):
 
@@ -113,13 +112,14 @@ class Canvas(QWidget, QObject):
         startx = np.max(self.labelView.buttonWidths) + 15
         orig_startx = startx
 
-        if self.vismode:
-            textoffset += 15
-            start_text += 15
-            startx += 15
-            orig_startx += 15
+        # probably included in next version...
+        # if self.vismode:
+        #     textoffset += 15
+        #     start_text += 15
+        #     startx += 15
+        #     orig_startx += 15
 
-        print(orig_startx)
+        # print(orig_startx)
         self.timeLineXOrigin = orig_startx
         self.rowh = rowheight
 
@@ -146,7 +146,7 @@ class Canvas(QWidget, QObject):
 
         row = 0
         rownumber = 0
-        print("merge value", merge)
+        # print("merge value", merge)
         for c in self.contacts:
             self.alphaFactor = 50
             bbScColor = BackboneSidechainContactType.colors[c.determineBackboneSidechainType()]
@@ -174,7 +174,7 @@ class Canvas(QWidget, QObject):
                 for l in range(self.range[0] + off, self.range[1] + 1, 10)[off:]:
                     if l == 0:
                         continue
-                    print(l)
+                    # print(l)
                     p.drawText(startx + (l - 1 - self.range[0]) * offset, row + textoffset + 2.0, str(l * merge))
                 self.labelView.move(0, rowheight)
                 row += rowheight

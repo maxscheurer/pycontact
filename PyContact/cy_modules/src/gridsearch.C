@@ -401,6 +401,22 @@ GridSearchPair *vmd_gridsearch1(const float *pos,int natoms, const int *on,
   return cur;
 }
 
+static double calc_contacts(const float *pos1, const float *pos2,
+int nAtomsPerFrame1, int nAtomsPerFrame2, double cutoff) {
+  double d2;
+  ResizeArray<int> *pairlist = new ResizeArray<int>[nAtomsPerFrame1+nAtomsPerFrame2];
+  GridSearchPair *p, *tmp;
+  for (p = pairs; p != NULL; p = tmp) {
+    int ind1=p->ind1;
+    int ind2=p->ind2;
+    pairlist[ind1].append(ind2);
+    pairlist[ind2].append(ind1);
+    tmp = p->next;
+    free(p);
+  }
+}
+
+
 static double sasa_grid(const float *pos,int natoms, float pairdist, int allow_double_counting, int maxpairs, const float *radius,const int npts, double srad, int pointstyle, int restricted, const int* restrictedList) {
   int on[natoms];
   fill_n(on,natoms,1);
