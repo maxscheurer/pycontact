@@ -406,14 +406,14 @@ int nAtomsPerFrame1, int nAtomsPerFrame2, double cutoff) {
   double d2;
   ResizeArray<int> *pairlist = new ResizeArray<int>[nAtomsPerFrame1+nAtomsPerFrame2];
   GridSearchPair *p, *tmp;
-  for (p = pairs; p != NULL; p = tmp) {
-    int ind1=p->ind1;
-    int ind2=p->ind2;
-    pairlist[ind1].append(ind2);
-    pairlist[ind2].append(ind1);
-    tmp = p->next;
-    free(p);
-  }
+  // for (p = pairs; p != NULL; p = tmp) {
+  //   int ind1=p->ind1;
+  //   int ind2=p->ind2;
+  //   pairlist[ind1].append(ind2);
+  //   pairlist[ind2].append(ind1);
+  //   tmp = p->next;
+  //   free(p);
+  // }
 }
 
 
