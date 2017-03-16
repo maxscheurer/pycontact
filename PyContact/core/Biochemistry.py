@@ -23,7 +23,8 @@ vdwRadii = {"H": 1.0,
 
 
 def vdwRadius(atomType):
-        return vdwRadii.get(atomType, 1.5)
+    """Returns the van der Waals-radius matching the given atom type. Default value is 1.5 A."""
+    return vdwRadii.get(atomType, 1.5)
 
 
 # type of Atom concerning it hbond behavior
@@ -47,7 +48,7 @@ class AtomType:
         comment = spl[1][1:]
         try:
             htype = spl[2]
-        except Exception:
+        except IndexError:
             htype = "none"
         tp = AtomType(name, comment, AtomHBondType.mapping[htype])
         return tp
@@ -231,13 +232,13 @@ class AccumulatedContact(object):
         try:
             sc1 = str(read_residue_db("scpolarity", "name", r1)[0]["scpolarity"])
             scpol1 = SideChainPolarity.mapping[sc1]
-        except Exception:
+        except IndexError:
             scpol1 = SideChainPolarity.other
 
         try:
             sc2 = str(read_residue_db("scpolarity", "name", r2)[0]["scpolarity"])
             scpol2 = SideChainPolarity.mapping[sc2]
-        except Exception:
+        except IndexError:
             scpol2 = SideChainPolarity.other
 
         # hydrogen bonds: donor, acceptor, both
