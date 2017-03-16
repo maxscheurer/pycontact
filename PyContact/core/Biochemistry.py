@@ -27,14 +27,14 @@ def vdwRadius(atomType):
     return vdwRadii.get(atomType, 1.5)
 
 
-# type of Atom concerning it hbond behavior
 class AtomHBondType:
+    """Defines the type of Atom concerning its hbond behaviour"""
     don, acc, both, none = range(4)
     mapping = {"don": don, "acc": acc, "both": both, "none": none}
 
 
-# AtomType represents MASS entry for atoms in CHARMM topology and parameter files
 class AtomType:
+    """Represents MASS entry for atoms in CHARMM topology and parameter files."""
     def __init__(self, name, comment, htype):
         self.name = name  # name = atomtype in CHARMM file
         self.comment = comment  # properties/infos according to CHARMM file
@@ -42,7 +42,7 @@ class AtomType:
 
     @staticmethod
     def parseParameterFileString(string):
-        # read charmm parameter/topology file to determine AtomTypes and their AtomHBondType
+        """Reads charmm parameter/topology file to determine AtomTypes and their AtomHBondType."""
         spl = string.split("!")
         name = spl[0].split()[2]
         comment = spl[1][1:]
@@ -115,10 +115,11 @@ class AccumulatedContact(object):
         return " - ".join(total)
 
     def addScore(self, newScore):
-        # append a score to the scoreArray, e.g. when a new frame score is added
+        """Appends a score to the scoreArray, e.g. when a new frame score is added."""
         self.scoreArray.append(newScore)
 
     def determineBackboneSidechainType(self):
+        """Returns the Backbone-Sidechain type"""
         if self.bb1 > self.sc1:
             self.atom1contactsBy = BackboneSidechainType.contactsBb
         else:
@@ -140,7 +141,7 @@ class AccumulatedContact(object):
         return self.backboneSideChainType
 
     def addContributingAtoms(self, contAtoms):
-        # append a list of contributing atom to the contributingAtoms list, e.g. when a new frame is added
+        """append a list of contributing atom to the contributingAtoms list, e.g. when a new frame is added"""
         self.contributingAtoms.append(contAtoms)  # used for temporary accumulation of contacts in data analysis
 
     def setScores(self):
@@ -148,6 +149,7 @@ class AccumulatedContact(object):
         self.median_score()
 
     def hbond_percentage(self):
+        """Computes the hbond percentage of all contacts, using the scoreArray."""
         self.hbondFramesScan()
         fnumber = len(self.scoreArray)
         counter = 0
@@ -157,6 +159,7 @@ class AccumulatedContact(object):
         return float(counter)/float(fnumber) * 100
 
     def total_time(self, ns_per_frame, threshold):
+        """Returns the total time, the contact score is above the given threshold value"""
         time = 0
         for score in self.scoreArray:
             if score > threshold:
@@ -165,14 +168,17 @@ class AccumulatedContact(object):
         return self.ttime
 
     def mean_life_time(self, ns_per_frame, threshold):
+        """Returns the mean life time, with the given threshold value"""
         self.meanLifeTime = np.mean(self.life_time(ns_per_frame, threshold))
         return self.meanLifeTime
 
     def median_life_time(self, ns_per_frame, threshold):
+        """Returns the mean life time, with the given threshold value"""
         self.medianLifeTime = np.median(self.life_time(ns_per_frame, threshold))
         return self.medianLifeTime
 
     def mean_score(self):
+        """Returns the mean score of the scoreArray"""
         mean = 0
         for score in self.scoreArray:
             mean += score
@@ -181,11 +187,13 @@ class AccumulatedContact(object):
         return mean
 
     def median_score(self):
+        """Returns the median score of the scoreArray"""
         med = np.median(self.scoreArray)
         self.medianScore = med
         return med
 
     def life_time(self, ns_per_frame, threshold):
+        """Computes the life time of a contact in ns, with the given threshold"""
         lifeTimes = []
         contactActive = False
         contactTime = 0
