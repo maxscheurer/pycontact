@@ -2,11 +2,11 @@ import pickle
 
 
 class DataHandler:
-    """docstring"""
+    """Handles the import or export of a session."""
 
     @staticmethod
     def importSessionFromFile(fileName):
-        """docstring"""
+        """Imports a saved session from 'filename'."""
         importDict = pickle.load(open(fileName, "rb"))
         contacts = importDict["contacts"]
         arguments = importDict["analyzer"][0:-1]
@@ -18,6 +18,7 @@ class DataHandler:
 
     @staticmethod
     def writeSessionToFile(fileName, analysis):
+        """Saves the current Session (analysis) at 'filename'."""
         analyzerArgs = [analysis.psf, analysis.dcd, analysis.cutoff, analysis.hbondcutoff,
                         analysis.hbondcutangle, analysis.sel1text, analysis.sel2text,
                         analysis.contactResults]

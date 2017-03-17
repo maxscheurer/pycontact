@@ -8,6 +8,7 @@ from .Biochemistry import *
 
 
 class Operator(object):
+    """Defines a comparison operator for contact filtering."""
     greater, smaller, equal, nequal = range(4)
     mapping = {u"greater": greater, u"smaller": smaller, u"equal": equal, u"not equal": nequal}
 
@@ -23,6 +24,7 @@ class Operator(object):
 
 
 class FrameFilter(object):
+    """Filters contact with a given frame range."""
     def __init__(self, name):
         self.name = name
 
@@ -39,12 +41,14 @@ class FrameFilter(object):
 
 
 class NameFilter(object):
+    """Filters contacts by name."""
 
     def __init__(self, name):
         self.name = name
 
     @staticmethod
     def filterContactsByName(contacts, nameA, nameB, mapindex):
+        """Returns contacts, when their key is included in nameA and nameB."""
         filtered = []
         for c in contacts:
             add = False
@@ -52,7 +56,7 @@ class NameFilter(object):
             try:
                 prop1 = c.key1[mapindex]
                 prop2 = c.key2[mapindex]
-            except Exception:
+            except IndexError:
                 filtered.append(c)
                 continue
             if nameA.lower() != u'all' and nameB.lower() != u'all':
@@ -77,6 +81,7 @@ class NameFilter(object):
 
 
 class RangeFilter(object):
+    """Filters contacts with a given range."""
     def __init__(self, name):
         self.name = name
 
@@ -89,6 +94,7 @@ class RangeFilter(object):
         return result
 
     def filterByRange(self, contacts, residRangeA, residRangeB, mapindex):
+        """Returns contacts that lie in residRangeA and residRangeB."""
         splitA = residRangeA.split(u",")
         splitB = residRangeB.split(u",")
 
@@ -119,7 +125,7 @@ class RangeFilter(object):
             try:
                 prop1 = int(c.key1[mapindex])
                 prop2 = int(c.key2[mapindex])
-            except Exception:
+            except IndexError:
                 filtered.append(c)
                 continue
             add = False
@@ -141,6 +147,7 @@ class RangeFilter(object):
 
 
 class BinaryFilter(object):
+    """Implements a binary filter with a given operator."""
     def __init__(self, name, operator, value):
         self.name = name
         self.operator = Operator.mapping[operator]
@@ -151,6 +158,7 @@ class BinaryFilter(object):
 
 
 class OnlyFilter(object):
+    """Implements a filter, that only selects contacts with specific properties, e.g.: hydrophobic."""
     def __init__(self, name, operator, value):
         self.name = name
         self.operator = operator
@@ -177,6 +185,7 @@ class OnlyFilter(object):
 
 
 class TotalTimeFilter(BinaryFilter):
+    """Binary filter concerning the total contact time."""
     def __init__(self, name, operator, value):
         super(TotalTimeFilter, self).__init__(name, operator, value)
 
@@ -190,8 +199,8 @@ class TotalTimeFilter(BinaryFilter):
         return filtered
 
 
-# filter compares contact score of every frame, only adds contact if true for all frames
 class ScoreFilter(BinaryFilter):
+    """Compares contact score of every frame, only adds contact if true for all frames."""
     def __init__(self, name, operator, value, ftype):
         super(ScoreFilter, self).__init__(name, operator, value)
         self.ftype = ftype
@@ -218,11 +227,13 @@ class ScoreFilter(BinaryFilter):
 
 
 class SortingOrder(object):
+    """Defines the sorting order, ascending or descending."""
     ascending, descending = range(2)
     mapping = {u"asc.": ascending, u"desc.": descending}
 
 
 class Sorting(object):
+    """Performs the sorting with respect to a specific key, e.g. mean lifetime."""
     def __init__(self, name, key, descending):
         self.name = name
         self. key = key

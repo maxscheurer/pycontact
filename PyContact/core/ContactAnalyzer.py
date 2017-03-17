@@ -235,14 +235,6 @@ class Analyzer(QObject):
                     key2.append(currentValue)
         return [key1, key2]
 
-    # input two key arrays as explained above
-    # example:
-    # keys1=["none","none","none","14", "VAL", "none"]
-    # keys2=["none","none","none","22", "ILE, "none"]
-    # returns a human readable key with the mapping identifiers in AccumulationMapIndex
-    # in the given example data:
-    # key="r.14rn.VAL-r.22rn.ILE"
-    # key is used to accumulated contacts in a dictionary (= a contact's unique identifier)
     @staticmethod
     def makeKeyFromKeyArrays(key1, key2):
         """Returns a human readable key from two key arrays.

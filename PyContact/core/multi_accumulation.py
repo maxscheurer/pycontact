@@ -17,6 +17,9 @@ def find_between(s, first, last):
 
 
 def makeKeyArraysFromKey(key):
+    """Converts a key to two key arrays.
+        "inverse" function of makeKeyFromKeyArrays
+    """
     keystring1, keystring2 = key.split("-")
     mapping = AccumulationMapIndex.mapping
     maximal = len(mapping)
@@ -103,6 +106,7 @@ def chunks(seq, num):
 
 
 def makeKeyArraysFromMaps(map1, map2, contact):
+    """Creates key Arrays from the chosen accumulation maps."""
     # global type_array,name_array,resid_array,resname_array,segids
     idx1 = contact.idx1
     idx2 = contact.idx2
@@ -148,22 +152,32 @@ def makeKeyArraysFromMaps(map1, map2, contact):
 
 
 def makeKeyFromKeyArrays(key1, key2):
-        key = ""
-        itemcounter = 0
-        for item in key1:
-            if item != "none":
-                key += AccumulationMapIndex.mapping[itemcounter] + str(item)
-            itemcounter += 1
-        key += "-"
-        itemcounter = 0
-        for item in key2:
-            if item != "none":
-                key += AccumulationMapIndex.mapping[itemcounter] + str(item)
-            itemcounter += 1
-        return key
+    """Returns a human readable key from two key arrays.
+        example:
+        keys1=["none","none","none","14", "VAL", "none"]
+        keys2=["none","none","none","22", "ILE, "none"]
+        returns a human readable key with the mapping identifiers in AccumulationMapIndex
+        in the given example data:
+        key="r.14rn.VAL-r.22rn.ILE"
+        key is used to accumulated contacts in a dictionary (= a contact's unique identifier)
+    """
+    key = ""
+    itemcounter = 0
+    for item in key1:
+        if item != "none":
+            key += AccumulationMapIndex.mapping[itemcounter] + str(item)
+        itemcounter += 1
+    key += "-"
+    itemcounter = 0
+    for item in key2:
+        if item != "none":
+            key += AccumulationMapIndex.mapping[itemcounter] + str(item)
+        itemcounter += 1
+    return key
 
 
 def loop_frame(contacts, map1, map2, trajArgs, rank):
+    """Performs contact analysis multicore"""
     allkeys = []
     results = []
     global backbone
