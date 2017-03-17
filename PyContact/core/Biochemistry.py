@@ -119,7 +119,7 @@ class AccumulatedContact(object):
         self.scoreArray.append(newScore)
 
     def determineBackboneSidechainType(self):
-        """Returns the Backbone-Sidechain type"""
+        """Returns the Backbone-Sidechain type."""
         if self.bb1 > self.sc1:
             self.atom1contactsBy = BackboneSidechainType.contactsBb
         else:
@@ -159,7 +159,7 @@ class AccumulatedContact(object):
         return float(counter)/float(fnumber) * 100
 
     def total_time(self, ns_per_frame, threshold):
-        """Returns the total time, the contact score is above the given threshold value"""
+        """Returns the total time, the contact score is above the given threshold value."""
         time = 0
         for score in self.scoreArray:
             if score > threshold:
@@ -168,17 +168,17 @@ class AccumulatedContact(object):
         return self.ttime
 
     def mean_life_time(self, ns_per_frame, threshold):
-        """Returns the mean life time, with the given threshold value"""
+        """Returns the mean life time, with the given threshold value."""
         self.meanLifeTime = np.mean(self.life_time(ns_per_frame, threshold))
         return self.meanLifeTime
 
     def median_life_time(self, ns_per_frame, threshold):
-        """Returns the mean life time, with the given threshold value"""
+        """Returns the mean life time, with the given threshold value."""
         self.medianLifeTime = np.median(self.life_time(ns_per_frame, threshold))
         return self.medianLifeTime
 
     def mean_score(self):
-        """Returns the mean score of the scoreArray"""
+        """Returns the mean score of the scoreArray."""
         mean = 0
         for score in self.scoreArray:
             mean += score
@@ -187,13 +187,13 @@ class AccumulatedContact(object):
         return mean
 
     def median_score(self):
-        """Returns the median score of the scoreArray"""
+        """Returns the median score of the scoreArray."""
         med = np.median(self.scoreArray)
         self.medianScore = med
         return med
 
     def life_time(self, ns_per_frame, threshold):
-        """Computes the life time of a contact in ns, with the given threshold"""
+        """Computes the life time of a contact in ns, with the given threshold."""
         lifeTimes = []
         contactActive = False
         contactTime = 0
@@ -231,6 +231,8 @@ class AccumulatedContact(object):
         return ContactType.shortcut[self.determine_ctype()]
 
     def determine_ctype(self):
+        """Computes the contact type of the accumulated contacts."""
+
         # only works if both maps contain resname
         r1 = self.key1[AccumulationMapIndex.resname].lower()
         r2 = self.key2[AccumulationMapIndex.resname].lower()
@@ -278,10 +280,9 @@ class AccumulatedContact(object):
             return ContactType.other
 
 
-# stores the frame's score as well as the key
 # many TempContactAccumulated objects are later converted to AccumulatedContact
 class TempContactAccumulate(object):
-    """docstring for TempContactAccumulate"""
+    """Stores the frame's score as well as the key."""
 
     def __init__(self, key1, key2):
         super(TempContactAccumulate, self).__init__()
@@ -296,8 +297,8 @@ class TempContactAccumulate(object):
         self.sc2score = 0
 
 
-# contains infos about an atom-atom contact
 class AtomContact:
+    """Contains infos about an atom-atom contact."""
     def __init__(self, frame, distance, weight, idx1, idx2, hbondinfo):
         self.frame = int(frame)  # frame the contact occured in
         self.distance = float(distance)  # distance between atom1 and atom2
@@ -307,13 +308,13 @@ class AtomContact:
         self.hbondinfo = hbondinfo  # list of HydrogenBonds for frame, empty list if no hbonds occured
 
     def toString(self):
-        # print details about contact to console
+        """Prints details about contact to console."""
         print("frame: %d, dist: %f, weight: %f, idx1: %d, idx2: %d" % (
             self.frame, self.distance, self.weight, self.idx1, self.idx2))
 
 
-# contains infos about a hydrogenbond corresponding to a contact between two heavyatoms
 class HydrogenBond:
+    """Contains infos about a hydrogenbond corresponding to a contact between two heavyatoms."""
     def __init__(self, donorIndex, acceptorIndex, hydrogenIndex, acceptorHydrogenDistance, angle, usedCutoffDist,
                  usedCutoffAngle):
         self.donorIndex = donorIndex  # global! index of hbond donor: D-h ... a
@@ -325,21 +326,25 @@ class HydrogenBond:
         self.usedCutoffAngle = usedCutoffAngle  # obvious
 
     def toString(self):
-        # print details about hbond to console
+        """Print details about hbond to console."""
         print("donor: %d, acceptor: %d, hydrogen: %d, dist: %f, angle: %f, usedCutoffDist: %f, usedCutoffAngle: %f" % (
             self.donorIndex, self.acceptorIndex, self.hydrogenIndex, self.acceptorHydrogenDistance, self.angle,
             self.usedCutoffDist, self.usedCutoffAngle))
 
 
-# enum and mapping for atom properties
-# used to dynamically define keys and have a bijective nomenclature for all properties
 class AccumulationMapIndex:
+    """Enum and mapping for atom properties.
+       Used to dynamically define keys and have a bijective nomenclature for all properties
+    """
     index, atype, name, resid, resname, segid = range(6)
     mapping = ["i.", "t.", "nm.", "r.", "rn.", "s."]
     vmdsel = ["index", "type", "name", "resid", "resname", "segname"]
 
 
 class ContactType:
+    """Defines the contact type.
+       Possible types: saltbridge, hydrophobic, hbond, other
+    """
     saltbr, hydrophobic, hbond, other = range(4)
     shortcut = ["saltbr", "hydrophobic", "hbond", "other"]
     colors = ["rgba(255, 0,0, 50)", "rgba(0, 0,255, 50)", "rgba(255, 0 ,255, 50)", "rgba(255, 255 ,255, 50)"]
@@ -347,15 +352,18 @@ class ContactType:
 
 
 class SideChainPolarity:
+    """Defines the side chain polarity."""
     nonpolar, positive, negative, polar, other = range(5)
     mapping = {"nonpolar": nonpolar, "positive": positive, "negative": negative, "polar": polar, "other": other}
 
 
 class BackboneSidechainType:
+    """Enum definition of the backbone-sidechain type."""
     contactsBb, contactsSc = range(2)
 
 
 class BackboneSidechainContactType:
+    """Enum definition and mapping of the backbone-sidechain-contact type."""
     bb_only, both, sc_only = range(3)
     mapping = [[BackboneSidechainType.contactsBb, BackboneSidechainType.contactsBb],
                [BackboneSidechainType.contactsBb, BackboneSidechainType.contactsSc],
@@ -364,6 +372,7 @@ class BackboneSidechainContactType:
 
 
 def mean_score_of_contactArray(contacts):
+    """Computes the mean score using the contacts array."""
     meanList = []
     for c in contacts:
         meanList = np.concatenate((meanList, c.scoreArray), axis=0)
@@ -371,6 +380,7 @@ def mean_score_of_contactArray(contacts):
 
 
 def median_score_of_contactArray(contacts):
+    """Computes the mean score using the contacts array."""
     medianList = []
     for c in contacts:
         medianList = np.concatenate((medianList, c.scoreArray), axis=0)

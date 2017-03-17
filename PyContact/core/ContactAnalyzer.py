@@ -28,7 +28,7 @@ MDAnalysis.core.flags['use_KDTree_routines'] = True
 
 
 class Analyzer(QObject):
-    """docstring for Analyzer"""
+    """Performs a contact search and analyzes the results."""
     frameUpdate = pyqtSignal(float)
 
     def __init__(self, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1text, sel2text):
@@ -58,6 +58,7 @@ class Analyzer(QObject):
         self.totalFramesToProcess = 1
 
     def runFrameScan(self, nproc):
+        """Performs a contact search using nproc threads."""
         if nproc == 1:
             self.contactResults = self.analyze_psf_dcd(self.psf, self.dcd, self.cutoff, self.hbondcutoff,
                                                        self.hbondcutangle, self.sel1text, self.sel2text)
@@ -67,6 +68,7 @@ class Analyzer(QObject):
                                                               self.hbondcutangle, self.sel1text, self.sel2text)
 
     def runContactAnalysis(self, map1, map2, nproc):
+        """Performs a contadt analysis using nproc threads."""
         if nproc == 1:
             self.finalAccumulatedContacts = self.analyze_contactResultsWithMaps(self.contactResults, map1, map2)
         else:
@@ -107,22 +109,26 @@ class Analyzer(QObject):
         except ValueError:
             return ""
 
-    # weight function to score contact distances
     @staticmethod
     def weight_function(value):
+        """weight function to score contact distances"""
         return 1.0 / (1.0 + np.exp(5.0 * (value - 4.0)))
 
-    # maps contain information wether to consider an atom's field for contact accumulation
-    # map1 and map2 contain six boolean values each, cf. AccumulationMapIndex
-    # for a given contact, the corresponding value to a field is written to keys1 and keys2, respectively
-    # example input:
-    # map1 = [0,0,0,1,1,0]
-    # map2 = [0,0,0,1,1,0], meaning that residue and resname should be used for contact accumulation
-    # contact: idx1,idx2
-    # results: (example!)
-    # keys1=["none","none","none","14", "VAL", "none"]
-    # keys2=["none","none","none","22", "ILE, "none"]
     def makeKeyArraysFromMaps(self, map1, map2, contact):
+        """Creates key Arrays from the chosen accumulation maps.
+
+            maps contain information wether to consider an atom's field for contact accumulation
+            map1 and map2 contain six boolean values each, cf. AccumulationMapIndex
+            for a given contact, the corresponding value to a field is written to keys1 and keys2, respectively
+            example input:
+            map1 = [0,0,0,1,1,0]
+            map2 = [0,0,0,1,1,0], meaning that residue and resname should be used for contact accumulation
+            contact: idx1,idx2
+            results: (example!)
+            keys1=["none","none","none","14", "VAL", "none"]
+            keys2=["none","none","none","22", "ILE, "none"]
+
+        """
         idx1 = contact.idx1
         idx2 = contact.idx2
         counter = 0
@@ -165,10 +171,10 @@ class Analyzer(QObject):
             counter += 1
         return [keys1, keys2]
 
-    # convert a key back to two key arrays
-    # cf. comments on makeKeyFromKeyArrays and makeKeyArraysFromMaps
-    # "inverse" function of makeKeyFromKeyArrays
     def makeKeyArraysFromKey(self, key):
+        """Converts a key to two key arrays.
+            "inverse" function of makeKeyFromKeyArrays
+        """
         keystring1, keystring2 = key.split("-")
         mapping = AccumulationMapIndex.mapping
         maximal = len(mapping)
@@ -239,6 +245,15 @@ class Analyzer(QObject):
     # key is used to accumulated contacts in a dictionary (= a contact's unique identifier)
     @staticmethod
     def makeKeyFromKeyArrays(key1, key2):
+        """Returns a human readable key from two key arrays.
+            example:
+            keys1=["none","none","none","14", "VAL", "none"]
+            keys2=["none","none","none","22", "ILE, "none"]
+            returns a human readable key with the mapping identifiers in AccumulationMapIndex
+            in the given example data:
+            key="r.14rn.VAL-r.22rn.ILE"
+            key is used to accumulated contacts in a dictionary (= a contact's unique identifier)
+        """
         key = ""
         itemcounter = 0
         for item in key1:
@@ -254,7 +269,7 @@ class Analyzer(QObject):
         return key
 
     def analyze_psf_dcd(self, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1text, sel2text):
-        # reading topology/parameter CHARMM files for setting AtomTypes and AtomHBondTypes
+        """Reading topology/parameter CHARMM files for setting AtomTypes and AtomHBondTypes"""
         heavyatomlines = []
         heavyatoms = []
         pars = open(os.path.dirname(os.path.abspath(__file__)) + '/testpar.prm', 'r')
@@ -457,6 +472,8 @@ class Analyzer(QObject):
         return contactResults
 
     def analyze_contactResultsWithMaps(self, contactResults, map1, map2):
+        """Analyzes contactsResults with the given maps."""
+
         #################################################
         # contactResults evaluation
         # only depending on map1, map2
@@ -552,6 +569,7 @@ class Analyzer(QObject):
         return finalAccumulatedContacts
 
     def analysisEventListener(self):
+        """Event listener for the progress bar in MainWindow."""
         while self.analysis_state:
             progress = 0
             for each in analysisProgressDict.keys():
@@ -566,8 +584,8 @@ class Analyzer(QObject):
                 progress = 0
                 self.analysis_state = False
 
-    # PARALLEL CODE
     def analyze_contactResultsWithMaps_Parallel(self, map1, map2, nproc):
+        """Analyzes contactsResults with the given maps, using nproc threads."""
         start = time.time()
         self.totalFramesToProcess = len(self.contactResults)
         results = []

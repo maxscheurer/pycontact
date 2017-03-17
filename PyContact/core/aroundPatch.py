@@ -5,6 +5,7 @@ from ..cy_modules import cy_gridsearch
 
 
 class AroundSelection(DistanceSelection):
+    """Implements a more efficient computation when 'around' is used in the selections."""
     token = 'around'
     precedence = 1
 
