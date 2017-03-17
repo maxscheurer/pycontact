@@ -34,6 +34,7 @@ class MplPlotter(FigureCanvas):
 
 
 class ContactPlotter(MplPlotter):
+    """Plots a frame-score plot with lines."""
 
     def plot_contact_figure(self, contact):
         self.axes.plot(contact.scoreArray)
@@ -54,6 +55,7 @@ class ContactPlotter(MplPlotter):
 
 
 class ContactPlotParameters:
+    """Parameter for the contact plotter."""
     mean, median, lifetime, median_life_time, hbond_percentage = range(5)
     mapping = ["Mean Score", "Median Score", "Mean Lifetime", "Median Lifetime", "Hbond percentage"]
 
@@ -191,6 +193,7 @@ class MapPlotter(MplPlotter):
 
 
 class SimplePlotter(MplPlotter):
+    """Simple plotter, used in the SASA view."""
     def plot(self, x, y):
         self.axes.plot(x, y)
         self.axes.set_xlabel("x")

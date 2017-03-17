@@ -37,10 +37,10 @@ with warnings.catch_warnings():
 
 
 class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
-    """PyContact Application Main Window with timeline"""
+    """PyContact Application Main Window with timeline."""
 
     def closeEvent(self, event):
-        """ Closing application when Exit on MainWindow is clicked"""
+        """Closing application when Exit on MainWindow is clicked."""
         print("Closing Application")
         event.accept()
         QApplication.quit()
@@ -115,14 +115,17 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.updateFilters()
 
     def showVMDControlPanel(self):
+        """Shows the VMD control panel, to remotely access VMD from PyContact."""
         self.vmdpanel.show()
 
     def showContactAreaView(self):
+        """Shows the SASA computation panel."""
         self.sasaView.show()
         if self.analysis:
             self.sasaView.setFilePaths(self.analysis.getFilePaths())
 
     def switchedToVisMode(self):
+        """Switch to vis mode, to show selected contacts directly in VMD."""
         if self.visModeButton.isChecked():
             self.vismode = True
             # conversions with clicked frames are not allowed
@@ -135,22 +138,26 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
     @pyqtSlot()
     def updateVMDSelections(self):
+        """Updates the selected contact in VMD via the vmd panel."""
         if self.vmdpanel.connected:
             self.vmdpanel.updateSelections(self.analysis.sel1text, self.analysis.sel2text,
                                            [self.filteredContacts[self.painter.globalClickedRow]])
 
     @pyqtSlot()
     def updateVMDFrame(self):
+        """Updates the selected frame in VMD via the vmd panel."""
         if self.vmdpanel.connected:
             self.vmdpanel.gotoVMDFrame(self.painter.clickedColumn)
 
     def updateSelectionLabels(self, sel1, sel2):
+        """Updates the current selection in the info labels."""
         self.currentSelection1 = sel1
         self.currentSelection2 = sel2
         self.selection1label.setText(sel1)
         self.selection2label.setText(sel2)
 
     def importSession(self):
+        """Imports a saved session from file."""
         fnames = QFileDialog.getOpenFileNames(self, "Open file")
         importfile = ""
         for f in fnames[0]:
@@ -170,6 +177,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.updateFilters()
 
     def exportSession(self):
+        """Exports the current session to file."""
         fileName = QFileDialog.getSaveFileName(self, 'Export file')
         filestring = fileName[0]
         if filestring == "":
@@ -184,6 +192,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             return
 
     def loadDefault(self):
+        """Loads the default session."""
         self.contacts, arguments, trajArgs, self.maps, contactResults = \
             DataHandler.importSessionFromFile(DEFAULTSESSION)
         self.analysis = Analyzer(*arguments)
@@ -196,6 +205,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.updateFilters()
 
     def loadDataPushed(self):
+        """Loads the trajectory data with the chosen initial parameters."""
         self.config, result = FileLoaderDialog.getConfig()
         if result == 1:
             self.setInfoLabel("Loading trajectory and running atomic contact analysis...")
@@ -209,17 +219,21 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
     @pyqtSlot(float)
     def updateAnalyzedFrames(self, value):
+        """Handles the progress bar update."""
         # print("Updating frames", value)
         self.progressBar.setValue(100 * value)
         QApplication.processEvents()
 
     def setInfoLabel(self, txt):
+        """Sets the Info label text."""
         self.statusLabel.setText(txt)
 
     def cleanInfoLabel(self):
+        """Clears the Info label text."""
         self.setInfoLabel("-")
 
     def analyzeDataPushed(self):
+        """Handles the Analyzer after the Accumulation maps have been set."""
         if self.analysis is None:
             box = ErrorBox(ErrorMessages.NODATA_PROMPTLOAD)
             box.exec_()
@@ -241,6 +255,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             self.cleanInfoLabel()
 
     def updateSettings(self):
+        """Updates the settings chosen from the settings view."""
         if self.settingsView.bbscScoreRadioButton.isChecked():
             self.colorScheme = ColorScheme.bbsc
         elif self.settingsView.customColorRadioButton.isChecked():
@@ -254,6 +269,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
 
     def updateFilters(self):
+        """Updates the chosen filters in MainWindow."""
         if self.vismode is True:
             self.frameStrideField.setText("1")
         stride = int(self.frameStrideField.text())
@@ -381,9 +397,11 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.exportWidget.setThresholdAndNsPerFrame(self.painter.threshold, self.painter.nsPerFrame)
 
     def openPrefs(self):
+        """Opens the preferences panel."""
         self.settingsView.show()
 
     def showStatistics(self):
+        """Shows general statistics of the analyzed data over all frames."""
         if len(self.contacts) == 0 or self.contacts is None:
             box = ErrorBox(ErrorMessages.NOSCORES_PROMPTANALYSIS)
             box.exec_()
@@ -423,6 +441,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         d.exec_()
 
     def showDeveloperInfo(self):
+        """Shows information about the contributing authors."""
         d = QDialog()
         grid = QGridLayout()
         d.setLayout(grid)
@@ -443,6 +462,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         d.exec_()
 
     def pushExport(self):
+        """Opens the export panel."""
         self.exportWidget.valueUpdated.connect(self.handleExportUpdate)
         self.exportWidget.setContacts(self.filteredContacts)
         if self.maps is not None:
@@ -453,6 +473,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
     @QtCore.Slot(str, str)
     def handleExportUpdate(self, fileName, fileType):
+        """Handles the paint event after the export of the current view has been initiated."""
         if fileType == "PNG":
             if len(fileName) > 0:
                 print("Saving current view to ", fileName)
@@ -471,6 +492,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
 
     def pushSave(self):
+        """Handles the saving process to store the current view to file."""
         fileName = QFileDialog.getSaveFileName(self, 'Export Path')
         print(self.formatBox.currentText())
         if self.formatBox.currentText() == "PNG":
@@ -491,6 +513,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
 
     def showColorPicker(self):
+        """Shows a color picker for the current view."""
         col = QColorDialog.getColor()
         self.customColor = col
         if col.isValid():
@@ -499,6 +522,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
 
 class PreferencesWidget(QTabWidget, Preferences.Ui_PreferencesPanel):
+    """Defines the preferences panel"""
     def __init__(self, parent=None):
         super(QWidget, self).__init__(parent)
         self.setupUi(self)

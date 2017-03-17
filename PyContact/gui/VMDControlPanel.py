@@ -12,9 +12,10 @@ from ..core.Biochemistry import *
 
 
 class VMDCommands:
-
+    """Collection of useful commands to remotely control VMD."""
     @staticmethod
     def translateSelections(mdanalysis_text):
+        """Replace segid and around to adopt the VMD syntax."""
         txt = mdanalysis_text.replace("segid", "segname")
         txt = txt.replace("-", " to ")
         # around x y--> within x of y
@@ -28,10 +29,12 @@ class VMDCommands:
 
     @staticmethod
     def gotoFrame(frame):
+        """Selects and shows the given frame."""
         return "animate goto %s" % str(frame)
 
     @staticmethod
     def styleBackbone():
+        """Sets a suitable visualization style for the backbone in VMD."""
         return """
         mol addrep 0
         mol modstyle top 0 NewCartoon 0.300000 10.000000 4.100000 0

@@ -10,7 +10,7 @@ from .Plotters import ContactPlotter
 
 
 class LabelView(QWidget):
-    """docstring for AnalysisView"""
+    """Proviedes more detailed statistics of the clicked contact in MainWindow."""
 
     def __init__(self, contacts):
         super(QWidget, self).__init__()
@@ -22,6 +22,7 @@ class LabelView(QWidget):
         self.initUI()
 
     def clean(self):
+        """Delete all labels."""
         allLabels = self.findChildren(QPushButton)
         for child in allLabels:
             sip.delete(child)
@@ -30,6 +31,7 @@ class LabelView(QWidget):
             sip.delete(child)
 
     def initUI(self):
+        """Create the labels to the corresponding contact"""
         start_text = 10
         textoffset = 5
         rowheight = 22
@@ -61,6 +63,8 @@ class LabelView(QWidget):
             row += rowheight
 
     def handleButton(self, data):
+        """Show the detailed view when clicking on the contact label"""
+
         # print('index clicked: '+ str(data))
         d = QDialog()
         grid = QGridLayout()
@@ -108,10 +112,6 @@ class LabelView(QWidget):
         grid.addWidget(meanLifeTimeLabel, 5, 1)
         grid.addWidget(medianLifeTimeTitleLabel, 5, 2)
         grid.addWidget(medianLifeTimeLabel, 5, 3)
-
-        # print("################################")
-        # print("Hier hier hier !!!!!!!!!!!!!!!!!!!!!!!")
-        # print("################################")
 
         contactPlot = ContactPlotter(None, width=4, height=2, dpi=80)
         contactPlot.plot_contact_figure(contact)

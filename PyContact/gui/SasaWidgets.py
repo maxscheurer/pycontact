@@ -27,6 +27,7 @@ np.set_printoptions(threshold=np.inf)
 def calculate_sasa_parallel(input_coords, natoms, pairdist, nprad,
                             surfacePoints, probeRadius, pointstyle,
                             restricted, restrictedList, rank):
+    """Computes the SASA in parallel."""
 
     temp_sasa = []
     frames_processed = 0
@@ -49,6 +50,7 @@ def calculate_sasa_parallel(input_coords, natoms, pairdist, nprad,
 
 
 class SasaWidget(QWidget, Ui_SasaWidget):
+    """Provides a UI for the SASA calculation, including restriction selection and contact area calculation."""
     def __init__(self, parent=None):
         super(QtWidgets.QWidget, self).__init__(parent)
         self.setupUi(self)
@@ -76,15 +78,18 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         self.topoloader = TopoTrajLoaderDialog()
 
     def setFilePaths(self, *argv):
+        """Sets the current trajectory paths from the main view."""
         self.psf = argv[0][0]
         self.dcd = argv[0][1]
 
     def loadData(self):
+        """Sets the chosen trajectory and topology paths."""
         loadedData = self.topoloader.getConfig()
         self.psf = loadedData[0][0]
         self.dcd = loadedData[0][1]
 
     def clearData(self):
+        """Clears the whole view and sets it to the initial state."""
         self.psf = ""
         self.dcd = ""
         self.allSasas = []
@@ -99,6 +104,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
 
 
     def savePlot(self):
+        """Saves the generated SASA plot over all frames."""
         fileName = QFileDialog.getSaveFileName(self, 'Export Path')
         if len(fileName[0]) > 0:
             path, file_extension = os.path.splitext(fileName[0])
@@ -113,6 +119,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
                 box.exec_()
 
     def exportData(self):
+        """Exports the computed SASA values of each frame to a text file."""
         fileName = QFileDialog.getSaveFileName(self, 'Export Path')
         if len(fileName[0]) > 0:
             path, file_extension = os.path.splitext(fileName[0])
@@ -125,6 +132,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
             f.close()
 
     def calculateSasa(self):
+        """Computes the SASA of the given selections."""
         print("calculate SASA")
 
         # test data:
@@ -291,6 +299,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         self.previewPlot.update()
 
     def sasaEventListener(self):
+        """Event listener for progress bar updates."""
         while self.state:
             QApplication.processEvents()
             progress = 0
@@ -312,6 +321,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
 
 
 class PbWidget(QProgressBar):
+    """Subclassed progressbar for the SASA UI."""
     def __init__(self, total=100):
         super(PbWidget, self).__init__()
         self.setMinimum(0)
