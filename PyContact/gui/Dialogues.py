@@ -10,6 +10,7 @@ from HelpButton import HelpButton
 
 
 class TopoTrajLoaderDialog(QDialog):
+    """Dialog to load the topology and trajectory file."""
     def __init__(self, parent=None):
         super(TopoTrajLoaderDialog, self).__init__(parent)
         self.setWindowTitle("Load Data")
@@ -37,24 +38,27 @@ class TopoTrajLoaderDialog(QDialog):
         grid.addWidget(helpButton, 2, 0)
 
     def pick_psf(self):
+        """Pick the topology file."""
         psfname = QFileDialog.getOpenFileNames(self, "Open topology")
         for file in psfname[0]:
             self.psf = file
             break
 
     def pick_dcd(self):
+        """Pick the trajectory file."""
         dcdname = QFileDialog.getOpenFileNames(self, "Open trajectory")
         for file in dcdname[0]:
             self.dcd = file
             break
 
     def configuration(self):
+        """Returns the chosen configuration."""
         config = [self.psf, self.dcd]
         return config
 
-    # static method to create the dialog and return (date, time, accepted)
     @staticmethod
     def getConfig(parent=None):
+        """Static method to create the dialog and return (date, time, accepted)."""
         dialog = TopoTrajLoaderDialog(parent)
         result = dialog.exec_()
         config = dialog.configuration()
@@ -62,6 +66,7 @@ class TopoTrajLoaderDialog(QDialog):
 
 
 class FileLoaderDialog(QDialog):
+    """Initial file loader dialog, including initial parameter settings."""
     def __init__(self, parent=None):
         super(FileLoaderDialog, self).__init__(parent)
         self.setWindowTitle("Load Data")
@@ -118,26 +123,29 @@ class FileLoaderDialog(QDialog):
         grid.addWidget(buttons, 6, 0)
 
     def pick_psf(self):
+        """Pick topology file."""
         psfname = QFileDialog.getOpenFileNames(self, "Open topology")
         for file in psfname[0]:
             self.psf = file
             break
 
     def pick_dcd(self):
+        """Pick trajectory file."""
         dcdname = QFileDialog.getOpenFileNames(self, "Open trajectory")
         for file in dcdname[0]:
             self.dcd = file
             break
 
     def configuration(self):
+        """Returns the chosen configuration."""
         config = Configuration(self.psf, self.dcd, float(self.cutoffField.text()), float(self.cutoffHbondField.text()),
                                float(self.cutoffAngleField.text()), self.selection1Field.text(),
                                self.selection2Field.text())
         return config
 
-    # static method to create the dialog and return (date, time, accepted)
     @staticmethod
     def getConfig(parent=None):
+        """Static method to create the dialog and return (date, time, accepted)."""
         dialog = FileLoaderDialog(parent)
         result = dialog.exec_()
         config = dialog.configuration()
@@ -145,6 +153,7 @@ class FileLoaderDialog(QDialog):
 
 
 class AnalysisDialog(QDialog):
+    """Dialog to define the Accumulation maps."""
     def __init__(self, parent=None):
         super(AnalysisDialog, self).__init__(parent)
 
@@ -201,17 +210,18 @@ class AnalysisDialog(QDialog):
         grid.addWidget(buttons, 6, 0)
 
     def mapping(self):
+        """Creates the Accumulation maps from the checkbox values."""
         # atom types will not be supported in the future
         map1 = [self.index1Checkbox.isChecked(), 0, self.name1Checkbox.isChecked(), self.resid1Checkbox.isChecked(),
                 self.resname1Checkbox.isChecked(), self.segid1Checkbox.isChecked()]
         map2 = [self.index2Checkbox.isChecked(), 0, self.name2Checkbox.isChecked(), self.resid2Checkbox.isChecked(),
                 self.resname2Checkbox.isChecked(), self.segid2Checkbox.isChecked()]
-        print(map1, map2)
+        print("Accumulation maps: ", map1, map2)
         return [map1, map2]
 
-    # static method to create the dialog and return (date, time, accepted)
     @staticmethod
     def getMapping(parent=None):
+        """Static method to create the dialog and return (date, time, accepted)."""
         dialog = AnalysisDialog(parent)
         result = dialog.exec_()
         mapping = dialog.mapping()

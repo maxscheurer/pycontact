@@ -10,6 +10,7 @@ from ErrorMessages import ErrorMessages
 
 
 class ExportTabWidget(QTabWidget):
+    """Widget for data exporting purposes."""
 
     valueUpdated = pyqtSignal(str, str)
 
@@ -52,6 +53,7 @@ class ExportTabWidget(QTabWidget):
         self.nsPerFrame = currentNsPerFrame
 
     def tab1UI(self):
+        """Tab where the current view can be exported to file."""
         grid = QGridLayout()
         self.tab1.setLayout(grid)
 
@@ -71,6 +73,7 @@ class ExportTabWidget(QTabWidget):
         grid.addWidget(self.tab1.formatBox, 2, 0)
 
     def tab2UI(self):
+        """Tab where analyzed data can be visualized and exported as histograms."""
         self.tab2.setLayout(self.grid1)
 
         self.tab2.histPlot = HistPlotter(None, width=8, height=5, dpi=60)
@@ -118,6 +121,7 @@ class ExportTabWidget(QTabWidget):
         self.grid1.addWidget(self.tab2.formatBox, 1, 2)
 
     def tab3UI(self):
+        """Tab where the contact map can be generated and exported."""
         self.tab3.setLayout(self.grid2)
 
         self.tab3.mapPlot = MapPlotter(None, width=8, height=5, dpi=60)
@@ -150,6 +154,7 @@ class ExportTabWidget(QTabWidget):
         self.grid2.addWidget(self.tab3.attributeBox, 0, 1)
 
     def tab4UI(self):
+        """Tab where selected data can be visualized in VMD via a Tcl script generation."""
         self.tab4.setLayout(self.grid3)
 
         label = QLabel("Split selections for each contact")
@@ -172,6 +177,7 @@ class ExportTabWidget(QTabWidget):
         self.grid3.addWidget(self.tab4.additionalText2, 2, 1)
 
     def tab5UI(self):
+        """Tab where the raw data can be exported to a text file."""
         self.tab5.setLayout(self.grid4)
 
         self.checkboxdict = {"mean_score": "Mean Score",
@@ -199,6 +205,7 @@ class ExportTabWidget(QTabWidget):
         self.grid4.addWidget(self.tab5.button, startLine, 5)
 
     def saveText(self):
+        """Executes the conversion of the analysis results to raw text data."""
         fileName = QFileDialog.getSaveFileName(self, 'Export Path')
         if len(fileName[0]) > 0:
             path, file_extension = os.path.splitext(fileName[0])
@@ -230,6 +237,7 @@ class ExportTabWidget(QTabWidget):
             f.close()
 
     def saveHist(self):
+        """Saves the histogram to the picked file path."""
         self.plotHist()
 
         fileName = QFileDialog.getSaveFileName(self, 'Export Path')
@@ -238,6 +246,7 @@ class ExportTabWidget(QTabWidget):
             self.tab2.histPlot.saveFigure(path, self.tab2.formatBox.currentText())
 
     def saveMap(self):
+        """Saves the contact map to the picked file path."""
         self.plotMap()
 
         fileName = QFileDialog.getSaveFileName(self, 'Export Path')
@@ -246,12 +255,15 @@ class ExportTabWidget(QTabWidget):
             self.tab3.mapPlot.saveFigure(path, self.tab3.formatBox.currentText())
 
     def pushPlot(self):
+        """Triggers the histogram plotter."""
         self.plotHist()
 
     def pushMapPlot(self):
+        """Triggers the contact map plotter."""
         self.plotMap()
 
     def plotHist(self):
+        """Plots the histogram."""
         sip.delete(self.tab2.histPlot)
         self.tab2.histPlot = HistPlotter(None, width=8, height=5, dpi=60)
         self.grid1.addWidget(self.tab2.histPlot, 3, 0, 1, 4)
@@ -265,6 +277,7 @@ class ExportTabWidget(QTabWidget):
         self.tab2.histPlot.update()
 
     def plotMap(self):
+        """Plots the contact map."""
         sip.delete(self.tab3.mapPlot)
         self.tab3.mapPlot = MapPlotter(None, width=8, height=5, dpi=60)
         self.grid2.addWidget(self.tab3.mapPlot, 3, 0, 1, 4)
@@ -280,6 +293,7 @@ class ExportTabWidget(QTabWidget):
         self.tab3.mapPlot.update()
 
     def pushSave(self):
+        """Saves the current view."""
         fileName = QFileDialog.getSaveFileName(self, 'Export Path')
         self.valueUpdated.emit(fileName[0], self.tab1.formatBox.currentText())
 
@@ -296,6 +310,7 @@ class ExportTabWidget(QTabWidget):
         self.label2 = label2
 
     def createTclScriptVis(self):
+        """Creates the Tcl script for VMD visualization of the selections."""
         if len(self.contacts) == 0:
             box = ErrorBox(ErrorMessages.NOCONTACTS)
             box.exec_()

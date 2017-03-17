@@ -9,10 +9,12 @@ from .LabelView import LabelView
 
 
 class ColorScheme:
+    """Enum the color scheme, either custom or backbone-sidechain type."""
     custom, bbsc = range(2)
 
 
 class Canvas(QWidget, QObject):
+    """Canvas where contact analysis results are drawn."""
     clickedRowSignal = pyqtSignal()
     clickedColumnSignal = pyqtSignal()
 
@@ -71,6 +73,7 @@ class Canvas(QWidget, QObject):
             self.clickedColumnSignal.emit()
 
     def switchToVisMode(self, vismode):
+        """Visualize contacts directly in VMD by selecting a specific row."""
         self.vismode = vismode
         # self.labelView.vismode = vismode
 
@@ -91,6 +94,7 @@ class Canvas(QWidget, QObject):
         qp.end()
 
     def renderContact(self, generator):
+        """Render the contact with the defined colors."""
         # startx = 90
         # orig_startx = startx
         start_text = 10
@@ -230,4 +234,5 @@ class Canvas(QWidget, QObject):
         self.clickedRow = -1
 
     def drawRenderedContact(self, qp):
+        """Draws the rendered contact to the canvas."""
         qp.drawPixmap(0, 0, self.sizeX, self.sizeY, self.pixmap)

@@ -1,4 +1,5 @@
 class ErrorMessages():
+    """Error message shortcuts for the ErrorBox dialog."""
 
     NOEXPDATA = "No data to export."
 

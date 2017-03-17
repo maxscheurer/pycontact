@@ -125,7 +125,7 @@ class RangeFilter(object):
             try:
                 prop1 = int(c.key1[mapindex])
                 prop2 = int(c.key2[mapindex])
-            except IndexError:
+            except ValueError:
                 filtered.append(c)
                 continue
             add = False

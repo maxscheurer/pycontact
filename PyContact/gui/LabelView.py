@@ -109,6 +109,10 @@ class LabelView(QWidget):
         grid.addWidget(medianLifeTimeTitleLabel, 5, 2)
         grid.addWidget(medianLifeTimeLabel, 5, 3)
 
+        # print("################################")
+        # print("Hier hier hier !!!!!!!!!!!!!!!!!!!!!!!")
+        # print("################################")
+
         contactPlot = ContactPlotter(None, width=4, height=2, dpi=80)
         contactPlot.plot_contact_figure(contact)
         grid.addWidget(contactPlot, 6, 0, 1, 4)

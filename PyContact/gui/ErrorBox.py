@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QMessageBox
 
 
 class ErrorBox(QMessageBox):
-    """docstring for ErrorBox"""
+    """Creates an Error dialog which displays the corresponding error message 'msg'."""
     def __init__(self, msg):
         super(ErrorBox, self).__init__()
         self.msg = msg
