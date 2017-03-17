@@ -13,10 +13,12 @@ from .LogPool import *
 
 
 def weight_function(value):
+    """weight function to score contact distances"""
     return 1.0 / (1.0 + np.exp(5.0 * (value - 4.0)))
 
 
 def chunks(seq, num):
+    """splits the list seq in num (almost) equally sized chunks."""
     avg = len(seq) / float(num)
     out = []
     last = 0.0
@@ -29,7 +31,7 @@ def chunks(seq, num):
 
 
 class ConvBond(object):
-    """docstring for ConvBond"""
+    """Python object of MDAnalysis bond for running jobs in parallel."""
     def __init__(self, bonds):
         super(ConvBond, self).__init__()
         self.types = []
@@ -46,6 +48,7 @@ class ConvBond(object):
 
 
 def loop_trajectory(sel1c, sel2c, indices1, indices2, config, suppl):
+    """Invoked to analyze trajectory chunk for contacts as a single thread."""
     # print(len(sel1c) , len(sel2c))
     # indices1 = suppl[0]
     # indices2 = suppl[1]
@@ -181,6 +184,7 @@ def loop_trajectory(sel1c, sel2c, indices1, indices2, config, suppl):
 
 
 def run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1text, sel2text):
+    """Invokes nproc threads to run trajectory loading and contact analysis in parallel."""
     # nproc = int(self.settingsView.coreBox.value())
     pool = LoggingPool(nproc)
     # manager = multiprocessing.Manager()
