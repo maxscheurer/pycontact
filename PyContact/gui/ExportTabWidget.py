@@ -279,7 +279,7 @@ class ExportTabWidget(QTabWidget):
     def plotMap(self):
         """Plots the contact map."""
         sip.delete(self.tab3.mapPlot)
-        self.tab3.mapPlot = MapPlotter(None, width=8, height=5, dpi=60)
+        self.tab3.mapPlot = AnimateMapPlotter(None, width=8, height=5, dpi=60)
         self.grid2.addWidget(self.tab3.mapPlot, 3, 0, 1, 4)
         if self.map1 is None or self.map2 is None or self.contacts is None or len(self.contacts) == 0:
             box = ErrorBox(ErrorMessages.RESID_REQUIRED)

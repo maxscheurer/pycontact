@@ -1,9 +1,10 @@
-from PyQt5.QtWidgets import QSizePolicy
+from PyQt5.QtWidgets import QSizePolicy, QApplication
 import numpy as np
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg \
     as FigureCanvas
 from matplotlib.figure import Figure
 from matplotlib import cm
+from matplotlib import animation as ani
 
 from ..core.ContactFilters import *
 from ..core.Biochemistry import AccumulationMapIndex
@@ -205,3 +206,101 @@ class SimplePlotter(MplPlotter):
 
     def clearFigure(self):
         self.fig.clf()
+
+
+
+class AnimateMapPlotter(MplPlotter):
+    """Animated canvas with an 2d heatmap plot."""
+
+    def plotMap(self, contacts, map1, map2, label1, label2, attribute, threshold, nsPerFrame):
+        self.contacts = contacts
+        self.map1 = map1
+        self.map2 = map2
+        self.label1 = label1
+        self.label2 = label2
+        self.attribute = attribute
+        self.threshold = threshold
+        self.nsPerFrame = nsPerFrame
+
+        self.minmaxresids1 = []
+        self.minmaxresids2 = []
+
+        if not self.map1[AccumulationMapIndex.resid] or not self.map2[AccumulationMapIndex.resid]:
+            return -1
+
+        for cont in self.contacts:
+            self.minmaxresids1.append(int(cont.key1[AccumulationMapIndex.resid]))
+            self.minmaxresids2.append(int(cont.key2[AccumulationMapIndex.resid]))
+
+        self.x = np.arange(np.min(self.minmaxresids1), np.max(self.minmaxresids1) + 1)
+        self.y = np.arange(np.min(self.minmaxresids2), np.max(self.minmaxresids2) + 1)
+        self.minx = np.min(self.minmaxresids1)
+        self.miny = np.min(self.minmaxresids2)
+        self.data = np.zeros((len(self.y), len(self.x)))
+        rng = np.arange(len(contacts[0].scoreArray))
+        self.cax = self.axes.matshow(self.data, cmap=cm.Greys, label=self.attribute)
+        # animation = ani.FuncAnimation(self.fig, self.updateMap, rng, init_func=self.initFig, interval=200, blit=True)
+        animation = ani.FuncAnimation(self.fig, self.updateMap, 50, interval=200, blit=True)
+        QApplication.processEvents()
+        self.show()
+
+        # writer = ani.writers['ffmpeg'](fps=30)
+        # animation.save('demo.mp4',writer=writer,dpi=100)
+
+    def initFig(self):
+        self.cax = self.axes.matshow(self.data, cmap=cm.Greys, label=self.attribute)
+        return self.cax,
+
+    def updateMap(self, frame):
+        print("frame: ", frame)
+        attribute = "Mean Score"
+        if attribute == "Mean Score":
+            for c in self.contacts:
+                r1 = int(c.key1[AccumulationMapIndex.resid]) - self.minx
+                r2 = int(c.key2[AccumulationMapIndex.resid]) - self.miny
+                self.data[r2, r1] = c.scoreArray[frame]
+        # elif attribute == "Median Score":
+        #     for c in contacts:
+        #         r1 = int(c.key1[AccumulationMapIndex.resid])-minx
+        #         r2 = int(c.key2[AccumulationMapIndex.resid])-miny
+        #         data[r2, r1] = c.median_score()
+        # elif attribute == "Mean Lifetime":
+        #     for c in contacts:
+        #         r1 = int(c.key1[AccumulationMapIndex.resid])-minx
+        #         r2 = int(c.key2[AccumulationMapIndex.resid])-miny
+        #         data[r2, r1] = c.mean_life_time(nsPerFrame, threshold)
+        # elif attribute == "Median Lifetime":
+        #     for c in contacts:
+        #         r1 = int(c.key1[AccumulationMapIndex.resid])-minx
+        #         r2 = int(c.key2[AccumulationMapIndex.resid])-miny
+        #         data[r2, r1] = c.median_life_time(nsPerFrame, threshold)
+        # elif attribute == "Hbond percentage":
+        #     for c in contacts:
+        #         r1 = int(c.key1[AccumulationMapIndex.resid])-minx
+        #         r2 = int(c.key2[AccumulationMapIndex.resid])-miny
+        #         data[r2, r1] = c.hbond_percentage()
+
+        # cax = self.axes.matshow(self.data, cmap=cm.Greys, label=attribute)
+        self.cax.set_data(self.data)
+
+        # TODO: do this automatically
+        stridex = 5
+        stridey = 5
+        # self.axes.set_xticks(np.arange(0, self.x.size, stridex))
+        # self.axes.set_xticklabels(np.arange(self.minx, self.x.size + self.minx, stridex))
+        # self.axes.set_title("Contact Map")
+
+        # self.axes.set_xlabel(self.label1)
+        # self.axes.set_ylabel(self.label2)
+
+        # self.axes.set_yticks(np.arange(0, self.y.size, stridey))
+        # self.axes.set_yticklabels(np.arange(self.miny, self.y.size + self.miny, stridey))
+        # cb = self.fig.colorbar(self.cax)
+        # cb.set_label(attribute)
+        # self.fig.tight_layout()
+        # self.draw()
+
+        return self.cax,
+
+    def saveFigure(self, path, outputFormat):
+        self.fig.savefig(path + "." + outputFormat, format=outputFormat)
