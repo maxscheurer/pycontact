@@ -43,24 +43,24 @@ pca_evalues_sorted = pca_evalues[idx]
 pca_evecs_sorted = pca_evecs[:, idx]
 
 percentages = pca_evalues_sorted / (np.sum(pca_evalues_sorted))
-# print(percentages)
+print(percentages, np.sum(percentages[:10]))
 
 pc_frames = []
 pcOfInterest = 0
 
 # ???? auto-correlation
-for p in range(3):
-    pc_list = []
-    for f in range(frames):
-        pc_list.append(np.dot(pca_evecs_sorted[:, p], r_vec[:, f]))
-    pc_np = np.array(pc_list)
-    mean_pc = np.mean(pc_np)
-    dx = pc_np - mean_pc
-    dx0 = np.zeros(dx.shape)
-    dx0.fill(dx[0])
-    mean_pc2 = np.mean(np.power(dx, 2))
-    autoc = dx[0] * dx0[0] / mean_pc2
-    print(dx[0], dx0[0], mean_pc2, autoc)
+# for p in range(3):
+#     pc_list = []
+#     for f in range(frames):
+#         pc_list.append(np.dot(pca_evecs_sorted[:, p], r_vec[:, f]))
+#     pc_np = np.array(pc_list)
+#     mean_pc = np.mean(pc_np)
+#     dx = pc_np - mean_pc
+#     dx0 = np.zeros(dx.shape)
+#     dx0.fill(dx[0])
+#     mean_pc2 = np.mean(np.power(dx, 2))
+#     autoc = dx[0] * dx0[0] / mean_pc2
+#     print(dx[0], dx0[0], mean_pc2, autoc)
 
 # plt.plot(range(N), np.power(pca_evecs_sorted[:, pcOfInterest], 2))
 # plt.xticks(range(N), r_names)
