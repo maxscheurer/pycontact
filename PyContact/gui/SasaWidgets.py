@@ -135,6 +135,8 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         """Computes the SASA of the given selections."""
         print("calculate SASA")
 
+        self.allSasas = []
+
         # test data:
         # psf = "rpn11_ubq_interface-ionized.psf"
         # pdb = "rpn11_ubq_interface-ionized.pdb"
