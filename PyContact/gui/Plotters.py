@@ -8,6 +8,8 @@ from matplotlib import animation as ani
 
 from ..core.ContactFilters import *
 from ..core.Biochemistry import AccumulationMapIndex
+from matplotlib import pyplot as plt
+plt.style.use('ggplot')
 
 
 class MplPlotter(FigureCanvas):
@@ -24,6 +26,7 @@ class MplPlotter(FigureCanvas):
         #
         FigureCanvas.__init__(self, self.fig)
         self.setParent(parent)
+        # print(self.fig.set_style) #.use("ggplot")
 
         FigureCanvas.setSizePolicy(self,
                                    QSizePolicy.Expanding,
@@ -115,7 +118,8 @@ class HistPlotter(MplPlotter):
         titlesNp = np.array(titles, dtype=str)
 
         x = range(len(currentContacts))
-        h = self.axes.bar(x, valuesNp, color="red")
+        # h = self.axes.bar(x, valuesNp, color="red")
+        h = self.axes.bar(x, valuesNp)
         xticks_pos = [0.7071 * patch.get_width() + patch.get_xy()[0] for patch in h]
         self.axes.set_xticklabels(titlesNp, ha='right', size=8, rotation=45)
         self.axes.set_xticks(xticks_pos)
