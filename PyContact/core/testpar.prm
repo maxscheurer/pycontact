@@ -4,7 +4,7 @@ MASS    68 NR2   14.00700 ! neutral his unprotonated ring nitrogen !acc
 MASS    69 NR3   14.00700 ! charged his ring nitrogen !don
 MASS    70 NH1   14.00700 ! peptide nitrogen !don
 MASS    71 NH2   14.00700 ! amide nitrogen !both
-MASS    72 NH3   14.00700 ! ammonium nitrogen !none
+MASS    72 NH3   14.00700 ! ammonium nitrogen !don
 MASS    73 NC2   14.00700 ! guanidinium nitrogen !don
 MASS    74 NY    14.00700 ! TRP N in pyrrole ring !don
 MASS    75 NP    14.00700 ! Proline ring NH2+ (N-terminal) !don

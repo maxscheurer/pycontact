@@ -403,7 +403,7 @@ class Analyzer(QObject):
                             typeHeavy = next((x.htype for x in heavyatoms if x.name == self.type_array[convindex2]),
                                              AtomHBondType.none)
                             # print(typeHeavy)
-                            if typeHeavy == AtomHBondType.acc and (distarray[conv_hatom, idx2] <= hbondcutoff):
+                            if (typeHeavy == AtomHBondType.acc or typeHeavy == AtomHBondType.both) and (distarray[conv_hatom, idx2] <= hbondcutoff):
                                 donorPosition = sel1.positions[idx1]
                                 hydrogenPosition = sel1.positions[conv_hatom]
                                 acceptorPosition = sel2.positions[idx2]
@@ -428,7 +428,7 @@ class Analyzer(QObject):
                             conv_hatom = indices2.index(global_hatom)
                             typeHeavy = next((x.htype for x in heavyatoms if x.name == self.type_array[convindex1]),
                                              AtomHBondType.none)
-                            if typeHeavy == AtomHBondType.acc and (distarray[idx1, conv_hatom] <= hbondcutoff):
+                            if (typeHeavy == AtomHBondType.acc or typeHeavy == AtomHBondType.both) and (distarray[idx1, conv_hatom] <= hbondcutoff):
                                 donorPosition = sel2.positions[idx2]
                                 hydrogenPosition = sel2.positions[conv_hatom]
                                 acceptorPosition = sel1.positions[idx1]

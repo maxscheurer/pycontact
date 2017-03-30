@@ -136,7 +136,7 @@ def loop_trajectory(sel1c, sel2c, indices1, indices2, config, suppl):
                         conv_hatom = np.where(indices1[frame] == global_hatom)[0][0]
                         typeHeavy = next((xx.htype for xx in heavyatoms if xx.name == type_array[convindex2]),
                                          AtomHBondType.none)
-                        if typeHeavy == AtomHBondType.acc and (distarray[conv_hatom, idx2] <= hbondcutoff):
+                        if (typeHeavy == AtomHBondType.acc or typeHeavy == AtomHBondType.both) and (distarray[conv_hatom, idx2] <= hbondcutoff):
                             donorPosition = s1[idx1]
                             hydrogenPosition = s1[conv_hatom]
                             acceptorPosition = s2[idx2]
@@ -159,7 +159,7 @@ def loop_trajectory(sel1c, sel2c, indices1, indices2, config, suppl):
                         conv_hatom = np.where(indices2[frame] == global_hatom)[0][0]
                         typeHeavy = next((xx.htype for xx in heavyatoms if xx.name == type_array[convindex1]),
                                          AtomHBondType.none)
-                        if typeHeavy == AtomHBondType.acc and (distarray[idx1, conv_hatom] <= hbondcutoff):
+                        if (typeHeavy == AtomHBondType.acc or typeHeavy == AtomHBondType.both) and (distarray[idx1, conv_hatom] <= hbondcutoff):
                             donorPosition = s2[idx2]
                             hydrogenPosition = s2[conv_hatom]
                             acceptorPosition = s1[idx1]

@@ -39,7 +39,7 @@ class PsfDcdReadingTest(TestCase):
         hbond_sum = 0
         for c in analyzer.finalAccumulatedContacts:
             hbond_sum += c.hbond_percentage()
-        self.assertEqual(hbond_sum, 606.0)
+        self.assertEqual(hbond_sum, 676.0)
 
     def test_multiCore_analysis(self):
         analyzer = Analyzer(self.psffile, self.dcdfile, 5.0, 2.5, 120, "segid RN11", "segid UBQ")
@@ -52,7 +52,7 @@ class PsfDcdReadingTest(TestCase):
         hbond_sum = 0
         for c in analyzer.finalAccumulatedContacts:
             hbond_sum += c.hbond_percentage()
-        self.assertEqual(hbond_sum, 606.0)
+        self.assertEqual(hbond_sum, 676.0)
 
     def test_around_selection_patch(self):
         univ = mda.Universe(self.psffile, self.dcdfile)
