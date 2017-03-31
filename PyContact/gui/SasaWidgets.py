@@ -49,6 +49,24 @@ def calculate_sasa_parallel(input_coords, natoms, pairdist, nprad,
     return temp_sasa
 
 
+def calculate_sasa_cuda(input_coords, natoms, pairdist, nprad,
+                            surfacePoints, probeRadius, pointstyle,
+                            restricted, restrictedList):
+    temp_sasa = []
+    for c in input_coords:
+        coords = np.reshape(c, (1, natoms * 3))
+        npcoords = np.array(coords, dtype=np.float32)
+        # startC = time.time()
+        asa = cy_gridsearch.cy_sasa(npcoords, natoms, pairdist, 0, -1, nprad, surfacePoints, probeRadius,
+                                    pointstyle, restricted, restrictedList)
+        # stopC = time.time()
+        # print("time for grid search: ", (stopC - startC))
+        # print("asa:", asa)
+        temp_sasa.append(asa)
+    return temp_sasa
+
+
+
 class SasaWidget(QWidget, Ui_SasaWidget):
     """Provides a UI for the SASA calculation, including restriction selection and contact area calculation."""
     def __init__(self, parent=None):
