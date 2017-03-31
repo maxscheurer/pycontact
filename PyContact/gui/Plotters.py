@@ -23,10 +23,8 @@ class MplPlotter(FigureCanvas):
 
         self.compute_initial_figure()
 
-        #
         FigureCanvas.__init__(self, self.fig)
         self.setParent(parent)
-        # print(self.fig.set_style) #.use("ggplot")
 
         FigureCanvas.setSizePolicy(self,
                                    QSizePolicy.Expanding,
@@ -240,11 +238,22 @@ class AnimateMapPlotter(MplPlotter):
         self.y = np.arange(np.min(self.minmaxresids2), np.max(self.minmaxresids2) + 1)
         self.minx = np.min(self.minmaxresids1)
         self.miny = np.min(self.minmaxresids2)
-        self.data = np.zeros((len(self.y), len(self.x)))
         rng = np.arange(len(contacts[0].scoreArray))
-        self.cax = self.axes.matshow(self.data, cmap=cm.Greys, label=self.attribute)
-        # animation = ani.FuncAnimation(self.fig, self.updateMap, rng, init_func=self.initFig, interval=200, blit=True)
-        animation = ani.FuncAnimation(self.fig, self.updateMap, 50, interval=200, blit=True)
+        self.cax = None
+        self.ttl = self.axes.set_title("Map")
+        # TODO: do this automatically
+        stridex = 5
+        stridey = 5
+        self.axes.set_xticks(np.arange(0, self.x.size, stridex))
+        self.axes.set_xticklabels(np.arange(self.minx, self.x.size + self.minx, stridex))
+        self.axes.set_xlabel(self.label1)
+        self.axes.set_ylabel(self.label2)
+        self.axes.set_yticks(np.arange(0, self.y.size, stridey))
+        self.axes.set_yticklabels(np.arange(self.miny, self.y.size + self.miny, stridey))
+        self.fig.tight_layout()
+        self.cb = None
+        animation = ani.FuncAnimation(self.fig, self.updateMap, rng, init_func=self.initFig, interval=200, blit=True, repeat=False)
+        # animation = ani.FuncAnimation(self.fig, self.updateMap, 50, interval=200, blit=True)
         QApplication.processEvents()
         self.show()
 
@@ -252,17 +261,35 @@ class AnimateMapPlotter(MplPlotter):
         # animation.save('demo.mp4',writer=writer,dpi=100)
 
     def initFig(self):
-        self.cax = self.axes.matshow(self.data, cmap=cm.Greys, label=self.attribute)
-        return self.cax,
-
-    def updateMap(self, frame):
+        data = np.zeros((len(self.y), len(self.x)))
+        frame = 0
         print("frame: ", frame)
         attribute = "Mean Score"
         if attribute == "Mean Score":
             for c in self.contacts:
                 r1 = int(c.key1[AccumulationMapIndex.resid]) - self.minx
                 r2 = int(c.key2[AccumulationMapIndex.resid]) - self.miny
-                self.data[r2, r1] = c.scoreArray[frame]
+                data[r2, r1] = c.scoreArray[frame]
+        self.cax = self.axes.matshow(data, cmap=cm.Greys, label=self.attribute)
+        self.ttl.set_text("Frame 0")
+        if self.cb is None:
+            self.cb = self.fig.colorbar(self.cax)
+            self.cb.set_label(self.attribute)
+        self.draw()
+        return self.cax,
+
+    def updateMap(self, frame):
+        print(frame)
+        data = np.zeros((len(self.y), len(self.x)))
+        attribute = "Mean Score"
+        if attribute == "Mean Score":
+            for c in self.contacts:
+                r1 = int(c.key1[AccumulationMapIndex.resid]) - self.minx
+                r2 = int(c.key2[AccumulationMapIndex.resid]) - self.miny
+                data[r2, r1] = c.scoreArray[frame]
+        self.cax.set_data(data)  # update the data
+        self.ttl.set_text("Frame " + str(frame))
+
         # elif attribute == "Median Score":
         #     for c in contacts:
         #         r1 = int(c.key1[AccumulationMapIndex.resid])-minx
@@ -284,25 +311,7 @@ class AnimateMapPlotter(MplPlotter):
         #         r2 = int(c.key2[AccumulationMapIndex.resid])-miny
         #         data[r2, r1] = c.hbond_percentage()
 
-        # cax = self.axes.matshow(self.data, cmap=cm.Greys, label=attribute)
-        self.cax.set_data(self.data)
-
-        # TODO: do this automatically
-        stridex = 5
-        stridey = 5
-        # self.axes.set_xticks(np.arange(0, self.x.size, stridex))
-        # self.axes.set_xticklabels(np.arange(self.minx, self.x.size + self.minx, stridex))
-        # self.axes.set_title("Contact Map")
-
-        # self.axes.set_xlabel(self.label1)
-        # self.axes.set_ylabel(self.label2)
-
-        # self.axes.set_yticks(np.arange(0, self.y.size, stridey))
-        # self.axes.set_yticklabels(np.arange(self.miny, self.y.size + self.miny, stridey))
-        # cb = self.fig.colorbar(self.cax)
-        # cb.set_label(attribute)
-        # self.fig.tight_layout()
-        # self.draw()
+        self.draw()
 
         return self.cax,
 
