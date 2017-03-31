@@ -14,6 +14,7 @@ from ..core.multi_accumulation import chunks
 from ..core.Biochemistry import vdwRadius
 from ..core.LogPool import *
 from ..cy_modules import cy_gridsearch
+from ..cy_modules import cy_sasa_cuda
 from Dialogues import TopoTrajLoaderDialog
 from ErrorBox import ErrorBox
 from ErrorMessages import ErrorMessages
@@ -49,20 +50,9 @@ def calculate_sasa_parallel(input_coords, natoms, pairdist, nprad,
     return temp_sasa
 
 
-def calculate_sasa_cuda(input_coords, natoms, pairdist, nprad,
-                            surfacePoints, probeRadius, pointstyle,
-                            restricted, restrictedList):
-    temp_sasa = []
-    for c in input_coords:
-        coords = np.reshape(c, (1, natoms * 3))
-        npcoords = np.array(coords, dtype=np.float32)
-        # startC = time.time()
-        asa = cy_gridsearch.cy_sasa(npcoords, natoms, pairdist, 0, -1, nprad, surfacePoints, probeRadius,
-                                    pointstyle, restricted, restrictedList)
-        # stopC = time.time()
-        # print("time for grid search: ", (stopC - startC))
-        # print("asa:", asa)
-        temp_sasa.append(asa)
+def calculate_sasa_cuda():
+    temp_sasa = cy_sasa_cuda.cy_sasa_cuda(5.0)
+    print(temp_sasa)
     return temp_sasa
 
 
@@ -94,6 +84,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         self.savePlotButton.clicked.connect(self.savePlot)
         self.exportDataButton.clicked.connect(self.exportData)
         self.topoloader = TopoTrajLoaderDialog()
+        calculate_sasa_cuda()
 
     def setFilePaths(self, *argv):
         """Sets the current trajectory paths from the main view."""

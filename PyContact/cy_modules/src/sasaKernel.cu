@@ -1,5 +1,5 @@
 #include <stdio.h>
 
-void __global__ NULLKernel() {
-
+void __global__ NullKernel() {
+    
 }

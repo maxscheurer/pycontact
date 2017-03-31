@@ -14,5 +14,6 @@ This class will get translated into python via swig
 
 
 double calculate_sasa_cuda(double test) {
-
+    NullKernel<<< 1, 1024 >>>();
+    return test;
 }
