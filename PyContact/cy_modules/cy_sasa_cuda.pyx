@@ -1,9 +1,7 @@
-import numpy as np
-
-cdef extern from "src/sasaCudaKernel.cu":
-  double sasa_cuda(const double test)
+cdef extern from "src/sasaCuda.hh":
+    double calculate_sasa_cuda(const double test)
 
 
-def cy_sasa(test):
-  cdef float sasa = sasa_cuda(test)
+def cy_sasa_cuda(test):
+  cdef double sasa = calculate_sasa_cuda(test)
   return sasa

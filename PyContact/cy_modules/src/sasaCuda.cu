@@ -7,15 +7,12 @@ you perform actions with the GPU
 This class will get translated into python via swig
 */
 
-#include <kernel.cu>
-#include <manager.hh>
+#include <sasaKernel.cu>
+#include <sasaCuda.hh>
 #include <assert.h>
 #include <iostream>
-using namespace std;
-
-GPUAdder::GPUAdder () {
-}
 
 
-GPUAdder::~GPUAdder() {
+double calculate_sasa_cuda(double test) {
+
 }

@@ -4,7 +4,7 @@
 {
     "distutils": {
         "depends": [
-            "PyContact/cy_modules/src/sasaCudaKernel.cu"
+            "PyContact/cy_modules/src/sasaCuda.hh"
         ], 
         "extra_compile_args": {
             "gcc": [], 
@@ -28,7 +28,7 @@
             "/Developer/NVIDIA/CUDA-8.0/lib"
         ]
     }, 
-    "module_name": "PyContact.cy_modules.cy_sasa_cuda"
+    "module_name": "PyContact.cy_modules.wrapper"
 }
 END: Cython Metadata */
 
@@ -475,7 +475,7 @@ static CYTHON_INLINE float __PYX_NAN() {
 
 #define __PYX_HAVE__PyContact__cy_modules__cy_sasa_cuda
 #define __PYX_HAVE_API__PyContact__cy_modules__cy_sasa_cuda
-#include "src/sasaCudaKernel.cu"
+#include "src/sasaCuda.hh"
 #ifdef _OPENMP
 #include <omp.h>
 #endif /* _OPENMP */
@@ -740,25 +740,6 @@ static const char *__pyx_f[] = {
 #define __Pyx_CLEAR(r)    do { PyObject* tmp = ((PyObject*)(r)); r = NULL; __Pyx_DECREF(tmp);} while(0)
 #define __Pyx_XCLEAR(r)   do { if((r) != NULL) {PyObject* tmp = ((PyObject*)(r)); r = NULL; __Pyx_DECREF(tmp);}} while(0)
 
-/* PyObjectGetAttrStr.proto */
-#if CYTHON_USE_TYPE_SLOTS
-static CYTHON_INLINE PyObject* __Pyx_PyObject_GetAttrStr(PyObject* obj, PyObject* attr_name) {
-    PyTypeObject* tp = Py_TYPE(obj);
-    if (likely(tp->tp_getattro))
-        return tp->tp_getattro(obj, attr_name);
-#if PY_MAJOR_VERSION < 3
-    if (likely(tp->tp_getattr))
-        return tp->tp_getattr(obj, PyString_AS_STRING(attr_name));
-#endif
-    return PyObject_GetAttr(obj, attr_name);
-}
-#else
-#define __Pyx_PyObject_GetAttrStr(o,n) PyObject_GetAttr(o,n)
-#endif
-
-/* Import.proto */
-static PyObject *__Pyx_Import(PyObject *name, PyObject *from_list, int level);
-
 /* CodeObjectCache.proto */
 typedef struct {
     PyCodeObject* code_object;
@@ -799,93 +780,87 @@ static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 int __pyx_module_is_main_PyContact__cy_modules__cy_sasa_cuda = 0;
 
 /* Implementation of 'PyContact.cy_modules.cy_sasa_cuda' */
-static const char __pyx_k_np[] = "np";
 static const char __pyx_k_main[] = "__main__";
 static const char __pyx_k_sasa[] = "sasa";
 static const char __pyx_k_test[] = "test";
-static const char __pyx_k_numpy[] = "numpy";
-static const char __pyx_k_import[] = "__import__";
 static const char __pyx_k_test_2[] = "__test__";
-static const char __pyx_k_cy_sasa[] = "cy_sasa";
+static const char __pyx_k_cy_sasa_cuda[] = "cy_sasa_cuda";
 static const char __pyx_k_Users_astrofreak_Projects_pycon[] = "/Users/astrofreak/Projects/pycontact/PyContact/cy_modules/cy_sasa_cuda.pyx";
 static const char __pyx_k_PyContact_cy_modules_cy_sasa_cud[] = "PyContact.cy_modules.cy_sasa_cuda";
 static PyObject *__pyx_n_s_PyContact_cy_modules_cy_sasa_cud;
 static PyObject *__pyx_kp_s_Users_astrofreak_Projects_pycon;
-static PyObject *__pyx_n_s_cy_sasa;
-static PyObject *__pyx_n_s_import;
+static PyObject *__pyx_n_s_cy_sasa_cuda;
 static PyObject *__pyx_n_s_main;
-static PyObject *__pyx_n_s_np;
-static PyObject *__pyx_n_s_numpy;
 static PyObject *__pyx_n_s_sasa;
 static PyObject *__pyx_n_s_test;
 static PyObject *__pyx_n_s_test_2;
-static PyObject *__pyx_pf_9PyContact_10cy_modules_12cy_sasa_cuda_cy_sasa(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_test); /* proto */
+static PyObject *__pyx_pf_9PyContact_10cy_modules_12cy_sasa_cuda_cy_sasa_cuda(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_test); /* proto */
 static PyObject *__pyx_tuple_;
 static PyObject *__pyx_codeobj__2;
 
-/* "PyContact/cy_modules/cy_sasa_cuda.pyx":7
+/* "PyContact/cy_modules/cy_sasa_cuda.pyx":5
  * 
  * 
- * def cy_sasa(test):             # <<<<<<<<<<<<<<
- *   cdef float sasa = sasa_cuda(test)
+ * def cy_sasa_cuda(test):             # <<<<<<<<<<<<<<
+ *   cdef double sasa = calculate_sasa_cuda(test)
  *   return sasa
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_9PyContact_10cy_modules_12cy_sasa_cuda_1cy_sasa(PyObject *__pyx_self, PyObject *__pyx_v_test); /*proto*/
-static PyMethodDef __pyx_mdef_9PyContact_10cy_modules_12cy_sasa_cuda_1cy_sasa = {"cy_sasa", (PyCFunction)__pyx_pw_9PyContact_10cy_modules_12cy_sasa_cuda_1cy_sasa, METH_O, 0};
-static PyObject *__pyx_pw_9PyContact_10cy_modules_12cy_sasa_cuda_1cy_sasa(PyObject *__pyx_self, PyObject *__pyx_v_test) {
+static PyObject *__pyx_pw_9PyContact_10cy_modules_12cy_sasa_cuda_1cy_sasa_cuda(PyObject *__pyx_self, PyObject *__pyx_v_test); /*proto*/
+static PyMethodDef __pyx_mdef_9PyContact_10cy_modules_12cy_sasa_cuda_1cy_sasa_cuda = {"cy_sasa_cuda", (PyCFunction)__pyx_pw_9PyContact_10cy_modules_12cy_sasa_cuda_1cy_sasa_cuda, METH_O, 0};
+static PyObject *__pyx_pw_9PyContact_10cy_modules_12cy_sasa_cuda_1cy_sasa_cuda(PyObject *__pyx_self, PyObject *__pyx_v_test) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("cy_sasa (wrapper)", 0);
-  __pyx_r = __pyx_pf_9PyContact_10cy_modules_12cy_sasa_cuda_cy_sasa(__pyx_self, ((PyObject *)__pyx_v_test));
+  __Pyx_RefNannySetupContext("cy_sasa_cuda (wrapper)", 0);
+  __pyx_r = __pyx_pf_9PyContact_10cy_modules_12cy_sasa_cuda_cy_sasa_cuda(__pyx_self, ((PyObject *)__pyx_v_test));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_9PyContact_10cy_modules_12cy_sasa_cuda_cy_sasa(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_test) {
-  float __pyx_v_sasa;
+static PyObject *__pyx_pf_9PyContact_10cy_modules_12cy_sasa_cuda_cy_sasa_cuda(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_test) {
+  double __pyx_v_sasa;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   double __pyx_t_1;
   PyObject *__pyx_t_2 = NULL;
-  __Pyx_RefNannySetupContext("cy_sasa", 0);
+  __Pyx_RefNannySetupContext("cy_sasa_cuda", 0);
 
-  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":8
+  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":6
  * 
- * def cy_sasa(test):
- *   cdef float sasa = sasa_cuda(test)             # <<<<<<<<<<<<<<
+ * def cy_sasa_cuda(test):
+ *   cdef double sasa = calculate_sasa_cuda(test)             # <<<<<<<<<<<<<<
  *   return sasa
  */
-  __pyx_t_1 = __pyx_PyFloat_AsDouble(__pyx_v_test); if (unlikely((__pyx_t_1 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 8, __pyx_L1_error)
-  __pyx_v_sasa = sasa_cuda(__pyx_t_1);
+  __pyx_t_1 = __pyx_PyFloat_AsDouble(__pyx_v_test); if (unlikely((__pyx_t_1 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 6, __pyx_L1_error)
+  __pyx_v_sasa = calculate_sasa_cuda(__pyx_t_1);
 
-  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":9
- * def cy_sasa(test):
- *   cdef float sasa = sasa_cuda(test)
+  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":7
+ * def cy_sasa_cuda(test):
+ *   cdef double sasa = calculate_sasa_cuda(test)
  *   return sasa             # <<<<<<<<<<<<<<
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_sasa); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 9, __pyx_L1_error)
+  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_sasa); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":7
+  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":5
  * 
  * 
- * def cy_sasa(test):             # <<<<<<<<<<<<<<
- *   cdef float sasa = sasa_cuda(test)
+ * def cy_sasa_cuda(test):             # <<<<<<<<<<<<<<
+ *   cdef double sasa = calculate_sasa_cuda(test)
  *   return sasa
  */
 
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_AddTraceback("PyContact.cy_modules.cy_sasa_cuda.cy_sasa", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("PyContact.cy_modules.cy_sasa_cuda.cy_sasa_cuda", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -918,11 +893,8 @@ static struct PyModuleDef __pyx_moduledef = {
 static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_PyContact_cy_modules_cy_sasa_cud, __pyx_k_PyContact_cy_modules_cy_sasa_cud, sizeof(__pyx_k_PyContact_cy_modules_cy_sasa_cud), 0, 0, 1, 1},
   {&__pyx_kp_s_Users_astrofreak_Projects_pycon, __pyx_k_Users_astrofreak_Projects_pycon, sizeof(__pyx_k_Users_astrofreak_Projects_pycon), 0, 0, 1, 0},
-  {&__pyx_n_s_cy_sasa, __pyx_k_cy_sasa, sizeof(__pyx_k_cy_sasa), 0, 0, 1, 1},
-  {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
+  {&__pyx_n_s_cy_sasa_cuda, __pyx_k_cy_sasa_cuda, sizeof(__pyx_k_cy_sasa_cuda), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
-  {&__pyx_n_s_np, __pyx_k_np, sizeof(__pyx_k_np), 0, 0, 1, 1},
-  {&__pyx_n_s_numpy, __pyx_k_numpy, sizeof(__pyx_k_numpy), 0, 0, 1, 1},
   {&__pyx_n_s_sasa, __pyx_k_sasa, sizeof(__pyx_k_sasa), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
   {&__pyx_n_s_test_2, __pyx_k_test_2, sizeof(__pyx_k_test_2), 0, 0, 1, 1},
@@ -936,17 +908,17 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":7
+  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":5
  * 
  * 
- * def cy_sasa(test):             # <<<<<<<<<<<<<<
- *   cdef float sasa = sasa_cuda(test)
+ * def cy_sasa_cuda(test):             # <<<<<<<<<<<<<<
+ *   cdef double sasa = calculate_sasa_cuda(test)
  *   return sasa
  */
-  __pyx_tuple_ = PyTuple_Pack(2, __pyx_n_s_test, __pyx_n_s_sasa); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 7, __pyx_L1_error)
+  __pyx_tuple_ = PyTuple_Pack(2, __pyx_n_s_test, __pyx_n_s_sasa); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple_);
   __Pyx_GIVEREF(__pyx_tuple_);
-  __pyx_codeobj__2 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple_, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_astrofreak_Projects_pycon, __pyx_n_s_cy_sasa, 7, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__2)) __PYX_ERR(0, 7, __pyx_L1_error)
+  __pyx_codeobj__2 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple_, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_astrofreak_Projects_pycon, __pyx_n_s_cy_sasa_cuda, 5, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__2)) __PYX_ERR(0, 5, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -1053,32 +1025,22 @@ PyMODINIT_FUNC PyInit_cy_sasa_cuda(void)
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":1
- * import numpy as np             # <<<<<<<<<<<<<<
- * 
- * cdef extern from "src/sasaCudaKernel.cu":
- */
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_numpy, 0, -1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_1) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":7
+  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":5
  * 
  * 
- * def cy_sasa(test):             # <<<<<<<<<<<<<<
- *   cdef float sasa = sasa_cuda(test)
+ * def cy_sasa_cuda(test):             # <<<<<<<<<<<<<<
+ *   cdef double sasa = calculate_sasa_cuda(test)
  *   return sasa
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9PyContact_10cy_modules_12cy_sasa_cuda_1cy_sasa, NULL, __pyx_n_s_PyContact_cy_modules_cy_sasa_cud); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 7, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9PyContact_10cy_modules_12cy_sasa_cuda_1cy_sasa_cuda, NULL, __pyx_n_s_PyContact_cy_modules_cy_sasa_cud); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 5, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_cy_sasa, __pyx_t_1) < 0) __PYX_ERR(0, 7, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_cy_sasa_cuda, __pyx_t_1) < 0) __PYX_ERR(0, 5, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "PyContact/cy_modules/cy_sasa_cuda.pyx":1
- * import numpy as np             # <<<<<<<<<<<<<<
+ * cdef extern from "src/sasaCuda.hh":             # <<<<<<<<<<<<<<
+ *     double calculate_sasa_cuda(const double test)
  * 
- * cdef extern from "src/sasaCudaKernel.cu":
  */
   __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
@@ -1124,80 +1086,6 @@ end:
     return (__Pyx_RefNannyAPIStruct *)r;
 }
 #endif
-
-/* Import */
-static PyObject *__Pyx_Import(PyObject *name, PyObject *from_list, int level) {
-    PyObject *empty_list = 0;
-    PyObject *module = 0;
-    PyObject *global_dict = 0;
-    PyObject *empty_dict = 0;
-    PyObject *list;
-    #if PY_VERSION_HEX < 0x03030000
-    PyObject *py_import;
-    py_import = __Pyx_PyObject_GetAttrStr(__pyx_b, __pyx_n_s_import);
-    if (!py_import)
-        goto bad;
-    #endif
-    if (from_list)
-        list = from_list;
-    else {
-        empty_list = PyList_New(0);
-        if (!empty_list)
-            goto bad;
-        list = empty_list;
-    }
-    global_dict = PyModule_GetDict(__pyx_m);
-    if (!global_dict)
-        goto bad;
-    empty_dict = PyDict_New();
-    if (!empty_dict)
-        goto bad;
-    {
-        #if PY_MAJOR_VERSION >= 3
-        if (level == -1) {
-            if (strchr(__Pyx_MODULE_NAME, '.')) {
-                #if PY_VERSION_HEX < 0x03030000
-                PyObject *py_level = PyInt_FromLong(1);
-                if (!py_level)
-                    goto bad;
-                module = PyObject_CallFunctionObjArgs(py_import,
-                    name, global_dict, empty_dict, list, py_level, NULL);
-                Py_DECREF(py_level);
-                #else
-                module = PyImport_ImportModuleLevelObject(
-                    name, global_dict, empty_dict, list, 1);
-                #endif
-                if (!module) {
-                    if (!PyErr_ExceptionMatches(PyExc_ImportError))
-                        goto bad;
-                    PyErr_Clear();
-                }
-            }
-            level = 0;
-        }
-        #endif
-        if (!module) {
-            #if PY_VERSION_HEX < 0x03030000
-            PyObject *py_level = PyInt_FromLong(level);
-            if (!py_level)
-                goto bad;
-            module = PyObject_CallFunctionObjArgs(py_import,
-                name, global_dict, empty_dict, list, py_level, NULL);
-            Py_DECREF(py_level);
-            #else
-            module = PyImport_ImportModuleLevelObject(
-                name, global_dict, empty_dict, list, level);
-            #endif
-        }
-    }
-bad:
-    #if PY_VERSION_HEX < 0x03030000
-    Py_XDECREF(py_import);
-    #endif
-    Py_XDECREF(empty_list);
-    Py_XDECREF(empty_dict);
-    return module;
-}
 
 /* CodeObjectCache */
 static int __pyx_bisect_code_objects(__Pyx_CodeObjectCacheEntry* entries, int count, int code_line) {

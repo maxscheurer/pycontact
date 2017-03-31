@@ -12,8 +12,8 @@ from Cython.Build import cythonize
 #               'PyContact/cy_modules/src/sasaCudaKernel',
 #               ]
 
-CUDA_FILES = ['PyContact/cy_modules/wrapper',
-              'PyContact/cy_modules/src/manager',
+CUDA_FILES = ['PyContact/cy_modules/cy_sasa_cuda',
+              'PyContact/cy_modules/src/sasaCuda',
               ]
 
 
@@ -76,7 +76,7 @@ extensions = [Extension("PyContact.cy_modules.cy_gridsearch",
               #                        'nvcc': ['-Wno-deprecated-gpu-targets', '-x=cu']},
               #   include_dirs = [CUDA['include'], 'PyContact/cy_modules/src']),
               Extension('PyContact.cy_modules.wrapper',
-                sources=['PyContact/cy_modules/src/manager.cu', 'PyContact/cy_modules/wrapper.pyx'],
+                sources=['PyContact/cy_modules/src/sasaCuda.cu', 'PyContact/cy_modules/cy_sasa_cuda.pyx'],
                 library_dirs=[CUDA['lib']],
                 libraries=['cudart'],
                 language='c++',
