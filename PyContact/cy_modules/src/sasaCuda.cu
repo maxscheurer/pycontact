@@ -67,7 +67,11 @@ double calculate_sasa_cuda( float *pos, int natoms, float pairdist,  float *radi
     }
 
     cudaMemcpy(h_sasa, d_sasa, static_cast<size_t>(natoms * sizeof(*d_sasa)), cudaMemcpyDeviceToHost);
-    float sasa = h_sasa[5];
+    float sasa = 0.0f;
+    for (int i = 0; i < natoms; i++) {
+      sasa += h_sasa[i];
+    }
+    std::cout << "SASA: " <<  sasa << std::endl;
     free(h_sasa);
     free(h_points);
     cudaFree(d_sasa);
