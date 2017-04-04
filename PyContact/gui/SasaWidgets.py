@@ -58,6 +58,7 @@ def calculate_sasa_cuda(input_coords, natoms, pairdist, nprad,
     # print(len(input_coords))
     coords = np.reshape(input_coords, (1, natoms * 3))
     npcoords = np.array(coords, dtype=np.float32)
+    npcoords = npcoords[0]
     # print("start C")
     # startC = time.time()
     asa = cy_sasa_cuda.cy_sasa_cuda(npcoords, natoms, pairdist, nprad, surfacePoints, probeRadius,
