@@ -49,7 +49,7 @@ def locate_cuda():
 
     cudaconfig = {'home': home, 'nvcc': nvcc,
                   'include': os.path.join(home, 'include'),
-                  'lib': os.path.join(home, 'lib')}
+                  'lib': os.path.join(home, 'lib64')}
     for k, v in cudaconfig.iteritems():
         if not os.path.exists(v):
             raise EnvironmentError('The CUDA %s path could not be located in %s' % (k, v))
@@ -64,13 +64,13 @@ extensions = [Extension("PyContact.cy_modules.cy_gridsearch",
                         ["PyContact/cy_modules/cy_gridsearch.pyx"], language="c++",
                         include_dirs=[".", "PyContact/cy_modules/src"],
                         extra_compile_args={'gcc': [],
-                                            'nvcc': ['-Wno-deprecated-gpu-targets', '-x=cu']}
+                                            'nvcc': ['-Wno-deprecated-gpu-targets', '-x=cu', '--compiler-options', "'-fPIC'"]}
                         ),
               Extension("PyContact.cy_modules.wrap_vmd",
                         ["PyContact/cy_modules/wrap_vmd.pyx"], language="c++",
                         include_dirs=[".", "PyContact/cy_modules/src"],
                         extra_compile_args={'gcc': [],
-                                            'nvcc': ['-Wno-deprecated-gpu-targets', '-x=cu']}
+                                            'nvcc': ['-Wno-deprecated-gpu-targets', '-x=cu','--compiler-options', "'-fPIC'"]}
                         ),
               # Extension('PyContact.cy_modules.cy_sasa_cuda',
               #   sources=['PyContact/cy_modules/src/sasaCudaKernel.cu', 'PyContact/cy_modules/cy_sasa_cuda.pyx'],
@@ -87,8 +87,8 @@ extensions = [Extension("PyContact.cy_modules.cy_gridsearch",
                 libraries=['cudart'],
                 language='c++',
                 runtime_library_dirs=[CUDA['lib']],
-                extra_compile_args={'gcc': [],
-                                     'nvcc': ['-Wno-deprecated-gpu-targets', '-x=cu']},
+                extra_compile_args={'g++': [],
+                                     'nvcc': ['-Wno-deprecated-gpu-targets', '-x=cu', '--compiler-options', "'-fPIC'"]},
                 include_dirs = [CUDA['include'], 'PyContact/cy_modules/src']
                         ),
               ]
