@@ -13,9 +13,8 @@ This class will get translated into python via swig
 #include <iostream>
 
 
-double calculate_sasa_cuda(const float *pos,int natoms, float pairdist, int allow_double_counting, int maxpairs,
-                           const float *radius,const int npts, double srad, int pointstyle, int restricted,
-                           const int* restrictedList) {
+double calculate_sasa_cuda(const float *pos, int natoms, float pairdist, const float *radius, const int npts,
+                           double srad, int pointstyle, int restricted, const int* restrictedList) {
     std::cout << "Cuda Test!" << std::endl;
     NullKernel<<< 1, 1024 >>>();
     return 0.0f;

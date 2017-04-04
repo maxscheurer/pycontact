@@ -1492,7 +1492,6 @@ static const char __pyx_k_natoms[] = "natoms";
 static const char __pyx_k_struct[] = "struct";
 static const char __pyx_k_unpack[] = "unpack";
 static const char __pyx_k_fortran[] = "fortran";
-static const char __pyx_k_maxsize[] = "maxsize";
 static const char __pyx_k_memview[] = "memview";
 static const char __pyx_k_Ellipsis[] = "Ellipsis";
 static const char __pyx_k_c_coords[] = "c_coords";
@@ -1518,7 +1517,6 @@ static const char __pyx_k_dtype_is_object[] = "dtype_is_object";
 static const char __pyx_k_cy_restrictedList[] = "cy_restrictedList";
 static const char __pyx_k_strided_and_direct[] = "<strided and direct>";
 static const char __pyx_k_strided_and_indirect[] = "<strided and indirect>";
-static const char __pyx_k_allow_double_counting[] = "allow_double_counting";
 static const char __pyx_k_contiguous_and_direct[] = "<contiguous and direct>";
 static const char __pyx_k_MemoryView_of_r_object[] = "<MemoryView of %r object>";
 static const char __pyx_k_MemoryView_of_r_at_0x_x[] = "<MemoryView of %r at 0x%x>";
@@ -1560,7 +1558,6 @@ static PyObject *__pyx_kp_s_Unable_to_convert_item_to_object;
 static PyObject *__pyx_kp_s_Users_astrofreak_Projects_pycon;
 static PyObject *__pyx_n_s_ValueError;
 static PyObject *__pyx_n_s_allocate_buffer;
-static PyObject *__pyx_n_s_allow_double_counting;
 static PyObject *__pyx_n_s_base;
 static PyObject *__pyx_n_s_c;
 static PyObject *__pyx_n_u_c;
@@ -1585,7 +1582,6 @@ static PyObject *__pyx_n_s_import;
 static PyObject *__pyx_n_s_itemsize;
 static PyObject *__pyx_kp_s_itemsize_0_for_cython_array;
 static PyObject *__pyx_n_s_main;
-static PyObject *__pyx_n_s_maxsize;
 static PyObject *__pyx_n_s_memview;
 static PyObject *__pyx_n_s_mode;
 static PyObject *__pyx_n_s_name;
@@ -1621,7 +1617,7 @@ static PyObject *__pyx_n_s_test;
 static PyObject *__pyx_kp_s_unable_to_allocate_array_data;
 static PyObject *__pyx_kp_s_unable_to_allocate_shape_and_str;
 static PyObject *__pyx_n_s_unpack;
-static PyObject *__pyx_pf_9PyContact_10cy_modules_12cy_sasa_cuda_cy_sasa_cuda(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_npcoords, PyObject *__pyx_v_natoms, PyObject *__pyx_v_pairdist, CYTHON_UNUSED PyObject *__pyx_v_allow_double_counting, CYTHON_UNUSED PyObject *__pyx_v_maxsize, PyObject *__pyx_v_nprad, PyObject *__pyx_v_surfacePoints, PyObject *__pyx_v_probeRadius, PyObject *__pyx_v_pointstyle, PyObject *__pyx_v_restricted, PyObject *__pyx_v_restrictedList); /* proto */
+static PyObject *__pyx_pf_9PyContact_10cy_modules_12cy_sasa_cuda_cy_sasa_cuda(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_npcoords, PyObject *__pyx_v_natoms, PyObject *__pyx_v_pairdist, PyObject *__pyx_v_nprad, PyObject *__pyx_v_surfacePoints, PyObject *__pyx_v_probeRadius, PyObject *__pyx_v_pointstyle, PyObject *__pyx_v_restricted, PyObject *__pyx_v_restrictedList); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __pyx_array_obj *__pyx_v_self, PyObject *__pyx_v_shape, Py_ssize_t __pyx_v_itemsize, PyObject *__pyx_v_format, PyObject *__pyx_v_mode, int __pyx_v_allocate_buffer); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array_2__getbuffer__(struct __pyx_array_obj *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_array___pyx_pf_15View_dot_MemoryView_5array_4__dealloc__(struct __pyx_array_obj *__pyx_v_self); /* proto */
@@ -1682,12 +1678,12 @@ static PyObject *__pyx_tuple__19;
 static PyObject *__pyx_tuple__20;
 static PyObject *__pyx_codeobj__15;
 
-/* "PyContact/cy_modules/cy_sasa_cuda.pyx":9
+/* "PyContact/cy_modules/cy_sasa_cuda.pyx":8
  * 
  * 
- * def cy_sasa_cuda(npcoords, natoms, pairdist, allow_double_counting, maxsize, nprad,             # <<<<<<<<<<<<<<
- *                  surfacePoints, probeRadius, pointstyle,
- *                  restricted, restrictedList):
+ * def cy_sasa_cuda(npcoords, natoms, pairdist, nprad, surfacePoints, probeRadius, pointstyle, restricted, restrictedList):             # <<<<<<<<<<<<<<
+ * 
+ *     cdef int [::1] cy_restrictedList = restrictedList
  */
 
 /* Python wrapper */
@@ -1697,8 +1693,6 @@ static PyObject *__pyx_pw_9PyContact_10cy_modules_12cy_sasa_cuda_1cy_sasa_cuda(P
   PyObject *__pyx_v_npcoords = 0;
   PyObject *__pyx_v_natoms = 0;
   PyObject *__pyx_v_pairdist = 0;
-  CYTHON_UNUSED PyObject *__pyx_v_allow_double_counting = 0;
-  CYTHON_UNUSED PyObject *__pyx_v_maxsize = 0;
   PyObject *__pyx_v_nprad = 0;
   PyObject *__pyx_v_surfacePoints = 0;
   PyObject *__pyx_v_probeRadius = 0;
@@ -1709,14 +1703,12 @@ static PyObject *__pyx_pw_9PyContact_10cy_modules_12cy_sasa_cuda_1cy_sasa_cuda(P
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("cy_sasa_cuda (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_npcoords,&__pyx_n_s_natoms,&__pyx_n_s_pairdist,&__pyx_n_s_allow_double_counting,&__pyx_n_s_maxsize,&__pyx_n_s_nprad,&__pyx_n_s_surfacePoints,&__pyx_n_s_probeRadius,&__pyx_n_s_pointstyle,&__pyx_n_s_restricted,&__pyx_n_s_restrictedList,0};
-    PyObject* values[11] = {0,0,0,0,0,0,0,0,0,0,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_npcoords,&__pyx_n_s_natoms,&__pyx_n_s_pairdist,&__pyx_n_s_nprad,&__pyx_n_s_surfacePoints,&__pyx_n_s_probeRadius,&__pyx_n_s_pointstyle,&__pyx_n_s_restricted,&__pyx_n_s_restrictedList,0};
+    PyObject* values[9] = {0,0,0,0,0,0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
-        case 11: values[10] = PyTuple_GET_ITEM(__pyx_args, 10);
-        case 10: values[9] = PyTuple_GET_ITEM(__pyx_args, 9);
         case  9: values[8] = PyTuple_GET_ITEM(__pyx_args, 8);
         case  8: values[7] = PyTuple_GET_ITEM(__pyx_args, 7);
         case  7: values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
@@ -1737,58 +1729,48 @@ static PyObject *__pyx_pw_9PyContact_10cy_modules_12cy_sasa_cuda_1cy_sasa_cuda(P
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_natoms)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("cy_sasa_cuda", 1, 11, 11, 1); __PYX_ERR(0, 9, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("cy_sasa_cuda", 1, 9, 9, 1); __PYX_ERR(0, 8, __pyx_L3_error)
         }
         case  2:
         if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_pairdist)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("cy_sasa_cuda", 1, 11, 11, 2); __PYX_ERR(0, 9, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("cy_sasa_cuda", 1, 9, 9, 2); __PYX_ERR(0, 8, __pyx_L3_error)
         }
         case  3:
-        if (likely((values[3] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_allow_double_counting)) != 0)) kw_args--;
+        if (likely((values[3] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_nprad)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("cy_sasa_cuda", 1, 11, 11, 3); __PYX_ERR(0, 9, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("cy_sasa_cuda", 1, 9, 9, 3); __PYX_ERR(0, 8, __pyx_L3_error)
         }
         case  4:
-        if (likely((values[4] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_maxsize)) != 0)) kw_args--;
+        if (likely((values[4] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_surfacePoints)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("cy_sasa_cuda", 1, 11, 11, 4); __PYX_ERR(0, 9, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("cy_sasa_cuda", 1, 9, 9, 4); __PYX_ERR(0, 8, __pyx_L3_error)
         }
         case  5:
-        if (likely((values[5] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_nprad)) != 0)) kw_args--;
+        if (likely((values[5] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_probeRadius)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("cy_sasa_cuda", 1, 11, 11, 5); __PYX_ERR(0, 9, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("cy_sasa_cuda", 1, 9, 9, 5); __PYX_ERR(0, 8, __pyx_L3_error)
         }
         case  6:
-        if (likely((values[6] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_surfacePoints)) != 0)) kw_args--;
+        if (likely((values[6] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_pointstyle)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("cy_sasa_cuda", 1, 11, 11, 6); __PYX_ERR(0, 9, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("cy_sasa_cuda", 1, 9, 9, 6); __PYX_ERR(0, 8, __pyx_L3_error)
         }
         case  7:
-        if (likely((values[7] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_probeRadius)) != 0)) kw_args--;
+        if (likely((values[7] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_restricted)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("cy_sasa_cuda", 1, 11, 11, 7); __PYX_ERR(0, 9, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("cy_sasa_cuda", 1, 9, 9, 7); __PYX_ERR(0, 8, __pyx_L3_error)
         }
         case  8:
-        if (likely((values[8] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_pointstyle)) != 0)) kw_args--;
+        if (likely((values[8] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_restrictedList)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("cy_sasa_cuda", 1, 11, 11, 8); __PYX_ERR(0, 9, __pyx_L3_error)
-        }
-        case  9:
-        if (likely((values[9] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_restricted)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("cy_sasa_cuda", 1, 11, 11, 9); __PYX_ERR(0, 9, __pyx_L3_error)
-        }
-        case 10:
-        if (likely((values[10] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_restrictedList)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("cy_sasa_cuda", 1, 11, 11, 10); __PYX_ERR(0, 9, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("cy_sasa_cuda", 1, 9, 9, 8); __PYX_ERR(0, 8, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "cy_sasa_cuda") < 0)) __PYX_ERR(0, 9, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "cy_sasa_cuda") < 0)) __PYX_ERR(0, 8, __pyx_L3_error)
       }
-    } else if (PyTuple_GET_SIZE(__pyx_args) != 11) {
+    } else if (PyTuple_GET_SIZE(__pyx_args) != 9) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
@@ -1800,37 +1782,33 @@ static PyObject *__pyx_pw_9PyContact_10cy_modules_12cy_sasa_cuda_1cy_sasa_cuda(P
       values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
       values[7] = PyTuple_GET_ITEM(__pyx_args, 7);
       values[8] = PyTuple_GET_ITEM(__pyx_args, 8);
-      values[9] = PyTuple_GET_ITEM(__pyx_args, 9);
-      values[10] = PyTuple_GET_ITEM(__pyx_args, 10);
     }
     __pyx_v_npcoords = values[0];
     __pyx_v_natoms = values[1];
     __pyx_v_pairdist = values[2];
-    __pyx_v_allow_double_counting = values[3];
-    __pyx_v_maxsize = values[4];
-    __pyx_v_nprad = values[5];
-    __pyx_v_surfacePoints = values[6];
-    __pyx_v_probeRadius = values[7];
-    __pyx_v_pointstyle = values[8];
-    __pyx_v_restricted = values[9];
-    __pyx_v_restrictedList = values[10];
+    __pyx_v_nprad = values[3];
+    __pyx_v_surfacePoints = values[4];
+    __pyx_v_probeRadius = values[5];
+    __pyx_v_pointstyle = values[6];
+    __pyx_v_restricted = values[7];
+    __pyx_v_restrictedList = values[8];
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("cy_sasa_cuda", 1, 11, 11, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 9, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("cy_sasa_cuda", 1, 9, 9, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 8, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("PyContact.cy_modules.cy_sasa_cuda.cy_sasa_cuda", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_9PyContact_10cy_modules_12cy_sasa_cuda_cy_sasa_cuda(__pyx_self, __pyx_v_npcoords, __pyx_v_natoms, __pyx_v_pairdist, __pyx_v_allow_double_counting, __pyx_v_maxsize, __pyx_v_nprad, __pyx_v_surfacePoints, __pyx_v_probeRadius, __pyx_v_pointstyle, __pyx_v_restricted, __pyx_v_restrictedList);
+  __pyx_r = __pyx_pf_9PyContact_10cy_modules_12cy_sasa_cuda_cy_sasa_cuda(__pyx_self, __pyx_v_npcoords, __pyx_v_natoms, __pyx_v_pairdist, __pyx_v_nprad, __pyx_v_surfacePoints, __pyx_v_probeRadius, __pyx_v_pointstyle, __pyx_v_restricted, __pyx_v_restrictedList);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_9PyContact_10cy_modules_12cy_sasa_cuda_cy_sasa_cuda(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_npcoords, PyObject *__pyx_v_natoms, PyObject *__pyx_v_pairdist, CYTHON_UNUSED PyObject *__pyx_v_allow_double_counting, CYTHON_UNUSED PyObject *__pyx_v_maxsize, PyObject *__pyx_v_nprad, PyObject *__pyx_v_surfacePoints, PyObject *__pyx_v_probeRadius, PyObject *__pyx_v_pointstyle, PyObject *__pyx_v_restricted, PyObject *__pyx_v_restrictedList) {
+static PyObject *__pyx_pf_9PyContact_10cy_modules_12cy_sasa_cuda_cy_sasa_cuda(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_npcoords, PyObject *__pyx_v_natoms, PyObject *__pyx_v_pairdist, PyObject *__pyx_v_nprad, PyObject *__pyx_v_surfacePoints, PyObject *__pyx_v_probeRadius, PyObject *__pyx_v_pointstyle, PyObject *__pyx_v_restricted, PyObject *__pyx_v_restrictedList) {
   __Pyx_memviewslice __pyx_v_cy_restrictedList = { 0, 0, { 0 }, { 0 }, { 0 } };
   __Pyx_memviewslice __pyx_v_cy_radius = { 0, 0, { 0 }, { 0 }, { 0 } };
   __Pyx_memviewslice __pyx_v_c_coords = { 0, 0, { 0 }, { 0 }, { 0 } };
@@ -1852,52 +1830,52 @@ static PyObject *__pyx_pf_9PyContact_10cy_modules_12cy_sasa_cuda_cy_sasa_cuda(CY
   int __pyx_t_13;
   __Pyx_RefNannySetupContext("cy_sasa_cuda", 0);
 
-  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":13
- *                  restricted, restrictedList):
+  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":10
+ * def cy_sasa_cuda(npcoords, natoms, pairdist, nprad, surfacePoints, probeRadius, pointstyle, restricted, restrictedList):
  * 
  *     cdef int [::1] cy_restrictedList = restrictedList             # <<<<<<<<<<<<<<
  *     cdef float [::1] cy_radius = nprad
  *     cdef float [::1] c_coords = npcoords[0]
  */
   __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_dc_int(__pyx_v_restrictedList);
-  if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 13, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 10, __pyx_L1_error)
   __pyx_v_cy_restrictedList = __pyx_t_1;
   __pyx_t_1.memview = NULL;
   __pyx_t_1.data = NULL;
 
-  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":14
+  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":11
  * 
  *     cdef int [::1] cy_restrictedList = restrictedList
  *     cdef float [::1] cy_radius = nprad             # <<<<<<<<<<<<<<
  *     cdef float [::1] c_coords = npcoords[0]
- *     cdef float sasa = calculate_sasa_cuda(&c_coords[0], natoms, pairdist, 0, -1, &cy_radius[0], surfacePoints,
+ *     cdef float sasa = calculate_sasa_cuda(&c_coords[0], natoms, pairdist, &cy_radius[0], surfacePoints,
  */
   __pyx_t_2 = __Pyx_PyObject_to_MemoryviewSlice_dc_float(__pyx_v_nprad);
-  if (unlikely(!__pyx_t_2.memview)) __PYX_ERR(0, 14, __pyx_L1_error)
+  if (unlikely(!__pyx_t_2.memview)) __PYX_ERR(0, 11, __pyx_L1_error)
   __pyx_v_cy_radius = __pyx_t_2;
   __pyx_t_2.memview = NULL;
   __pyx_t_2.data = NULL;
 
-  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":15
+  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":12
  *     cdef int [::1] cy_restrictedList = restrictedList
  *     cdef float [::1] cy_radius = nprad
  *     cdef float [::1] c_coords = npcoords[0]             # <<<<<<<<<<<<<<
- *     cdef float sasa = calculate_sasa_cuda(&c_coords[0], natoms, pairdist, 0, -1, &cy_radius[0], surfacePoints,
+ *     cdef float sasa = calculate_sasa_cuda(&c_coords[0], natoms, pairdist, &cy_radius[0], surfacePoints,
  *                                           probeRadius, pointstyle, restricted, &cy_restrictedList[0])
  */
-  __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_npcoords, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetItemInt(__pyx_v_npcoords, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 12, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_2 = __Pyx_PyObject_to_MemoryviewSlice_dc_float(__pyx_t_3);
-  if (unlikely(!__pyx_t_2.memview)) __PYX_ERR(0, 15, __pyx_L1_error)
+  if (unlikely(!__pyx_t_2.memview)) __PYX_ERR(0, 12, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_c_coords = __pyx_t_2;
   __pyx_t_2.memview = NULL;
   __pyx_t_2.data = NULL;
 
-  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":16
+  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":13
  *     cdef float [::1] cy_radius = nprad
  *     cdef float [::1] c_coords = npcoords[0]
- *     cdef float sasa = calculate_sasa_cuda(&c_coords[0], natoms, pairdist, 0, -1, &cy_radius[0], surfacePoints,             # <<<<<<<<<<<<<<
+ *     cdef float sasa = calculate_sasa_cuda(&c_coords[0], natoms, pairdist, &cy_radius[0], surfacePoints,             # <<<<<<<<<<<<<<
  *                                           probeRadius, pointstyle, restricted, &cy_restrictedList[0])
  *     return sasa
  */
@@ -1909,10 +1887,10 @@ static PyObject *__pyx_pf_9PyContact_10cy_modules_12cy_sasa_cuda_cy_sasa_cuda(CY
   } else if (unlikely(__pyx_t_4 >= __pyx_v_c_coords.shape[0])) __pyx_t_5 = 0;
   if (unlikely(__pyx_t_5 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_5);
-    __PYX_ERR(0, 16, __pyx_L1_error)
+    __PYX_ERR(0, 13, __pyx_L1_error)
   }
-  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_v_natoms); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 16, __pyx_L1_error)
-  __pyx_t_6 = __pyx_PyFloat_AsFloat(__pyx_v_pairdist); if (unlikely((__pyx_t_6 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 16, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_v_natoms); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 13, __pyx_L1_error)
+  __pyx_t_6 = __pyx_PyFloat_AsFloat(__pyx_v_pairdist); if (unlikely((__pyx_t_6 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 13, __pyx_L1_error)
   __pyx_t_7 = 0;
   __pyx_t_8 = -1;
   if (__pyx_t_7 < 0) {
@@ -1921,19 +1899,19 @@ static PyObject *__pyx_pf_9PyContact_10cy_modules_12cy_sasa_cuda_cy_sasa_cuda(CY
   } else if (unlikely(__pyx_t_7 >= __pyx_v_cy_radius.shape[0])) __pyx_t_8 = 0;
   if (unlikely(__pyx_t_8 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_8);
-    __PYX_ERR(0, 16, __pyx_L1_error)
+    __PYX_ERR(0, 13, __pyx_L1_error)
   }
-  __pyx_t_8 = __Pyx_PyInt_As_int(__pyx_v_surfacePoints); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 16, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyInt_As_int(__pyx_v_surfacePoints); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 13, __pyx_L1_error)
 
-  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":17
+  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":14
  *     cdef float [::1] c_coords = npcoords[0]
- *     cdef float sasa = calculate_sasa_cuda(&c_coords[0], natoms, pairdist, 0, -1, &cy_radius[0], surfacePoints,
+ *     cdef float sasa = calculate_sasa_cuda(&c_coords[0], natoms, pairdist, &cy_radius[0], surfacePoints,
  *                                           probeRadius, pointstyle, restricted, &cy_restrictedList[0])             # <<<<<<<<<<<<<<
  *     return sasa
  */
-  __pyx_t_9 = __pyx_PyFloat_AsDouble(__pyx_v_probeRadius); if (unlikely((__pyx_t_9 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 17, __pyx_L1_error)
-  __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_v_pointstyle); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 17, __pyx_L1_error)
-  __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_v_restricted); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_t_9 = __pyx_PyFloat_AsDouble(__pyx_v_probeRadius); if (unlikely((__pyx_t_9 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_t_10 = __Pyx_PyInt_As_int(__pyx_v_pointstyle); if (unlikely((__pyx_t_10 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_v_restricted); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 14, __pyx_L1_error)
   __pyx_t_12 = 0;
   __pyx_t_13 = -1;
   if (__pyx_t_12 < 0) {
@@ -1942,36 +1920,36 @@ static PyObject *__pyx_pf_9PyContact_10cy_modules_12cy_sasa_cuda_cy_sasa_cuda(CY
   } else if (unlikely(__pyx_t_12 >= __pyx_v_cy_restrictedList.shape[0])) __pyx_t_13 = 0;
   if (unlikely(__pyx_t_13 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_13);
-    __PYX_ERR(0, 17, __pyx_L1_error)
+    __PYX_ERR(0, 14, __pyx_L1_error)
   }
 
-  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":16
+  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":13
  *     cdef float [::1] cy_radius = nprad
  *     cdef float [::1] c_coords = npcoords[0]
- *     cdef float sasa = calculate_sasa_cuda(&c_coords[0], natoms, pairdist, 0, -1, &cy_radius[0], surfacePoints,             # <<<<<<<<<<<<<<
+ *     cdef float sasa = calculate_sasa_cuda(&c_coords[0], natoms, pairdist, &cy_radius[0], surfacePoints,             # <<<<<<<<<<<<<<
  *                                           probeRadius, pointstyle, restricted, &cy_restrictedList[0])
  *     return sasa
  */
-  __pyx_v_sasa = calculate_sasa_cuda((&(*((float *) ( /* dim=0 */ ((char *) (((float *) __pyx_v_c_coords.data) + __pyx_t_4)) )))), __pyx_t_5, __pyx_t_6, 0, -1, (&(*((float *) ( /* dim=0 */ ((char *) (((float *) __pyx_v_cy_radius.data) + __pyx_t_7)) )))), __pyx_t_8, __pyx_t_9, __pyx_t_10, __pyx_t_11, (&(*((int *) ( /* dim=0 */ ((char *) (((int *) __pyx_v_cy_restrictedList.data) + __pyx_t_12)) )))));
+  __pyx_v_sasa = calculate_sasa_cuda((&(*((float *) ( /* dim=0 */ ((char *) (((float *) __pyx_v_c_coords.data) + __pyx_t_4)) )))), __pyx_t_5, __pyx_t_6, (&(*((float *) ( /* dim=0 */ ((char *) (((float *) __pyx_v_cy_radius.data) + __pyx_t_7)) )))), __pyx_t_8, __pyx_t_9, __pyx_t_10, __pyx_t_11, (&(*((int *) ( /* dim=0 */ ((char *) (((int *) __pyx_v_cy_restrictedList.data) + __pyx_t_12)) )))));
 
-  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":18
- *     cdef float sasa = calculate_sasa_cuda(&c_coords[0], natoms, pairdist, 0, -1, &cy_radius[0], surfacePoints,
+  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":15
+ *     cdef float sasa = calculate_sasa_cuda(&c_coords[0], natoms, pairdist, &cy_radius[0], surfacePoints,
  *                                           probeRadius, pointstyle, restricted, &cy_restrictedList[0])
  *     return sasa             # <<<<<<<<<<<<<<
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_sasa); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 18, __pyx_L1_error)
+  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_sasa); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_r = __pyx_t_3;
   __pyx_t_3 = 0;
   goto __pyx_L0;
 
-  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":9
+  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":8
  * 
  * 
- * def cy_sasa_cuda(npcoords, natoms, pairdist, allow_double_counting, maxsize, nprad,             # <<<<<<<<<<<<<<
- *                  surfacePoints, probeRadius, pointstyle,
- *                  restricted, restrictedList):
+ * def cy_sasa_cuda(npcoords, natoms, pairdist, nprad, surfacePoints, probeRadius, pointstyle, restricted, restrictedList):             # <<<<<<<<<<<<<<
+ * 
+ *     cdef int [::1] cy_restrictedList = restrictedList
  */
 
   /* function exit code */
@@ -14353,7 +14331,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_Users_astrofreak_Projects_pycon, __pyx_k_Users_astrofreak_Projects_pycon, sizeof(__pyx_k_Users_astrofreak_Projects_pycon), 0, 0, 1, 0},
   {&__pyx_n_s_ValueError, __pyx_k_ValueError, sizeof(__pyx_k_ValueError), 0, 0, 1, 1},
   {&__pyx_n_s_allocate_buffer, __pyx_k_allocate_buffer, sizeof(__pyx_k_allocate_buffer), 0, 0, 1, 1},
-  {&__pyx_n_s_allow_double_counting, __pyx_k_allow_double_counting, sizeof(__pyx_k_allow_double_counting), 0, 0, 1, 1},
   {&__pyx_n_s_base, __pyx_k_base, sizeof(__pyx_k_base), 0, 0, 1, 1},
   {&__pyx_n_s_c, __pyx_k_c, sizeof(__pyx_k_c), 0, 0, 1, 1},
   {&__pyx_n_u_c, __pyx_k_c, sizeof(__pyx_k_c), 0, 1, 0, 1},
@@ -14378,7 +14355,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_itemsize, __pyx_k_itemsize, sizeof(__pyx_k_itemsize), 0, 0, 1, 1},
   {&__pyx_kp_s_itemsize_0_for_cython_array, __pyx_k_itemsize_0_for_cython_array, sizeof(__pyx_k_itemsize_0_for_cython_array), 0, 0, 1, 0},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
-  {&__pyx_n_s_maxsize, __pyx_k_maxsize, sizeof(__pyx_k_maxsize), 0, 0, 1, 1},
   {&__pyx_n_s_memview, __pyx_k_memview, sizeof(__pyx_k_memview), 0, 0, 1, 1},
   {&__pyx_n_s_mode, __pyx_k_mode, sizeof(__pyx_k_mode), 0, 0, 1, 1},
   {&__pyx_n_s_name, __pyx_k_name, sizeof(__pyx_k_name), 0, 0, 1, 1},
@@ -14580,17 +14556,17 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__13);
   __Pyx_GIVEREF(__pyx_tuple__13);
 
-  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":9
+  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":8
  * 
  * 
- * def cy_sasa_cuda(npcoords, natoms, pairdist, allow_double_counting, maxsize, nprad,             # <<<<<<<<<<<<<<
- *                  surfacePoints, probeRadius, pointstyle,
- *                  restricted, restrictedList):
+ * def cy_sasa_cuda(npcoords, natoms, pairdist, nprad, surfacePoints, probeRadius, pointstyle, restricted, restrictedList):             # <<<<<<<<<<<<<<
+ * 
+ *     cdef int [::1] cy_restrictedList = restrictedList
  */
-  __pyx_tuple__14 = PyTuple_Pack(15, __pyx_n_s_npcoords, __pyx_n_s_natoms, __pyx_n_s_pairdist, __pyx_n_s_allow_double_counting, __pyx_n_s_maxsize, __pyx_n_s_nprad, __pyx_n_s_surfacePoints, __pyx_n_s_probeRadius, __pyx_n_s_pointstyle, __pyx_n_s_restricted, __pyx_n_s_restrictedList, __pyx_n_s_cy_restrictedList, __pyx_n_s_cy_radius, __pyx_n_s_c_coords, __pyx_n_s_sasa); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 9, __pyx_L1_error)
+  __pyx_tuple__14 = PyTuple_Pack(13, __pyx_n_s_npcoords, __pyx_n_s_natoms, __pyx_n_s_pairdist, __pyx_n_s_nprad, __pyx_n_s_surfacePoints, __pyx_n_s_probeRadius, __pyx_n_s_pointstyle, __pyx_n_s_restricted, __pyx_n_s_restrictedList, __pyx_n_s_cy_restrictedList, __pyx_n_s_cy_radius, __pyx_n_s_c_coords, __pyx_n_s_sasa); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__14);
   __Pyx_GIVEREF(__pyx_tuple__14);
-  __pyx_codeobj__15 = (PyObject*)__Pyx_PyCode_New(11, 0, 15, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__14, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_astrofreak_Projects_pycon, __pyx_n_s_cy_sasa_cuda, 9, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__15)) __PYX_ERR(0, 9, __pyx_L1_error)
+  __pyx_codeobj__15 = (PyObject*)__Pyx_PyCode_New(9, 0, 13, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__14, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_Users_astrofreak_Projects_pycon, __pyx_n_s_cy_sasa_cuda, 8, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__15)) __PYX_ERR(0, 8, __pyx_L1_error)
 
   /* "View.MemoryView":282
  *         return self.name
@@ -14801,16 +14777,16 @@ PyMODINIT_FUNC PyInit_cy_sasa_cuda(void)
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_1) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":9
+  /* "PyContact/cy_modules/cy_sasa_cuda.pyx":8
  * 
  * 
- * def cy_sasa_cuda(npcoords, natoms, pairdist, allow_double_counting, maxsize, nprad,             # <<<<<<<<<<<<<<
- *                  surfacePoints, probeRadius, pointstyle,
- *                  restricted, restrictedList):
+ * def cy_sasa_cuda(npcoords, natoms, pairdist, nprad, surfacePoints, probeRadius, pointstyle, restricted, restrictedList):             # <<<<<<<<<<<<<<
+ * 
+ *     cdef int [::1] cy_restrictedList = restrictedList
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9PyContact_10cy_modules_12cy_sasa_cuda_1cy_sasa_cuda, NULL, __pyx_n_s_PyContact_cy_modules_cy_sasa_cud); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 9, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9PyContact_10cy_modules_12cy_sasa_cuda_1cy_sasa_cuda, NULL, __pyx_n_s_PyContact_cy_modules_cy_sasa_cud); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_cy_sasa_cuda, __pyx_t_1) < 0) __PYX_ERR(0, 9, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_cy_sasa_cuda, __pyx_t_1) < 0) __PYX_ERR(0, 8, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "PyContact/cy_modules/cy_sasa_cuda.pyx":1
