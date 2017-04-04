@@ -18,5 +18,5 @@ double calculate_sasa_cuda(const float *pos,int natoms, float pairdist, int allo
                            const int* restrictedList) {
     std::cout << "Cuda Test!" << std::endl;
     NullKernel<<< 1, 1024 >>>();
-    return test;
+    return 0.0f;
 }

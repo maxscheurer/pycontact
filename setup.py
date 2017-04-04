@@ -62,10 +62,16 @@ CUDA = locate_cuda()
 
 extensions = [Extension("PyContact.cy_modules.cy_gridsearch",
                         ["PyContact/cy_modules/cy_gridsearch.pyx"], language="c++",
-                        include_dirs=[".", "PyContact/cy_modules/src"]),
+                        include_dirs=[".", "PyContact/cy_modules/src"],
+                        extra_compile_args={'gcc': [],
+                                            'nvcc': ['-Wno-deprecated-gpu-targets', '-x=cu']}
+                        ),
               Extension("PyContact.cy_modules.wrap_vmd",
                         ["PyContact/cy_modules/wrap_vmd.pyx"], language="c++",
-                        include_dirs=[".", "PyContact/cy_modules/src"]),
+                        include_dirs=[".", "PyContact/cy_modules/src"],
+                        extra_compile_args={'gcc': [],
+                                            'nvcc': ['-Wno-deprecated-gpu-targets', '-x=cu']}
+                        ),
               # Extension('PyContact.cy_modules.cy_sasa_cuda',
               #   sources=['PyContact/cy_modules/src/sasaCudaKernel.cu', 'PyContact/cy_modules/cy_sasa_cuda.pyx'],
               #   library_dirs=[CUDA['lib']],
@@ -83,7 +89,8 @@ extensions = [Extension("PyContact.cy_modules.cy_gridsearch",
                 runtime_library_dirs=[CUDA['lib']],
                 extra_compile_args={'gcc': [],
                                      'nvcc': ['-Wno-deprecated-gpu-targets', '-x=cu']},
-                include_dirs = [CUDA['include'], 'PyContact/cy_modules/src']),
+                include_dirs = [CUDA['include'], 'PyContact/cy_modules/src']
+                        ),
               ]
 
 
@@ -116,6 +123,7 @@ def customize_compiler_for_nvcc(self):
             # from the extra_compile_args in the Extension class
             postargs = extra_postargs['nvcc']
         else:
+            print(extra_postargs)
             postargs = extra_postargs['gcc']
 
         super(obj, src, ext, cc_args, postargs, pp_opts)
