@@ -155,9 +155,10 @@ class SasaWidget(QWidget, Ui_SasaWidget):
     def calculateSasaCuda(self):
         """Computes the SASA of the given selections."""
         print("Calculating SASA with CUDA support")
+        from PyContact.exampleData.datafiles import DCD, PSF
 
-        self.psf = "/Users/astrofreak/Projects/pycontact/PyContact/exampleData/rpn11_ubq_interface-ionized.psf"
-        self.dcd = "/Users/astrofreak/Projects/pycontact/PyContact/exampleData/short.dcd"
+        self.psf = PSF
+        self.dcd = DCD
 
         self.allSasas = []
 
