@@ -2,6 +2,7 @@
 #include <sasaCuda.hh>
 #include <assert.h>
 #include <iostream>
+#include <chTimer.hpp>
 
 
 double calculate_sasa_cuda( float *pos, int natoms, float pairdist,  float *radius,  int npts,
@@ -9,6 +10,7 @@ double calculate_sasa_cuda( float *pos, int natoms, float pairdist,  float *radi
 
     const int blockSize = 256;
     const int gridSize = ceil(static_cast<float>(natoms) / static_cast<float>(blockSize));
+    const int neighboursInShMem = 3000;
 
     //std::cout << "Grid Size: " << gridSize << std::endl;
     //std::cout << "Block Size: " << blockSize << std::endl;
@@ -19,6 +21,8 @@ double calculate_sasa_cuda( float *pos, int natoms, float pairdist,  float *radi
     float* d_radius = NULL;
     float3* h_points = NULL;
     float3* d_points = NULL;
+
+    ChTimer kernelTimer;
 
 
     h_sasa = static_cast<float*>(malloc(static_cast<size_t>(natoms * sizeof(*h_sasa))));
@@ -55,8 +59,13 @@ double calculate_sasa_cuda( float *pos, int natoms, float pairdist,  float *radi
     cudaMemcpy(d_sasa, h_sasa, static_cast<size_t>(natoms * sizeof(*d_sasa)), cudaMemcpyHostToDevice);
     cudaMemcpy(d_points, h_points, static_cast<size_t>(npts * sizeof(*d_points)), cudaMemcpyHostToDevice);
 
-    SasaKernel<<< gridSize, blockSize >>>(natoms, pairdist, npts, srad, d_pos, d_radius, d_points, d_sasa);
+    kernelTimer.start();
+
+    SasaKernel<<< gridSize, blockSize, neighboursInShMem * sizeof(float4) >>>(natoms, pairdist,
+        npts, neighboursInShMem, srad, d_pos, d_radius, d_points, d_sasa);
     cudaDeviceSynchronize();
+
+    kernelTimer.stop();
 
     cudaError_t cudaError = cudaGetLastError();
     if ( cudaError != cudaSuccess ) {
@@ -72,6 +81,8 @@ double calculate_sasa_cuda( float *pos, int natoms, float pairdist,  float *radi
       sasa += h_sasa[i];
     }
     std::cout << "SASA: " <<  sasa << std::endl;
+    std::cout << "Kernel time: " << kernelTimer.getTime() << std::endl;
+    std::cout << natoms << std::endl;
     free(h_sasa);
     free(h_points);
     cudaFree(d_sasa);

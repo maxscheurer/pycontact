@@ -69,7 +69,7 @@ probeRadius = 1.4
 # seltext = sasaSelection1TextField.text()
 # seltext2 = sasaSelection2TextField.text()
 # resseltext = sasaRestrictionTextField.text()
-seltext = "protein"
+seltext = "segid RN11"
 resseltext = ""
 
 # 0=spiral, 1=random (VMD)
