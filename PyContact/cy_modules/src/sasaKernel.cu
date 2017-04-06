@@ -21,7 +21,7 @@ void __global__ SasaKernel(int natoms, float pairdist, const int npts, float sra
 
             for (int atomId = 0; atomId < natoms; atomId++) {
                 if (atomId != thread) {
-                    float neighbourRad2 = radius[atomId];
+                    float neighbourRad2 = radius[atomId] + srad;
                     neighbourRad2 *= neighbourRad2;
                     float3 neighbourCenter = pos[atomId];
                     float3 dr;
@@ -43,7 +43,6 @@ void __global__ SasaKernel(int natoms, float pairdist, const int npts, float sra
                 remainingPoints--;
             }
         }
-
-        sasa[thread] = 4.188790204786391f * powf(currentRadius, 3) * (float)(remainingPoints) / npts;
+        sasa[thread] = 12.5663706144 * powf(currentRadius+srad, 2) * (float)(remainingPoints) / npts;
     }
 }

@@ -459,17 +459,18 @@ static double sasa_grid(const float *pos,int natoms, float pairdist, int allow_d
       }
   }
   else {
-    // All the spheres use the same spiral points.
-    for (int k=0; k<npts; k++) {
-      float h_k = 2.0 * (k - 1.0) / (npts - 1.0) - 1.0;
-      float theta_k = acosf(h_k);
-      float phi_k =0;
-      if (! (k == 1 || k == npts)) {
-          phi_k = fmod((phi_k + 3.6 / sqrt(npts * (1 - (h_k*h_k)))),(2 * M_PI));
-      }
-      spherepts[3*k  ] = cosf(phi_k) * sinf(theta_k);
-      spherepts[3*k+1] = sinf(phi_k) * sinf(theta_k);
-      spherepts[3*k+2] = cosf(theta_k);
+    float phi_k = 0.0f;
+    for (int k = 1; k <= npts; k++) {
+        float h_k = 2.0f * (k - 1.0f) / (npts - 1.0f) - 1.0f;
+        float theta_k = acosf(h_k);
+        if (k == 1 || k == npts) {
+            phi_k = 0.0f;
+        } else {
+            phi_k = fmod((phi_k + 3.6f / sqrtf(npts * (1.0f - h_k*h_k))), (float)(2.0f*M_PI));
+        }
+        spherepts[3*(k-1)  ] = cosf(phi_k) * sinf(theta_k);
+        spherepts[3*(k-1)+1] = sinf(phi_k) * sinf(theta_k);
+        spherepts[3*(k-1)+2] = cosf(theta_k);
     }
   }
 
