@@ -339,19 +339,28 @@ class Analyzer(QObject):
                     # distance between atom1 and atom2
                 distance = distarray[idx1, idx2]
                 weight = self.weight_function(distance)
+
                 # read AtomHBondType from heavyatoms list
-                type1 = next((x.htype for x in heavyatoms if x.name == self.type_array[convindex1]), AtomHBondType.none)
-                type2 = next((x.htype for x in heavyatoms if x.name == self.type_array[convindex2]), AtomHBondType.none)
+                # TODO: FF independent?
+                # type1 = next((x.htype for x in heavyatoms if x.name == self.type_array[convindex1]), AtomHBondType.none)
+                # type2 = next((x.htype for x in heavyatoms if x.name == self.type_array[convindex2]), AtomHBondType.none)
+
+
                 # HydrogenBondAlgorithm
                 hydrogenBonds = []
-                if type1 != AtomHBondType.none and type2 != AtomHBondType.none:
-                    if (type1 == AtomHBondType.both and type2 == AtomHBondType.both) or \
-                            (type1 == AtomHBondType.acc and type2 == AtomHBondType.don) or \
-                            (type1 == AtomHBondType.don and type2 == AtomHBondType.acc) or \
-                            (type1 == AtomHBondType.both and type2 == AtomHBondType.acc) or \
-                            (type1 == AtomHBondType.acc and type2 == AtomHBondType.both) or \
-                            (type1 == AtomHBondType.don and type2 == AtomHBondType.both) or \
-                            (type1 == AtomHBondType.both and type2 == AtomHBondType.don):
+                # FF independent hydrogen bonds
+                if (self.name_array[convindex1].startswith("N") and self.name_array[convindex2].startswith("O")) \
+                    or (self.name_array[convindex1].startswith("N") and self.name_array[convindex2].startswith("N")) \
+                    or (self.name_array[convindex1].startswith("O") and self.name_array[convindex2].startswith("N")) \
+                    or (self.name_array[convindex1].startswith("O") and self.name_array[convindex2].startswith("O")):
+                # if type1 != AtomHBondType.none and type2 != AtomHBondType.none:
+                    # if (type1 == AtomHBondType.both and type2 == AtomHBondType.both) or \
+                    #         (type1 == AtomHBondType.acc and type2 == AtomHBondType.don) or \
+                    #         (type1 == AtomHBondType.don and type2 == AtomHBondType.acc) or \
+                    #         (type1 == AtomHBondType.both and type2 == AtomHBondType.acc) or \
+                    #         (type1 == AtomHBondType.acc and type2 == AtomHBondType.both) or \
+                    #         (type1 == AtomHBondType.don and type2 == AtomHBondType.both) or \
+                    #         (type1 == AtomHBondType.both and type2 == AtomHBondType.don):
                         # print("hbond? %s - %s" % (type_array[convindex1], type_array[convindex2]))
                         # search for hatom, check numbering in bond!!!!!!!!!!
                         b1 = self.bonds[convindex1]
@@ -403,7 +412,11 @@ class Analyzer(QObject):
                             typeHeavy = next((x.htype for x in heavyatoms if x.name == self.type_array[convindex2]),
                                              AtomHBondType.none)
                             # print(typeHeavy)
-                            if (typeHeavy == AtomHBondType.acc or typeHeavy == AtomHBondType.both) and (distarray[conv_hatom, idx2] <= hbondcutoff):
+                            #
+                            # TODO: FF independent version
+                            # if (typeHeavy == AtomHBondType.acc or typeHeavy == AtomHBondType.both) and (distarray[conv_hatom, idx2] <= hbondcutoff):
+                            dist = distarray[conv_hatom, idx2]
+                            if (dist <= hbondcutoff):
                                 donorPosition = sel1.positions[idx1]
                                 hydrogenPosition = sel1.positions[conv_hatom]
                                 acceptorPosition = sel2.positions[idx2]
@@ -416,7 +429,6 @@ class Analyzer(QObject):
                                 # print(angle)
                                 if angle >= hbondcutangle:
                                     # print("new hbond")
-                                    dist = distarray[conv_hatom, idx2]
                                     new_hbond = HydrogenBond(convindex1, convindex2, global_hatom, dist, angle,
                                                              hbondcutoff,
                                                              hbondcutangle)
@@ -428,7 +440,12 @@ class Analyzer(QObject):
                             conv_hatom = indices2.index(global_hatom)
                             typeHeavy = next((x.htype for x in heavyatoms if x.name == self.type_array[convindex1]),
                                              AtomHBondType.none)
-                            if (typeHeavy == AtomHBondType.acc or typeHeavy == AtomHBondType.both) and (distarray[idx1, conv_hatom] <= hbondcutoff):
+                            # TODO: FF independent version
+                            # if (typeHeavy == AtomHBondType.acc or typeHeavy == AtomHBondType.both) and (distarray[idx1, conv_hatom] <= hbondcutoff):
+                            # FIXME: WTF?
+                            # if (distarray[conv_hatom, idx2] <= hbondcutoff):
+                            dist = distarray[idx1, conv_hatom]
+                            if (dist <= hbondcutoff):
                                 donorPosition = sel2.positions[idx2]
                                 hydrogenPosition = sel2.positions[conv_hatom]
                                 acceptorPosition = sel1.positions[idx1]
@@ -439,7 +456,6 @@ class Analyzer(QObject):
                                 dot = np.dot(v1, v2)
                                 angle = np.degrees(np.arccos(dot / (v1norm * v2norm)))
                                 if angle >= hbondcutangle:
-                                    dist = distarray[idx1, conv_hatom]
                                     new_hbond = HydrogenBond(convindex2, convindex1, global_hatom, dist, angle,
                                                              hbondcutoff,
                                                              hbondcutangle)
@@ -456,10 +472,10 @@ class Analyzer(QObject):
         stop = time.time()
 
         # show trajectory information and selection information
-        print("trajectory with %d frames loaded" % len(u.trajectory))
-        print("Selection 1: ", len(sel1.positions), ", Selection2: ", len(sel2.positions))
+        #print("trajectory with %d frames loaded" % len(u.trajectory))
+        #print("Selection 1: ", len(sel1.positions), ", Selection2: ", len(sel2.positions))
 
-        print("analyzeTime: ", stop - start)
+        #print("analyzeTime: ", stop - start)
         # pickle.dump(contactResults, open("single_results.dat", "w"))
         return contactResults
 
@@ -523,7 +539,7 @@ class Analyzer(QObject):
             counter += 1
         accumulatedContactsDict = {}
         stop = time.time()
-        print(stop - start)
+        # print(stop - start)
         # accumulatedContactsDict (dict)
         # ---> key vs. list of TempContactAccumulated
         #
@@ -557,7 +573,7 @@ class Analyzer(QObject):
             # print(key, acc.bb1, acc.bb2, acc.sc1, acc.sc2)
             # print(len(acc.scoreArray))
         stop = time.time()
-        print(stop - start)
+        # print(stop - start)
         return finalAccumulatedContacts
 
     def analysisEventListener(self):
@@ -597,11 +613,11 @@ class Analyzer(QObject):
         pool.join()
         self.analysis_state = False
         stop = time.time()
-        print("time: ", str(stop - start), rank)
-        print(str(len(c)), rank)
+        # print("time: ", str(stop - start), rank)
+        # print(str(len(c)), rank)
         allkeys = []
         frame_contacts_accumulated = []
-        print(len(results))
+        # print(len(results))
         for res in results:
             rn = res.get()
             allkeys.extend(rn[0])
@@ -632,6 +648,6 @@ class Analyzer(QObject):
         # stop = time.time()
         # print(stop - start)
         glob_stop = time.time()
-        print(glob_stop - start)
+        # print(glob_stop - start)
         # self.progressWidget.hide()
         return finalAccumulatedContacts

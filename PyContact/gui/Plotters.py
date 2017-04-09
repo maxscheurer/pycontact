@@ -5,6 +5,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg \
 from matplotlib.figure import Figure
 from matplotlib import cm
 from matplotlib import animation as ani
+from matplotlib.widgets import Slider, Button
 
 from ..core.ContactFilters import *
 from ..core.Biochemistry import AccumulationMapIndex
@@ -275,6 +276,8 @@ class AnimateMapPlotter(MplPlotter):
         if self.cb is None:
             self.cb = self.fig.colorbar(self.cax)
             self.cb.set_label(self.attribute)
+            # mp_slider_ax  = self.fig.add_axes([1, 1, 0.65, 0.03])
+            # sfreq = Slider(mp_slider_ax, 'Freq', 0.1, 30.0, valinit=10)
         self.draw()
         return self.cax,
 
