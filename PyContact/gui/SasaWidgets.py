@@ -14,6 +14,7 @@ from ..core.multi_accumulation import chunks
 from ..core.Biochemistry import vdwRadius
 from ..core.LogPool import *
 from ..cy_modules import cy_gridsearch
+from ..cy_modules import cy_sasa_cuda
 from Dialogues import TopoTrajLoaderDialog
 from ErrorBox import ErrorBox
 from ErrorMessages import ErrorMessages
@@ -49,6 +50,26 @@ def calculate_sasa_parallel(input_coords, natoms, pairdist, nprad,
     return temp_sasa
 
 
+def calculate_sasa_cuda(input_coords, natoms, pairdist, nprad,
+                        surfacePoints, probeRadius, pointstyle,
+                        restricted, restrictedList):
+
+    temp_sasa = []
+    # print(len(input_coords))
+    coords = np.reshape(input_coords, (1, natoms * 3))
+    npcoords = np.array(coords, dtype=np.float32)
+    npcoords = npcoords[0]
+    # print("start C")
+    # startC = time.time()
+    asa = cy_sasa_cuda.cy_sasa_cuda(npcoords, natoms, pairdist, nprad, surfacePoints, probeRadius,
+                                    pointstyle, restricted, restrictedList)
+    # stopC = time.time()
+    # print("time for grid search: ", (stopC - startC))
+    # print("asa:", asa)
+    return asa
+
+
+
 class SasaWidget(QWidget, Ui_SasaWidget):
     """Provides a UI for the SASA calculation, including restriction selection and contact area calculation."""
     def __init__(self, parent=None):
@@ -70,7 +91,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         self.previewPlot = SimplePlotter(None, width=5, height=2, dpi=60)
         self.graphGridLayout.addWidget(self.previewPlot)
         self.gridLayout.addWidget(self.sasaProgressBar, 8, 1, 1, 2)
-        self.calcSasaButton.clicked.connect(self.calculateSasa)
+        self.calcSasaButton.clicked.connect(self.calculateSasaCuda)
         self.loadDataButton.clicked.connect(self.loadData)
         self.clearDataButton.clicked.connect(self.clearData)
         self.savePlotButton.clicked.connect(self.savePlot)
@@ -130,6 +151,94 @@ class SasaWidget(QWidget, Ui_SasaWidget):
             for i in range(self.totalFramesToProcess):
                 f.write(str(i) + "\t" + str(self.allSasas[i]) + "\n")
             f.close()
+
+    def calculateSasaCuda(self):
+        """Computes the SASA of the given selections."""
+        print("Calculating SASA with CUDA support")
+        from PyContact.exampleData.datafiles import DCD, PSF
+
+        self.psf = PSF
+        self.dcd = DCD
+
+        self.allSasas = []
+
+        # load psf and trajectory, make lists with radii and coordinates
+        if self.psf == "" or self.dcd == "":
+            e = ErrorBox(ErrorMessages.CHOOSEFILE)
+            e.exec_()
+            return
+
+        try:
+            u = MDAnalysis.Universe(self.psf, self.dcd)
+        except IOError:
+            e = ErrorBox(ErrorMessages.FILE_NOT_FOUND)
+            e.exec_()
+            return
+
+        probeRadius = 1.4
+
+        # seltext = "segid UBQ"
+        # resseltext = "segid UBQ and same residue as around 5.0 (segid RN11)"
+        seltext = self.sasaSelection1TextField.text()
+        seltext2 = self.sasaSelection2TextField.text()
+        resseltext = self.sasaRestrictionTextField.text()
+
+        seltext = "protein"
+
+        # 0=spiral, 1=random (VMD)
+        pointstyle = 1
+        # number of points to approximate the sphere
+        surfacePoints = 50
+        # pair distance
+        pairdist = 2.0 * (2.0 + 1.4)
+
+        if resseltext != "":
+            restricted = 1
+        else:
+            restricted = 0
+
+        selection = u.select_atoms(seltext)
+
+        radius = []
+        restrictedList = []
+        if restricted:
+            ressel = u.select_atoms(resseltext)
+            for s in selection.atoms:
+                if s in ressel.atoms:
+                    restrictedList.append(1)
+                else:
+                    restrictedList.append(0)
+                radius.append(vdwRadius(s.name[0]))
+        else:
+            restrictedList = [0]
+            for s in selection.atoms:
+                radius.append(vdwRadius(s.name[0]))
+        natoms = len(selection)
+        nprad = np.array(radius, dtype=np.float32)
+        restrictedList = np.array(restrictedList, dtype=np.int32)
+
+        # TODO: bug if selection is not static for all frames
+        # TODO: dynamic allocation of positions in every frame!
+        input_coords = []
+        for ts in u.trajectory:
+            input_coords.append(selection.positions)
+
+        results = []
+        trajLength = len(u.trajectory)
+        self.totalFramesToProcess = trajLength
+        for frame in range(self.totalFramesToProcess):
+            self.allSasas.append(calculate_sasa_cuda(input_coords[frame], natoms, pairdist, nprad,
+                                               surfacePoints, probeRadius, pointstyle,
+                                               restricted, restrictedList))
+
+        print("SASA Results: ", self.allSasas)
+        sip.delete(self.previewPlot)
+        self.previewPlot = SimplePlotter(None, width=5, height=2, dpi=60)
+        self.previewPlot.plot(np.arange(0, trajLength, 1), self.allSasas)
+        self.previewPlot.axes.set_xlabel("frame")
+        self.previewPlot.axes.set_ylabel(r'SASA [A$^\circ$^2]')
+        self.graphGridLayout.addWidget(self.previewPlot)
+        self.previewPlot.update()
 
     def calculateSasa(self):
         """Computes the SASA of the given selections."""
