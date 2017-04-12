@@ -19,6 +19,7 @@ from SasaWidgets import SasaWidget
 from Canvas import Canvas
 from Dialogues import FileLoaderDialog, AnalysisDialog
 from ExportTabWidget import ExportTabWidget
+from Statistics import Statistics
 from Plotters import *
 from ..core.ContactAnalyzer import *
 from ErrorBox import ErrorBox
@@ -98,6 +99,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         # setup of extra widgets
         self.exportWidget = ExportTabWidget()
         self.sasaView = SasaWidget()
+        self.statisticsView = None
 
         self.analysis_state = False
 
@@ -406,39 +408,8 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             box = ErrorBox(ErrorMessages.NOSCORES_PROMPTANALYSIS)
             box.exec_()
             return
-        d = QDialog()
-        grid = QGridLayout()
-        d.setLayout(grid)
-
-        numberTitleLabel = QLabel("total number of contacts:")
-        numberLabel = QLabel(str(len(self.contacts)))
-
-        numberFramesTitleLabel = QLabel("number of frames:")
-        numberFramesLabel = QLabel(str(len(self.contacts[0].scoreArray)))
-
-        meanTitleLabel = QLabel("mean contact score:")
-        meanLabel = QLabel(str(mean_score_of_contactArray(self.contacts)))
-
-        medianTitleLabel = QLabel("median score:")
-        medianLabel = QLabel(str(median_score_of_contactArray(self.contacts)))
-
-        grid.addWidget(numberTitleLabel, 0, 0)
-        grid.addWidget(numberLabel, 0, 1)
-        grid.addWidget(numberFramesTitleLabel, 1, 0)
-        grid.addWidget(numberFramesLabel, 1, 1)
-        grid.addWidget(meanTitleLabel, 2, 0)
-        grid.addWidget(meanLabel, 2, 1)
-
-        grid.addWidget(medianTitleLabel, 2, 2)
-        grid.addWidget(medianLabel, 2, 3)
-
-        allContactPlot = ContactPlotter(None, width=4, height=2, dpi=80)
-        allContactPlot.plot_all_contacts_figure(self.contacts)
-        grid.addWidget(allContactPlot, 3, 0, 1, 4)
-        d.setWindowTitle("Statistics")
-        d.resize(600, 450)
-        d.setWindowModality(Qt.ApplicationModal)
-        d.exec_()
+        self.statisticsView = Statistics(self.contacts)
+        self.statisticsView.showNormal()
 
     def showDeveloperInfo(self):
         """Shows information about the contributing authors."""
