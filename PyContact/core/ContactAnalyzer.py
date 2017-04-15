@@ -17,7 +17,7 @@ import numpy as np
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject
 
 # TODO: fix aroundPatch with gridsearch in C code using cython
-from .aroundPatch import AroundSelection
+#from .aroundPatch import AroundSelection
 
 from ..db.DbReader import *
 from .Biochemistry import (AccumulatedContact, AtomContact, AccumulationMapIndex, AtomType, HydrogenBond, AtomHBondType,
