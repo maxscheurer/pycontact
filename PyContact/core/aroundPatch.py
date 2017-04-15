@@ -1,4 +1,4 @@
-from MDAnalysis.core.selection import *
+from MDAnalysis.core.Selection import *
 import numpy as np
 
 from ..cy_modules import cy_gridsearch

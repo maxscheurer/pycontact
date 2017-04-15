@@ -43,7 +43,7 @@ setup(
     package_dir = {'PyContact': 'PyContact'},
     packages=find_packages(),
 
-    install_requires = ['numpy','matplotlib','mdanalysis>=0.16'],
+    install_requires = ['numpy','matplotlib','mdanalysis==0.15'],
     cmdclass = {'build_ext': build_ext},
     ext_modules = cythonize(extensions),
 
