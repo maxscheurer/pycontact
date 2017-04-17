@@ -288,7 +288,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
                 all_sasas2.extend(r.get())
 
             diff_list = []
-            for sasa_value1, sasa_value2 in zip(all_sasas, all_sasas2):
+            for sasa_value1, sasa_value2 in zip(self.allSasas, all_sasas2):
                 diff_list.append(sasa_value1 - sasa_value2)
             self.allSasas = diff_list
 
@@ -296,7 +296,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         self.previewPlot = SimplePlotter(None, width=5, height=2, dpi=60)
         self.previewPlot.plot(np.arange(0, trajLength, 1), self.allSasas)
         self.previewPlot.axes.set_xlabel("frame")
-        self.previewPlot.axes.set_ylabel(r'SASA [A$^\circ$^2]')
+        self.previewPlot.axes.set_ylabel(r'SASA [A$^{\circ}$$^{2}$]')
         self.graphGridLayout.addWidget(self.previewPlot)
         self.previewPlot.update()
 
