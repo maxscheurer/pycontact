@@ -33,4 +33,5 @@ class Statistics(QWidget, Ui_Statistics):
 
         self.contactPlotter = ContactPlotter(None, width=4, height=2, dpi=80)
         self.contactPlotter.plot_all_contacts_figure(self.contacts)
+        # self.contactPlotter.plot_hbondNumber(self.contacts)
         self.plotGridLayout.addWidget(self.contactPlotter)

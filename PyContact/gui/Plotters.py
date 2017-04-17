@@ -56,6 +56,20 @@ class ContactPlotter(MplPlotter):
         self.axes.set_xlabel("frame")
         self.axes.set_ylabel("score")
 
+    def plot_hbondNumber(self, contacts):
+        values = []
+        for c in contacts:
+            c.hbondFramesScan()
+
+        for frame in range(len(contacts[0].scoreArray)):
+            current = 0
+            for c in contacts:
+                current += c.hbondFrames[frame]
+            values.append(current)
+        self.axes.plot(values)
+        self.axes.set_xlabel("frame")
+        self.axes.set_ylabel("hbond number")
+
 
 class ContactPlotParameters:
     """Parameter for the contact plotter."""
