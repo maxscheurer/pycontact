@@ -55,7 +55,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.filteredContacts = []
         self.setupUi(self)
 
-        self.setWindowTitle("pyContact")
+        self.setWindowTitle("PyContact")
 
         # painter contains both labels and frame boxes for drawing
         self.painter = Canvas()
