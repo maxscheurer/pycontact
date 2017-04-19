@@ -11,6 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Statistics(object):
     def setupUi(self, Statistics):
         Statistics.setObjectName("Statistics")
+        Statistics.setWindowModality(QtCore.Qt.WindowModal)
         Statistics.resize(653, 425)
         self.gridLayout = QtWidgets.QGridLayout(Statistics)
         self.gridLayout.setObjectName("gridLayout")
