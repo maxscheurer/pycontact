@@ -212,9 +212,9 @@ class AnalysisDialog(QDialog):
     def mapping(self):
         """Creates the Accumulation maps from the checkbox values."""
         # atom types will not be supported in the future
-        map1 = [self.index1Checkbox.isChecked(), 0, self.name1Checkbox.isChecked(), self.resid1Checkbox.isChecked(),
+        map1 = [self.index1Checkbox.isChecked(), self.name1Checkbox.isChecked(), self.resid1Checkbox.isChecked(),
                 self.resname1Checkbox.isChecked(), self.segid1Checkbox.isChecked()]
-        map2 = [self.index2Checkbox.isChecked(), 0, self.name2Checkbox.isChecked(), self.resid2Checkbox.isChecked(),
+        map2 = [self.index2Checkbox.isChecked(), self.name2Checkbox.isChecked(), self.resid2Checkbox.isChecked(),
                 self.resname2Checkbox.isChecked(), self.segid2Checkbox.isChecked()]
         print("Accumulation maps: ", map1, map2)
         return [map1, map2]

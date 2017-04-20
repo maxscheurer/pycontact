@@ -276,8 +276,16 @@ class Analyzer(QObject):
         for atom in backbone_sel:
             self.backbone.append(atom.index)
 
-        sel1 = u.select_atoms(sel1text)
-        sel2 = u.select_atoms(sel2text)
+
+        # check if self-interaction is wanted
+        selfInteraction = False
+        if sel2text == "self":
+            sel1 = u.select_atoms(sel1text)
+            sel2 = u.select_atoms(sel1text)
+            selfInteraction = True
+        else:
+            sel1 = u.select_atoms(sel1text)
+            sel2 = u.select_atoms(sel2text)
 
         contactResults = []
         # loop over trajectory
@@ -316,6 +324,10 @@ class Analyzer(QObject):
                 if re.match("H(.*)", self.name_array[convindex1]) or re.match("H(.*)", self.name_array[convindex2]):
                     continue
                     # distance between atom1 and atom2
+                # check if residues are more than 4 apart, and in the same segment
+                if selfInteraction:
+                    if (self.resid_array[convindex1] - self.resid_array[convindex2]) < 5 and self.segids[convindex1] == self.segids[convindex2]:
+                        continue
                 distance = distarray[idx1, idx2]
                 weight = self.weight_function(distance)
 
