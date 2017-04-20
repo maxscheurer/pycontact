@@ -231,8 +231,8 @@ class Analyzer(QObject):
     def makeKeyFromKeyArrays(key1, key2):
         """Returns a human readable key from two key arrays.
             example:
-            keys1=["none","none","none","14", "VAL", "none"]
-            keys2=["none","none","none","22", "ILE, "none"]
+            keys1=["none","none","14", "VAL", "none"]
+            keys2=["none","none","22", "ILE", "none"]
             returns a human readable key with the mapping identifiers in AccumulationMapIndex
             in the given example data:
             key="r.14rn.VAL-r.22rn.ILE"
@@ -330,12 +330,6 @@ class Analyzer(QObject):
                         continue
                 distance = distarray[idx1, idx2]
                 weight = self.weight_function(distance)
-
-                # read AtomHBondType from heavyatoms list
-                # TODO: FF independent?
-                # type1 = next((x.htype for x in heavyatoms if x.name == self.type_array[convindex1]), AtomHBondType.none)
-                # type2 = next((x.htype for x in heavyatoms if x.name == self.type_array[convindex2]), AtomHBondType.none)
-
 
                 # HydrogenBondAlgorithm
                 hydrogenBonds = []
