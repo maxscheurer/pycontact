@@ -19,9 +19,7 @@ from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject
 # TODO: fix aroundPatch with gridsearch in C code using cython
 from .aroundPatch import AroundSelection
 
-from ..db.DbReader import *
-from .Biochemistry import (AccumulatedContact, AtomContact, AccumulationMapIndex, AtomType, HydrogenBond, AtomHBondType,
-                           TempContactAccumulate)
+from .Biochemistry import (AccumulatedContact, AtomContact, AccumulationMapIndex, AtomType, HydrogenBond, AtomHBondType, TempContactAccumulate, HydrogenBondAtoms)
 
 MDAnalysis.core.flags['use_periodic_selections'] = False
 MDAnalysis.core.flags['use_KDTree_routines'] = True
@@ -261,18 +259,7 @@ class Analyzer(QObject):
         return key
 
     def analyze_psf_dcd(self, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1text, sel2text):
-        """Reading topology/parameter CHARMM files for setting AtomTypes and AtomHBondTypes"""
-        heavyatomlines = []
-        heavyatoms = []
-        pars = open(os.path.dirname(os.path.abspath(__file__)) + '/testpar.prm', 'r')
-        for line in pars:
-            if re.match("MASS", line):
-                heavyatomlines.append(line.rstrip())
-        for atomline in heavyatomlines:
-            # read new AtomType and its corresponding AtomHBondType from file
-            atype = AtomType.parseParameterFileString(atomline)
-            # print(atomline, atype.htype)
-            heavyatoms.append(atype)
+        """Reading topology/trajectory and assessing hbonds"""
 
         # load psf and dcd file in memory
         u = MDAnalysis.Universe(psf, dcd)
@@ -349,18 +336,7 @@ class Analyzer(QObject):
                 # HydrogenBondAlgorithm
                 hydrogenBonds = []
                 # FF independent hydrogen bonds
-                if (self.name_array[convindex1].startswith("N") and self.name_array[convindex2].startswith("O")) \
-                    or (self.name_array[convindex1].startswith("N") and self.name_array[convindex2].startswith("N")) \
-                    or (self.name_array[convindex1].startswith("O") and self.name_array[convindex2].startswith("N")) \
-                    or (self.name_array[convindex1].startswith("O") and self.name_array[convindex2].startswith("O")):
-                # if type1 != AtomHBondType.none and type2 != AtomHBondType.none:
-                    # if (type1 == AtomHBondType.both and type2 == AtomHBondType.both) or \
-                    #         (type1 == AtomHBondType.acc and type2 == AtomHBondType.don) or \
-                    #         (type1 == AtomHBondType.don and type2 == AtomHBondType.acc) or \
-                    #         (type1 == AtomHBondType.both and type2 == AtomHBondType.acc) or \
-                    #         (type1 == AtomHBondType.acc and type2 == AtomHBondType.both) or \
-                    #         (type1 == AtomHBondType.don and type2 == AtomHBondType.both) or \
-                    #         (type1 == AtomHBondType.both and type2 == AtomHBondType.don):
+                if (self.name_array[convindex1][0] in HydrogenBondAtoms.atoms and self.name_array[convindex2][0] in HydrogenBondAtoms.atoms):
                         # print("hbond? %s - %s" % (type_array[convindex1], type_array[convindex2]))
                         # search for hatom, check numbering in bond!!!!!!!!!!
                         b1 = self.bonds[convindex1]
@@ -409,8 +385,6 @@ class Analyzer(QObject):
                         # check hbond criteria for hydrogen atoms bound to first atom
                         for global_hatom in hydrogenAtomsBoundToAtom1:
                             conv_hatom = indices1.index(global_hatom)
-                            typeHeavy = next((x.htype for x in heavyatoms if x.name == self.type_array[convindex2]),
-                                             AtomHBondType.none)
                             # print(typeHeavy)
                             #
                             # TODO: FF independent version
@@ -438,8 +412,6 @@ class Analyzer(QObject):
                                     # print(angle)
                         for global_hatom in hydrogenAtomsBoundToAtom2:
                             conv_hatom = indices2.index(global_hatom)
-                            typeHeavy = next((x.htype for x in heavyatoms if x.name == self.type_array[convindex1]),
-                                             AtomHBondType.none)
                             # TODO: FF independent version
                             # if (typeHeavy == AtomHBondType.acc or typeHeavy == AtomHBondType.both) and (distarray[idx1, conv_hatom] <= hbondcutoff):
                             # FIXME: WTF?

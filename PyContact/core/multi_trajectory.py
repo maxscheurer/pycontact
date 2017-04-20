@@ -60,8 +60,7 @@ def loop_trajectory(sel1c, sel2c, indices1, indices2, config, suppl):
     bonds = suppl[1]
     # segids = comm.bcast(segids, root=0)
     # backbone = comm.bcast(backbone, root=0)
-    heavyatoms = suppl[2]
-    name_array = suppl[3]
+    name_array = suppl[2]
 
     allRankContacts = []
     # start = time.time()
@@ -82,16 +81,7 @@ def loop_trajectory(sel1c, sel2c, indices1, indices2, config, suppl):
             distance = distarray[idx1, idx2]
             weight = weight_function(distance)
             hydrogenBonds = []
-            type1 = next((xx.htype for xx in heavyatoms if xx.name == type_array[convindex1]), AtomHBondType.none)
-            type2 = next((xx.htype for xx in heavyatoms if xx.name == type_array[convindex2]), AtomHBondType.none)
-            if type1 != AtomHBondType.none and type2 != AtomHBondType.none:
-                if (type1 == AtomHBondType.both and type2 == AtomHBondType.both) or \
-                        (type1 == AtomHBondType.acc and type2 == AtomHBondType.don) or \
-                        (type1 == AtomHBondType.don and type2 == AtomHBondType.acc) or \
-                        (type1 == AtomHBondType.both and type2 == AtomHBondType.acc) or \
-                        (type1 == AtomHBondType.acc and type2 == AtomHBondType.both) or \
-                        (type1 == AtomHBondType.don and type2 == AtomHBondType.both) or \
-                        (type1 == AtomHBondType.both and type2 == AtomHBondType.don):
+            if (name_array[convindex1][0] in HydrogenBondAtoms.atoms and name_array[convindex2][0] in HydrogenBondAtoms.atoms):
                     # print("hbond? %s - %s" % (type_array[convindex1], type_array[convindex2]))
                     # search for hatom, check numbering in bond!!!!!!!!!!
                     b1 = bonds[convindex1]
@@ -134,9 +124,8 @@ def loop_trajectory(sel1c, sel2c, indices1, indices2, config, suppl):
 
                     for global_hatom in hydrogenAtomsBoundToAtom1:
                         conv_hatom = np.where(indices1[frame] == global_hatom)[0][0]
-                        typeHeavy = next((xx.htype for xx in heavyatoms if xx.name == type_array[convindex2]),
-                                         AtomHBondType.none)
-                        if (typeHeavy == AtomHBondType.acc or typeHeavy == AtomHBondType.both) and (distarray[conv_hatom, idx2] <= hbondcutoff):
+                        dist = distarray[conv_hatom, idx2]
+                        if dist <= hbondcutoff:
                             donorPosition = s1[idx1]
                             hydrogenPosition = s1[conv_hatom]
                             acceptorPosition = s2[idx2]
@@ -147,7 +136,6 @@ def loop_trajectory(sel1c, sel2c, indices1, indices2, config, suppl):
                             dot = np.dot(v1, v2)
                             angle = np.degrees(np.arccos(dot / (v1norm * v2norm)))
                             if angle >= hbondcutangle:
-                                dist = distarray[conv_hatom, idx2]
                                 new_hbond = HydrogenBond(convindex1, convindex2, global_hatom, dist, angle,
                                                          hbondcutoff,
                                                          hbondcutangle)
@@ -157,9 +145,8 @@ def loop_trajectory(sel1c, sel2c, indices1, indices2, config, suppl):
                             # print angle
                     for global_hatom in hydrogenAtomsBoundToAtom2:
                         conv_hatom = np.where(indices2[frame] == global_hatom)[0][0]
-                        typeHeavy = next((xx.htype for xx in heavyatoms if xx.name == type_array[convindex1]),
-                                         AtomHBondType.none)
-                        if (typeHeavy == AtomHBondType.acc or typeHeavy == AtomHBondType.both) and (distarray[idx1, conv_hatom] <= hbondcutoff):
+                        dist = distarray[idx1, conv_hatom]
+                        if dist <= hbondcutoff:
                             donorPosition = s2[idx2]
                             hydrogenPosition = s2[conv_hatom]
                             acceptorPosition = s1[idx1]
@@ -170,7 +157,6 @@ def loop_trajectory(sel1c, sel2c, indices1, indices2, config, suppl):
                             dot = np.dot(v1, v2)
                             angle = np.degrees(np.arccos(dot / (v1norm * v2norm)))
                             if angle >= hbondcutangle:
-                                dist = distarray[idx1, conv_hatom]
                                 new_hbond = HydrogenBond(convindex2, convindex1, global_hatom, dist, angle,
                                                          hbondcutoff,
                                                          hbondcutangle)
@@ -189,17 +175,6 @@ def run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1t
     pool = LoggingPool(nproc)
     # manager = multiprocessing.Manager()
     # d=manager.list(trajArgs)
-
-    heavyatomlines = []
-    heavyatoms = []
-    pars = open(os.path.dirname(os.path.abspath(__file__)) + '/testpar.prm', 'r')
-    for line in pars:
-        if re.match("MASS", line):
-            heavyatomlines.append(line.rstrip())
-    for atomline in heavyatomlines:
-        # read new AtomType and its corresponding AtomHBondType from file
-        atype = AtomType.parseParameterFileString(atomline)
-        heavyatoms.append(atype)
 
     # load psf and dcd
     u = MDAnalysis.Universe(psf, dcd)
@@ -259,9 +234,9 @@ def run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1t
     sel2c = chunks(sel2coords, nproc)
     sel1ind = chunks(indices1, nproc)
     sel2ind = chunks(indices2, nproc)
-    print(len(sel1ind), len(sel2ind))
+    # print(len(sel1ind), len(sel2ind))
     # show trajectory information and selection information
-    print("trajectory with %d frames loaded" % len(u.trajectory))
+    # print("trajectory with %d frames loaded" % len(u.trajectory))
 
     print("Running on %d cores" % nproc)
     results = []
@@ -269,17 +244,17 @@ def run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1t
     for c in zip(sel1c, sel2c, sel1ind, sel2ind):
         results.append(pool.apply_async(loop_trajectory, args=(c[0], c[1], c[2], c[3],
                                                                [cutoff, hbondcutoff, hbondcutangle],
-                                                               [type_array, bonds, heavyatoms, name_array])))
+                                                               [type_array, bonds, name_array])))
         rank += 1
     pool.close()
     pool.join()
     stop = time.time()
-    print("time: ", str(stop-start), rank)
+    # print("time: ", str(stop-start), rank)
     allContacts = []
     for res in results:
         rn = res.get()
-        print(len(rn))
+        # print(len(rn))
         allContacts.extend(rn)
     # pickle.dump(allContacts,open("parallel_results.dat","w"))
-    print("frames: ", len(allContacts))
+    # print("frames: ", len(allContacts))
     return [allContacts, resname_array, resid_array, name_array, type_array, segids, backbone]
