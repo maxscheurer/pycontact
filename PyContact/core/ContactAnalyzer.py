@@ -77,7 +77,7 @@ class Analyzer(QObject):
 
     def setTrajectoryData(
             self, resname_array, resid_array, name_array,
-            type_array, segids, backbone,
+            segids, backbone,
             sel1text, sel2text):
         self.resname_array = resname_array
         self.resid_array = resid_array
