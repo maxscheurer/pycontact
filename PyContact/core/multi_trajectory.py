@@ -47,7 +47,7 @@ class ConvBond(object):
         return self.indices
 
 
-def loop_trajectory(sel1c, sel2c, indices1, indices2, config, suppl):
+def loop_trajectory(sel1c, sel2c, indices1, indices2, config, suppl, selfInteraction):
     """Invoked to analyze trajectory chunk for contacts as a single thread."""
     # print(len(sel1c) , len(sel2c))
     # indices1 = suppl[0]
@@ -60,6 +60,12 @@ def loop_trajectory(sel1c, sel2c, indices1, indices2, config, suppl):
     # segids = comm.bcast(segids, root=0)
     # backbone = comm.bcast(backbone, root=0)
     name_array = suppl[1]
+
+    resid_array = []
+    segids = []
+    if (selfInteraction):
+        resid_array = suppl[2]
+        segids = suppl[3]
 
     allRankContacts = []
     # start = time.time()
@@ -76,6 +82,9 @@ def loop_trajectory(sel1c, sel2c, indices1, indices2, config, suppl):
             # hydrogen bonds can still be detected!
             if re.match("H(.*)", name_array[convindex1]) or re.match("H(.*)", name_array[convindex2]):
                 continue
+            if selfInteraction:
+                if (resid_array[convindex1] - resid_array[convindex2]) < 5 and segids[convindex1] == segids[convindex2]:
+                    continue
             # distance between atom1 and atom2
             distance = distarray[idx1, idx2]
             weight = weight_function(distance)
@@ -178,8 +187,15 @@ def run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1t
     # load psf and dcd
     u = MDAnalysis.Universe(psf, dcd)
     # define selections according to sel1text and sel2text
-    sel1 = u.select_atoms(sel1text)
-    sel2 = u.select_atoms(sel2text)
+
+    selfInteraction = False
+    if sel2text == "self":
+        sel1 = u.select_atoms(sel1text)
+        sel2 = u.select_atoms(sel1text)
+        selfInteraction = True
+    else:
+        sel1 = u.select_atoms(sel1text)
+        sel2 = u.select_atoms(sel2text)
 
     # write properties of all atoms to lists
     all_sel = u.select_atoms("all")
@@ -239,9 +255,14 @@ def run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1t
     results = []
     rank = 0
     for c in zip(sel1c, sel2c, sel1ind, sel2ind):
-        results.append(pool.apply_async(loop_trajectory, args=(c[0], c[1], c[2], c[3],
+        if (selfInteraction):
+            results.append(pool.apply_async(loop_trajectory, args=(c[0], c[1], c[2], c[3],
                                                                [cutoff, hbondcutoff, hbondcutangle],
-                                                               [bonds, name_array])))
+                                                               [bonds, name_array, resid_array, segids], selfInteraction)))
+        else:
+            results.append(pool.apply_async(loop_trajectory, args=(c[0], c[1], c[2], c[3],
+                                                               [cutoff, hbondcutoff, hbondcutangle],
+                                                               [bonds, name_array], selfInteraction)))
         rank += 1
     pool.close()
     pool.join()

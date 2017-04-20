@@ -54,6 +54,14 @@ class PsfDcdReadingTest(TestCase):
             # hbond_sum += c.hbond_percentage()
         # self.assertEqual(hbond_sum, 676.0)
 
+    def test_selfInteraction_analysis_parallel(self):
+        analyzer = Analyzer(self.psffile, self.dcdfile, 5.0, 2.5, 120, "segid RN11", "self")
+        analyzer.runFrameScan(2)
+        self.assertEqual(len(analyzer.contactResults), 50)
+        map1 = [0, 0, 1, 1, 0]
+        map2 = [0, 0, 1, 1, 0]
+        analyzer.runContactAnalysis(map1, map2, 1)
+
     def test_multiCore_analysis(self):
         analyzer = Analyzer(self.psffile, self.dcdfile, 5.0, 2.5, 120, "segid RN11", "segid UBQ")
         analyzer.runFrameScan(2)
