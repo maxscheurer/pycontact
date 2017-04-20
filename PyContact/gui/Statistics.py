@@ -35,4 +35,3 @@ class Statistics(QWidget, Ui_Statistics):
         self.contactPlotter.plot_all_contacts_figure(self.contacts)
         # self.contactPlotter.plot_hbondNumber(self.contacts)
         self.plotGridLayout.addWidget(self.contactPlotter)
-        self.contactPlotter.saveFigure("hbonds","eps")
