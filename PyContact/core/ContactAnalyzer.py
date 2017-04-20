@@ -279,6 +279,7 @@ class Analyzer(QObject):
 
         # check if self-interaction is wanted
         selfInteraction = False
+
         if sel2text == "self":
             sel1 = u.select_atoms(sel1text)
             sel2 = u.select_atoms(sel1text)
@@ -286,6 +287,10 @@ class Analyzer(QObject):
         else:
             sel1 = u.select_atoms(sel1text)
             sel2 = u.select_atoms(sel2text)
+
+        if (len(sel1.atoms) == 0 or len(sel2.atoms) == 0):
+            # TODO: throw an exception
+            return None
 
         contactResults = []
         # loop over trajectory
