@@ -56,11 +56,10 @@ def loop_trajectory(sel1c, sel2c, indices1, indices2, config, suppl):
     # resname_array = comm.bcast(resname_array, root=0)
     # resid_array = comm.bcast(resid_array, root=0)
     # name_array = comm.bcast(name_array, root=0)
-    type_array = suppl[0]
-    bonds = suppl[1]
+    bonds = suppl[0]
     # segids = comm.bcast(segids, root=0)
     # backbone = comm.bcast(backbone, root=0)
-    name_array = suppl[2]
+    name_array = suppl[1]
 
     allRankContacts = []
     # start = time.time()
@@ -100,7 +99,7 @@ def loop_trajectory(sel1c, sel2c, indices1, indices2, config, suppl):
                             # for j in bondindices1:
                             #     print(self.type_array[j+1])
                             hydrogenidx = next(
-                                (j for j in bondindices1 if type_array[j].startswith("H")), -1)
+                                (j for j in bondindices1 if name_array[j].startswith("H")), -1)
                             if hydrogenidx != -1:
                                 # print(self.type_array[hydrogenidx])
                                 hydrogenAtomsBoundToAtom1.append(hydrogenidx)
@@ -116,7 +115,7 @@ def loop_trajectory(sel1c, sel2c, indices1, indices2, config, suppl):
                             # print("h bond to atom2")
                             bondindices2 = b2.to_indices()[bondcount2]
                             hydrogenidx = next(
-                                (k for k in bondindices2 if type_array[k].startswith("H")), -1)
+                                (k for k in bondindices2 if name_array[k].startswith("H")), -1)
                             if hydrogenidx != -1:
                                 # print(type_array[hydrogenidx])
                                 hydrogenAtomsBoundToAtom2.append(hydrogenidx)
@@ -188,7 +187,6 @@ def run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1t
     resname_array = []
     resid_array = []
     name_array = []
-    type_array = []
     bonds = []
     segids = []
     backbone = []
@@ -196,7 +194,6 @@ def run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1t
         resname_array.append(atom.resname)
         resid_array.append(atom.resid)
         name_array.append(atom.name)
-        type_array.append(atom.type)
         bonds.append(ConvBond(atom.bonds))
         segids.append(atom.segid)
     for atom in backbone_sel:
@@ -244,7 +241,7 @@ def run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1t
     for c in zip(sel1c, sel2c, sel1ind, sel2ind):
         results.append(pool.apply_async(loop_trajectory, args=(c[0], c[1], c[2], c[3],
                                                                [cutoff, hbondcutoff, hbondcutangle],
-                                                               [type_array, bonds, name_array])))
+                                                               [bonds, name_array])))
         rank += 1
     pool.close()
     pool.join()
@@ -257,4 +254,4 @@ def run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1t
         allContacts.extend(rn)
     # pickle.dump(allContacts,open("parallel_results.dat","w"))
     # print("frames: ", len(allContacts))
-    return [allContacts, resname_array, resid_array, name_array, type_array, segids, backbone]
+    return [allContacts, resname_array, resid_array, name_array, segids, backbone]

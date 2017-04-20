@@ -45,7 +45,6 @@ class Analyzer(QObject):
         self.resname_array = []
         self.resid_array = []
         self.name_array = []
-        self.type_array = []
         self.segids = []
         self.backbone = []
         self.finalAccumulatedContacts = []
@@ -61,7 +60,7 @@ class Analyzer(QObject):
             self.contactResults = self.analyze_psf_dcd(self.psf, self.dcd, self.cutoff, self.hbondcutoff,
                                                        self.hbondcutangle, self.sel1text, self.sel2text)
         else:
-            self.contactResults, self.resname_array, self.resid_array, self.name_array, self.type_array, self.segids, \
+            self.contactResults, self.resname_array, self.resid_array, self.name_array, self.segids, \
                             self.backbone = run_load_parallel(nproc, self.psf, self.dcd, self.cutoff, self.hbondcutoff,
                                                               self.hbondcutangle, self.sel1text, self.sel2text)
 
@@ -83,7 +82,6 @@ class Analyzer(QObject):
         self.resname_array = resname_array
         self.resid_array = resid_array
         self.name_array = name_array
-        self.type_array = type_array
         self.segids = segids
         self.backbone = backbone
         self.sel1text = sel1text
@@ -91,7 +89,7 @@ class Analyzer(QObject):
 
     def getTrajectoryData(self):
         return [self.resname_array, self.resid_array, self.name_array,
-                self.type_array, self.segids, self.backbone, self.sel1text,
+                self.segids, self.backbone, self.sel1text,
                 self.sel2text]
 
     def getFilePaths(self):
@@ -135,8 +133,6 @@ class Analyzer(QObject):
             if val == 1:
                 if counter == AccumulationMapIndex.index:
                     keys1.append(idx1)
-                elif counter == AccumulationMapIndex.atype:
-                    keys1.append(self.type_array[idx1])
                 elif counter == AccumulationMapIndex.name:
                     keys1.append(self.name_array[idx1])
                 elif counter == AccumulationMapIndex.resid:
@@ -154,8 +150,6 @@ class Analyzer(QObject):
             if val == 1:
                 if counter == AccumulationMapIndex.index:
                     keys2.append(idx2)
-                elif counter == AccumulationMapIndex.atype:
-                    keys2.append(self.type_array[idx2])
                 elif counter == AccumulationMapIndex.name:
                     keys2.append(self.name_array[idx2])
                 elif counter == AccumulationMapIndex.resid:
@@ -271,14 +265,12 @@ class Analyzer(QObject):
         self.resname_array = []
         self.resid_array = []
         self.name_array = []
-        self.type_array = []
         self.segids = []
         self.backbone = []
         for atom in all_sel.atoms:
             self.resname_array.append(atom.resname)
             self.resid_array.append(atom.resid)
             self.name_array.append(atom.name)
-            self.type_array.append(atom.type)
             self.bonds.append(atom.bonds)
             self.segids.append(atom.segid)
         for atom in backbone_sel:
