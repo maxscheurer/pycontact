@@ -26,6 +26,7 @@ class Detail(QWidget, Ui_Detail):
         self.nsPerFrame = nsPerFrame
         self.threshold = threshold
 
+        self.setWindowTitle(self.contact.title)
         self.labelTotalTime.setText(str(self.contact.total_time(self.nsPerFrame, self.threshold)))
         self.labelThreshold.setText(str(self.threshold))
         self.labelMedianScore.setText(str(self.contact.median_score()))
@@ -47,9 +48,7 @@ class Detail(QWidget, Ui_Detail):
         sip.delete(self.contactPlotter)
         self.contactPlotter = ContactPlotter(None, width=4, height=2, dpi=70)
         if self.attributeBox.currentText() == "Score":
-            self.contactPlotter.plot_all_contacts_figure(self.contacts)
-        elif self.attributeBox.currentText() == "hbond number":
-            self.contactPlotter.plot_hbondNumber(self.contacts)
+            self.contactPlotter.plot_contact_figure(self.contact)
         self.plotGridLayout.addWidget(self.contactPlotter)
 
     def savePlot(self):
