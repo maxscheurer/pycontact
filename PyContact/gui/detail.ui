@@ -166,11 +166,6 @@
        <string>Score</string>
       </property>
      </item>
-     <item>
-      <property name="text">
-       <string>hbond number</string>
-      </property>
-     </item>
     </widget>
    </item>
    <item row="7" column="1">

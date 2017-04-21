@@ -21,6 +21,8 @@ class LabelView(QWidget):
         self.checkboxes = []
         self.buttonWidths = []
         self.detailView = None
+        self.nsPerFrame = 0
+        self.threshold = 0
         self.initUI()
 
     def clean(self):
@@ -66,5 +68,5 @@ class LabelView(QWidget):
 
     def handleButton(self, data):
         """Show the detailed view when clicking on the contact label"""
-        self.detailView = Detail(self.contacts[data])
+        self.detailView = Detail(self.contacts[data], self.nsPerFrame, self.threshold)
         self.detailView.show()

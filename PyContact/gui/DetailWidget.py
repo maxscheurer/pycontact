@@ -19,10 +19,12 @@ from ..core.Biochemistry import mean_score_of_contactArray, median_score_of_cont
 
 
 class Detail(QWidget, Ui_Detail):
-    def __init__(self, data, parent=None):
+    def __init__(self, data, nsPerFrame, threshold, parent=None):
         super(QtWidgets.QWidget, self).__init__(parent)
         self.setupUi(self)
         self.contact = data
+        self.nsPerFrame = nsPerFrame
+        self.threshold = threshold
 
         self.labelTotalTime.setText(str(self.contact.total_time(self.nsPerFrame, self.threshold)))
         self.labelThreshold.setText(str(self.threshold))
