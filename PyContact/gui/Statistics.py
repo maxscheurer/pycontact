@@ -1,8 +1,4 @@
 from __future__ import print_function
-import sip
-import time
-import os
-
 
 from PyQt5.QtWidgets import QWidget, QApplication, QFileDialog
 import MDAnalysis

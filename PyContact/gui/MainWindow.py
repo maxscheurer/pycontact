@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import (QMainWindow, QTabWidget, QLabel, QDialog, QProgress
                              QApplication, QGridLayout, QFileDialog, QColorDialog, QWidget)
 from PyQt5.Qt import Qt, QColor
 from PyQt5.QtGui import QIntValidator
+from PyQt5.QtSvg import QSvgGenerator
 import numpy as np
 
 from . import MainQtGui
@@ -449,6 +450,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
     @QtCore.Slot(str, str)
     def handleExportUpdate(self, fileName, fileType):
         """Handles the paint event after the export of the current view has been initiated."""
+        print("test")
         if fileType == "PNG":
             if len(fileName) > 0:
                 print("Saving current view to ", fileName)
@@ -464,26 +466,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
                 self.painter.renderContact(generator)
         self.painter.rendered = False
         self.painter.repaint()
-
-    def pushSave(self):
-        """Handles the saving process to store the current view to file."""
-        fileName = QFileDialog.getSaveFileName(self, 'Export Path')
-        print(self.formatBox.currentText())
-        if self.formatBox.currentText() == "PNG":
-            if len(fileName[0]) > 0:
-                print("Saving current view to ", fileName[0])
-                currentView = self.painter.grab()
-                currentView.save(fileName[0])
-        elif self.formatBox.currentText() == "SVG":
-            if len(fileName[0]) > 0:
-                print("Saving current view to ", fileName[0])
-                generator = QSvgGenerator()
-                generator.setFileName(fileName[0])
-                generator.setSize(self.painter.size())
-                generator.setViewBox(self.painter.rect())
-                self.painter.renderContact(generator)
-        self.painter.rendered = False
-        self.painter.repaint()
+        self.painter.update()
 
     def showColorPicker(self):
         """Shows a color picker for the current view."""

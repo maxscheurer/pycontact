@@ -216,7 +216,7 @@ class Canvas(QWidget, QObject):
             rownumber += 1
 
         if generator:
-            row = 0
+            row = rowheight
             for c in self.contacts:
                 p.setPen(0)
                 # print(ContactType.colors[c.contactType])
