@@ -243,6 +243,9 @@ class ExportTabWidget(QTabWidget):
         fileName = QFileDialog.getSaveFileName(self, 'Export Path')
         if len(fileName[0]) > 0:
             path, file_extension = os.path.splitext(fileName[0])
+            if file_extension == "":
+                file_extension = "." + self.tab2.formatBox.currentText().lower()
+            path += file_extension
             self.tab2.histPlot.saveFigure(path, self.tab2.formatBox.currentText())
 
     def saveMap(self):
