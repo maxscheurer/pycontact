@@ -61,6 +61,11 @@ class PsfDcdReadingTest(TestCase):
         except:
             print("Error in atom selection caught.")
 
+        try:
+            analyzer.runFrameScan(4)
+        except:
+            print("Error in atom selection (multicore) caught.")
+
     def test_selfInteraction_analysis_parallel(self):
         analyzer = Analyzer(self.psffile, self.dcdfile, 5.0, 2.5, 120, "segid RN11", "self")
         analyzer.runFrameScan(2)

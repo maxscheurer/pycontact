@@ -292,7 +292,6 @@ class Analyzer(QObject):
             sel2 = u.select_atoms(sel2text)
 
         if (len(sel1.atoms) == 0 or len(sel2.atoms) == 0):
-            # TODO: throw an exception
             raise Exception
 
         contactResults = []

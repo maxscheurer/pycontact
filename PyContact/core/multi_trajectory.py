@@ -215,6 +215,9 @@ def run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1t
     for atom in backbone_sel:
         backbone.append(atom.index)
 
+    if (len(sel1.atoms) == 0 or len(sel2.atoms) == 0):
+        raise Exception
+
     sel1coords = []
     sel2coords = []
     # start = time.time()
