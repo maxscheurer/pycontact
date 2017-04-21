@@ -116,6 +116,8 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.updateSettings()
         self.updateFilters()
 
+        self.actionDefault.setText("Load sample data")
+
     def showVMDControlPanel(self):
         """Shows the VMD control panel, to remotely access VMD from PyContact."""
         self.vmdpanel.show()
