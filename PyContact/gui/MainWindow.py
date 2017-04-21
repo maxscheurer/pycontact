@@ -276,6 +276,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.painter.colorScheme = self.colorScheme
         self.painter.customColor = self.customColor
         self.painter.repaint()
+        self.painter.update()
 
     def updateFilters(self):
         """Updates the chosen filters in MainWindow."""
@@ -387,6 +388,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
                     self.painter.contacts = self.filteredContacts
                     self.painter.rendered = False
                     self.painter.repaint()
+                    self.painter.update()
                     if len(self.filteredContacts) == 0:
                         self.painter.labelView.clean()
             else:
@@ -395,6 +397,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
                 self.painter.contacts = self.filteredContacts
                 self.painter.rendered = False
                 self.painter.repaint()
+                self.painter.update()
 
         # Update data for export
         self.exportWidget.setContacts(self.filteredContacts)

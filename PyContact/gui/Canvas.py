@@ -55,9 +55,9 @@ class Canvas(QWidget, QObject):
             self.clickedColumn = int((x - self.timeLineXOrigin) / self.offset)
             # print("clickedRow: " + str(self.clickedRow))
             self.rendered = False
-            self.update()
-            self.paintEvent(QPaintEvent(QRect(0, 0, self.sizeX, self.sizeY)))
             self.clickedRowSignal.emit()
+            self.repaint()
+            self.update()
 
     def mouseReleaseEvent(self, event):
         pass
