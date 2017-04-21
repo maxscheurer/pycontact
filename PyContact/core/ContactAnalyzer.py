@@ -19,9 +19,7 @@ from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject
 # TODO: fix aroundPatch with gridsearch in C code using cython
 from .aroundPatch import AroundSelection
 
-from ..db.DbReader import *
-from .Biochemistry import (AccumulatedContact, AtomContact, AccumulationMapIndex, AtomType, HydrogenBond, AtomHBondType,
-                           TempContactAccumulate)
+from .Biochemistry import (AccumulatedContact, AtomContact, AccumulationMapIndex, AtomType, HydrogenBond, AtomHBondType, TempContactAccumulate, HydrogenBondAtoms)
 
 MDAnalysis.core.flags['use_periodic_selections'] = False
 MDAnalysis.core.flags['use_KDTree_routines'] = True
@@ -47,7 +45,6 @@ class Analyzer(QObject):
         self.resname_array = []
         self.resid_array = []
         self.name_array = []
-        self.type_array = []
         self.segids = []
         self.backbone = []
         self.finalAccumulatedContacts = []
@@ -59,13 +56,16 @@ class Analyzer(QObject):
 
     def runFrameScan(self, nproc):
         """Performs a contact search using nproc threads."""
-        if nproc == 1:
-            self.contactResults = self.analyze_psf_dcd(self.psf, self.dcd, self.cutoff, self.hbondcutoff,
+        try:
+            if nproc == 1:
+                self.contactResults = self.analyze_psf_dcd(self.psf, self.dcd, self.cutoff, self.hbondcutoff,
                                                        self.hbondcutangle, self.sel1text, self.sel2text)
-        else:
-            self.contactResults, self.resname_array, self.resid_array, self.name_array, self.type_array, self.segids, \
+            else:
+                self.contactResults, self.resname_array, self.resid_array, self.name_array, self.segids, \
                             self.backbone = run_load_parallel(nproc, self.psf, self.dcd, self.cutoff, self.hbondcutoff,
                                                               self.hbondcutangle, self.sel1text, self.sel2text)
+        except:
+            raise Exception
 
     def runContactAnalysis(self, map1, map2, nproc):
         """Performs a contadt analysis using nproc threads."""
@@ -80,12 +80,11 @@ class Analyzer(QObject):
 
     def setTrajectoryData(
             self, resname_array, resid_array, name_array,
-            type_array, segids, backbone,
+            segids, backbone,
             sel1text, sel2text):
         self.resname_array = resname_array
         self.resid_array = resid_array
         self.name_array = name_array
-        self.type_array = type_array
         self.segids = segids
         self.backbone = backbone
         self.sel1text = sel1text
@@ -93,7 +92,7 @@ class Analyzer(QObject):
 
     def getTrajectoryData(self):
         return [self.resname_array, self.resid_array, self.name_array,
-                self.type_array, self.segids, self.backbone, self.sel1text,
+                self.segids, self.backbone, self.sel1text,
                 self.sel2text]
 
     def getFilePaths(self):
@@ -137,8 +136,6 @@ class Analyzer(QObject):
             if val == 1:
                 if counter == AccumulationMapIndex.index:
                     keys1.append(idx1)
-                elif counter == AccumulationMapIndex.atype:
-                    keys1.append(self.type_array[idx1])
                 elif counter == AccumulationMapIndex.name:
                     keys1.append(self.name_array[idx1])
                 elif counter == AccumulationMapIndex.resid:
@@ -156,8 +153,6 @@ class Analyzer(QObject):
             if val == 1:
                 if counter == AccumulationMapIndex.index:
                     keys2.append(idx2)
-                elif counter == AccumulationMapIndex.atype:
-                    keys2.append(self.type_array[idx2])
                 elif counter == AccumulationMapIndex.name:
                     keys2.append(self.name_array[idx2])
                 elif counter == AccumulationMapIndex.resid:
@@ -239,8 +234,8 @@ class Analyzer(QObject):
     def makeKeyFromKeyArrays(key1, key2):
         """Returns a human readable key from two key arrays.
             example:
-            keys1=["none","none","none","14", "VAL", "none"]
-            keys2=["none","none","none","22", "ILE, "none"]
+            keys1=["none","none","14", "VAL", "none"]
+            keys2=["none","none","22", "ILE", "none"]
             returns a human readable key with the mapping identifiers in AccumulationMapIndex
             in the given example data:
             key="r.14rn.VAL-r.22rn.ILE"
@@ -261,18 +256,7 @@ class Analyzer(QObject):
         return key
 
     def analyze_psf_dcd(self, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1text, sel2text):
-        """Reading topology/parameter CHARMM files for setting AtomTypes and AtomHBondTypes"""
-        heavyatomlines = []
-        heavyatoms = []
-        pars = open(os.path.dirname(os.path.abspath(__file__)) + '/testpar.prm', 'r')
-        for line in pars:
-            if re.match("MASS", line):
-                heavyatomlines.append(line.rstrip())
-        for atomline in heavyatomlines:
-            # read new AtomType and its corresponding AtomHBondType from file
-            atype = AtomType.parseParameterFileString(atomline)
-            # print(atomline, atype.htype)
-            heavyatoms.append(atype)
+        """Reading topology/trajectory and assessing hbonds"""
 
         # load psf and dcd file in memory
         u = MDAnalysis.Universe(psf, dcd)
@@ -284,21 +268,31 @@ class Analyzer(QObject):
         self.resname_array = []
         self.resid_array = []
         self.name_array = []
-        self.type_array = []
         self.segids = []
         self.backbone = []
         for atom in all_sel.atoms:
             self.resname_array.append(atom.resname)
             self.resid_array.append(atom.resid)
             self.name_array.append(atom.name)
-            self.type_array.append(atom.type)
             self.bonds.append(atom.bonds)
             self.segids.append(atom.segid)
         for atom in backbone_sel:
             self.backbone.append(atom.index)
 
-        sel1 = u.select_atoms(sel1text)
-        sel2 = u.select_atoms(sel2text)
+
+        # check if self-interaction is wanted
+        selfInteraction = False
+
+        if sel2text == "self":
+            sel1 = u.select_atoms(sel1text)
+            sel2 = u.select_atoms(sel1text)
+            selfInteraction = True
+        else:
+            sel1 = u.select_atoms(sel1text)
+            sel2 = u.select_atoms(sel2text)
+
+        if (len(sel1.atoms) == 0 or len(sel2.atoms) == 0):
+            raise Exception
 
         contactResults = []
         # loop over trajectory
@@ -337,30 +331,17 @@ class Analyzer(QObject):
                 if re.match("H(.*)", self.name_array[convindex1]) or re.match("H(.*)", self.name_array[convindex2]):
                     continue
                     # distance between atom1 and atom2
+                # check if residues are more than 4 apart, and in the same segment
+                if selfInteraction:
+                    if (self.resid_array[convindex1] - self.resid_array[convindex2]) < 5 and self.segids[convindex1] == self.segids[convindex2]:
+                        continue
                 distance = distarray[idx1, idx2]
                 weight = self.weight_function(distance)
-
-                # read AtomHBondType from heavyatoms list
-                # TODO: FF independent?
-                # type1 = next((x.htype for x in heavyatoms if x.name == self.type_array[convindex1]), AtomHBondType.none)
-                # type2 = next((x.htype for x in heavyatoms if x.name == self.type_array[convindex2]), AtomHBondType.none)
-
 
                 # HydrogenBondAlgorithm
                 hydrogenBonds = []
                 # FF independent hydrogen bonds
-                if (self.name_array[convindex1].startswith("N") and self.name_array[convindex2].startswith("O")) \
-                    or (self.name_array[convindex1].startswith("N") and self.name_array[convindex2].startswith("N")) \
-                    or (self.name_array[convindex1].startswith("O") and self.name_array[convindex2].startswith("N")) \
-                    or (self.name_array[convindex1].startswith("O") and self.name_array[convindex2].startswith("O")):
-                # if type1 != AtomHBondType.none and type2 != AtomHBondType.none:
-                    # if (type1 == AtomHBondType.both and type2 == AtomHBondType.both) or \
-                    #         (type1 == AtomHBondType.acc and type2 == AtomHBondType.don) or \
-                    #         (type1 == AtomHBondType.don and type2 == AtomHBondType.acc) or \
-                    #         (type1 == AtomHBondType.both and type2 == AtomHBondType.acc) or \
-                    #         (type1 == AtomHBondType.acc and type2 == AtomHBondType.both) or \
-                    #         (type1 == AtomHBondType.don and type2 == AtomHBondType.both) or \
-                    #         (type1 == AtomHBondType.both and type2 == AtomHBondType.don):
+                if (self.name_array[convindex1][0] in HydrogenBondAtoms.atoms and self.name_array[convindex2][0] in HydrogenBondAtoms.atoms):
                         # print("hbond? %s - %s" % (type_array[convindex1], type_array[convindex2]))
                         # search for hatom, check numbering in bond!!!!!!!!!!
                         b1 = self.bonds[convindex1]
@@ -409,8 +390,6 @@ class Analyzer(QObject):
                         # check hbond criteria for hydrogen atoms bound to first atom
                         for global_hatom in hydrogenAtomsBoundToAtom1:
                             conv_hatom = indices1.index(global_hatom)
-                            typeHeavy = next((x.htype for x in heavyatoms if x.name == self.type_array[convindex2]),
-                                             AtomHBondType.none)
                             # print(typeHeavy)
                             #
                             # TODO: FF independent version
@@ -438,8 +417,6 @@ class Analyzer(QObject):
                                     # print(angle)
                         for global_hatom in hydrogenAtomsBoundToAtom2:
                             conv_hatom = indices2.index(global_hatom)
-                            typeHeavy = next((x.htype for x in heavyatoms if x.name == self.type_array[convindex1]),
-                                             AtomHBondType.none)
                             # TODO: FF independent version
                             # if (typeHeavy == AtomHBondType.acc or typeHeavy == AtomHBondType.both) and (distarray[idx1, conv_hatom] <= hbondcutoff):
                             # FIXME: WTF?

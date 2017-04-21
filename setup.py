@@ -8,12 +8,7 @@ from Cython.Build import cythonize
 
 extensions = [Extension("PyContact.cy_modules.cy_gridsearch",
                         ["PyContact/cy_modules/cy_gridsearch.pyx"], language="c++",
-                        include_dirs=[".", "PyContact/cy_modules/src"]),
-              Extension("PyContact.cy_modules.wrap_vmd",
-                        ["PyContact/cy_modules/wrap_vmd.pyx"], language="c++",
-                        include_dirs=[".", "PyContact/cy_modules/src"])
-              ]
-
+                        include_dirs=[".", "PyContact/cy_modules/src"]), ]
 setup(
     name='pycontact',
     version='0.1.0b',
@@ -47,7 +42,7 @@ setup(
     cmdclass = {'build_ext': build_ext},
     ext_modules = cythonize(extensions),
 
-    package_data = {'PyContact': ['exampleData/defaultsession','core/testpar.prm','exampleData/*.psf','exampleData/*.pdb','exampleData/*.dcd','exampleData/*.tpr','exampleData/*.xtc','gui/*.tcl','db/aa.db']},
+    package_data = {'PyContact': ['exampleData/defaultsession','exampleData/*.psf','exampleData/*.pdb','exampleData/*.dcd','exampleData/*.tpr','exampleData/*.xtc','gui/*.tcl','db/aa.db']},
     entry_points={
         'console_scripts': [
             'pycontact=PyContact.pycontact:main',

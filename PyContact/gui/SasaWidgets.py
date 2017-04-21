@@ -137,15 +137,6 @@ class SasaWidget(QWidget, Ui_SasaWidget):
 
         self.allSasas = []
 
-        # test data:
-        # psf = "rpn11_ubq_interface-ionized.psf"
-        # pdb = "rpn11_ubq_interface-ionized.pdb"
-        # dcd = "/home/max/Projects/pycontact/short.dcd"
-
-        # Rafaels COH3 DOC3
-        # psf = "/mnt/workspace/pycontactData/nowater.psf"
-        # dcd = "/mnt/workspace/pycontactData/trajectory_short.dcd"
-
         # load psf and trajectory, make lists with radii and coordinates
         if self.psf == "" or self.dcd == "":
             e = ErrorBox(ErrorMessages.CHOOSEFILE)
@@ -180,13 +171,6 @@ class SasaWidget(QWidget, Ui_SasaWidget):
             restricted = 0
 
         selection = u.select_atoms(seltext)
-
-        # not used at the moment
-        # if perres:
-        #     resids = sorted(set(selection.resids))
-        #     segs = sorted(set(selection.segids))
-        # else:
-        #     pass
 
         # natoms = len(selection.atoms)
         radius = []

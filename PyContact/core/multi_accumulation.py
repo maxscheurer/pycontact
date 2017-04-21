@@ -107,7 +107,6 @@ def chunks(seq, num):
 
 def makeKeyArraysFromMaps(map1, map2, contact):
     """Creates key Arrays from the chosen accumulation maps."""
-    # global type_array,name_array,resid_array,resname_array,segids
     idx1 = contact.idx1
     idx2 = contact.idx2
     counter = 0
@@ -116,8 +115,6 @@ def makeKeyArraysFromMaps(map1, map2, contact):
         if val == 1:
             if counter == AccumulationMapIndex.index:
                 keys1.append(idx1)
-            elif counter == AccumulationMapIndex.atype:
-                keys1.append(type_array[idx1])
             elif counter == AccumulationMapIndex.name:
                 keys1.append(name_array[idx1])
             elif counter == AccumulationMapIndex.resid:
@@ -135,8 +132,6 @@ def makeKeyArraysFromMaps(map1, map2, contact):
         if val == 1:
             if counter == AccumulationMapIndex.index:
                 keys2.append(idx2)
-            elif counter == AccumulationMapIndex.atype:
-                keys2.append(type_array[idx2])
             elif counter == AccumulationMapIndex.name:
                 keys2.append(name_array[idx2])
             elif counter == AccumulationMapIndex.resid:
@@ -181,14 +176,12 @@ def loop_frame(contacts, map1, map2, trajArgs, rank):
     allkeys = []
     results = []
     global backbone
-    global type_array
     global name_array
     global resid_array
     global resname_array
     global segids
     frames_processed = 0
-    backbone, type_array, name_array, resid_array, resname_array, segids = trajArgs[5], trajArgs[3], trajArgs[2],\
-                                                                           trajArgs[1], trajArgs[0], trajArgs[4]
+    backbone, name_array, resid_array, resname_array, segids = trajArgs[4], trajArgs[2], trajArgs[1], trajArgs[0], trajArgs[3]
 
     for frame in contacts:
         currentFrameAcc = {}

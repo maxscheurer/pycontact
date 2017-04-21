@@ -70,6 +70,9 @@ class ContactPlotter(MplPlotter):
         self.axes.set_xlabel("frame")
         self.axes.set_ylabel("hbond number")
 
+    def saveFigure(self, path, outputFormat):
+        self.fig.savefig(path + "." + outputFormat, format=outputFormat)
+
 
 class ContactPlotParameters:
     """Parameter for the contact plotter."""

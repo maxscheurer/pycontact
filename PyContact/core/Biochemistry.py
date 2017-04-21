@@ -32,6 +32,8 @@ class AtomHBondType:
     don, acc, both, none = range(4)
     mapping = {"don": don, "acc": acc, "both": both, "none": none}
 
+class HydrogenBondAtoms:
+    atoms = ["O", "N", "S"]
 
 class AtomType:
     """Represents MASS entry for atoms in CHARMM topology and parameter files."""
@@ -336,9 +338,9 @@ class AccumulationMapIndex:
     """Enum and mapping for atom properties.
        Used to dynamically define keys and have a bijective nomenclature for all properties
     """
-    index, atype, name, resid, resname, segid = range(6)
-    mapping = ["i.", "t.", "nm.", "r.", "rn.", "s."]
-    vmdsel = ["index", "type", "name", "resid", "resname", "segname"]
+    index, name, resid, resname, segid = range(5)
+    mapping = ["i.", "nm.", "r.", "rn.", "s."]
+    vmdsel = ["index", "name", "resid", "resname", "segname"]
 
 
 class ContactType:
