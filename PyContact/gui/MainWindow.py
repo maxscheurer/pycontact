@@ -7,7 +7,6 @@ import PyQt5.QtCore as QtCore
 from PyQt5.QtCore import QRect, pyqtSlot, QObject
 from PyQt5.QtWidgets import (QMainWindow, QTabWidget, QLabel, QDialog, QProgressBar,
                              QApplication, QGridLayout, QFileDialog, QColorDialog, QWidget)
-from PyQt5.QtGui import QPaintEvent
 from PyQt5.Qt import Qt, QColor
 from PyQt5.QtGui import QIntValidator
 import numpy as np
@@ -275,8 +274,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.painter.rendered = False
         self.painter.colorScheme = self.colorScheme
         self.painter.customColor = self.customColor
-        self.painter.update()
-        self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
+        self.painter.repaint()
 
     def updateFilters(self):
         """Updates the chosen filters in MainWindow."""
@@ -287,7 +285,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             stride = 1
             QApplication.processEvents()
             self.frameStrideField.setText(str(stride))
-        print("stride: ", stride)
+        # print("stride: ", stride)
         self.painter.merge = stride
         self.painter.labelView.clean()
         self.painter.showHbondScores = False
@@ -387,8 +385,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
                             self.painter.showHbondScores = True
                     self.painter.contacts = self.filteredContacts
                     self.painter.rendered = False
-                    self.painter.update()
-                    self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
+                    self.painter.repaint()
                     if len(self.filteredContacts) == 0:
                         self.painter.labelView.clean()
             else:
@@ -396,8 +393,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
                 self.painter.showHbondScores = False
                 self.painter.contacts = self.filteredContacts
                 self.painter.rendered = False
-                self.painter.update()
-                self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
+                self.painter.repaint()
 
         # Update data for export
         self.exportWidget.setContacts(self.filteredContacts)
@@ -467,8 +463,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
                 generator.setViewBox(self.painter.rect())
                 self.painter.renderContact(generator)
         self.painter.rendered = False
-        self.painter.update()
-        self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
+        self.painter.repaint()
 
     def pushSave(self):
         """Handles the saving process to store the current view to file."""
@@ -488,8 +483,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
                 generator.setViewBox(self.painter.rect())
                 self.painter.renderContact(generator)
         self.painter.rendered = False
-        self.painter.update()
-        self.painter.paintEvent(QPaintEvent(QRect(0, 0, self.painter.sizeX, self.painter.sizeY)))
+        self.painter.repaint()
 
     def showColorPicker(self):
         """Shows a color picker for the current view."""
