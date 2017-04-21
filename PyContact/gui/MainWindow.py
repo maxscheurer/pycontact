@@ -210,12 +210,18 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         """Loads the trajectory data with the chosen initial parameters."""
         self.config, result = FileLoaderDialog.getConfig()
         if result == 1:
+            QApplication.processEvents()
             self.setInfoLabel("Loading trajectory and running atomic contact analysis...")
             nproc = int(self.settingsView.coreBox.value())
             self.analysis = Analyzer(self.config.psf, self.config.dcd, self.config.cutoff, self.config.hbondcutoff,
                                      self.config.hbondcutangle, self.config.sel1text, self.config.sel2text)
             QApplication.processEvents()
-            self.analysis.runFrameScan(nproc)
+            try:
+                self.analysis.runFrameScan(nproc)
+            except:
+                box = ErrorBox("Error while loading data: Probably you specified an atom selection with 0 atoms or invalid input files.")
+                box.exec_()
+                self.loadDataPushed()
             self.setInfoLabel("%d frames loaded." % len(self.analysis.contactResults))
             self.updateSelectionLabels(self.config.sel1text, self.config.sel2text)
 

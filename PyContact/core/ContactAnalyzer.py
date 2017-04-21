@@ -56,13 +56,16 @@ class Analyzer(QObject):
 
     def runFrameScan(self, nproc):
         """Performs a contact search using nproc threads."""
-        if nproc == 1:
-            self.contactResults = self.analyze_psf_dcd(self.psf, self.dcd, self.cutoff, self.hbondcutoff,
+        try:
+            if nproc == 1:
+                self.contactResults = self.analyze_psf_dcd(self.psf, self.dcd, self.cutoff, self.hbondcutoff,
                                                        self.hbondcutangle, self.sel1text, self.sel2text)
-        else:
-            self.contactResults, self.resname_array, self.resid_array, self.name_array, self.segids, \
+            else:
+                self.contactResults, self.resname_array, self.resid_array, self.name_array, self.segids, \
                             self.backbone = run_load_parallel(nproc, self.psf, self.dcd, self.cutoff, self.hbondcutoff,
                                                               self.hbondcutangle, self.sel1text, self.sel2text)
+        except:
+            raise Exception
 
     def runContactAnalysis(self, map1, map2, nproc):
         """Performs a contadt analysis using nproc threads."""
@@ -290,7 +293,7 @@ class Analyzer(QObject):
 
         if (len(sel1.atoms) == 0 or len(sel2.atoms) == 0):
             # TODO: throw an exception
-            return None
+            raise Exception
 
         contactResults = []
         # loop over trajectory
