@@ -7,6 +7,7 @@ from PyQt5.Qt import Qt
 
 from ..core.Biochemistry import ContactType
 from .Plotters import ContactPlotter
+from .DetailWidget import Detail
 
 
 class LabelView(QWidget):
@@ -19,6 +20,7 @@ class LabelView(QWidget):
         self.buttons = []
         self.checkboxes = []
         self.buttonWidths = []
+        self.detailView = None
         self.initUI()
 
     def clean(self):
@@ -64,59 +66,5 @@ class LabelView(QWidget):
 
     def handleButton(self, data):
         """Show the detailed view when clicking on the contact label"""
-
-        # print('index clicked: '+ str(data))
-        d = QDialog()
-        grid = QGridLayout()
-        d.setLayout(grid)
-        contact = self.contacts[data]
-        timeLabel = QLabel(str(contact.total_time(self.nsPerFrame, self.threshold)))
-        thresholdLabel = QLabel(str(self.threshold))
-        timeTitleLabel = QLabel("total time [ns]:")
-        thresholdTitleLabel = QLabel("current threshold:")
-
-        backboneSidechainTitleLabel = QLabel("bb/sc score (A)")
-        backboneSidechainTitleLabel2 = QLabel("bb/sc score (B)")
-
-        backboneSidechainLabel = QLabel("%.2f/%.2f" % (contact.bb1, contact.sc1))
-        backboneSidechainLabel2 = QLabel("%.2f/%.2f" % (contact.bb2, contact.sc2))
-
-        meanLifeTimeTitleLabel = QLabel("mean lifetime:")
-        meanLifeTimeLabel = QLabel(str(contact.mean_life_time(self.nsPerFrame, self.threshold)))
-
-        medianLifeTimeTitleLabel = QLabel("median lifetime:")
-        medianLifeTimeLabel = QLabel(str(contact.median_life_time(self.nsPerFrame, self.threshold)))
-
-        meanTitleLabel = QLabel("mean score:")
-        meanLabel = QLabel(str(contact.mean_score()))
-
-        medianTitleLabel = QLabel("median score:")
-        medianLabel = QLabel(str(contact.median_score()))
-
-        grid.addWidget(timeTitleLabel, 0, 0)
-        grid.addWidget(timeLabel, 0, 1)
-        grid.addWidget(thresholdTitleLabel, 1, 0)
-        grid.addWidget(thresholdLabel, 1, 1)
-        grid.addWidget(meanTitleLabel, 2, 0)
-        grid.addWidget(meanLabel, 2, 1)
-
-        grid.addWidget(medianTitleLabel, 2, 2)
-        grid.addWidget(medianLabel, 2, 3)
-
-        grid.addWidget(backboneSidechainTitleLabel, 3, 0)
-        grid.addWidget(backboneSidechainLabel, 3, 1)
-        grid.addWidget(backboneSidechainTitleLabel2, 4, 0)
-        grid.addWidget(backboneSidechainLabel2, 4, 1)
-
-        grid.addWidget(meanLifeTimeTitleLabel, 5, 0)
-        grid.addWidget(meanLifeTimeLabel, 5, 1)
-        grid.addWidget(medianLifeTimeTitleLabel, 5, 2)
-        grid.addWidget(medianLifeTimeLabel, 5, 3)
-
-        contactPlot = ContactPlotter(None, width=4, height=2, dpi=80)
-        contactPlot.plot_contact_figure(contact)
-        grid.addWidget(contactPlot, 6, 0, 1, 4)
-        d.setWindowTitle(contact.title)
-        d.resize(650, 700)
-        d.setWindowModality(Qt.ApplicationModal)
-        d.exec_()
+        self.detailView = Detail(self.contacts[data])
+        self.detailView.show()
