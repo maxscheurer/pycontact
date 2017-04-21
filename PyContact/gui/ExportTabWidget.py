@@ -295,7 +295,11 @@ class ExportTabWidget(QTabWidget):
     def pushSave(self):
         """Saves the current view."""
         fileName = QFileDialog.getSaveFileName(self, 'Export Path')
-        self.valueUpdated.emit(fileName[0], self.tab1.formatBox.currentText())
+        path, file_extension = os.path.splitext(fileName[0])
+        if file_extension == "":
+            file_extension = "." + self.tab1.formatBox.currentText().lower()
+        path += file_extension
+        self.valueUpdated.emit(path, self.tab1.formatBox.currentText())
 
     def setContacts(self, currentContacts):
         self.contacts = currentContacts
