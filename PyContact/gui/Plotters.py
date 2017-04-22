@@ -54,7 +54,7 @@ class ContactPlotter(MplPlotter):
                 current += c.scoreArray[frame]
             values.append(current)
         if smooth:
-            self.axes.plot(self.savitzky_golay(np.array(values), smooth, 1))
+            self.axes.plot(self.savitzky_golay(np.array(values), smooth, 2))
         else:
             self.axes.plot(values)
         self.axes.set_xlabel("frame")
@@ -71,7 +71,7 @@ class ContactPlotter(MplPlotter):
                 current += c.hbondFrames[frame]
             values.append(current)
         if smooth:
-            self.axes.plot(self.savitzky_golay(np.array(values), smooth, 1))
+            self.axes.plot(self.savitzky_golay(np.array(values), smooth, 2))
         else:
             self.axes.plot(values)
         self.axes.set_xlabel("frame")

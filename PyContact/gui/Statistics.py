@@ -46,10 +46,11 @@ class Statistics(QWidget, Ui_Statistics):
         self.contactPlotter = ContactPlotter(None, width=4, height=2, dpi=70)
         smoothOn = self.smoothCheckbox.isChecked()
         smooth = 0
+        limit = 5
         if smoothOn:
             smooth = int(self.smoothStrideField.text())
-            if smooth < 3:
-                smooth = 3
+            if smooth < limit:
+                smooth = limit
             if smooth % 2 == 0:
                 smooth += 1
             self.smoothStrideField.setText(str(smooth))
