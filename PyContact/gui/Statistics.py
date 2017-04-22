@@ -3,6 +3,7 @@ import sip
 import os
 
 from PyQt5.QtWidgets import QWidget, QApplication, QFileDialog
+from PyQt5.QtGui import QIntValidator
 import MDAnalysis
 import numpy as np
 
@@ -31,23 +32,38 @@ class Statistics(QWidget, Ui_Statistics):
         self.savePlotButton.clicked.connect(self.savePlot)
         self.plotButton.clicked.connect(self.plotAttribute)
 
+        posIntValidator = QIntValidator()
+        posIntValidator.setBottom(3)
+        self.smoothStrideField.setValidator(posIntValidator)
+
         self.contactPlotter = ContactPlotter(None, width=4, height=2, dpi=70)
-        self.contactPlotter.plot_all_contacts_figure(self.contacts)
+        self.contactPlotter.plot_all_contacts_figure(self.contacts, 0)
         self.plotGridLayout.addWidget(self.contactPlotter)
 
     def plotAttribute(self):
         """Plots the selected attribute."""
         sip.delete(self.contactPlotter)
         self.contactPlotter = ContactPlotter(None, width=4, height=2, dpi=70)
+        smoothOn = self.smoothCheckbox.isChecked()
+        smooth = 0
+        if smoothOn:
+            smooth = int(self.smoothStrideField.text())
+            if smooth < 3:
+                smooth = 3
+            if smooth % 2 == 0:
+                smooth += 1
+            self.smoothStrideField.setText(str(smooth))
         if self.attributeBox.currentText() == "Score":
-            self.contactPlotter.plot_all_contacts_figure(self.contacts)
+            self.contactPlotter.plot_all_contacts_figure(self.contacts, smooth)
         elif self.attributeBox.currentText() == "hbond number":
-            self.contactPlotter.plot_hbondNumber(self.contacts)
+            self.contactPlotter.plot_hbondNumber(self.contacts, smooth)
         self.plotGridLayout.addWidget(self.contactPlotter)
 
     def savePlot(self):
         """Saves the current plot."""
         fileName = QFileDialog.getSaveFileName(self, 'Save Path')
+        if fileName == "":
+            return
         path, file_extension = os.path.splitext(fileName[0])
         if file_extension == "":
             file_extension = "png"

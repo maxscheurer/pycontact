@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'statistics.ui'
+# Form implementation generated from reading ui file 'PyContact/gui/statistics.ui'
 #
-# Created by: PyQt5 UI code generator 5.8.2
+# Created by: PyQt5 UI code generator 5.8
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -70,6 +70,11 @@ class Ui_Statistics(object):
         self.labelMeanScore.setText("")
         self.labelMeanScore.setObjectName("labelMeanScore")
         self.gridLayout.addWidget(self.labelMeanScore, 2, 3, 1, 1)
+        self.attributeBox = QtWidgets.QComboBox(Statistics)
+        self.attributeBox.setObjectName("attributeBox")
+        self.attributeBox.addItem("")
+        self.attributeBox.addItem("")
+        self.gridLayout.addWidget(self.attributeBox, 6, 0, 1, 1)
         self.line = QtWidgets.QFrame(Statistics)
         self.line.setFrameShape(QtWidgets.QFrame.HLine)
         self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
@@ -92,11 +97,6 @@ class Ui_Statistics(object):
         self.plotGridLayout.addItem(spacerItem, 0, 0, 1, 1)
         self.gridLayout_3.addLayout(self.plotGridLayout, 0, 1, 1, 1)
         self.gridLayout.addWidget(self.plotWidget, 5, 0, 1, 4)
-        self.attributeBox = QtWidgets.QComboBox(Statistics)
-        self.attributeBox.setObjectName("attributeBox")
-        self.attributeBox.addItem("")
-        self.attributeBox.addItem("")
-        self.gridLayout.addWidget(self.attributeBox, 6, 0, 1, 1)
         self.plotButton = QtWidgets.QPushButton(Statistics)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -105,6 +105,21 @@ class Ui_Statistics(object):
         self.plotButton.setSizePolicy(sizePolicy)
         self.plotButton.setObjectName("plotButton")
         self.gridLayout.addWidget(self.plotButton, 6, 1, 1, 1)
+        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.smoothCheckbox = QtWidgets.QCheckBox(Statistics)
+        self.smoothCheckbox.setObjectName("smoothCheckbox")
+        self.horizontalLayout.addWidget(self.smoothCheckbox)
+        self.smoothStrideField = QtWidgets.QLineEdit(Statistics)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.smoothStrideField.sizePolicy().hasHeightForWidth())
+        self.smoothStrideField.setSizePolicy(sizePolicy)
+        self.smoothStrideField.setMaximumSize(QtCore.QSize(50, 16777215))
+        self.smoothStrideField.setObjectName("smoothStrideField")
+        self.horizontalLayout.addWidget(self.smoothStrideField)
+        self.gridLayout.addLayout(self.horizontalLayout, 6, 2, 1, 1)
 
         self.retranslateUi(Statistics)
         QtCore.QMetaObject.connectSlotsByName(Statistics)
@@ -120,4 +135,6 @@ class Ui_Statistics(object):
         self.attributeBox.setItemText(0, _translate("Statistics", "Score"))
         self.attributeBox.setItemText(1, _translate("Statistics", "hbond number"))
         self.plotButton.setText(_translate("Statistics", "Plot"))
+        self.smoothCheckbox.setText(_translate("Statistics", "Smooth:"))
+        self.smoothStrideField.setText(_translate("Statistics", "5"))
 

@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QSizePolicy, QApplication
 import numpy as np
+from math import factorial
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg \
     as FigureCanvas
 from matplotlib.figure import Figure
@@ -44,7 +45,7 @@ class ContactPlotter(MplPlotter):
         self.axes.set_xlabel("frame")
         self.axes.set_ylabel("score")
 
-    def plot_all_contacts_figure(self, contacts):
+    def plot_all_contacts_figure(self, contacts, smooth):
         values = []
 
         for frame in range(len(contacts[0].scoreArray)):
@@ -52,11 +53,14 @@ class ContactPlotter(MplPlotter):
             for c in contacts:
                 current += c.scoreArray[frame]
             values.append(current)
-        self.axes.plot(values)
+        if smooth:
+            self.axes.plot(self.savitzky_golay(np.array(values), smooth, 1))
+        else:
+            self.axes.plot(values)
         self.axes.set_xlabel("frame")
         self.axes.set_ylabel("score")
 
-    def plot_hbondNumber(self, contacts):
+    def plot_hbondNumber(self, contacts, smooth):
         values = []
         for c in contacts:
             c.hbondFramesScan()
@@ -66,9 +70,36 @@ class ContactPlotter(MplPlotter):
             for c in contacts:
                 current += c.hbondFrames[frame]
             values.append(current)
-        self.axes.plot(values)
+        if smooth:
+            self.axes.plot(self.savitzky_golay(np.array(values), smooth, 1))
+        else:
+            self.axes.plot(values)
         self.axes.set_xlabel("frame")
         self.axes.set_ylabel("hbond number")
+
+    # from http://scipy.github.io/old-wiki/pages/Cookbook/SavitzkyGolay
+    def savitzky_golay(self, y, window_size, order, deriv=0, rate=1):
+
+        try:
+            window_size = np.abs(np.int(window_size))
+            order = np.abs(np.int(order))
+        except ValueError, msg:
+            raise ValueError("window_size and order have to be of type int")
+        if window_size % 2 != 1 or window_size < 1:
+            raise TypeError("window_size size must be a positive odd number")
+        if window_size < order + 2:
+            raise TypeError("window_size is too small for the polynomials order")
+        order_range = range(order+1)
+        half_window = (window_size -1) // 2
+        # precompute coefficients
+        b = np.mat([[k**i for i in order_range] for k in range(-half_window, half_window+1)])
+        m = np.linalg.pinv(b).A[deriv] * rate**deriv * factorial(deriv)
+        # pad the signal at the extremes with
+        # values taken from the signal itself
+        firstvals = y[0] - np.abs( y[1:half_window+1][::-1] - y[0] )
+        lastvals = y[-1] + np.abs(y[-half_window-1:-1][::-1] - y[-1])
+        y = np.concatenate((firstvals, y, lastvals))
+        return np.convolve( m[::-1], y, mode='valid')
 
     def saveFigure(self, path, outputFormat):
         self.fig.savefig(path + "." + outputFormat, format=outputFormat)
