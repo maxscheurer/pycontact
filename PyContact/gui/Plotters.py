@@ -7,11 +7,18 @@ from matplotlib.figure import Figure
 from matplotlib import cm
 from matplotlib import animation as ani
 from matplotlib.widgets import Slider, Button
+import matplotlib
 
 from ..core.ContactFilters import *
 from ..core.Biochemistry import AccumulationMapIndex
 from matplotlib import pyplot as plt
 plt.style.use('ggplot')
+
+font = {'family' : 'normal',
+        'weight' : 'normal',
+        'size'   : 14}
+
+matplotlib.rc('font', **font)
 
 
 class MplPlotter(FigureCanvas):
@@ -54,7 +61,10 @@ class ContactPlotter(MplPlotter):
                 current += c.scoreArray[frame]
             values.append(current)
         if smooth:
-            self.axes.plot(self.savitzky_golay(np.array(values), smooth, 2))
+            val = self.savitzky_golay(np.array(values), smooth, 2)
+            smaller = np.where(val < 0)
+            val[smaller] = 0
+            self.axes.plot(val)
         else:
             self.axes.plot(values)
         self.axes.set_xlabel("frame")
@@ -71,7 +81,10 @@ class ContactPlotter(MplPlotter):
                 current += c.hbondFrames[frame]
             values.append(current)
         if smooth:
-            self.axes.plot(self.savitzky_golay(np.array(values), smooth, 2))
+            val = self.savitzky_golay(np.array(values), smooth, 2)
+            smaller = np.where(val < 0)
+            val[smaller] = 0
+            self.axes.plot(val)
         else:
             self.axes.plot(values)
         self.axes.set_xlabel("frame")
