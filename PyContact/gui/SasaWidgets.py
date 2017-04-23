@@ -67,7 +67,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         self.sasaProgressBar.setTextVisible(True)
         self.sasaProgressBar.setInvertedAppearance(False)
         self.sasaProgressBar.setObjectName("sasaProgressBar")
-        self.previewPlot = SimplePlotter(None, width=5, height=2, dpi=60)
+        self.previewPlot = SimplePlotter(None, width=4, height=2, dpi=70)
         self.graphGridLayout.addWidget(self.previewPlot)
         self.gridLayout.addWidget(self.sasaProgressBar, 8, 1, 1, 2)
         self.calcSasaButton.clicked.connect(self.calculateSasa)
@@ -96,7 +96,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         self.totalFramesToProcess = 0
         self.sasaProgressBar.setProperty("value", 0)
         sip.delete(self.previewPlot)
-        self.previewPlot = SimplePlotter(None, width=5, height=2, dpi=60)
+        self.previewPlot = SimplePlotter(None, width=4, height=2, dpi=70)
         self.graphGridLayout.addWidget(self.previewPlot)
         self.sasaSelection1TextField.setText("")
         self.sasaSelection2TextField.setText("")
@@ -277,10 +277,13 @@ class SasaWidget(QWidget, Ui_SasaWidget):
             self.allSasas = diff_list
 
         sip.delete(self.previewPlot)
-        self.previewPlot = SimplePlotter(None, width=5, height=2, dpi=60)
+        self.previewPlot = SimplePlotter(None, width=4, height=2, dpi=70)
         self.previewPlot.plot(np.arange(0, trajLength, 1), self.allSasas)
         self.previewPlot.axes.set_xlabel("frame")
-        self.previewPlot.axes.set_ylabel(r'SASA [A$^{\circ}$$^{2}$]')
+        if self.calculateContactAreaCheckbox.isChecked():
+            self.previewPlot.axes.set_ylabel(r'Contact Area [A$^{\circ}$$^{2}$]')
+        else:
+            self.previewPlot.axes.set_ylabel(r'SASA [A$^{\circ}$$^{2}$]')
         self.graphGridLayout.addWidget(self.previewPlot)
         self.previewPlot.update()
 
