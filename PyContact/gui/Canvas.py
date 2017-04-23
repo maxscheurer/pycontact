@@ -179,6 +179,7 @@ class Canvas(QWidget, QObject):
                     if l == 0:
                         continue
                     # print(l)
+                    # TODO: sometimes errors occur!
                     p.drawText(startx + (l - 1 - self.range[0]) * offset, row + textoffset + 2.0, str(l * merge))
                 self.labelView.move(0, rowheight)
                 row += rowheight
