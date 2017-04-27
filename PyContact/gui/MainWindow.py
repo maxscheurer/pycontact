@@ -117,9 +117,15 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.updateSettings()
         self.updateFilters()
 
-        self.tableTest = Widget()
-        self.tableTest.setGeometry(100, 100, 400, 400)
-        self.tableTest.show()
+        # self.tableTest = Widget()
+        # self.tableTest.setGeometry(100, 100, 400, 400)
+        # self.tableTest.show()
+
+        # from ..db.DbReader import read_residue_db_all
+        # res = read_residue_db_all()
+        # residueList = []    # 1st: name, 2nd scpolarity
+        # for k in res:
+        #     residueList.appen([k["name"], k["scpolarity"]])
 
         self.actionDefault.setText("Load sample data")
 
