@@ -30,6 +30,7 @@ import Preferences
 from ..exampleData.datafiles import DEFAULTSESSION
 from VMDControlPanel import VMDControlPanel
 from ..core.DataHandler import DataHandler
+from TableModels import *
 
 multiprocessing.log_to_stderr()
 np.set_printoptions(threshold=np.inf)
@@ -115,6 +116,10 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.painter.clickedColumnSignal.connect(self.updateVMDFrame)
         self.updateSettings()
         self.updateFilters()
+
+        self.tableTest = Widget()
+        self.tableTest.setGeometry(100, 100, 400, 400)
+        self.tableTest.show()
 
         self.actionDefault.setText("Load sample data")
 
