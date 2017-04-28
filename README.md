@@ -33,7 +33,9 @@ Analysis can also be performed by using PyContact as a plain python package. In 
 you automate analysis (reading trajectories and running contact score accumulation) from your python script and
 later on visualize it in the GUI.
 
-## About
-Authors: Maximilian Scheurer and Peter Rodenkirch
+## Citation
+If you use PyContact in a scientific publication, please cite:
+(placeholder)
 
-Please give a reference to this website if you use the software in research.
+## About
+Main Developers: Maximilian Scheurer and Peter Rodenkirch
