@@ -11,24 +11,24 @@ extensions = [Extension("PyContact.cy_modules.cy_gridsearch",
                         include_dirs=[".", "PyContact/cy_modules/src"]), ]
 setup(
     name='pycontact',
-    version='0.1.0b',
-    description='pycontact - a tool for contact analysis of biomolecules from MD trajectories',
-    long_description='',
+    version='1.0',
+    description='PyContact',
+    long_description='Tool for analysis of non-covalent interactions in MD trajectories',
     url='https://github.com/maxscheurer/pycontact',
     author='Maximilian Scheurer, Peter Rodenkirch',
     author_email='mscheurer@ks.uiuc.edu',
-    license='GPLv3',
+    license='LGPLv3',
 
 # https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
 
         # Indicate who your project is intended for
         'Intended Audience :: Science/Research',
         'Topic :: Scientific/Engineering',
 
         # Pick your license as you wish (should match "license" above)
-        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+        'License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)',
 
         'Programming Language :: Python :: 2.7',
     ],
