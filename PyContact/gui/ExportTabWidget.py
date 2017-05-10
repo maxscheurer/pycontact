@@ -47,6 +47,8 @@ class ExportTabWidget(QTabWidget):
         self.map2 = None
         self.label1 = ""
         self.label2 = ""
+        self.psf = ""
+        self.dcd = ""
 
     def setThresholdAndNsPerFrame(self, currentThreshold, currentNsPerFrame):
         self.threshold = currentThreshold
@@ -307,6 +309,11 @@ class ExportTabWidget(QTabWidget):
     def setContacts(self, currentContacts):
         self.contacts = currentContacts
 
+    def setFilePaths(self, *argv):
+        """Sets the current trajectory paths from the main view."""
+        self.psf = argv[0][0]
+        self.dcd = argv[0][1]
+
     def setMaps(self, map1, map2):
         self.map1 = map1
         self.map2 = map2
@@ -322,62 +329,71 @@ class ExportTabWidget(QTabWidget):
             box = ErrorBox(ErrorMessages.NOCONTACTS)
             box.exec_()
             return
-        f = open('vis.tcl', 'w')
-        f.write('mol new %s \n' % self.config.psf)
-        f.write('mol addfile %s \n' % self.config.dcd)
-        f.write('mol delrep 0 top \n')
-        f.write('mol representation NewCartoon \n')
-        f.write('mol Color ColorID 3 \n')
-        f.write('mol selection {all} \n')
-        f.write('mol addrep top \n')
 
-        if self.splitVisCheckbox.isChecked():
-            for cont in self.filteredContacts:
-                currentSel1 = []
-                index = 0
-                for item in cont.key1:
-                    if item != "none":
-                        currentSel1.append(AccumulationMapIndex.vmdsel[index] + " " + item)
-                    index += 1
-                currentSel1String = " and ".join(currentSel1)
-                currentSel2 = []
-                index = 0
-                for item in cont.key2:
-                    if item != "none":
-                        currentSel2.append(AccumulationMapIndex.vmdsel[index] + " " + item)
-                    index += 1
-                currentSel2String = " and ".join(currentSel2)
-                add1 = ("" if self.tab4.additionalText1.text() == "" else (" and " + self.tab4.additionalText1.text()))
-                add2 = ("" if self.tab4.additionalText2.text() == "" else (" and " + self.tab4.additionalText2.text()))
-                sel = "("+currentSel1String + add1 + ") or (" + currentSel2String + add2 + ")"
+        fileName = QFileDialog.getSaveFileName(self, 'Save Path')
+        if len(fileName[0]) > 0:
+            path, file_extension = os.path.splitext(fileName[0])
+            if file_extension != ".tcl":
+                file_extension = ".tcl"
+
+            path += file_extension
+
+            f = open(path, 'w')
+            f.write('mol new %s \n' % self.psf)
+            f.write('mol addfile %s \n' % self.dcd)
+            f.write('mol delrep 0 top \n')
+            f.write('mol representation NewCartoon \n')
+            f.write('mol Color ColorID 3 \n')
+            f.write('mol selection {all} \n')
+            f.write('mol addrep top \n')
+
+            if self.tab4.splitVisCheckbox.isChecked():
+                for cont in self.contacts:
+                    currentSel1 = []
+                    index = 0
+                    for item in cont.key1:
+                        if item != "none":
+                            currentSel1.append(AccumulationMapIndex.vmdsel[index] + " " + item)
+                        index += 1
+                    currentSel1String = " and ".join(currentSel1)
+                    currentSel2 = []
+                    index = 0
+                    for item in cont.key2:
+                        if item != "none":
+                            currentSel2.append(AccumulationMapIndex.vmdsel[index] + " " + item)
+                        index += 1
+                    currentSel2String = " and ".join(currentSel2)
+                    add1 = ("" if self.tab4.additionalText1.text() == "" else (" and " + self.tab4.additionalText1.text()))
+                    add2 = ("" if self.tab4.additionalText2.text() == "" else (" and " + self.tab4.additionalText2.text()))
+                    sel = "("+currentSel1String + add1 + ") or (" + currentSel2String + add2 + ")"
+                    f.write('mol representation Licorice \n')
+                    f.write('mol Color Name \n')
+                    f.write('mol selection {%s} \n' % sel)
+                    f.write('mol addrep top \n')
+            else:
+                total = []
+                for cont in self.contacts:
+                    currentSel1 = []
+                    index = 0
+                    for item in cont.key1:
+                        if item != "none":
+                            currentSel1.append(AccumulationMapIndex.vmdsel[index] + " " + item)
+                        index += 1
+                    currentSel1String = " and ".join(currentSel1)
+                    currentSel2 = []
+                    index = 0
+                    for item in cont.key2:
+                        if item != "none":
+                            currentSel2.append(AccumulationMapIndex.vmdsel[index] + " " + item)
+                        index += 1
+                    currentSel2String = " and ".join(currentSel2)
+                    add1 = ("" if self.tab4.additionalText1.text() == "" else (" and " + self.tab4.additionalText1.text()))
+                    add2 = ("" if self.tab4.additionalText2.text() == "" else (" and " + self.tab4.additionalText2.text()))
+                    sel = "(" + currentSel1String + add1 + ") or (" + currentSel2String + add2 + ")"
+                    total.append(sel)
+                seltext = " or ".join(total)
                 f.write('mol representation Licorice \n')
                 f.write('mol Color Name \n')
-                f.write('mol selection {%s} \n' % sel)
+                f.write('mol selection {%s} \n' % seltext)
                 f.write('mol addrep top \n')
-        else:
-            total = []
-            for cont in self.contacts:
-                currentSel1 = []
-                index = 0
-                for item in cont.key1:
-                    if item != "none":
-                        currentSel1.append(AccumulationMapIndex.vmdsel[index] + " " + item)
-                    index += 1
-                currentSel1String = " and ".join(currentSel1)
-                currentSel2 = []
-                index = 0
-                for item in cont.key2:
-                    if item != "none":
-                        currentSel2.append(AccumulationMapIndex.vmdsel[index] + " " + item)
-                    index += 1
-                currentSel2String = " and ".join(currentSel2)
-                add1 = ("" if self.tab4.additionalText1.text() == "" else (" and " + self.tab4.additionalText1.text()))
-                add2 = ("" if self.tab4.additionalText2.text() == "" else (" and " + self.tab4.additionalText2.text()))
-                sel = "(" + currentSel1String + add1 + ") or (" + currentSel2String + add2 + ")"
-                total.append(sel)
-            seltext = " or ".join(total)
-            f.write('mol representation Licorice \n')
-            f.write('mol Color Name \n')
-            f.write('mol selection {%s} \n' % seltext)
-            f.write('mol addrep top \n')
-        f.close()
+            f.close()

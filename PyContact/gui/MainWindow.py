@@ -187,6 +187,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.analysis.setTrajectoryData(*trajArgs)
         self.analysis.finalAccumulatedContacts = self.contacts
         self.sasaView.setFilePaths(*self.analysis.getFilePaths())
+        self.exportWidget.setFilePaths(*self.analysis.getFilePaths())
         self.updateSelectionLabels(arguments[5], arguments[6])
         self.updateSettings()
         self.updateFilters()
@@ -215,6 +216,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.analysis.setTrajectoryData(*trajArgs)
         self.analysis.finalAccumulatedContacts = self.contacts
         self.sasaView.setFilePaths(*self.analysis.getFilePaths())
+        self.exportWidget.setFilePaths(*self.analysis.getFilePaths())
         self.updateSelectionLabels(arguments[5], arguments[6])
         self.updateSettings()
         self.updateFilters()
@@ -237,6 +239,8 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
                 self.loadDataPushed()
             self.setInfoLabel("%d frames loaded." % len(self.analysis.contactResults))
             self.updateSelectionLabels(self.config.sel1text, self.config.sel2text)
+            self.sasaView.setFilePaths(*self.analysis.getFilePaths())
+            self.exportWidget.setFilePaths(*self.analysis.getFilePaths())
 
     @pyqtSlot(float)
     def updateAnalyzedFrames(self, value):
