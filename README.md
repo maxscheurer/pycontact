@@ -35,7 +35,7 @@ later on visualize it in the GUI.
 
 ## Citation
 If you use PyContact in a scientific publication, please cite:
-(placeholder)
+(available soon).
 
 ## About
 Main Developers: Maximilian Scheurer and Peter Rodenkirch
