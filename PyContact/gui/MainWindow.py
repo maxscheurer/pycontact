@@ -30,7 +30,7 @@ import Preferences
 from ..exampleData.datafiles import DEFAULTSESSION
 from VMDControlPanel import VMDControlPanel
 from ..core.DataHandler import DataHandler
-from TableModels import *
+# from TableModels import *
 
 multiprocessing.log_to_stderr()
 np.set_printoptions(threshold=np.inf)
