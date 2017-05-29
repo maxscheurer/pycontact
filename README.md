@@ -1,5 +1,6 @@
 # PyContact
 [![Build Status](https://travis-ci.org/maxscheurer/pycontact.svg?branch=develop)](https://travis-ci.org/maxscheurer/pycontact)
+[![DOI](https://www.zenodo.org/badge/56337063.svg)](https://www.zenodo.org/badge/latestdoi/56337063)
 
 **PyContact** is a GUI-based tool for rapid, versatile and customizable analysis of non-covalent interactions in molecular dynamics (MD) trajectories.
 
