@@ -39,7 +39,7 @@ setup(
     packages=find_packages(),
 
     setup_requires = ['cython'],
-    install_requires = ['numpy','matplotlib','mdanalysis==0.15','cython'],
+    install_requires = ['numpy','matplotlib','mdanalysis<0.16','cython'],
     cmdclass = {'build_ext': build_ext},
     ext_modules = cythonize(extensions),
 
