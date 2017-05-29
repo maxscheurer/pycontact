@@ -20,4 +20,4 @@ A citation will be available soon.
 
 ## About
 Main Developers: Maximilian Scheurer and Peter Rodenkirch
-Support: Open an Issue on Github or [email us](mscheurer@ks.uiuc.edu).
+Support: Open an Issue on Github or [email us](mailto:mscheurer@ks.uiuc.edu).
