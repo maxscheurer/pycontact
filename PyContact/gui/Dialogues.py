@@ -72,6 +72,7 @@ class FileLoaderDialog(QDialog):
         self.setWindowTitle("Load Data")
         self.psf = ""
         self.dcd = ""
+        production = 1
 
         grid = QGridLayout(self)
 
@@ -99,8 +100,12 @@ class FileLoaderDialog(QDialog):
         self.cutoffHbondField = QLineEdit("2.5")
         self.cutoffHbondField.setValidator(posDoubleValidator)
 
-        self.selection1Field = QLineEdit("segid RN11")
-        self.selection2Field = QLineEdit("segid UBQ")
+        if production:
+            self.selection1Field = QLineEdit("")
+            self.selection2Field = QLineEdit("")
+        else:
+            self.selection1Field = QLineEdit("segid RN11")
+            self.selection2Field = QLineEdit("segid UBQ")
 
         grid.addWidget(cutoffLabel, 1, 0)
         grid.addWidget(cutoffAngleLabel, 2, 0)
