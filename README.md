@@ -7,12 +7,12 @@
 Please find detailed installation instructions on the [project website](https://pycontact.github.io/) together
 with a basic tutorial.
 
-For interactive visualization: latest version of [VMD](http://www.ks.uiuc.edu/Development/Download/download.cgi?PackageName=VMD)
+For interactive visualization: latest version of [VMD](http://www.ks.uiuc.edu/Development/Download/download.cgi?PackageName=VMD).
 
 
 ## Scripting
 Analysis can also be performed by using PyContact as a plain python package. In this way,
-you can automate analysis (reading trajectories and running contact score accumulation) from your Python script and visualize it in the GUI.
+you can automate analysis (reading trajectories and running contact score accumulation) from your Python script and visualize it in the GUI. For an example, see this [Python script](examples/automation.py).
 
 ## Citation
 If you use PyContact in a scientific publication, please cite:
