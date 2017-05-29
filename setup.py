@@ -43,7 +43,7 @@ setup(
     cmdclass = {'build_ext': build_ext},
     ext_modules = cythonize(extensions),
 
-    package_data = {'PyContact': ['exampleData/defaultsession','exampleData/*.psf','exampleData/*.pdb','exampleData/*.dcd','exampleData/*.tpr','exampleData/*.xtc','gui/*.tcl','db/aa.db']},
+    package_data = {'PyContact': ['exampleData/defaultsession','exampleData/*.psf','exampleData/*.pdb','exampleData/*.dcd','exampleData/*.tpr','exampleData/*.xtc','gui/*.tcl','db/aa.db','cy_modules/*.pyx','cy_modules/src/*']},
     entry_points={
         'console_scripts': [
             'pycontact=PyContact.pycontact:main',
