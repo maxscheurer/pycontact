@@ -135,6 +135,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
     def showContactAreaView(self):
         """Shows the SASA computation panel."""
+        self.sasaView.nsPerFrame = float(self.settingsView.nsPerFrameField.text())
         self.sasaView.show()
         if self.analysis:
             self.sasaView.setFilePaths(self.analysis.getFilePaths())
@@ -292,6 +293,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.painter.customColor = self.customColor
         self.painter.repaint()
         self.painter.update()
+        self.sasaView.nsPerFrame = float(self.settingsView.nsPerFrameField.text())
 
     def updateFilters(self):
         """Updates the chosen filters in MainWindow."""
@@ -431,7 +433,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             box = ErrorBox(ErrorMessages.NOSCORES_PROMPTANALYSIS)
             box.exec_()
             return
-        self.statisticsView = Statistics(self.contacts)
+        self.statisticsView = Statistics(self.contacts, float(self.settingsView.nsPerFrameField.text()))
         self.statisticsView.showNormal()
 
     def showDeveloperInfo(self):

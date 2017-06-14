@@ -47,12 +47,13 @@ class MplPlotter(FigureCanvas):
 class ContactPlotter(MplPlotter):
     """Plots a frame-score plot with lines."""
 
-    def plot_contact_figure(self, contact):
-        self.axes.plot(contact.scoreArray)
-        self.axes.set_xlabel("frame")
+    def plot_contact_figure(self, contact, nsPerFrame):
+        frames = np.arange(0, len(contact.scoreArray), 1) * nsPerFrame
+        self.axes.plot(frames, contact.scoreArray)
+        self.axes.set_xlabel("time [ns]")
         self.axes.set_ylabel("score")
 
-    def plot_all_contacts_figure(self, contacts, smooth):
+    def plot_all_contacts_figure(self, contacts, smooth, nsPerFrame):
         values = []
 
         for frame in range(len(contacts[0].scoreArray)):
@@ -60,6 +61,7 @@ class ContactPlotter(MplPlotter):
             for c in contacts:
                 current += c.scoreArray[frame]
             values.append(current)
+        frames = np.arange(0, len(values), 1) * nsPerFrame
         if smooth:
             val = self.savitzky_golay(np.array(values), smooth, 2)
             smaller = np.where(val < 0)
@@ -67,10 +69,10 @@ class ContactPlotter(MplPlotter):
             self.axes.plot(val)
         else:
             self.axes.plot(values)
-        self.axes.set_xlabel("frame")
+        self.axes.set_xlabel("time [ns]")
         self.axes.set_ylabel("score")
 
-    def plot_hbondNumber(self, contacts, smooth):
+    def plot_hbondNumber(self, contacts, smooth, nsPerFrame):
         values = []
         for c in contacts:
             c.hbondFramesScan()
@@ -80,14 +82,15 @@ class ContactPlotter(MplPlotter):
             for c in contacts:
                 current += c.hbondFrames[frame]
             values.append(current)
+        frames = np.arange(0, len(values), 1) * nsPerFrame
         if smooth:
             val = self.savitzky_golay(np.array(values), smooth, 2)
             smaller = np.where(val < 0)
             val[smaller] = 0
-            self.axes.plot(val)
+            self.axes.plot(frames, val)
         else:
-            self.axes.plot(values)
-        self.axes.set_xlabel("frame")
+            self.axes.plot(frames, values)
+        self.axes.set_xlabel("time [ns]")
         self.axes.set_ylabel("hbond number")
 
     # from http://scipy.github.io/old-wiki/pages/Cookbook/SavitzkyGolay

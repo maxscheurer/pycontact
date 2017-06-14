@@ -11,7 +11,7 @@ extensions = [Extension("PyContact.cy_modules.cy_gridsearch",
                         include_dirs=[".", "PyContact/cy_modules/src"]), ]
 setup(
     name='pycontact',
-    version='1.0',
+    version='1.0.1',
     description='PyContact',
     long_description='Tool for analysis of non-covalent interactions in MD trajectories',
     url='https://github.com/maxscheurer/pycontact',

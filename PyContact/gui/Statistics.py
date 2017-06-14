@@ -20,10 +20,11 @@ from ..core.Biochemistry import mean_score_of_contactArray, median_score_of_cont
 
 
 class Statistics(QWidget, Ui_Statistics):
-    def __init__(self, data, parent=None):
+    def __init__(self, data, nspf, parent=None):
         super(QtWidgets.QWidget, self).__init__(parent)
         self.setupUi(self)
         self.contacts = data
+        self.nsPerFrame = nspf
 
         self.labelNumFrames.setText(str(len(self.contacts[0].scoreArray)))
         self.labelTotalContacts.setText(str(len(self.contacts)))
@@ -37,7 +38,7 @@ class Statistics(QWidget, Ui_Statistics):
         self.smoothStrideField.setValidator(posIntValidator)
 
         self.contactPlotter = ContactPlotter(None, width=4, height=2, dpi=70)
-        self.contactPlotter.plot_all_contacts_figure(self.contacts, 0)
+        self.contactPlotter.plot_all_contacts_figure(self.contacts, 0, self.nsPerFrame)
         self.plotGridLayout.addWidget(self.contactPlotter)
 
     def plotAttribute(self):
@@ -55,9 +56,9 @@ class Statistics(QWidget, Ui_Statistics):
                 smooth += 1
             self.smoothStrideField.setText(str(smooth))
         if self.attributeBox.currentText() == "Score":
-            self.contactPlotter.plot_all_contacts_figure(self.contacts, smooth)
+            self.contactPlotter.plot_all_contacts_figure(self.contacts, smooth, self.nsPerFrame)
         elif self.attributeBox.currentText() == "hbond number":
-            self.contactPlotter.plot_hbondNumber(self.contacts, smooth)
+            self.contactPlotter.plot_hbondNumber(self.contacts, smooth, self.nsPerFrame)
         self.plotGridLayout.addWidget(self.contactPlotter)
 
     def savePlot(self):

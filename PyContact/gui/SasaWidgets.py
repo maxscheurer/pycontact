@@ -60,6 +60,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         self.psf, self. dcd = "", ""
         self.allSasas = []
         self.totalFramesToProcess = 0
+        self.nsPerFrame = 1.0
 
         sip.delete(self.sasaProgressBar)
         self.sasaProgressBar = PbWidget(total=100)
@@ -278,8 +279,8 @@ class SasaWidget(QWidget, Ui_SasaWidget):
 
         sip.delete(self.previewPlot)
         self.previewPlot = SimplePlotter(None, width=4, height=2, dpi=70)
-        self.previewPlot.plot(np.arange(0, trajLength, 1), self.allSasas)
-        self.previewPlot.axes.set_xlabel("frame")
+        self.previewPlot.plot(np.arange(0, trajLength, 1) * self.nsPerFrame, self.allSasas)
+        self.previewPlot.axes.set_xlabel("time [ns]")
         if self.calculateContactAreaCheckbox.isChecked():
             self.previewPlot.axes.set_ylabel(r'Contact Area [A$^{\circ}$$^{2}$]')
         else:
