@@ -40,7 +40,7 @@ class Detail(QWidget, Ui_Detail):
         self.plotButton.clicked.connect(self.plotAttribute)
 
         self.contactPlotter = ContactPlotter(None, width=4, height=2, dpi=70)
-        self.contactPlotter.plot_contact_figure(self.contact)
+        self.contactPlotter.plot_contact_figure(self.contact, self.nsPerFrame)
         self.plotGridLayout.addWidget(self.contactPlotter)
 
     def plotAttribute(self):
@@ -48,7 +48,7 @@ class Detail(QWidget, Ui_Detail):
         sip.delete(self.contactPlotter)
         self.contactPlotter = ContactPlotter(None, width=4, height=2, dpi=70)
         if self.attributeBox.currentText() == "Score":
-            self.contactPlotter.plot_contact_figure(self.contact)
+            self.contactPlotter.plot_contact_figure(self.contact, self.nsPerFrame)
         self.plotGridLayout.addWidget(self.contactPlotter)
 
     def savePlot(self):
