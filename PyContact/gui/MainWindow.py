@@ -16,6 +16,7 @@ from . import MainQtGui
 from ..core.multi_accumulation import *
 from ..core.Biochemistry import vdwRadius
 from SasaWidgets import SasaWidget
+from MoleculeTracker import MoleculeTracker
 from Canvas import Canvas
 from Dialogues import FileLoaderDialog, AnalysisDialog
 from ExportTabWidget import ExportTabWidget
@@ -101,6 +102,9 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.exportWidget = ExportTabWidget()
         self.sasaView = SasaWidget()
         self.statisticsView = None
+
+        self.moleculeTracker = MoleculeTracker()
+        self.moleculeTracker.show()
 
         self.analysis_state = False
 
