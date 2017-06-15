@@ -298,6 +298,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.painter.repaint()
         self.painter.update()
         self.sasaView.nsPerFrame = float(self.settingsView.nsPerFrameField.text())
+        self.moleculeTracker.contactAnalyzer = self.analysis
 
     def updateFilters(self):
         """Updates the chosen filters in MainWindow."""

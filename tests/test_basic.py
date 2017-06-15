@@ -41,6 +41,11 @@ class PsfDcdReadingTest(TestCase):
             hbond_sum += c.hbond_percentage()
         self.assertEqual(hbond_sum, 676.0)
 
+    def test_trackMolecule(self):
+        analyzer = Analyzer(self.psffile, self.dcdfile, 5.0, 2.5, 120, "segid RN11 and resid 85", "segid UBQ")
+        analyzer.runFrameScan(1)
+        analyzer.runMoleculeTracking(1, [0, 0, 1, 1, 0])
+
     def test_selfInteraction_analysis(self):
         analyzer = Analyzer(self.psffile, self.dcdfile, 5.0, 2.5, 120, "segid RN11", "self")
         analyzer.runFrameScan(1)

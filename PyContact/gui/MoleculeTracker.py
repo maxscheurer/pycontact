@@ -4,6 +4,8 @@ import sip
 from PyQt5.QtWidgets import QWidget, QRadioButton, QApplication, QFileDialog
 
 from track_mol_gui import *
+from ErrorMessages import ErrorMessages
+from ErrorBox import ErrorBox
 
 
 class MoleculeTracker(QWidget, Ui_trackMoleculeView):
@@ -21,6 +23,10 @@ class MoleculeTracker(QWidget, Ui_trackMoleculeView):
         self.contactAnalyzer = None
 
     def runTracking(self):
+        if self.contactAnalyzer is None:
+            box = ErrorBox(ErrorMessages.NODATA_PROMPTLOAD)
+            box.exec_()
+            return
         print("Executing molecule tracking.")
         selectionIndex = 0
         if self.sel1RadioButton.isChecked():
@@ -30,4 +36,4 @@ class MoleculeTracker(QWidget, Ui_trackMoleculeView):
         print("Selection: ", selectionIndex)
         frameMerge = int(self.mergeFrames.text())
         print("Merge: ", frameMerge)
-        
+        result = self.contactAnalyzer.runMoleculeTracking(selectionIndex, [0, 0, 1, 1, 0])

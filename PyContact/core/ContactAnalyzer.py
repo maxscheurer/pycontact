@@ -8,6 +8,7 @@ from multi_accumulation import *
 from multi_trajectory import run_load_parallel
 from LogPool import *
 from copy import deepcopy
+import operator
 
 import pickle
 
@@ -77,6 +78,11 @@ class Analyzer(QObject):
         self.lastMap1 = map1
         self.lastMap2 = map2
         return deepcopy(self.finalAccumulatedContacts)
+
+    def runMoleculeTracking(self, selIndex, map):
+        print("Running tracking")
+        self.analyze_trackMolecule(self.contactResults, 1, map)
+        return 0
 
     def setTrajectoryData(
             self, resname_array, resid_array, name_array,
@@ -455,6 +461,31 @@ class Analyzer(QObject):
         #print("analyzeTime: ", stop - start)
         # pickle.dump(contactResults, open("single_results.dat", "w"))
         return contactResults
+
+    def analyze_trackMolecule(self, contactResults, selindex, map):
+        total = len(contactResults)
+        counter = 1
+
+        # list with list of tuples with contacts sorted by frame
+        allSortedFrameContacts = []
+        for frame in contactResults:
+            currentFrameAcc = {}
+            for cont in frame:
+                if selindex == 1:
+                    key1, key2 = self.makeKeyArraysFromMaps([], map, cont)
+                elif selindex == 2:
+                    key1, key2 = self.makeKeyArraysFromMaps(map, [], cont)
+                key = self.makeKeyFromKeyArrays(key1, key2)
+                #print(key)
+                if key in currentFrameAcc:
+                    currentFrameAcc[key] += cont.weight
+                else:
+                    currentFrameAcc[key] = 0
+            sorted_frame_contacts = sorted(currentFrameAcc.items(), key=operator.itemgetter(1), reverse=1)
+            allSortedFrameContacts.append(sorted_frame_contacts)
+        print(allSortedFrameContacts)
+
+
 
     def analyze_contactResultsWithMaps(self, contactResults, map1, map2):
         """Analyzes contactsResults with the given maps."""
