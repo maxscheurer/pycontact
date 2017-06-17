@@ -57,18 +57,19 @@ class Analyzer(QObject):
 
     def runFrameScan(self, nproc):
         """Performs a contact search using nproc threads."""
-        # try:
-        if nproc == 1:
-            self.contactResults = self.analyze_psf_dcd_grid(self.psf, self.dcd, self.cutoff, self.hbondcutoff,
-                                                   self.hbondcutangle, self.sel1text, self.sel2text)
-            # self.contactResults = self.analyze_psf_dcd(self.psf, self.dcd, self.cutoff, self.hbondcutoff,
-            #                                        self.hbondcutangle, self.sel1text, self.sel2text)
-        else:
-            self.contactResults, self.resname_array, self.resid_array, self.name_array, self.segids, \
-                        self.backbone = run_load_parallel(nproc, self.psf, self.dcd, self.cutoff, self.hbondcutoff,
-                                                          self.hbondcutangle, self.sel1text, self.sel2text)
-        # except:
-            # raise Exception
+        try:
+            if nproc == 1:
+                self.contactResults = self.analyze_psf_dcd_grid(self.psf, self.dcd, self.cutoff, self.hbondcutoff,
+                                                       self.hbondcutangle, self.sel1text, self.sel2text)
+                # old: original version but slower
+                # self.contactResults = self.analyze_psf_dcd(self.psf, self.dcd, self.cutoff, self.hbondcutoff,
+                #                                        self.hbondcutangle, self.sel1text, self.sel2text)
+            else:
+                self.contactResults, self.resname_array, self.resid_array, self.name_array, self.segids, \
+                            self.backbone = run_load_parallel(nproc, self.psf, self.dcd, self.cutoff, self.hbondcutoff,
+                                                              self.hbondcutangle, self.sel1text, self.sel2text)
+        except:
+            raise Exception
 
     def runContactAnalysis(self, map1, map2, nproc):
         """Performs a contadt analysis using nproc threads."""
@@ -264,6 +265,7 @@ class Analyzer(QObject):
         return key
 
 
+    # newer version, uses gridsearch to find contacts, much faster and less memory-intense
     def analyze_psf_dcd_grid(self, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1text, sel2text):
         """Reading topology/trajectory and assessing hbonds"""
 

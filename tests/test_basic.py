@@ -4,6 +4,8 @@ from os import path
 from PyContact.core.ContactAnalyzer import *
 from PyContact.exampleData.datafiles import DCD, PSF, TPR, XTC
 import MDAnalysis as mda
+import multiprocessing
+multiprocessing.log_to_stderr()
 
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 # from PyContact.core.multi_trajectory import run_load_parallel
