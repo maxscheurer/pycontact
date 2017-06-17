@@ -1,4 +1,5 @@
 from cython.view cimport array as cvarray
+from libcpp.vector cimport vector
 import numpy as np
 
 cdef extern from "src/gridsearch.C":
@@ -6,6 +7,9 @@ cdef extern from "src/gridsearch.C":
 
 cdef extern from "src/gridsearch.C":
   int* find_within(const float *xyz, int *flgs, int *others, int num, float r)
+
+cdef extern from "src/gridsearch.C":
+  vector[vector[int]] find_contacts(const float *pos1, const float *pos2, int nAtoms1, int nAtoms2, double cutoff)
 
 def cy_sasa(npcoords, natoms, pairdist, allow_double_counting, maxsize, nprad,
   surfacePoints, probeRadius, pointstyle,
@@ -22,3 +26,10 @@ def cy_find_within(xyz, flgs, others, num, r):
   cdef int [::1] cy_others = others
   cdef int[::1] result = <int[:num]> find_within(&cy_pos[0],&cy_flags[0], &cy_others[0], num, r)
   return np.asarray(result)
+
+
+def cy_find_contacts(xyz1, natoms1, xyz2, natoms2, r):
+  cdef float [::1] cy_pos1 = xyz1[0]
+  cdef float [::1] cy_pos2 = xyz2[0]
+  res = find_contacts(&cy_pos1[0], &cy_pos2[0], natoms1, natoms2, r)
+  return res

@@ -4,6 +4,7 @@
 #include <math.h>
 #include "ResizeArray.h"
 #include <vector>
+#include <tuple>
 
 #define FALSE   0
 #define TRUE    1
@@ -23,6 +24,10 @@ struct GridSearchPair {
   int ind1, ind2;
   GridSearchPair *next;
 };
+
+GridSearchPair *vmd_gridsearch3(const float *posA, int natomsA, const int *A,
+                                const float *posB, int natomsB, const int *B,
+                                float pairdist, int allow_double_counting, int maxpairs);
 
 #define VMD_RAND_MAX 2147483647L
 long vmd_random(void) {
@@ -401,19 +406,25 @@ GridSearchPair *vmd_gridsearch1(const float *pos,int natoms, const int *on,
   return cur;
 }
 
-static double calc_contacts(const float *pos1, const float *pos2,
-int nAtomsPerFrame1, int nAtomsPerFrame2, double cutoff) {
-  double d2;
-  ResizeArray<int> *pairlist = new ResizeArray<int>[nAtomsPerFrame1+nAtomsPerFrame2];
+std::vector<std::vector<int>> find_contacts(const float *pos1, const float *pos2,
+int nAtoms1, int nAtoms2, double cutoff) {
+  std::vector<std::vector<int>> pairlist1(nAtoms1+nAtoms2);
   GridSearchPair *p, *tmp;
-  // for (p = pairs; p != NULL; p = tmp) {
-  //   int ind1=p->ind1;
-  //   int ind2=p->ind2;
-  //   pairlist[ind1].append(ind2);
-  //   pairlist[ind2].append(ind1);
-  //   tmp = p->next;
-  //   free(p);
-  // }
+  int allowDouble = 0;
+  int A[nAtoms1];
+  fill_n(A, nAtoms1, 1);
+  int B[nAtoms2];
+  fill_n(B, nAtoms2, 1);
+  GridSearchPair* pairs = vmd_gridsearch3(pos1, nAtoms1, A, pos2, nAtoms2, B, cutoff, allowDouble, -1);
+  for (p = pairs; p != NULL; p = tmp) {
+    int ind1=p->ind1;
+    int ind2=p->ind2;
+    pairlist1[ind1].push_back(ind2);
+    pairlist1[ind2].push_back(ind1);
+    tmp = p->next;
+    free(p);
+  }
+  return pairlist1;
 }
 
 
@@ -830,4 +841,323 @@ void * find_within_routine( void *v ) {
     }
   }
   return NULL;
+}
+
+static int make_neighborlist_sym(int **nbrlist, int xb, int yb, int zb) {
+  int xi, yi, zi, aindex, xytotb;
+
+  if (nbrlist == NULL)
+    return -1;
+
+  xytotb = xb * yb;
+  aindex = 0;
+  for (zi=0; zi<zb; zi++) {
+    for (yi=0; yi<yb; yi++) {
+      for (xi=0; xi<xb; xi++) {
+        int nbrs[28]; // 27 neighbors, and a -1 to mark end of the list
+        int n=0;
+        nbrs[n++] = aindex;
+        if (xi < xb-1) nbrs[n++] = aindex + 1;
+        if (yi < yb-1) nbrs[n++] = aindex + xb;
+        if (zi < zb-1) nbrs[n++] = aindex + xytotb;
+        if (xi < (xb-1) && yi < (yb-1)) nbrs[n++] = aindex + xb + 1;
+        if (xi < (xb-1) && zi < (zb-1)) nbrs[n++] = aindex + xytotb + 1;
+        if (yi < (yb-1) && zi < (zb-1)) nbrs[n++] = aindex + xytotb + xb;
+        if (xi < (xb-1) && yi) nbrs[n++] = aindex - xb + 1;
+        if (xi && zi < (zb-1)) nbrs[n++] = aindex + xytotb - 1;
+        if (yi && zi < (zb-1)) nbrs[n++] = aindex + xytotb - xb;
+        if (xi < (xb-1) && yi < (yb-1) && zi < (zb-1)) nbrs[n++] = aindex + xytotb + xb + 1;
+        if (xi && yi < (yb-1) && zi < (zb-1)) nbrs[n++] = aindex + xytotb + xb - 1;
+        if (xi < (xb-1) && yi && zi < (zb-1)) nbrs[n++] = aindex + xytotb - xb + 1;
+        if (xi && yi && zi < (zb-1)) nbrs[n++] = aindex + xytotb - xb - 1;
+
+        if (xi) nbrs[n++] = aindex - 1;
+        if (yi) nbrs[n++] = aindex - xb;
+        if (zi) nbrs[n++] = aindex - xytotb;
+        if (xi && yi) nbrs[n++] = aindex - xb - 1;
+        if (xi && zi) nbrs[n++] = aindex - xytotb - 1;
+        if (yi && zi) nbrs[n++] = aindex - xytotb - xb;
+        if (xi && yi < (yb-1)) nbrs[n++] = aindex + xb - 1;
+        if (xi < (xb-1) && zi) nbrs[n++] = aindex - xytotb + 1;
+        if (yi < (yb-1) && zi) nbrs[n++] = aindex - xytotb + xb;
+        if (xi && yi && zi) nbrs[n++] = aindex - xytotb - xb - 1;
+        if (xi < (xb-1) && yi && zi) nbrs[n++] = aindex - xytotb - xb + 1;
+        if (xi && yi < (yb-1) && zi) nbrs[n++] = aindex - xytotb + xb - 1;
+        if (xi < (xb-1) && yi < (yb-1) && zi) nbrs[n++] = aindex - xytotb + xb + 1;
+        nbrs[n++] = -1; // mark end of list
+
+        int *lst = (int *) malloc(n*sizeof(int));
+        if (lst == NULL)
+          return -1; // return on failed allocations
+        memcpy(lst, nbrs, n*sizeof(int));
+        nbrlist[aindex] = lst;
+        aindex++;
+      }
+    }
+  }
+
+  return 0;
+}
+
+
+GridSearchPair *vmd_gridsearch3(const float *posA, int natomsA, const int *A,
+                                const float *posB, int natomsB, const int *B,
+                                float pairdist, int allow_double_counting, int maxpairs) {
+
+  if (!natomsA || !natomsB) return NULL;
+
+  if (allow_double_counting == -1) { //default
+    if (posA == posB && natomsA == natomsB)
+      allow_double_counting = FALSE;
+    else
+      allow_double_counting = TRUE;
+  }
+
+  // if same molecule and *A[] == *B[], it is a lot faster to use gridsearch1
+  if (posA == posB && natomsA == natomsB) {
+    bool is_equal = TRUE;
+    for (int i=0; i<natomsA && is_equal; i++) {
+      if (A[i] != B[i])
+        is_equal = FALSE;
+    }
+    if (is_equal)
+      return vmd_gridsearch1(posA, natomsA, A, pairdist, allow_double_counting, maxpairs);
+  }
+
+  float min[3], max[3], sqdist;
+  float minB[3], maxB[3]; //tmp storage
+  int i, j, xb, yb, zb, xytotb, totb, aindex;
+  int **boxatomA, *numinboxA, *maxinboxA;
+  int **boxatomB, *numinboxB, *maxinboxB;
+  int **nbrlist;
+  float sidelen[3], volume;
+  int numonA = 0;   int numonB = 0;
+  int paircount = 0;
+  int maxpairsreached = 0;
+  sqdist = pairdist * pairdist;
+
+  // 1. Find grid size for binning
+  // find bounding box for selected atoms
+  find_minmax(posA, natomsA, A, min, max, &numonA);
+  find_minmax(posB, natomsB, B, minB, maxB, &numonB);
+
+  // If no atoms were selected we don't have to go on
+  if (!numonA || !numonB) return NULL;
+
+  for (i=0; i<3; i++) {
+    if (minB[i] < min[i]) min[i] = minB[i];
+    if (maxB[i] > max[i]) max[i] = maxB[i];
+  }
+
+  // do sanity checks and complain if we've got bogus atom coordinates,
+  // we shouldn't ever have density higher than 0.1 atom/A^3, but we'll
+  // be generous and allow much higher densities.
+  if (maxpairs != -1) {
+    vec_sub(sidelen, max, min);
+    // include estimate for atom radius (1 Angstrom) in volume determination
+    volume = fabsf((sidelen[0] + 2.0f) * (sidelen[1] + 2.0f) * (sidelen[2] + 2.0f));
+    if (((numonA + numonB) / volume) > 1.0) {
+      // msgWarn << "vmd_gridsearch3: insane atom density" << sendmsg;
+    }
+  }
+
+  // I don't want the grid to get too large, otherwise I could run out
+  // of memory.  Octrees would be cool, but I'll just limit the grid size
+  // and let the performance degrade a little for pathological systems.
+  // Note that sqdist is what gets used for the actual distance checks;
+  // from here on out pairdist is only used to set the grid size, so we
+  // can set it to anything larger than the original pairdist.
+  const int MAXBOXES = 4000000;
+  totb = MAXBOXES + 1;
+
+  float newpairdist = pairdist;
+  float xrange = max[0]-min[0];
+  float yrange = max[1]-min[1];
+  float zrange = max[2]-min[2];
+  do {
+    pairdist = newpairdist;
+    const float invpairdist = 1.0f / pairdist;
+    xb = ((int)(xrange*invpairdist))+1;
+    yb = ((int)(yrange*invpairdist))+1;
+    zb = ((int)(zrange*invpairdist))+1;
+    xytotb = yb * xb;
+    totb = xytotb * zb;
+    newpairdist = pairdist * 1.26f; // cbrt(2) is about 1.26
+  } while (totb > MAXBOXES || totb < 1); // check for integer wraparound too
+
+  // 2. Sort each atom into appropriate bins
+  boxatomA = (int **) calloc(1, totb*sizeof(int *));
+  numinboxA = (int *) calloc(1, totb*sizeof(int));
+  maxinboxA = (int *) calloc(1, totb*sizeof(int));
+  if (boxatomA == NULL || numinboxA == NULL || maxinboxA == NULL) {
+    if (boxatomA != NULL)
+      free(boxatomA);
+    if (numinboxA != NULL)
+      free(numinboxA);
+    if (maxinboxA != NULL)
+      free(maxinboxA);
+    // msgErr << "Gridsearch memory allocation failed, bailing out" << sendmsg;
+    return NULL; // ran out of memory, bail out!
+  }
+
+  const float invpairdist = 1.0f / pairdist;
+  for (i=0; i<natomsA; i++) {
+    if (A[i]) {
+      int axb, ayb, azb, aindex, num;
+
+      // compute box index for new atom
+      const float *loc = posA + 3L*i;
+      axb = (int)((loc[0] - min[0])*invpairdist);
+      ayb = (int)((loc[1] - min[1])*invpairdist);
+      azb = (int)((loc[2] - min[2])*invpairdist);
+
+      // clamp box indices to valid range in case of FP error
+      if (axb >= xb) axb = xb-1;
+      if (ayb >= yb) ayb = yb-1;
+      if (azb >= zb) azb = zb-1;
+
+      aindex = azb * xytotb + ayb * xb + axb;
+
+      // grow box if necessary
+      if ((num = numinboxA[aindex]) == maxinboxA[aindex]) {
+        boxatomA[aindex] = (int *) realloc(boxatomA[aindex], (num+4)*sizeof(int));
+        maxinboxA[aindex] += 4;
+      }
+
+      // store atom index in box
+      boxatomA[aindex][num] = i;
+      numinboxA[aindex]++;
+    }
+  }
+  free(maxinboxA);
+
+  boxatomB = (int **) calloc(1, totb*sizeof(int *));
+  numinboxB = (int *) calloc(1, totb*sizeof(int));
+  maxinboxB = (int *) calloc(1, totb*sizeof(int));
+  if (boxatomB == NULL || numinboxB == NULL || maxinboxB == NULL) {
+    if (boxatomB != NULL)
+      free(boxatomB);
+    if (numinboxB != NULL)
+      free(numinboxB);
+    if (maxinboxB != NULL)
+      free(maxinboxB);
+    // msgErr << "Gridsearch memory allocation failed, bailing out" << sendmsg;
+    return NULL; // ran out of memory, bail out!
+  }
+
+  for (i=0; i<natomsB; i++) {
+    if (B[i]) {
+      int axb, ayb, azb, aindex, num;
+
+      // compute box index for new atom
+      const float *loc = posB + 3L*i;
+      axb = (int)((loc[0] - min[0])*invpairdist);
+      ayb = (int)((loc[1] - min[1])*invpairdist);
+      azb = (int)((loc[2] - min[2])*invpairdist);
+
+      // clamp box indices to valid range in case of FP error
+      if (axb >= xb) axb = xb-1;
+      if (ayb >= yb) ayb = yb-1;
+      if (azb >= zb) azb = zb-1;
+
+      aindex = azb * xytotb + ayb * xb + axb;
+
+      // grow box if necessary
+      if ((num = numinboxB[aindex]) == maxinboxB[aindex]) {
+        boxatomB[aindex] = (int *) realloc(boxatomB[aindex], (num+4)*sizeof(int));
+        maxinboxB[aindex] += 4;
+      }
+
+      // store atom index in box
+      boxatomB[aindex][num] = i;
+      numinboxB[aindex]++;
+    }
+  }
+  free(maxinboxB);
+
+
+  // 3. Build pairlists of atoms less than sqrtdist apart
+  nbrlist = (int **) calloc(1, totb*sizeof(int *));
+  if (make_neighborlist_sym(nbrlist, xb, yb, zb)) {
+    if (boxatomA != NULL) {
+      for (i=0; i<totb; i++) {
+        if (boxatomA[i] != NULL) free(boxatomA[i]);
+      }
+      free(boxatomA);
+    }
+    if (boxatomB != NULL) {
+      for (i=0; i<totb; i++) {
+        if (boxatomB[i] != NULL) free(boxatomB[i]);
+      }
+      free(boxatomB);
+    }
+    if (nbrlist != NULL) {
+      for (i=0; i<totb; i++) {
+        if (nbrlist[i] != NULL) free(nbrlist[i]);
+      }
+      free(nbrlist);
+    }
+    free(numinboxA);
+    free(numinboxB);
+    // msgErr << "Gridsearch memory allocation failed, bailing out" << sendmsg;
+    return NULL; // ran out of memory, bail out!
+  }
+
+  // setup head of pairlist
+  GridSearchPair *head, *cur;
+  head = (GridSearchPair *) malloc(sizeof(GridSearchPair));
+  head->next = NULL;
+  cur = head;
+
+  for (aindex = 0; aindex < totb; aindex++) {
+    int *tmpbox, *tmpnbr, *nbr;
+    tmpbox = boxatomA[aindex];
+    tmpnbr = nbrlist[aindex];
+    for (nbr = tmpnbr; (*nbr != -1) && (!maxpairsreached); nbr++) {
+      int *nbrboxB = boxatomB[*nbr];
+      for (i=0; (i<numinboxA[aindex]) && (!maxpairsreached); i++) {
+        const float *p1;
+        int ind1 = tmpbox[i];
+        p1 = posA + 3L*ind1;
+        for (j=0; (j<numinboxB[*nbr]) && (!maxpairsreached); j++) {
+          const float *p2;
+          int ind2 = nbrboxB[j];
+          p2 = posB + 3L*ind2;
+          if (!allow_double_counting && B[ind1] && A[ind2] && ind2<=ind1) continue; //don't double-count bonds XXX
+          if (distance2(p1,p2) > sqdist) continue;
+
+          if (maxpairs > 0) {
+            if (paircount >= maxpairs) {
+              maxpairsreached = 1;
+              continue;
+            }
+          }
+
+          add_link(cur, ind1, ind2);
+          paircount++;
+          cur = cur->next;
+          cur->next = NULL;
+        }
+      }
+    }
+  }
+
+  for (i=0; i<totb; i++) {
+    free(boxatomA[i]);
+    free(boxatomB[i]);
+    free(nbrlist[i]);
+  }
+  free(boxatomA);
+  free(boxatomB);
+  free(nbrlist);
+  free(numinboxA);
+  free(numinboxB);
+
+  cur = head->next;
+  free(head);
+
+  // if (maxpairsreached)
+    // msgErr << "gridsearch3: exceeded pairlist sanity check, aborted" << sendmsg;
+
+  return cur;
 }

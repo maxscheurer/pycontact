@@ -19,8 +19,8 @@ from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject
 
 # TODO: fix aroundPatch with gridsearch in C code using cython
 from .aroundPatch import AroundSelection
-
 from .Biochemistry import (AccumulatedContact, AtomContact, AccumulationMapIndex, AtomType, HydrogenBond, AtomHBondType, TempContactAccumulate, HydrogenBondAtoms)
+from ..cy_modules.cy_gridsearch import cy_find_contacts
 
 MDAnalysis.core.flags['use_periodic_selections'] = False
 MDAnalysis.core.flags['use_KDTree_routines'] = True
@@ -57,16 +57,16 @@ class Analyzer(QObject):
 
     def runFrameScan(self, nproc):
         """Performs a contact search using nproc threads."""
-        try:
-            if nproc == 1:
-                self.contactResults = self.analyze_psf_dcd(self.psf, self.dcd, self.cutoff, self.hbondcutoff,
-                                                       self.hbondcutangle, self.sel1text, self.sel2text)
-            else:
-                self.contactResults, self.resname_array, self.resid_array, self.name_array, self.segids, \
-                            self.backbone = run_load_parallel(nproc, self.psf, self.dcd, self.cutoff, self.hbondcutoff,
-                                                              self.hbondcutangle, self.sel1text, self.sel2text)
-        except:
-            raise Exception
+        # try:
+        if nproc == 1:
+            self.contactResults = self.analyze_psf_dcd(self.psf, self.dcd, self.cutoff, self.hbondcutoff,
+                                                   self.hbondcutangle, self.sel1text, self.sel2text)
+        else:
+            self.contactResults, self.resname_array, self.resid_array, self.name_array, self.segids, \
+                        self.backbone = run_load_parallel(nproc, self.psf, self.dcd, self.cutoff, self.hbondcutoff,
+                                                          self.hbondcutangle, self.sel1text, self.sel2text)
+        # except:
+            # raise Exception
 
     def runContactAnalysis(self, map1, map2, nproc):
         """Performs a contadt analysis using nproc threads."""
@@ -260,6 +260,222 @@ class Analyzer(QObject):
                 key += AccumulationMapIndex.mapping[itemcounter] + str(item)
             itemcounter += 1
         return key
+
+
+    def analyze_psf_dcd_grid(self, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1text, sel2text):
+        """Reading topology/trajectory and assessing hbonds"""
+
+        # load psf and dcd file in memory
+        u = MDAnalysis.Universe(psf, dcd)
+
+# TODO: think about doing u.select_atoms(sel1text + " or " + sel2text)
+        all_sel = u.select_atoms("all")
+        # all_sel = u.select_atoms("%s or %s or name H.*" % (sel1text, sel2text))
+        backbone_sel = u.select_atoms("backbone")
+        self.resname_array = []
+        self.resid_array = []
+        self.name_array = []
+        self.segids = []
+        self.backbone = []
+        for atom in all_sel.atoms:
+            self.resname_array.append(atom.resname)
+            self.resid_array.append(atom.resid)
+            self.name_array.append(atom.name)
+            self.bonds.append(atom.bonds)
+            self.segids.append(atom.segid)
+        for atom in backbone_sel:
+            self.backbone.append(atom.index)
+
+        selfInteraction = False
+
+        if sel2text == "self":
+            sel1 = u.select_atoms(sel1text)
+            sel2 = u.select_atoms(sel1text)
+            selfInteraction = True
+        else:
+            sel1 = u.select_atoms(sel1text)
+            sel2 = u.select_atoms(sel2text)
+
+        if (len(sel1.atoms) == 0 or len(sel2.atoms) == 0):
+            raise Exception
+
+        contactResults = []
+        # loop over trajectory
+        self.totalFrameNumber = len(u.trajectory)
+        start = time.time()
+        for ts in u.trajectory:
+            # define selections according to sel1text and sel2text
+            if "around" in sel1text:
+                sel1 = u.select_atoms(sel1text)
+            if "around" in sel2text:
+                sel2 = u.select_atoms(sel2text)
+            # write atomindices for each selection to list
+            indices1 = []
+            for at in sel1.atoms:
+                indices1.append(at.index)
+            indices2 = []
+            for at in sel2.atoms:
+                indices2.append(at.index)
+
+            currentFrameContacts = []
+            frame = ts.frame
+            self.currentFrameNumber = ts.frame
+
+            # pass positions and distance to cython
+            natoms1 = len(sel1.atoms)
+            natoms2 = len(sel2.atoms)
+            pos1 = np.reshape(sel1.positions, (1, natoms1 * 3))
+            pos2 = np.reshape(sel2.positions, (1, natoms2 * 3))
+            xyz1 = np.array(pos1, dtype=np.float32)
+            xyz2 = np.array(pos2, dtype=np.float32)
+            # 2d array with index of atom1 being the index of the first dimension
+            # individual lists contain atom2 indices
+            res = cy_find_contacts(xyz1, natoms1, xyz2, natoms2, 5.0)
+            nbList1 = res[:natoms1]
+            nbList2 = res[natoms1:]
+
+            distarray = distances.distance_array(sel1.positions, sel2.positions, box=None)
+
+            idx1 = 0
+            for atom1sNeighbors in nbList1:
+                for idx2 in atom1sNeighbors:
+                    convindex1 = indices1[idx1]  # idx1 converted to global atom indexing
+                    convindex2 = indices2[idx2]  # idx2 converted to global atom indexing
+                    # jump out of loop if hydrogen contacts are found, only contacts between heavy atoms are considered,
+                    # hydrogen bonds can still be detected!
+                    if re.match("H(.*)", self.name_array[convindex1]) or re.match("H(.*)", self.name_array[convindex2]):
+                        continue
+                        # distance between atom1 and atom2
+                    # check if residues are more than 4 apart, and in the same segment
+                    if selfInteraction:
+                        if (self.resid_array[convindex1] - self.resid_array[convindex2]) < 5 and self.segids[convindex1] == self.segids[convindex2]:
+                            continue
+                    # distance = distarray[idx1, idx2]
+                    # weight = self.weight_function(distance)
+                    distance = np.linalg.norm(sel1.positions[idx1] - sel2.positions[idx2])
+                    if (distance - distarray[idx1, idx2]) > 0.001:
+                        print("Error in distance calculations!")
+                        return
+                    print(convindex1, convindex2, distance, distarray[idx1, idx2])
+                    if (distance > cutoff):
+                        print("Distances must be smaller/equal cutoff!")
+                        return
+                    weight = self.weight_function(distance)
+
+                    # HydrogenBondAlgorithm
+                    hydrogenBonds = []
+                    # FF independent hydrogen bonds
+                    if (self.name_array[convindex1][0] in HydrogenBondAtoms.atoms and self.name_array[convindex2][0] in HydrogenBondAtoms.atoms):
+                            # print("hbond? %s - %s" % (type_array[convindex1], type_array[convindex2]))
+                            # search for hatom, check numbering in bond!!!!!!!!!!
+                            b1 = self.bonds[convindex1]
+                            b2 = self.bonds[convindex2]
+
+                            # b1 = all_sel[convindex1].bonds
+                            # b2 = all_sel[convindex2].bonds
+                            # search for hydrogen atoms bound to atom 1
+                            bondcount1 = 0
+                            hydrogenAtomsBoundToAtom1 = []
+
+                            # new code
+                            for bnd in b1:
+                                b = bnd.type
+                                hydrogen = next((x for x in b if x.startswith("H")), 0)
+                                # print(b)
+                                if hydrogen != 0:
+                                    # print("h bond to atom1")
+                                    bondindices1 = b1.to_indices()[bondcount1]
+                                    # print bondindices1
+                                    # for j in bondindices1:
+                                    #     print(self.type_array[j+1])
+                                    hydrogenidx = next(
+                                        (j for j in bondindices1 if self.name_array[j].startswith("H")), -1)
+                                    if hydrogenidx != -1:
+                                        # print(self.type_array[hydrogenidx])
+                                        hydrogenAtomsBoundToAtom1.append(hydrogenidx)
+                                bondcount1 += 1
+                            # search for hydrogen atoms bound to atom 2
+                            bondcount2 = 0
+                            hydrogenAtomsBoundToAtom2 = []
+                            # print(b2)
+                            for bnd2 in b2:
+                                b = bnd2.type
+                                hydrogen = next((x for x in b if x.startswith("H")), 0)
+                                # print(b)
+                                if hydrogen != 0:
+                                    # print("h bond to atom2")
+                                    bondindices2 = b2.to_indices()[bondcount2]
+                                    hydrogenidx = next(
+                                        (k for k in bondindices2 if self.name_array[k].startswith("H")), -1)
+                                    if hydrogenidx != -1:
+                                        # print(type_array[hydrogenidx])
+                                        hydrogenAtomsBoundToAtom2.append(hydrogenidx)
+                                bondcount2 += 1
+                            # check hbond criteria for hydrogen atoms bound to first atom
+                            for global_hatom in hydrogenAtomsBoundToAtom1:
+                                conv_hatom = indices1.index(global_hatom)
+                                # print(typeHeavy)
+                                #
+                                # TODO: FF independent version
+                                # if (typeHeavy == AtomHBondType.acc or typeHeavy == AtomHBondType.both) and (distarray[conv_hatom, idx2] <= hbondcutoff):
+                                # dist = distarray[conv_hatom, idx2]
+                                dist = np.linalg.norm(sel1.positions[conv_hatom] - sel2.positions[idx2])
+                                if (dist <= hbondcutoff):
+                                    donorPosition = sel1.positions[idx1]
+                                    hydrogenPosition = sel1.positions[conv_hatom]
+                                    acceptorPosition = sel2.positions[idx2]
+                                    v1 = hydrogenPosition - acceptorPosition
+                                    v2 = hydrogenPosition - donorPosition
+                                    v1norm = np.linalg.norm(v1)
+                                    v2norm = np.linalg.norm(v2)
+                                    dot = np.dot(v1, v2)
+                                    angle = np.degrees(np.arccos(dot / (v1norm * v2norm)))
+                                    # print(angle)
+                                    if angle >= hbondcutangle:
+                                        # print("new hbond")
+                                        new_hbond = HydrogenBond(convindex1, convindex2, global_hatom, dist, angle,
+                                                                 hbondcutoff,
+                                                                 hbondcutangle)
+                                        hydrogenBonds.append(new_hbond)
+                                        # print(str(convindex1) + " " + str(convindex2)
+                                        # print("hbond found: %d,%d,%d"%(convindex1,global_hatom,convindex2))
+                                        # print(angle)
+                            for global_hatom in hydrogenAtomsBoundToAtom2:
+                                conv_hatom = indices2.index(global_hatom)
+                                # TODO: FF independent version
+                                # if (typeHeavy == AtomHBondType.acc or typeHeavy == AtomHBondType.both) and (distarray[idx1, conv_hatom] <= hbondcutoff):
+                                # FIXME: WTF?
+                                # if (distarray[conv_hatom, idx2] <= hbondcutoff):
+                                # dist = distarray[idx1, conv_hatom]
+                                dist = np.linalg.norm(sel1.positions[idx1] - sel2.positions[conv_hatom])
+                                if (dist <= hbondcutoff):
+                                    donorPosition = sel2.positions[idx2]
+                                    hydrogenPosition = sel2.positions[conv_hatom]
+                                    acceptorPosition = sel1.positions[idx1]
+                                    v1 = hydrogenPosition - acceptorPosition
+                                    v2 = hydrogenPosition - donorPosition
+                                    v1norm = np.linalg.norm(v1)
+                                    v2norm = np.linalg.norm(v2)
+                                    dot = np.dot(v1, v2)
+                                    angle = np.degrees(np.arccos(dot / (v1norm * v2norm)))
+                                    if angle >= hbondcutangle:
+                                        new_hbond = HydrogenBond(convindex2, convindex1, global_hatom, dist, angle,
+                                                                 hbondcutoff,
+                                                                 hbondcutangle)
+                                        hydrogenBonds.append(new_hbond)
+                                        # print str(convindex1) + " " + str(convindex2)
+                                        # print "hbond found: %d,%d,%d"%(convindex2,global_hatom,convindex1)
+                                        # print angle
+                                        # finalize
+                    newAtomContact = AtomContact(int(frame), float(distance), float(weight), int(convindex1),
+                                                 int(convindex2),
+                                                 hydrogenBonds)
+                    currentFrameContacts.append(newAtomContact)
+                idx1 += 1
+            contactResults.append(currentFrameContacts)
+        return contactResults
+
+
 
     def analyze_psf_dcd(self, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1text, sel2text):
         """Reading topology/trajectory and assessing hbonds"""
