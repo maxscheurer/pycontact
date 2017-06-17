@@ -410,7 +410,7 @@ std::vector<std::vector<int>> find_contacts(const float *pos1, const float *pos2
 int nAtoms1, int nAtoms2, double cutoff) {
   std::vector<std::vector<int>> pairlist1(nAtoms1+nAtoms2);
   GridSearchPair *p, *tmp;
-  int allowDouble = 0;
+  int allowDouble = 1;
   int A[nAtoms1];
   fill_n(A, nAtoms1, 1);
   int B[nAtoms2];
@@ -420,7 +420,7 @@ int nAtoms1, int nAtoms2, double cutoff) {
     int ind1=p->ind1;
     int ind2=p->ind2;
     pairlist1[ind1].push_back(ind2);
-    pairlist1[ind2].push_back(ind1);
+    pairlist1[nAtoms1+ind2].push_back(ind1);
     tmp = p->next;
     free(p);
   }

@@ -59,8 +59,10 @@ class Analyzer(QObject):
         """Performs a contact search using nproc threads."""
         # try:
         if nproc == 1:
-            self.contactResults = self.analyze_psf_dcd(self.psf, self.dcd, self.cutoff, self.hbondcutoff,
+            self.contactResults = self.analyze_psf_dcd_grid(self.psf, self.dcd, self.cutoff, self.hbondcutoff,
                                                    self.hbondcutangle, self.sel1text, self.sel2text)
+            # self.contactResults = self.analyze_psf_dcd(self.psf, self.dcd, self.cutoff, self.hbondcutoff,
+            #                                        self.hbondcutangle, self.sel1text, self.sel2text)
         else:
             self.contactResults, self.resname_array, self.resid_array, self.name_array, self.segids, \
                         self.backbone = run_load_parallel(nproc, self.psf, self.dcd, self.cutoff, self.hbondcutoff,
@@ -330,11 +332,10 @@ class Analyzer(QObject):
             xyz2 = np.array(pos2, dtype=np.float32)
             # 2d array with index of atom1 being the index of the first dimension
             # individual lists contain atom2 indices
-            res = cy_find_contacts(xyz1, natoms1, xyz2, natoms2, 5.0)
+            res = cy_find_contacts(xyz1, natoms1, xyz2, natoms2, cutoff)
             nbList1 = res[:natoms1]
             nbList2 = res[natoms1:]
 
-            distarray = distances.distance_array(sel1.positions, sel2.positions, box=None)
 
             idx1 = 0
             for atom1sNeighbors in nbList1:
@@ -352,14 +353,14 @@ class Analyzer(QObject):
                             continue
                     # distance = distarray[idx1, idx2]
                     # weight = self.weight_function(distance)
-                    distance = np.linalg.norm(sel1.positions[idx1] - sel2.positions[idx2])
-                    if (distance - distarray[idx1, idx2]) > 0.001:
-                        print("Error in distance calculations!")
-                        return
-                    print(convindex1, convindex2, distance, distarray[idx1, idx2])
-                    if (distance > cutoff):
-                        print("Distances must be smaller/equal cutoff!")
-                        return
+                    distance = np.linalg.norm(pos1[0][3*idx1:3*idx1+3] - pos2[0][3*idx2:3*idx2+3])
+                    # if (distance - distarray[idx1, idx2]) > 0.001:
+                    #     print("Error in distance calculations!")
+                    #     return
+                    # # print(convindex1, convindex2, distance, distarray[idx1, idx2])
+                    # if (distance > cutoff):
+                    #     print("Distances must be smaller/equal cutoff!")
+                    #     return
                     weight = self.weight_function(distance)
 
                     # HydrogenBondAlgorithm
@@ -419,7 +420,8 @@ class Analyzer(QObject):
                                 # TODO: FF independent version
                                 # if (typeHeavy == AtomHBondType.acc or typeHeavy == AtomHBondType.both) and (distarray[conv_hatom, idx2] <= hbondcutoff):
                                 # dist = distarray[conv_hatom, idx2]
-                                dist = np.linalg.norm(sel1.positions[conv_hatom] - sel2.positions[idx2])
+                                # dist = np.linalg.norm(sel1.positions[conv_hatom] - sel2.positions[idx2])
+                                dist = np.linalg.norm(pos1[0][3*conv_hatom:3*conv_hatom+3] - pos2[0][3*idx2:3*idx2+3])
                                 if (dist <= hbondcutoff):
                                     donorPosition = sel1.positions[idx1]
                                     hydrogenPosition = sel1.positions[conv_hatom]
@@ -447,7 +449,8 @@ class Analyzer(QObject):
                                 # FIXME: WTF?
                                 # if (distarray[conv_hatom, idx2] <= hbondcutoff):
                                 # dist = distarray[idx1, conv_hatom]
-                                dist = np.linalg.norm(sel1.positions[idx1] - sel2.positions[conv_hatom])
+                                # dist = np.linalg.norm(sel1.positions[idx1] - sel2.positions[conv_hatom])
+                                dist = np.linalg.norm(pos1[0][3*idx1:3*idx1+3] - pos2[0][3*conv_hatom:3*conv_hatom+3])
                                 if (dist <= hbondcutoff):
                                     donorPosition = sel2.positions[idx2]
                                     hydrogenPosition = sel2.positions[conv_hatom]
@@ -473,6 +476,12 @@ class Analyzer(QObject):
                     currentFrameContacts.append(newAtomContact)
                 idx1 += 1
             contactResults.append(currentFrameContacts)
+
+        # pickle.dump(contactResults, open("single_results_experimental.dat", "w"))
+        # for f in contactResults:
+        #     print("experiment", len(f))
+        stop = time.time()
+        print("grid:",stop-start)
         return contactResults
 
 
@@ -675,7 +684,10 @@ class Analyzer(QObject):
         #print("Selection 1: ", len(sel1.positions), ", Selection2: ", len(sel2.positions))
 
         #print("analyzeTime: ", stop - start)
-        # pickle.dump(contactResults, open("single_results.dat", "w"))
+        # pickle.dump(contactResults, open("single_results_working.dat", "w"))
+        # for f in contactResults:
+            # print("working", len(f))
+        print("distmatrix: ", stop-start)
         return contactResults
 
     def analyze_trackMolecule(self, contactResults, selindex, map):
