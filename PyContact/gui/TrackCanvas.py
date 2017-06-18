@@ -112,18 +112,7 @@ class TrackCanvas(QWidget, QObject):
                 rowheight = totalHeight + self.maximalContactsPerRow*lheight
 
             for label in frame:
-                #cindex = self.contacts.index(c)
-                #self.buttons.append(QPushButton(c.title))
                 stylesheet = "border: 0px solid #222222; background-color: rgba(255,0,0,%d);" % int(label[1]*2)
-                # stylesheet = "border: 0px solid #222222; background-color: " + ContactType.colors[3] + " ;"
-
-                #self.buttons[-1].setStyleSheet(stylesheet)
-                #self.buttons[-1].clicked.connect(partial(self.handleButton, data=cindex))
-                #self.buttons[-1].setParent(self)
-                #self.buttons[-1].move(start_text + checkboxOffset, row + textoffset)
-                #self.buttons[-1].setFont(QFont('Arial', 9))
-                #self.buttons[-1].show()
-                #self.buttonWidths.append(self.buttons[-1].width())
                 currentLabels.append(StretchedLabel(label[0]))
                 currentLabels[-1].setAutoFillBackground(True)
                 currentLabels[-1].setStyleSheet(stylesheet)
@@ -156,7 +145,7 @@ class TrackCanvas(QWidget, QObject):
                     frameLabels[-1].setFont(QFont('Arial', 10))
                     frameLabels[-1].show()
             totalWidth += colnumber*colwidth
-        #self.resize(totalWidth, totalHeight)
+        # self.resize(totalWidth, totalHeight)
 
 
     def drawRenderedContact(self, qp):
