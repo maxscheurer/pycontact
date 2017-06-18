@@ -46,6 +46,7 @@ class MoleculeTracker(QWidget, Ui_trackMoleculeView):
         result = self.contactAnalyzer.runMoleculeTracking(selectionIndex, [0, 0, 1, 1, 0])
         print("Analysis finished", result)
         self.labelPainter.contacts = result
+        self.labelPainter.maximalContactsPerRow = int(self.maxContactsPerRowField.text())
         self.labelPainter.draw_labels()
         # self.labelPainter.repaint()
         self.labelPainter.update()
