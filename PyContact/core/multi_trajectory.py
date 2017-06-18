@@ -77,9 +77,9 @@ def loop_trajectory_grid(sel1c, sel2c, indices1, indices2, config, suppl, selfIn
         xyz2 = np.array(pos2, dtype=np.float32)
         # 2d array with index of atom1 being the index of the first dimension
         # individual lists contain atom2 indices
-        res = cy_find_contacts(xyz1, natoms1, xyz2, natoms2, cutoff)
-        nbList1 = res[:natoms1]
-        nbList2 = res[natoms1:]
+        nbList1 = cy_find_contacts(xyz1, natoms1, xyz2, natoms2, cutoff)
+        # nbList1 = res[:natoms1]
+        # nbList2 = res[natoms1:]
         idx1 = 0
         for atom1sNeighbors in nbList1:
             for idx2 in atom1sNeighbors:

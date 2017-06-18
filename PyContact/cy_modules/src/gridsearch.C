@@ -420,7 +420,7 @@ int nAtoms1, int nAtoms2, double cutoff) {
     int ind1=p->ind1;
     int ind2=p->ind2;
     pairlist1[ind1].push_back(ind2);
-    pairlist1[nAtoms1+ind2].push_back(ind1);
+    // pairlist1[nAtoms1+ind2].push_back(ind1);
     tmp = p->next;
     free(p);
   }

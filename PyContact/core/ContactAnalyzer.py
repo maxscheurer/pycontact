@@ -334,9 +334,11 @@ class Analyzer(QObject):
             xyz2 = np.array(pos2, dtype=np.float32)
             # 2d array with index of atom1 being the index of the first dimension
             # individual lists contain atom2 indices
-            res = cy_find_contacts(xyz1, natoms1, xyz2, natoms2, cutoff)
-            nbList1 = res[:natoms1]
-            nbList2 = res[natoms1:]
+            nbList1 = cy_find_contacts(xyz1, natoms1, xyz2, natoms2, cutoff)
+
+            # we only need the 1st list
+            # nbList1 = res[:natoms1]
+            # nbList2 = res[natoms1:]
 
 
             idx1 = 0
