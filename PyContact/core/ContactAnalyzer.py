@@ -84,8 +84,7 @@ class Analyzer(QObject):
 
     def runMoleculeTracking(self, selIndex, map):
         print("Running tracking")
-        self.analyze_trackMolecule(self.contactResults, 1, map)
-        return 0
+        return self.analyze_trackMolecule(self.contactResults, 1, map)
 
     def setTrajectoryData(
             self, resname_array, resid_array, name_array,
@@ -715,7 +714,7 @@ class Analyzer(QObject):
                     currentFrameAcc[key] = 0
             sorted_frame_contacts = sorted(currentFrameAcc.items(), key=operator.itemgetter(1), reverse=1)
             allSortedFrameContacts.append(sorted_frame_contacts)
-        print(allSortedFrameContacts)
+        return allSortedFrameContacts
 
 
 

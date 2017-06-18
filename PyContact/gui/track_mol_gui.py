@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'track_mol_gui.ui'
 #
-# Created by: PyQt5 UI code generator 5.6
+# Created by: PyQt5 UI code generator 5.8.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_trackMoleculeView(object):
     def setupUi(self, trackMoleculeView):
         trackMoleculeView.setObjectName("trackMoleculeView")
-        trackMoleculeView.resize(584, 443)
+        trackMoleculeView.resize(743, 538)
         self.gridLayout = QtWidgets.QGridLayout(trackMoleculeView)
         self.gridLayout.setObjectName("gridLayout")
         self.widget = QtWidgets.QWidget(trackMoleculeView)
@@ -22,6 +22,17 @@ class Ui_trackMoleculeView(object):
         self.trackTimelineView = QtWidgets.QWidget(self.widget)
         self.trackTimelineView.setMinimumSize(QtCore.QSize(0, 340))
         self.trackTimelineView.setObjectName("trackTimelineView")
+        self.gridLayout_3 = QtWidgets.QGridLayout(self.trackTimelineView)
+        self.gridLayout_3.setContentsMargins(0, 0, 0, 0)
+        self.gridLayout_3.setObjectName("gridLayout_3")
+        self.scrollArea = QtWidgets.QScrollArea(self.trackTimelineView)
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setObjectName("scrollArea")
+        self.scrollAreaWidgetContents = QtWidgets.QWidget()
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 687, 430))
+        self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
+        self.scrollArea.setWidget(self.scrollAreaWidgetContents)
+        self.gridLayout_3.addWidget(self.scrollArea, 0, 0, 1, 1)
         self.gridLayout_2.addWidget(self.trackTimelineView, 1, 0, 1, 1)
         self.trackSettingsView = QtWidgets.QWidget(self.widget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
