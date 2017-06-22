@@ -4,7 +4,6 @@
 #include <math.h>
 #include "ResizeArray.h"
 #include <vector>
-#include <tuple>
 
 #define FALSE   0
 #define TRUE    1
