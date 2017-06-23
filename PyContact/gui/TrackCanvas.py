@@ -35,6 +35,8 @@ class TrackCanvas(QWidget, QObject):
         self.contacts = None
         self.labels = []
         self.maximalContactsPerRow = 1
+        self.sizeX = 0
+        self.sizeY = 0
 
     def draw_labels(self):
         if self.contacts is not None:
@@ -44,8 +46,6 @@ class TrackCanvas(QWidget, QObject):
     def paintEvent(self, event):
         qp = QPainter()
         qp.begin(self)
-        print("paint event")
-
         # render pixmap to resolve performance issues
         # if self.rendered:
         #     self.drawRenderedContact(qp)
@@ -54,7 +54,7 @@ class TrackCanvas(QWidget, QObject):
         #     self.renderContact(False)
         # self.rendered = True
 
-        # self.setMinimumSize(QSize(self.sizeX, self.sizeY))
+        self.setMinimumSize(QSize(self.sizeX, self.sizeY))
 
         qp.end()
 
@@ -88,6 +88,7 @@ class TrackCanvas(QWidget, QObject):
         offsetY = 10
         offsetX = 50
         colwidth = 80
+        colnumberMax = 10
         lheight = 20
         totalWidth = offsetX
         totalHeight = offsetY
@@ -100,12 +101,12 @@ class TrackCanvas(QWidget, QObject):
             # print("painting labels", len(frame))
             currentLabels = []
             lnumber = 0
-            print(frame)
+            # print(frame)
             if len(frame) == 0:
                 currentLabels.append(StretchedLabel("empty"))
                 currentLabels[-1].setParent(self)
                 width = currentLabels[-1].width()
-                print("width", width)
+                # print("width", width)
                 currentLabels[-1].move(offsetX + colnumber*colwidth, offsetY + lnumber*lheight + totalHeight)
                 currentLabels[-1].setFont(QFont('Arial', 10))
                 currentLabels[-1].show()
@@ -118,7 +119,7 @@ class TrackCanvas(QWidget, QObject):
                 currentLabels[-1].setStyleSheet(stylesheet)
                 currentLabels[-1].setParent(self)
                 width = currentLabels[-1].width()
-                print("width", width)
+                # print("width", width)
                 currentLabels[-1].move(offsetX + colnumber*colwidth, offsetY + lnumber*lheight + totalHeight)
                 currentLabels[-1].setFont(QFont('Arial', 10))
                 currentLabels[-1].show()
@@ -130,7 +131,8 @@ class TrackCanvas(QWidget, QObject):
 
             self.labels.append(currentLabels)
             colnumber += 1
-            if colnumber >= 10:
+
+            if colnumber >= colnumberMax:
                 frameCounter += colnumber
                 colnumber = 0
                 rownumber += 1
@@ -140,13 +142,14 @@ class TrackCanvas(QWidget, QObject):
                     frameLabels.append(StretchedLabel("%d" % frameCounter))
                     frameLabels[-1].setParent(self)
                     width = frameLabels[-1].width()
-                    print("width", width)
+                    # print("width", width)
                     frameLabels[-1].move(10 + colnumber*colwidth, offsetY + 0.4*self.maximalContactsPerRow*lheight + totalHeight)
                     frameLabels[-1].setFont(QFont('Arial', 10))
                     frameLabels[-1].show()
-            totalWidth += colnumber*colwidth
-        # self.resize(totalWidth, totalHeight)
 
+        self.sizeX = colnumberMax * colwidth + offsetX
+        self.sizeY = offsetY + rownumber * self.maximalContactsPerRow * lheight
+        print(self.sizeY)
 
     def drawRenderedContact(self, qp):
         """Draws the rendered contact to the canvas."""

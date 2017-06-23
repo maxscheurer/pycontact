@@ -40,11 +40,11 @@ class MoleculeTracker(QWidget, Ui_trackMoleculeView):
             selectionIndex = 1
         elif self.sel2RadioButton.isChecked():
             selectionIndex = 2
-        print("Selection: ", selectionIndex)
+        # print("Selection: ", selectionIndex)
         frameMerge = int(self.mergeFrames.text())
-        print("Merge: ", frameMerge)
+        # print("Merge: ", frameMerge)
         result = self.contactAnalyzer.runMoleculeTracking(selectionIndex, [0, 0, 1, 1, 0])
-        print("Analysis finished", result)
+        # print("Analysis finished", result)
         self.labelPainter.contacts = result
         self.labelPainter.maximalContactsPerRow = int(self.maxContactsPerRowField.text())
         self.labelPainter.draw_labels()
