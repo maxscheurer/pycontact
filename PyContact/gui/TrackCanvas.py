@@ -73,7 +73,7 @@ class TrackCanvas(QWidget, QObject):
         whiteColor = QColor(255, 255, 255)
 
         # self.pixmap = QPixmap(QSize(self.sizeX, self.sizeY))
-        p = QPainter()
+        #p = QPainter()
 
         # if generator:
         #     p.begin(generator)
@@ -81,7 +81,7 @@ class TrackCanvas(QWidget, QObject):
         #     p.begin(self.pixmap)
 
         # p.fillRect(0, 0, self.sizeX, self.sizeY, whiteColor)
-        p.end()
+        #p.end()
         row = 0
         rownumber = 0
         colnumber = 0
@@ -149,7 +149,6 @@ class TrackCanvas(QWidget, QObject):
 
         self.sizeX = colnumberMax * colwidth + offsetX
         self.sizeY = offsetY + rownumber * self.maximalContactsPerRow * lheight
-        print(self.sizeY)
 
     def drawRenderedContact(self, qp):
         """Draws the rendered contact to the canvas."""
