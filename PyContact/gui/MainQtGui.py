@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'MainQtGui.ui'
 #
-# Created by: PyQt5 UI code generator 5.8
+# Created by: PyQt5 UI code generator 5.7.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1265, 864)
+        MainWindow.resize(1265, 710)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
@@ -85,7 +85,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 941, 708))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 911, 549))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
         self.gridLayout.addWidget(self.scrollArea, 2, 0, 1, 8)
@@ -316,6 +316,8 @@ class Ui_MainWindow(object):
         self.sortingKeyDropdown.addItem("")
         self.sortingKeyDropdown.addItem("")
         self.sortingKeyDropdown.addItem("")
+        self.sortingKeyDropdown.addItem("")
+        self.sortingKeyDropdown.addItem("")
         self.gridLayout_4.addWidget(self.sortingKeyDropdown, 2, 1, 1, 1)
         self.activeSortingBox = QtWidgets.QCheckBox(self.widget)
         self.activeSortingBox.setText("")
@@ -357,7 +359,7 @@ class Ui_MainWindow(object):
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1265, 25))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1265, 22))
         self.menubar.setDefaultUp(False)
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
@@ -395,6 +397,8 @@ class Ui_MainWindow(object):
         self.actionPreferences.setObjectName("actionPreferences")
         self.actionVMD_Remote_Control = QtWidgets.QAction(MainWindow)
         self.actionVMD_Remote_Control.setObjectName("actionVMD_Remote_Control")
+        self.actionTrack_Molecule = QtWidgets.QAction(MainWindow)
+        self.actionTrack_Molecule.setObjectName("actionTrack_Molecule")
         self.menuFile.addAction(self.actionLoad_Data)
         self.menuFile.addAction(self.actionImport_Session)
         self.menuFile.addAction(self.actionExport_Session)
@@ -403,6 +407,7 @@ class Ui_MainWindow(object):
         self.menuTools.addAction(self.actionExportData)
         self.menuTools.addAction(self.actionContact_Area_Calculations)
         self.menuTools.addAction(self.actionVMD_Remote_Control)
+        self.menuTools.addAction(self.actionTrack_Molecule)
         self.menuSettings.addAction(self.actionPreferences)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuTools.menuAction())
@@ -473,6 +478,8 @@ class Ui_MainWindow(object):
         self.sortingKeyDropdown.setItemText(4, _translate("MainWindow", "total time"))
         self.sortingKeyDropdown.setItemText(5, _translate("MainWindow", "mean lifetime"))
         self.sortingKeyDropdown.setItemText(6, _translate("MainWindow", "median lifetime"))
+        self.sortingKeyDropdown.setItemText(7, _translate("MainWindow", "resid 1"))
+        self.sortingKeyDropdown.setItemText(8, _translate("MainWindow", "resid 2"))
         self.label_3.setText(_translate("MainWindow", "Show Only:"))
         self.selectOnlyToolbox.setItemText(0, _translate("MainWindow", "hbonds"))
         self.selectOnlyToolbox.setItemText(1, _translate("MainWindow", "hydrophobic"))
@@ -506,4 +513,6 @@ class Ui_MainWindow(object):
         self.actionPreferences.setShortcut(_translate("MainWindow", "Ctrl+,"))
         self.actionVMD_Remote_Control.setText(_translate("MainWindow", "VMD Remote Control"))
         self.actionVMD_Remote_Control.setShortcut(_translate("MainWindow", "Ctrl+V"))
+        self.actionTrack_Molecule.setText(_translate("MainWindow", "Track Molecule"))
+        self.actionTrack_Molecule.setShortcut(_translate("MainWindow", "Ctrl+T"))
 

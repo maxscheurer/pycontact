@@ -259,10 +259,24 @@ class Sorting(object):
             sortedContacts = sorted(contacts, key=lambda c: c.backboneSideChainType, reverse=self.descending)
         elif self.key == u"contact type":
             sortedContacts = sorted(contacts, key=lambda c: c.contactType, reverse=self.descending)
-        elif self.key == u"resid A":
-            sortedContacts = sorted(contacts, key=lambda c: prop1, reverse=self.descending)
-        elif self.key == u"resid B":
-            sortedContacts = sorted(contacts, key=lambda c: prop2, reverse=self.descending)
+        elif self.key == u"resid 1":
+            try:
+                prop1 = contacts[0].key1[AccumulationMapIndex.resid]
+                if prop1 != "none":
+                    sortedContacts = sorted(contacts, key=lambda c: int(c.key1[AccumulationMapIndex.resid]), reverse=self.descending)
+                else:
+                    sortedContacts = contacts
+            except IndexError:
+                pass
+        elif self.key == u"resid 2":
+            try:
+                prop2 = contacts[0].key2[AccumulationMapIndex.resid]
+                if prop2 != "none":
+                    sortedContacts = sorted(contacts, key=lambda c: int(c.key2[AccumulationMapIndex.resid]), reverse=self.descending)
+                else:
+                    sortedContacts = contacts
+            except IndexError:
+                pass
         elif self.key == u"total time":
             for con in contacts:
                 con.total_time(self.nspf, self.threshold)

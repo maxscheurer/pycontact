@@ -84,7 +84,7 @@ class Analyzer(QObject):
 
     def runMoleculeTracking(self, selIndex, map):
         print("Running tracking")
-        return self.analyze_trackMolecule(self.contactResults, 1, map)
+        return self.analyze_trackMolecule(self.contactResults, selIndex, map)
 
     def setTrajectoryData(
             self, resname_array, resid_array, name_array,
@@ -262,7 +262,7 @@ class Analyzer(QObject):
         for string in tempList:
             if string != "":
                 finishedList.append(string)
-        finishedString = " , ".join(finishedList)
+        finishedString = ", ".join(finishedList)
         return finishedString
 
     @staticmethod

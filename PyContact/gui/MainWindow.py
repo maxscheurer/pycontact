@@ -104,7 +104,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.statisticsView = None
 
         self.moleculeTracker = MoleculeTracker()
-        self.moleculeTracker.show()
+        self.actionTrack_Molecule.triggered.connect(self.showMoleculeTracker)
 
         self.analysis_state = False
 
@@ -136,6 +136,10 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
     def showVMDControlPanel(self):
         """Shows the VMD control panel, to remotely access VMD from PyContact."""
         self.vmdpanel.show()
+
+    def showMoleculeTracker(self):
+        """Shows the VMD control panel, to remotely access VMD from PyContact."""
+        self.moleculeTracker.show()
 
     def showContactAreaView(self):
         """Shows the SASA computation panel."""

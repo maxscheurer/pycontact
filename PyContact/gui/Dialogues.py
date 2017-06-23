@@ -164,8 +164,8 @@ class AnalysisDialog(QDialog):
 
         grid = QGridLayout(self)
 
-        title1 = QLabel("selection 1")
-        title2 = QLabel("selection 2")
+        self.title1 = QLabel("selection 1")
+        self.title2 = QLabel("selection 2")
         indexLabel = QLabel("index: ")
         nameLabel = QLabel("atom name: ")
         residLabel = QLabel("resid: ")
@@ -186,8 +186,8 @@ class AnalysisDialog(QDialog):
         self.resname2Checkbox = QCheckBox()
         self.segid2Checkbox = QCheckBox()
 
-        grid.addWidget(title1, 0, 1)
-        grid.addWidget(title2, 0, 2)
+        grid.addWidget(self.title1, 0, 1)
+        grid.addWidget(self.title2, 0, 2)
         grid.addWidget(indexLabel, 1, 0)
         grid.addWidget(nameLabel, 2, 0)
         grid.addWidget(residLabel, 3, 0)
@@ -213,6 +213,7 @@ class AnalysisDialog(QDialog):
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
         grid.addWidget(buttons, 6, 0)
+        self.gridLayout = grid
 
     def mapping(self):
         """Creates the Accumulation maps from the checkbox values."""
@@ -231,3 +232,24 @@ class AnalysisDialog(QDialog):
         result = dialog.exec_()
         mapping = dialog.mapping()
         return mapping, result == QDialog.Accepted
+
+
+class AnalysisSingleDialog(AnalysisDialog):
+    def __init__(self, parent=None):
+        super(AnalysisSingleDialog, self).__init__(parent)
+        self.index2Checkbox.setHidden(True)
+        self.name2Checkbox.setHidden(True)
+        self.resid2Checkbox.setHidden(True)
+        self.resname2Checkbox.setHidden(True)
+        self.segid2Checkbox.setHidden(True)
+        self.title2.setHidden(True)
+        self.title1.setText("selection")
+        self.setWindowTitle("Molecule Tracking Selection")
+
+    @staticmethod
+    def getMapping(parent=None):
+        """Static method to create the dialog and return (date, time, accepted)."""
+        dialog = AnalysisSingleDialog(parent)
+        result = dialog.exec_()
+        mapping = dialog.mapping()
+        return mapping[0], result == QDialog.Accepted

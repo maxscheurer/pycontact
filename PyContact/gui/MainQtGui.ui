@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1265</width>
-    <height>864</height>
+    <height>710</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -142,8 +142,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>941</width>
-         <height>708</height>
+         <width>911</width>
+         <height>549</height>
         </rect>
        </property>
       </widget>
@@ -709,6 +709,16 @@
               <string>median lifetime</string>
              </property>
             </item>
+            <item>
+             <property name="text">
+              <string>resid 1</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>resid 2</string>
+             </property>
+            </item>
            </widget>
           </item>
           <item row="2" column="3">
@@ -817,7 +827,7 @@
      <x>0</x>
      <y>0</y>
      <width>1265</width>
-     <height>25</height>
+     <height>22</height>
     </rect>
    </property>
    <property name="defaultUp">
@@ -845,6 +855,7 @@
     <addaction name="actionExportData"/>
     <addaction name="actionContact_Area_Calculations"/>
     <addaction name="actionVMD_Remote_Control"/>
+    <addaction name="actionTrack_Molecule"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
     <property name="title">
@@ -951,6 +962,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+V</string>
+   </property>
+  </action>
+  <action name="actionTrack_Molecule">
+   <property name="text">
+    <string>Track Molecule</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
    </property>
   </action>
  </widget>
