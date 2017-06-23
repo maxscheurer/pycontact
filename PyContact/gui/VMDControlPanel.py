@@ -53,6 +53,16 @@ class VMDCommands:
         mol modcolor %s top ColorID %d
         """ % (idx, idx, sel, idx, colorID), representations]
 
+    def addUserFieldSelection(sel, representations):
+        idx = str(len(representations))
+        representations.append(sel)
+        return ["""
+        mol addrep top
+        mol modstyle %s top Licorice
+        mol modselect %s top (%s)
+        mol modcolor %s top User
+        """ % (idx, idx, sel, idx), representations]
+
     @staticmethod
     def removeReps(index):
         # delrep rep_number molecule_number
@@ -105,6 +115,8 @@ class VMDControlPanel(QWidget):
         self.connected = False
 
     def initUI(self):
+        self.runningFancy = False
+        self.fancyPrepared = False
         self.setLayout(self.grid)
         self.setWindowTitle("VMD Control Panel")
         self.resize(640, 444)
@@ -133,11 +145,19 @@ class VMDControlPanel(QWidget):
         self.grid.addWidget(self.stopButton, 0, 2)
         self.stopButton.setEnabled(False)
 
+        self.fancyVisButton = QPushButton("Fancy")
+        self.fancyVisButton.clicked.connect(self.fancy_vis)
+        self.grid.addWidget(self.fancyVisButton, 2, 2)
+        self.fancyVisButton.setEnabled(True)
+        self.sel1 = ""
+        self.sel2 = ""
+        self.filteredContactList = []
+
         # just for testing purposes
         self.commandButton = QPushButton("Send command")
-        # self.commandButton.clicked.connect(self.sendCommand)
-        # self.grid.addWidget(self.commandButton, 2, 0)
-        # self.commandButton.setEnabled(False)
+        self.commandButton.clicked.connect(self.sendCommand)
+        self.grid.addWidget(self.commandButton, 4, 0)
+        self.commandButton.setEnabled(False)
 
         self.commandField = QLineEdit()
         self.grid.addWidget(self.commandField, 1, 0, 1, 2)
@@ -201,6 +221,51 @@ class VMDControlPanel(QWidget):
 
     def updateInfoLabel(self, txt):
         self.infoLabel.setText(txt)
+
+    def fancy_vis(self):
+        if self.runningFancy and self.fancyPrepared:
+            self.runningFancy = False
+            self.vmd.send_command("animate pause")
+        elif not self.fancyPrepared:
+            self.runningFancy = True
+            for s in reversed(range(1, len(self.representations) + 1)):
+                self.vmd.send_command(self.vmd.commands.removeReps(s))
+            self.representations = self.representations[:1]
+            for c in self.filteredContactList:
+                sel1 = self.vmd.commands.translateSelections(self.sel1)
+                sel2 = self.vmd.commands.translateSelections(self.sel2)
+                currentFrame = 0
+                self.vmd.send_command("animate goto 0")
+                currentSel1 = []
+                index = 0
+                for item in c.key1:
+                    if item != "none":
+                        currentSel1.append(AccumulationMapIndex.vmdsel[index] + " " + item)
+                    index += 1
+                currentSel1String = " and ".join(currentSel1)
+                sel1 += currentSel1String + " or "
+                currentSel2 = []
+                index = 0
+                for item in c.key2:
+                    if item != "none":
+                        currentSel2.append(AccumulationMapIndex.vmdsel[index] + " " + item)
+                    index += 1
+                currentSel2String = " and ".join(currentSel2)
+                sel2 += currentSel2String + " or "
+                self.vmd.send_command("set ::remote_ctl::sel [atomselect top ((%s) or (%s))]" % (sel1, sel2))
+                for e in c.scoreArray:
+                    self.gotoVMDFrame(currentFrame)
+                    self.vmd.send_command("animate goto 0")
+                    currentFrame += 1
+                    self.vmd.send_command("$::remote_ctl::sel set user %f" % e)
+            self.fancyPrepared = True
+            s = sel1 + " or " + sel2
+            print(s)
+            sel1command, self.representations = self.vmd.commands.addUserFieldSelection(s, self.representations)
+            self.vmd.send_command(sel1command)
+            self.vmd.send_command("animate forward")
+        else:
+            pass
 
     def pushConnectVMD(self):
         try:

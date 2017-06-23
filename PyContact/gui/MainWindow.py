@@ -426,6 +426,9 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         if self.maps is not None:
             self.exportWidget.setMaps(self.maps[0], self.maps[1])
             self.exportWidget.setMapLabels(self.analysis.sel1text, self.analysis.sel2text)
+            self.vmdpanel.sel1 = self.analysis.sel1text
+            self.vmdpanel.sel2 = self.analysis.sel2text
+            self.vmdpanel.filteredContactList = self.filteredContacts
         self.exportWidget.setThresholdAndNsPerFrame(self.painter.threshold, self.painter.nsPerFrame)
 
     def openPrefs(self):
