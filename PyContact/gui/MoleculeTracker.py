@@ -1,5 +1,5 @@
 from __future__ import print_function
-import sip
+import sip, os
 
 from PyQt5.QtWidgets import QWidget, QRadioButton, QApplication, QFileDialog, QLabel
 from PyQt5.QtGui import (QColor, QPainter, QFont, QPixmap, QPaintEvent)
@@ -20,14 +20,30 @@ class MoleculeTracker(QWidget, Ui_trackMoleculeView):
         self.setWindowTitle("MoleculeTracker")
         self.contactAnalyzer = None
         self.runTrackingButton.clicked.connect(self.runTracking)
+        self.textExportButton.clicked.connect(self.exportTextFile)
         self.labelPainter = TrackCanvas()
         self.scrollArea.setWidget(self.labelPainter)
+        self.trackingResult = None
 
     def setContactAnalyzer(self, conAnalyzer):
         self.contactAnalyzer = conAnalyzer
 
     def clean(self):
         self.contactAnalyzer = None
+
+    def exportTextFile(self):
+        fileName = QFileDialog.getSaveFileName(self, 'Export Path')
+        if len(fileName[0]) > 0:
+            path, file_extension = os.path.splitext(fileName[0])
+            if file_extension == "":
+                file_extension = ".dat"
+
+            f = open(path + file_extension, "w")
+            for i in range(len(self.trackingResult)):
+                cont = self.trackingResult[i]
+                line2print = [(x[0]+" ("+str(x[1])+") ") for x in cont[:int(self.maxContactsPerFrame.text())]]
+                f.write(str(i) + "\t" + " ".join(line2print) + "\n")
+            f.close()
 
     def runTracking(self):
         if self.contactAnalyzer is None:
@@ -43,10 +59,10 @@ class MoleculeTracker(QWidget, Ui_trackMoleculeView):
         # print("Selection: ", selectionIndex)
         frameMerge = int(self.mergeFrames.text())
         # print("Merge: ", frameMerge)
-        result = self.contactAnalyzer.runMoleculeTracking(selectionIndex, [0, 0, 1, 1, 0])
+        self.trackingResult = self.contactAnalyzer.runMoleculeTracking(selectionIndex, [0, 0, 1, 1, 0])
         # print("Analysis finished", result)
-        self.labelPainter.contacts = result
-        self.labelPainter.maximalContactsPerRow = int(self.maxContactsPerRowField.text())
-        self.labelPainter.draw_labels()
+        # self.labelPainter.contacts = result
+        # self.labelPainter.maximalContactsPerRow = int(self.maxContactsPerFrameField.text())
+        # self.labelPainter.draw_labels()
         # self.labelPainter.repaint()
-        self.labelPainter.update()
+        # self.labelPainter.update()

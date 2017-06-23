@@ -239,6 +239,33 @@ class Analyzer(QObject):
         return [key1, key2]
 
     @staticmethod
+    def make_single_title(key):
+        """returns the title of the AccumulatedContact to be displayed in contact's label"""
+        titleDict = {}
+        counter = 0
+        for item in key:
+            titleDict[AccumulationMapIndex.mapping[counter]] = (item if item != "none" else "")
+            counter += 1
+        residueString = "%s%s" % (titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.resname]],
+                                  str(titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.resid]]))
+        atomIndexString = ("%s %s" % (AccumulationMapIndex.mapping[AccumulationMapIndex.index],
+                                      str(titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.index]])) if
+                           titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.index]] != "" else "")
+        atomNameString = ("%s %s" % (AccumulationMapIndex.mapping[AccumulationMapIndex.name],
+                                     str(titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.name]])) if
+                          titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.name]] != "" else "")
+        segnameString = ("%s %s" % (AccumulationMapIndex.mapping[AccumulationMapIndex.segid],
+                                    str(titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.segid]])) if
+                         titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.segid]] != "" else "")
+        tempList = [residueString, atomIndexString, atomNameString, segnameString]
+        finishedList = []
+        for string in tempList:
+            if string != "":
+                finishedList.append(string)
+        finishedString = " , ".join(finishedList)
+        return finishedString
+
+    @staticmethod
     def makeKeyFromKeyArrays(key1, key2):
         """Returns a human readable key from two key arrays.
             example:
@@ -704,14 +731,14 @@ class Analyzer(QObject):
             for cont in frame:
                 if selindex == 1:
                     key1, key2 = self.makeKeyArraysFromMaps([], map, cont)
+                    tit = Analyzer.make_single_title(key2)
                 elif selindex == 2:
                     key1, key2 = self.makeKeyArraysFromMaps(map, [], cont)
-                key = self.makeKeyFromKeyArrays(key1, key2)
-                #print(key)
-                if key in currentFrameAcc:
-                    currentFrameAcc[key] += cont.weight
+                    tit = Analyzer.make_single_title(key1)
+                if tit in currentFrameAcc:
+                    currentFrameAcc[tit] += cont.weight
                 else:
-                    currentFrameAcc[key] = 0
+                    currentFrameAcc[tit] = 0
             sorted_frame_contacts = sorted(currentFrameAcc.items(), key=operator.itemgetter(1), reverse=1)
             allSortedFrameContacts.append(sorted_frame_contacts)
         return allSortedFrameContacts

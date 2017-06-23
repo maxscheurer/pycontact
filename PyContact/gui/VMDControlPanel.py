@@ -252,17 +252,18 @@ class VMDControlPanel(QWidget):
                     index += 1
                 currentSel2String = " and ".join(currentSel2)
                 sel2 += currentSel2String + " or "
-                self.vmd.send_command("set ::remote_ctl::sel [atomselect top ((%s) or (%s))]" % (sel1, sel2))
+                self.vmd.send_command("set ::remote_ctl::sel [atomselect top ((%s) or (%s))]; $::remote_ctl::sel global" % (sel1, sel2))
                 for e in c.scoreArray:
                     self.gotoVMDFrame(currentFrame)
                     self.vmd.send_command("animate goto 0")
                     currentFrame += 1
                     self.vmd.send_command("$::remote_ctl::sel set user %f" % e)
+                    self.vmd.send_command("$::remote_ctl::sel delete")
             self.fancyPrepared = True
             s = sel1 + " or " + sel2
             print(s)
-            sel1command, self.representations = self.vmd.commands.addUserFieldSelection(s, self.representations)
-            self.vmd.send_command(sel1command)
+            #sel1command, self.representations = self.vmd.commands.addUserFieldSelection(s, self.representations)
+            #self.vmd.send_command(sel1command)
             self.vmd.send_command("animate forward")
         else:
             pass

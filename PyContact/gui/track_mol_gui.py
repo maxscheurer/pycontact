@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'track_mol_gui.ui'
 #
-# Created by: PyQt5 UI code generator 5.8.2
+# Created by: PyQt5 UI code generator 5.7.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_trackMoleculeView(object):
     def setupUi(self, trackMoleculeView):
         trackMoleculeView.setObjectName("trackMoleculeView")
-        trackMoleculeView.resize(743, 538)
+        trackMoleculeView.resize(743, 635)
         self.gridLayout = QtWidgets.QGridLayout(trackMoleculeView)
         self.gridLayout.setObjectName("gridLayout")
         self.widget = QtWidgets.QWidget(trackMoleculeView)
@@ -29,7 +29,7 @@ class Ui_trackMoleculeView(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 687, 430))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 669, 506))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
         self.gridLayout_3.addWidget(self.scrollArea, 0, 0, 1, 1)
@@ -58,10 +58,10 @@ class Ui_trackMoleculeView(object):
         self.label_2 = QtWidgets.QLabel(self.trackSettingsView)
         self.label_2.setObjectName("label_2")
         self.horizontalLayout.addWidget(self.label_2)
-        self.maxContactsPerRowField = QtWidgets.QLineEdit(self.trackSettingsView)
-        self.maxContactsPerRowField.setMaximumSize(QtCore.QSize(70, 16777215))
-        self.maxContactsPerRowField.setObjectName("maxContactsPerRowField")
-        self.horizontalLayout.addWidget(self.maxContactsPerRowField)
+        self.maxContactsPerFrame = QtWidgets.QLineEdit(self.trackSettingsView)
+        self.maxContactsPerFrame.setMaximumSize(QtCore.QSize(70, 16777215))
+        self.maxContactsPerFrame.setObjectName("maxContactsPerFrame")
+        self.horizontalLayout.addWidget(self.maxContactsPerFrame)
         self.label = QtWidgets.QLabel(self.trackSettingsView)
         self.label.setObjectName("label")
         self.horizontalLayout.addWidget(self.label)
@@ -72,6 +72,9 @@ class Ui_trackMoleculeView(object):
         self.runTrackingButton = QtWidgets.QPushButton(self.trackSettingsView)
         self.runTrackingButton.setObjectName("runTrackingButton")
         self.horizontalLayout.addWidget(self.runTrackingButton)
+        self.textExportButton = QtWidgets.QPushButton(self.trackSettingsView)
+        self.textExportButton.setObjectName("textExportButton")
+        self.horizontalLayout.addWidget(self.textExportButton)
         self.gridLayout_2.addWidget(self.trackSettingsView, 0, 0, 1, 1)
         self.gridLayout.addWidget(self.widget, 0, 0, 1, 1)
 
@@ -83,9 +86,10 @@ class Ui_trackMoleculeView(object):
         trackMoleculeView.setWindowTitle(_translate("trackMoleculeView", "Form"))
         self.sel1RadioButton.setText(_translate("trackMoleculeView", "Sel. 1"))
         self.sel2RadioButton.setText(_translate("trackMoleculeView", "Sel. 2"))
-        self.label_2.setText(_translate("trackMoleculeView", "Max. Contacts/Row"))
-        self.maxContactsPerRowField.setText(_translate("trackMoleculeView", "3"))
+        self.label_2.setText(_translate("trackMoleculeView", "Max. Contacts/Frame"))
+        self.maxContactsPerFrame.setText(_translate("trackMoleculeView", "3"))
         self.label.setText(_translate("trackMoleculeView", "Merge frames:"))
         self.mergeFrames.setText(_translate("trackMoleculeView", "1"))
         self.runTrackingButton.setText(_translate("trackMoleculeView", "Run Tracking"))
+        self.textExportButton.setText(_translate("trackMoleculeView", "Text export"))
 

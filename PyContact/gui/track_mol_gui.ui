@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>743</width>
-    <height>538</height>
+    <height>635</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,8 +36,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>687</width>
-              <height>430</height>
+              <width>669</width>
+              <height>506</height>
              </rect>
             </property>
            </widget>
@@ -100,12 +100,12 @@
          <item>
           <widget class="QLabel" name="label_2">
            <property name="text">
-            <string>Max. Contacts/Row</string>
+            <string>Max. Contacts/Frame</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="maxContactsPerRowField">
+          <widget class="QLineEdit" name="maxContactsPerFrame">
            <property name="maximumSize">
             <size>
              <width>70</width>
@@ -141,6 +141,13 @@
           <widget class="QPushButton" name="runTrackingButton">
            <property name="text">
             <string>Run Tracking</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="textExportButton">
+           <property name="text">
+            <string>Text export</string>
            </property>
           </widget>
          </item>
