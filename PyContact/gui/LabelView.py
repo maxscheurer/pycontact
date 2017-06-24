@@ -4,6 +4,7 @@ from functools import partial
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import (QWidget, QPushButton, QLabel, QDialog, QGridLayout, QCheckBox)
 from PyQt5.Qt import Qt
+import numpy as np
 
 from ..core.Biochemistry import ContactType
 from .Plotters import ContactPlotter
@@ -24,6 +25,7 @@ class LabelView(QWidget):
         self.nsPerFrame = 0
         self.threshold = 0
         self.initUI()
+        print(self.geometry())
 
     def clean(self):
         """Delete all labels."""
@@ -65,6 +67,8 @@ class LabelView(QWidget):
             #     self.checkboxes[-1].move(start_text, row + textoffset - 2.0)
             #     self.checkboxes[-1].show()
             row += rowheight
+        # if len(self.buttonWidths):
+        #     self.setGeometry(0, 0, np.max(self.buttonWidths) + 10, row)
 
     def handleButton(self, data):
         """Show the detailed view when clicking on the contact label"""

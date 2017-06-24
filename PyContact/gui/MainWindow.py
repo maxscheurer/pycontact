@@ -62,6 +62,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         # painter contains both labels and frame boxes for drawing
         self.painter = Canvas()
         self.scrollArea.setWidget(self.painter)
+        self.scrollArea.horizontalScrollBar().valueChanged.connect(self.horizontalScrollBarChanged)
         self.actionExportData.triggered.connect(self.pushExport)
         self.actionLoad_Data.triggered.connect(self.loadDataPushed)
         self.actionExport_Session.triggered.connect(self.exportSession)
@@ -132,6 +133,11 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         #     residueList.appen([k["name"], k["scpolarity"]])
 
         self.actionDefault.setText("Load sample data")
+
+    def horizontalScrollBarChanged(self):
+        x = self.scrollArea.horizontalScrollBar().value()
+        y = self.painter.labelView.y()
+        self.painter.labelView.move(x, y)
 
     def showVMDControlPanel(self):
         """Shows the VMD control panel, to remotely access VMD from PyContact."""
