@@ -222,9 +222,10 @@ class ScoreFilter(BinaryFilter):
                 med = c.median_score()
                 if op.compare(med, self.value, self.operator):
                     filtered.append(c)
-        elif self.ftype == u"HB \%":
+        elif self.ftype == u"HB %":
             for c in contacts:
                 med = c.hbond_percentage()
+                print(med)
                 if op.compare(med, self.value, self.operator):
                     filtered.append(c)
         return filtered

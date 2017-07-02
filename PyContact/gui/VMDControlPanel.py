@@ -53,15 +53,17 @@ class VMDCommands:
         mol modcolor %s top ColorID %d
         """ % (idx, idx, sel, idx, colorID), representations]
 
+    @staticmethod
     def addUserFieldSelection(sel, representations):
         idx = str(len(representations))
         representations.append(sel)
         return ["""
         mol addrep top
-        mol modstyle %s top Licorice
+        mol modstyle %s top QuickSurf 0.500000 0.500000 0.500000 1.000000
         mol modselect %s top (%s)
         mol modcolor %s top User
-        """ % (idx, idx, sel, idx), representations]
+        mol selupdate %s top 1
+        """ % (idx, idx, sel, idx, idx), representations]
 
     @staticmethod
     def removeReps(index):
@@ -243,7 +245,7 @@ class VMDControlPanel(QWidget):
                         currentSel1.append(AccumulationMapIndex.vmdsel[index] + " " + item)
                     index += 1
                 currentSel1String = " and ".join(currentSel1)
-                sel1 += currentSel1String + " or "
+                sel1 += " and " + currentSel1String
                 currentSel2 = []
                 index = 0
                 for item in c.key2:
@@ -251,19 +253,25 @@ class VMDControlPanel(QWidget):
                         currentSel2.append(AccumulationMapIndex.vmdsel[index] + " " + item)
                     index += 1
                 currentSel2String = " and ".join(currentSel2)
-                sel2 += currentSel2String + " or "
-                self.vmd.send_command("set ::remote_ctl::sel [atomselect top ((%s) or (%s))]; $::remote_ctl::sel global" % (sel1, sel2))
+                sel2 += " and " + currentSel2String
+                # print(sel1, sel2)
+                self.vmd.send_command("set ::remote_ctl::sel [atomselect top {(%s) or (%s)}]; $::remote_ctl::sel global" % (sel1, sel2))
+                self.vmd.send_command("$::remote_ctl::sel set beta 20")
                 for e in c.scoreArray:
                     self.gotoVMDFrame(currentFrame)
-                    self.vmd.send_command("animate goto 0")
+                    self.vmd.send_command("animate goto %d" % currentFrame)
                     currentFrame += 1
-                    self.vmd.send_command("$::remote_ctl::sel set user %f" % e)
-                    self.vmd.send_command("$::remote_ctl::sel delete")
+                    self.vmd.send_command("set ::remote_ctl::current [$::remote_ctl::sel get user]")
+                    self.vmd.send_command("$::remote_ctl::sel set user [::remote_ctl::addToList [list $::remote_ctl::current] %f]" % e)
+                # self.vmd.send_command("$::remote_ctl::sel delete")
             self.fancyPrepared = True
-            s = sel1 + " or " + sel2
-            print(s)
-            #sel1command, self.representations = self.vmd.commands.addUserFieldSelection(s, self.representations)
-            #self.vmd.send_command(sel1command)
+            sel1 = self.vmd.commands.translateSelections(self.sel1)
+            sel2 = self.vmd.commands.translateSelections(self.sel2)
+            s = "noh and user > 0 and (("+ sel1 + ") or (" + sel2 + "))"
+            #print(s)
+            sel1command, self.representations = self.vmd.commands.addUserFieldSelection(s, self.representations)
+            self.vmd.send_command(sel1command)
+            self.vmd.send_command("color scale method BGR")
             self.vmd.send_command("animate forward")
         else:
             pass

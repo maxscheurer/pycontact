@@ -71,7 +71,7 @@ namespace eval remote_ctl {
             #puts $sock $result
             puts $result
             if {[string first "set" $line] == 0} {
-              
+
             }
 
           }
@@ -89,6 +89,14 @@ namespace eval remote_ctl {
       proc putlog { text } {
         puts $text
         return
+      }
+
+      proc addToList { l numb } {
+        set result {}
+        foreach i $numb {
+          lappend result [expr $i + $numb]
+        }
+        return $result
       }
     }
 
