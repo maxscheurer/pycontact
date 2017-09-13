@@ -121,7 +121,7 @@ class VMDControlPanel(QWidget):
         self.fancyPrepared = False
         self.setLayout(self.grid)
         self.setWindowTitle("VMD Control Panel")
-        self.resize(640, 444)
+        self.resize(640, 144)
         self.grid.setGeometry(QtCore.QRect(10, 10, 621, 431))
 
         self.startButton = QPushButton("Start VMD")
@@ -147,22 +147,22 @@ class VMDControlPanel(QWidget):
         self.grid.addWidget(self.stopButton, 0, 2)
         self.stopButton.setEnabled(False)
 
-        self.fancyVisButton = QPushButton("Fancy")
-        self.fancyVisButton.clicked.connect(self.fancy_vis)
-        self.grid.addWidget(self.fancyVisButton, 2, 2)
-        self.fancyVisButton.setEnabled(True)
+        # self.fancyVisButton = QPushButton("Fancy")
+        # self.fancyVisButton.clicked.connect(self.fancy_vis)
+        # self.grid.addWidget(self.fancyVisButton, 2, 2)
+        # self.fancyVisButton.setEnabled(True)
         self.sel1 = ""
         self.sel2 = ""
         self.filteredContactList = []
 
         # just for testing purposes
-        self.commandButton = QPushButton("Send command")
-        self.commandButton.clicked.connect(self.sendCommand)
-        self.grid.addWidget(self.commandButton, 4, 0)
-        self.commandButton.setEnabled(False)
+        # self.commandButton = QPushButton("Send command")
+        # self.commandButton.clicked.connect(self.sendCommand)
+        # self.grid.addWidget(self.commandButton, 4, 0)
+        # self.commandButton.setEnabled(False)
 
-        self.commandField = QLineEdit()
-        self.grid.addWidget(self.commandField, 1, 0, 1, 2)
+        # self.commandField = QLineEdit()
+        # self.grid.addWidget(self.commandField, 1, 0, 1, 2)
         self.vmd = VMDTcp()
 
     def addRep(self, txt):
@@ -289,7 +289,7 @@ class VMDControlPanel(QWidget):
     def pushStartVMD(self):
         self.startButton.setEnabled(False)
         self.stopButton.setEnabled(True)
-        self.commandButton.setEnabled(True)
+        # self.commandButton.setEnabled(True)
         response = self.vmd.start()
         if response == -1:
             self.connectButton.setEnabled(True)
