@@ -11,13 +11,13 @@ extensions = [Extension("PyContact.cy_modules.cy_gridsearch",
                         include_dirs=[".", "PyContact/cy_modules/src"], extra_compile_args=["-std=c++0x"]), ]
 setup(
     name='pycontact',
-    version='1.0.1',
+    version='1.0.2',
     description='PyContact',
     long_description='Tool for analysis of non-covalent interactions in MD trajectories',
     url='https://github.com/maxscheurer/pycontact',
     author='Maximilian Scheurer, Peter Rodenkirch',
     author_email='mscheurer@ks.uiuc.edu',
-    license='LGPLv3',
+    license='GPLv3',
 
 # https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
