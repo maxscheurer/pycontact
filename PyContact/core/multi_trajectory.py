@@ -71,8 +71,8 @@ def loop_trajectory_grid(sel1c, sel2c, indices1, indices2, config, suppl, selfIn
         currentFrameContacts = []
         natoms1 = len(s1)
         natoms2 = len(s2)
-        pos1 = np.reshape(s1, (1, natoms1 * 3))
-        pos2 = np.reshape(s2, (1, natoms2 * 3))
+        pos1 = np.array(np.reshape(s1, (1, natoms1 * 3)), dtype=np.float64)
+        pos2 = np.array(np.reshape(s2, (1, natoms2 * 3)), dtype=np.float64)
         xyz1 = np.array(pos1, dtype=np.float32)
         xyz2 = np.array(pos2, dtype=np.float32)
         # 2d array with index of atom1 being the index of the first dimension
@@ -96,7 +96,8 @@ def loop_trajectory_grid(sel1c, sel2c, indices1, indices2, config, suppl, selfIn
                         continue
                 # distance = distarray[idx1, idx2]
                 # weight = weight_function(distance)
-                distance = np.linalg.norm(pos1[0][3*idx1:3*idx1+3] - pos2[0][3*idx2:3*idx2+3])
+                dvec = pos1[0][3*idx1:3*idx1+3] - pos2[0][3*idx2:3*idx2+3]
+                distance = np.sqrt(dvec.dot(dvec))
                 # if (distance - distarray[idx1, idx2]) > 0.001:
                 #     print("Error in distance calculations!")
                 #     return
@@ -165,8 +166,8 @@ def loop_trajectory_grid(sel1c, sel2c, indices1, indices2, config, suppl, selfIn
                             dist = np.linalg.norm(pos1[0][3*conv_hatom:3*conv_hatom+3] - pos2[0][3*idx2:3*idx2+3])
                             if (dist <= hbondcutoff):
                                 donorPosition = s1[idx1]
-                                hydrogenPosition = s1[conv_hatom]
-                                acceptorPosition = s2[idx2]
+                                hydrogenPosition = np.array(s1[conv_hatom], dtype=np.float64)
+                                acceptorPosition = np.array(s2[idx2], dtype=np.float64)
                                 v1 = hydrogenPosition - acceptorPosition
                                 v2 = hydrogenPosition - donorPosition
                                 v1norm = np.linalg.norm(v1)
@@ -194,8 +195,8 @@ def loop_trajectory_grid(sel1c, sel2c, indices1, indices2, config, suppl, selfIn
                             dist = np.linalg.norm(pos1[0][3*idx1:3*idx1+3] - pos2[0][3*conv_hatom:3*conv_hatom+3])
                             if (dist <= hbondcutoff):
                                 donorPosition = s2[idx2]
-                                hydrogenPosition = s2[conv_hatom]
-                                acceptorPosition = s1[idx1]
+                                hydrogenPosition = np.array(s2[conv_hatom], dtype=np.float64)
+                                acceptorPosition = np.array(s1[idx1], dtype=np.float64)
                                 v1 = hydrogenPosition - acceptorPosition
                                 v2 = hydrogenPosition - donorPosition
                                 v1norm = np.linalg.norm(v1)

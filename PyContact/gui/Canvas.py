@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import QSize, QRect
 from PyQt5.QtCore import pyqtSignal, QObject
 import numpy as np
+import math
 
 from ..core.ContactFilters import *
 from .LabelView import LabelView
@@ -195,9 +196,12 @@ class Canvas(QWidget, QObject):
                 alpha = merged_score * self.alphaFactor
                 if alpha > 255:
                     alpha = 255
+                if math.isnan(alpha):
+                    alpha = 255
                 if self.colorScheme == ColorScheme.bbsc:
                     # pass
-                    p.setBrush(QColor(bbScColor[0], bbScColor[1], bbScColor[2], alpha))
+                    p.setBrush(QColor(bbScColor[0], bbScColor[1], bbScColor[2],
+                                      alpha))
                 elif self.colorScheme == ColorScheme.custom:
                     color = QColor(self.customColor)
                     color.setAlpha(alpha)
