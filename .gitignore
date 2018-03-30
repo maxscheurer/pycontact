@@ -54,3 +54,6 @@ cy_modules/cy_gridsearch.c*
 build/
 dist/
 pycontact.egg-info/
+
+#pytest
+.pytest_cache/
