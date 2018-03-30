@@ -40,3 +40,17 @@ class PyContactJob:
         else:
             DataHandler.writeSessionToFile(self.name + ".session", self.analyzer)
         print("Wrote session to file")
+
+    def writeContactDataToFile(self, fname="", contacts=[]):
+        """Writes the current analysis session to a text file with either self.name + .txt or fname as output filename"""
+        """ if passed a list of contacts, it will write these to the output file """
+        if fname != "" and len(contacts):
+            DataHandler.writeContactsToFile(fname, contacts)
+        elif fname != "" and not len(contacts):
+            DataHandler.writeContactsToFile(self.name,
+                                            self.analyzer.finalAccumulatedContacts)
+        elif fname == "" and len(contacts):
+            DataHandler.writeContactsToFile(self.name, contacts)
+        elif fname == "" and not len(contacts):
+            DataHandler.writeContactsToFile(self.name,
+                                            self.analyzer.finalAccumulatedContacts)

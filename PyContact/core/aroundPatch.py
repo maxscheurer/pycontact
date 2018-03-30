@@ -2,7 +2,6 @@ import MDAnalysis
 
 MDA_VERSION = int(MDAnalysis.__version__.split(".")[1])
 if MDA_VERSION >= 16:
-    print("new version")
     from MDAnalysis.core.selection import *
 else:
     from MDAnalysis.core.Selection import *

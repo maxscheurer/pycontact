@@ -1,5 +1,5 @@
 import pickle
-
+import os
 
 class DataHandler:
     """Handles the import or export of a session."""
@@ -26,3 +26,39 @@ class DataHandler:
         exportDict = {"contacts": analysis.finalAccumulatedContacts, "analyzer": analyzerArgs, "trajectory": trajArgs,
                       "maps": [analysis.lastMap1, analysis.lastMap2]}
         pickle.dump(exportDict, open(fileName, "wb"))
+
+
+    @staticmethod
+    def writeContactsToFile(filename, contacts):
+        path, file_extension = os.path.splitext(filename[0])
+
+        requestedParameters = ["contactTypeAsShortcut", "mean_score", "median_score", "hbond_percentage"]
+        checkboxdict = {"mean_score": "Mean Score",
+                             "hbond_percentage": "HBond Percentage", "median_score": "Median Score",
+                             "contactTypeAsShortcut": "Contact Type",
+                             "getScoreArray": "Score List", "hbondFramesScan": "Hydrogen Bond Frames"}
+
+        tableHeadings = []
+        for par in requestedParameters:
+            tableHeadings.append(checkboxdict[par])
+
+        f = open(path + ".txt", "w")
+        row_format = " {:>20} " * (len(requestedParameters) + 1)
+        f.write(row_format.format("", *tableHeadings))
+        f.write("\n")
+        for c in contacts:
+            currentContactProperties = []
+            for p in requestedParameters:
+                # Python2:
+                # exec('propertyToAdd = c.' + p + '()')
+                code = compile('propertyToAdd = c.' + p + '()', '<string>', 'exec')
+                ns = {}
+                ns['c'] = c
+                exec(code, ns)
+                propertyToAdd = ns['propertyToAdd']
+                if isinstance(propertyToAdd, float):
+                    propertyToAdd = "{0:.3f}".format(propertyToAdd)
+                currentContactProperties.append(propertyToAdd)
+            f.write(row_format.format(c.human_readable_title(), *currentContactProperties))
+            f.write("\n")
+        f.close()
