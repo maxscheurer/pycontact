@@ -8,14 +8,14 @@ import MDAnalysis
 import numpy as np
 
 from .Plotters import ContactPlotter
-from statistics_ui import *
+from .statistics_ui import *
 from ..core.multi_accumulation import chunks
 from ..core.Biochemistry import vdwRadius
 from ..core.LogPool import *
 from ..cy_modules import cy_gridsearch
-from Dialogues import TopoTrajLoaderDialog
-from ErrorBox import ErrorBox
-from ErrorMessages import ErrorMessages
+from .Dialogues import TopoTrajLoaderDialog
+from .ErrorBox import ErrorBox
+from .ErrorMessages import ErrorMessages
 from ..core.Biochemistry import mean_score_of_contactArray, median_score_of_contactArray
 
 

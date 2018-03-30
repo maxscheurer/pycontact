@@ -1,4 +1,12 @@
-from MDAnalysis.core.Selection import *
+import MDAnalysis
+
+MDA_VERSION = int(MDAnalysis.__version__.split(".")[1])
+if MDA_VERSION >= 16:
+    print("new version")
+    from MDAnalysis.core.selection import *
+else:
+    from MDAnalysis.core.Selection import *
+
 import numpy as np
 
 from ..cy_modules import cy_gridsearch
@@ -41,12 +49,16 @@ class AroundSelection(DistanceSelection):
             others = np.concatenate((sys_zeros, sel_ones), axis=0)
 
             atom_number = flgs.size
-            result = cy_gridsearch.cy_find_within(all_positions, flgs, others, atom_number, self.cutoff)
+            result = cy_gridsearch.cy_find_within(all_positions, flgs, others,
+                                                  atom_number, self.cutoff)
 
             real_result = result[0:np.size(syspos, 0)]
             found_indices = np.where(real_result != 0)[0]
             unique_idx = np.unique(found_indices)
-            return unique(sys[unique_idx.astype(np.int32)])
+            if MDA_VERSION >= 16:
+                return sys[unique_idx.astype(np.int32)].unique
+            else:
+                return unique(sys[unique_idx.astype(np.int32)])
         else:
             kdtree = KDTree(dim=3, bucket_size=10)
             kdtree.set_coords(sys.positions)

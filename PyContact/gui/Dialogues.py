@@ -6,7 +6,7 @@ from PyQt5.QtGui import QDoubleValidator
 
 from ..core.LoadConfiguration import Configuration
 from PyContact.core.ContactAnalyzer import Analyzer
-from HelpButton import HelpButton
+from .HelpButton import HelpButton
 
 
 class TopoTrajLoaderDialog(QDialog):

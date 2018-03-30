@@ -4,9 +4,9 @@ import re
 import os
 import time
 import multiprocessing
-from multi_accumulation import *
-from multi_trajectory import run_load_parallel
-from LogPool import *
+from .multi_accumulation import *
+from .multi_trajectory import run_load_parallel
+from .LogPool import *
 from copy import deepcopy
 import operator
 

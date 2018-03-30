@@ -9,14 +9,14 @@ import MDAnalysis
 import numpy as np
 
 from .Plotters import SimplePlotter
-from sasa_gui import *
+from .sasa_gui import *
 from ..core.multi_accumulation import chunks
 from ..core.Biochemistry import vdwRadius
 from ..core.LogPool import *
 from ..cy_modules import cy_gridsearch
-from Dialogues import TopoTrajLoaderDialog
-from ErrorBox import ErrorBox
-from ErrorMessages import ErrorMessages
+from .Dialogues import TopoTrajLoaderDialog
+from .ErrorBox import ErrorBox
+from .ErrorMessages import ErrorMessages
 
 # manage processes for SASA
 sasaProgressManager = multiprocessing.Manager()

@@ -7,11 +7,11 @@ from PyQt5.QtCore import QSize, QRect
 from PyQt5.QtCore import pyqtSignal, QObject
 import numpy as np
 
-from track_mol_gui import *
-from ErrorMessages import ErrorMessages
-from ErrorBox import ErrorBox
-from TrackCanvas import TrackCanvas
-from Dialogues import AnalysisSingleDialog
+from .track_mol_gui import *
+from .ErrorMessages import ErrorMessages
+from .ErrorBox import ErrorBox
+from .TrackCanvas import TrackCanvas
+from .Dialogues import AnalysisSingleDialog
 
 
 class MoleculeTracker(QWidget, Ui_trackMoleculeView):

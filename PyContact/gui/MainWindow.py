@@ -15,21 +15,21 @@ import numpy as np
 from . import MainQtGui
 from ..core.multi_accumulation import *
 from ..core.Biochemistry import vdwRadius
-from SasaWidgets import SasaWidget
-from MoleculeTracker import MoleculeTracker
-from Canvas import Canvas
-from Dialogues import FileLoaderDialog, AnalysisDialog
-from ExportTabWidget import ExportTabWidget
-from Statistics import Statistics
-from Plotters import *
+from .SasaWidgets import SasaWidget
+from .MoleculeTracker import MoleculeTracker
+from .Canvas import Canvas
+from .Dialogues import FileLoaderDialog, AnalysisDialog
+from .ExportTabWidget import ExportTabWidget
+from .Statistics import Statistics
+from .Plotters import *
 from ..core.ContactAnalyzer import *
-from ErrorBox import ErrorBox
-from ErrorMessages import ErrorMessages
+from .ErrorBox import ErrorBox
+from .ErrorMessages import ErrorMessages
 from ..core.LogPool import *
 from ..core.aroundPatch import AroundSelection
-import Preferences
+from . import Preferences
 from ..exampleData.datafiles import DEFAULTSESSION
-from VMDControlPanel import VMDControlPanel
+from .VMDControlPanel import VMDControlPanel
 from ..core.DataHandler import DataHandler
 # from TableModels import *
 

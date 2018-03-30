@@ -5,7 +5,7 @@ from pkg_resources import resource_filename as res
 from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QPushButton, QLineEdit
 from PyQt5 import QtCore
 
-from Dialogues import TopoTrajLoaderDialog
+from .Dialogues import TopoTrajLoaderDialog
 from ..core.Biochemistry import *
 
 # from ..cy_modules import wrap_vmd as vmd

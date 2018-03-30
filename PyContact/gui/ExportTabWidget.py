@@ -4,9 +4,9 @@ from PyQt5.QtWidgets import QTabWidget, QWidget, QGridLayout, QLabel, QPushButto
     QFileDialog
 from PyQt5.QtCore import pyqtSignal
 
-from Plotters import *
-from ErrorBox import ErrorBox
-from ErrorMessages import ErrorMessages
+from .Plotters import *
+from .ErrorBox import ErrorBox
+from .ErrorMessages import ErrorMessages
 
 
 class ExportTabWidget(QTabWidget):

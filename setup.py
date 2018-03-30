@@ -11,7 +11,7 @@ extensions = [Extension("PyContact.cy_modules.cy_gridsearch",
                         include_dirs=[".", "PyContact/cy_modules/src"], extra_compile_args=["-std=c++0x"]), ]
 setup(
     name='pycontact',
-    version='1.0.2',
+    version='1.0.3.dev',
     description='PyContact',
     long_description='Tool for analysis of non-covalent interactions in MD trajectories',
     url='https://github.com/maxscheurer/pycontact',
@@ -28,9 +28,10 @@ setup(
         'Topic :: Scientific/Engineering',
 
         # Pick your license as you wish (should match "license" above)
-        'License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)',
+        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
 
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.6',
     ],
 
     keywords='computational biophysics simulation biology bioinformatics visualization protein biomolecules dna',
@@ -39,7 +40,7 @@ setup(
     packages=find_packages(),
 
     setup_requires = ['cython'],
-    install_requires = ['numpy','matplotlib','mdanalysis<0.16','cython'],
+    install_requires = ['numpy','matplotlib','mdanalysis','cython'],
     cmdclass = {'build_ext': build_ext},
     ext_modules = cythonize(extensions),
 
