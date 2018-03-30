@@ -354,8 +354,8 @@ class Analyzer(QObject):
             # pass positions and distance to cython
             natoms1 = len(sel1.atoms)
             natoms2 = len(sel2.atoms)
-            pos1 = np.reshape(sel1.positions, (1, natoms1 * 3))
-            pos2 = np.reshape(sel2.positions, (1, natoms2 * 3))
+            pos1 = np.array(np.reshape(sel1.positions, (1, natoms1 * 3)), dtype=np.float64)
+            pos2 = np.array(np.reshape(sel2.positions, (1, natoms2 * 3)), dtype=np.float64)
             xyz1 = np.array(pos1, dtype=np.float32)
             xyz2 = np.array(pos2, dtype=np.float32)
             # 2d array with index of atom1 being the index of the first dimension
@@ -383,7 +383,9 @@ class Analyzer(QObject):
                             continue
                     # distance = distarray[idx1, idx2]
                     # weight = self.weight_function(distance)
-                    distance = np.linalg.norm(pos1[0][3*idx1:3*idx1+3] - pos2[0][3*idx2:3*idx2+3])
+                    dvec = pos1[0][3*idx1:3*idx1+3] - pos2[0][3*idx2:3*idx2+3]
+                    distance = np.sqrt(dvec.dot(dvec))
+                    # print(dvec, distance, dvec.dtype)
                     # if (distance - distarray[idx1, idx2]) > 0.001:
                     #     print("Error in distance calculations!")
                     #     return
@@ -454,8 +456,8 @@ class Analyzer(QObject):
                                 dist = np.linalg.norm(pos1[0][3*conv_hatom:3*conv_hatom+3] - pos2[0][3*idx2:3*idx2+3])
                                 if (dist <= hbondcutoff):
                                     donorPosition = sel1.positions[idx1]
-                                    hydrogenPosition = sel1.positions[conv_hatom]
-                                    acceptorPosition = sel2.positions[idx2]
+                                    hydrogenPosition = np.array(sel1.positions[conv_hatom], dtype=np.float64)
+                                    acceptorPosition = np.array(sel2.positions[idx2], dtype=np.float64)
                                     v1 = hydrogenPosition - acceptorPosition
                                     v2 = hydrogenPosition - donorPosition
                                     v1norm = np.linalg.norm(v1)
@@ -483,8 +485,8 @@ class Analyzer(QObject):
                                 dist = np.linalg.norm(pos1[0][3*idx1:3*idx1+3] - pos2[0][3*conv_hatom:3*conv_hatom+3])
                                 if (dist <= hbondcutoff):
                                     donorPosition = sel2.positions[idx2]
-                                    hydrogenPosition = sel2.positions[conv_hatom]
-                                    acceptorPosition = sel1.positions[idx1]
+                                    hydrogenPosition = np.array(sel2.positions[conv_hatom], dtype=np.float64)
+                                    acceptorPosition = np.array(sel1.positions[idx1], dtype=np.float64)
                                     v1 = hydrogenPosition - acceptorPosition
                                     v2 = hydrogenPosition - donorPosition
                                     v1norm = np.linalg.norm(v1)

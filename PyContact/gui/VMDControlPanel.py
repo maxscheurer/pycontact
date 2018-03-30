@@ -121,7 +121,7 @@ class VMDControlPanel(QWidget):
         self.fancyPrepared = False
         self.setLayout(self.grid)
         self.setWindowTitle("VMD Control Panel")
-        self.resize(640, 144)
+        self.resize(640, 444)
         self.grid.setGeometry(QtCore.QRect(10, 10, 621, 431))
 
         self.startButton = QPushButton("Start VMD")
@@ -289,7 +289,7 @@ class VMDControlPanel(QWidget):
     def pushStartVMD(self):
         self.startButton.setEnabled(False)
         self.stopButton.setEnabled(True)
-        # self.commandButton.setEnabled(True)
+        self.commandButton.setEnabled(True)
         response = self.vmd.start()
         if response == -1:
             self.connectButton.setEnabled(True)
