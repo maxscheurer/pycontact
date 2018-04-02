@@ -91,6 +91,18 @@ class FileLoaderDialog(QDialog):
         selection1Label = QLabel("selection 1: ")
         selection2Label = QLabel("selection 2: ")
 
+        topologyFileLabel = QLabel("topology file: ")
+        trajectoryFileLabel = QLabel("trajectory file: ")
+
+        self.topFileDisplay = QLabel("-")
+        self.trajFileDisplay = QLabel("-")
+
+        grid.addWidget(topologyFileLabel, 1, 0)
+        grid.addWidget(trajectoryFileLabel, 2, 0)
+
+        grid.addWidget(self.topFileDisplay, 1, 1)
+        grid.addWidget(self.trajFileDisplay, 2, 1)
+
         self.cutoffField = QLineEdit("5.0")
         posDoubleValidator = QDoubleValidator()
         posDoubleValidator.setBottom(0)
@@ -107,17 +119,17 @@ class FileLoaderDialog(QDialog):
             self.selection1Field = QLineEdit("segid RN11")
             self.selection2Field = QLineEdit("segid UBQ")
 
-        grid.addWidget(cutoffLabel, 1, 0)
-        grid.addWidget(cutoffAngleLabel, 2, 0)
-        grid.addWidget(cutoffHbondLabel, 3, 0)
-        grid.addWidget(selection1Label, 4, 0)
-        grid.addWidget(selection2Label, 5, 0)
+        grid.addWidget(cutoffLabel, 3, 0)
+        grid.addWidget(cutoffAngleLabel, 4, 0)
+        grid.addWidget(cutoffHbondLabel, 5, 0)
+        grid.addWidget(selection1Label, 6, 0)
+        grid.addWidget(selection2Label, 7, 0)
 
-        grid.addWidget(self.cutoffField, 1, 1)
-        grid.addWidget(self.cutoffAngleField, 2, 1)
-        grid.addWidget(self.cutoffHbondField, 3, 1)
-        grid.addWidget(self.selection1Field, 4, 1)
-        grid.addWidget(self.selection2Field, 5, 1)
+        grid.addWidget(self.cutoffField, 3, 1)
+        grid.addWidget(self.cutoffAngleField, 4, 1)
+        grid.addWidget(self.cutoffHbondField, 5, 1)
+        grid.addWidget(self.selection1Field, 6, 1)
+        grid.addWidget(self.selection2Field, 7, 1)
 
         # OK and Cancel buttons
         buttons = QDialogButtonBox(
@@ -125,13 +137,14 @@ class FileLoaderDialog(QDialog):
             Qt.Horizontal, self)
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
-        grid.addWidget(buttons, 6, 0)
+        grid.addWidget(buttons, 8, 0)
 
     def pick_psf(self):
         """Pick topology file."""
         psfname = QFileDialog.getOpenFileNames(self, "Open topology")
         for file in psfname[0]:
             self.psf = file
+            self.topFileDisplay.setText(self.psf.split("/")[-1])
             break
 
     def pick_dcd(self):
@@ -139,6 +152,7 @@ class FileLoaderDialog(QDialog):
         dcdname = QFileDialog.getOpenFileNames(self, "Open trajectory")
         for file in dcdname[0]:
             self.dcd = file
+            self.trajFileDisplay.setText(self.dcd.split("/")[-1])
             break
 
     def configuration(self):
