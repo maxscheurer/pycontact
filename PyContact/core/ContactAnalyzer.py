@@ -73,10 +73,7 @@ class Analyzer(QObject):
 
     def runContactAnalysis(self, map1, map2, nproc):
         """Performs a contadt analysis using nproc threads."""
-        if nproc == 1:
-            self.finalAccumulatedContacts = self.analyze_contactResultsWithMaps(self.contactResults, map1, map2)
-        else:
-            self.finalAccumulatedContacts = self.analyze_contactResultsWithMaps_Parallel(map1, map2, nproc)
+        self.finalAccumulatedContacts = self.analyze_contactResultsWithMaps(self.contactResults, map1, map2)
 
         self.lastMap1 = map1
         self.lastMap2 = map2
@@ -746,7 +743,6 @@ class Analyzer(QObject):
         return allSortedFrameContacts
 
 
-
     def analyze_contactResultsWithMaps(self, contactResults, map1, map2):
         """Analyzes contactsResults with the given maps."""
 
@@ -859,63 +855,3 @@ class Analyzer(QObject):
                     analysisProgressDict[each] = 0
                 progress = 0
                 self.analysis_state = False
-
-    def analyze_contactResultsWithMaps_Parallel(self, map1, map2, nproc):
-        """Analyzes contactsResults with the given maps, using nproc threads."""
-        start = time.time()
-        self.totalFramesToProcess = len(self.contactResults)
-        results = []
-        rank = 0
-        manager = multiprocessing.Manager()
-        d = manager.list(self.getTrajectoryData())
-        all_chunk = chunks(self.contactResults, nproc)
-        pool = LoggingPool(nproc)
-        print("Running on %d cores" % nproc)
-        for c in all_chunk:
-            results.append(pool.apply_async(loop_frame, args=(c, map1, map2, d, rank)))
-            rank += 1
-        # self.totalFramesToProcess = len(contResults)
-        self.analysis_state = True
-        self.analysisEventListener()
-        pool.close()
-        pool.join()
-        self.analysis_state = False
-        stop = time.time()
-        # print("time: ", str(stop - start), rank)
-        # print(str(len(c)), rank)
-        allkeys = []
-        frame_contacts_accumulated = []
-        # print(len(results))
-        for res in results:
-            rn = res.get()
-            allkeys.extend(rn[0])
-            frame_contacts_accumulated.extend(rn[1])
-        accumulatedContactsDict = {}
-        start = time.time()
-        for key in allkeys:
-            accumulatedContactsDict[key] = []
-            for frame_dict in frame_contacts_accumulated:
-                if key not in frame_dict:  # puts empty score TempContactAccumulate in dict
-                    key1, key2 = makeKeyArraysFromKey(key)
-                    emptyCont = TempContactAccumulate(key1, key2)
-                    emptyCont.fscore = 0
-                    frame_dict[key] = emptyCont
-                accumulatedContactsDict[key].append(frame_dict[key])
-        finalAccumulatedContacts = []  # list of AccumulatedContacts
-        for key in accumulatedContactsDict:
-            key1, key2 = makeKeyArraysFromKey(key)
-            acc = AccumulatedContact(key1, key2)
-            for tempContact in accumulatedContactsDict[key]:
-                acc.addScore(tempContact.fscore)
-                acc.addContributingAtoms(tempContact.contributingAtomContacts)
-                acc.bb1 += tempContact.bb1score
-                acc.bb2 += tempContact.bb2score
-                acc.sc1 += tempContact.sc1score
-                acc.sc2 += tempContact.sc2score
-            finalAccumulatedContacts.append(acc)
-        # stop = time.time()
-        # print(stop - start)
-        glob_stop = time.time()
-        # print(glob_stop - start)
-        # self.progressWidget.hide()
-        return finalAccumulatedContacts
