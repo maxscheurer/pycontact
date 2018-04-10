@@ -13,7 +13,6 @@ from PyQt5.QtSvg import QSvgGenerator
 import numpy as np
 
 from . import MainQtGui
-from ..core.multi_accumulation import *
 from ..core.Biochemistry import vdwRadius
 from .SasaWidgets import SasaWidget
 from .MoleculeTracker import MoleculeTracker

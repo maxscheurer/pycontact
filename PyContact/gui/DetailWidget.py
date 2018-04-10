@@ -8,7 +8,7 @@ import numpy as np
 
 from .Plotters import ContactPlotter
 from .detail_ui import *
-from ..core.multi_accumulation import chunks
+from ..core.multi_trajectory import chunks
 from ..core.Biochemistry import vdwRadius
 from ..core.LogPool import *
 from ..cy_modules import cy_gridsearch

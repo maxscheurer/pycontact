@@ -10,7 +10,7 @@ import numpy as np
 
 from .Plotters import SimplePlotter
 from .sasa_gui import *
-from ..core.multi_accumulation import chunks
+from ..core.multi_trajectory import chunks
 from ..core.Biochemistry import vdwRadius
 from ..core.LogPool import *
 from ..cy_modules import cy_gridsearch
@@ -132,6 +132,7 @@ class SasaWidget(QWidget, Ui_SasaWidget):
                 f.write(str(i) + "\t" + str(self.allSasas[i]) + "\n")
             f.close()
 
+    # TODO: move this somewhere else, e.g., core modules
     def calculateSasa(self):
         """Computes the SASA of the given selections."""
         print("calculate SASA")
@@ -223,7 +224,8 @@ class SasaWidget(QWidget, Ui_SasaWidget):
             self.allSasas.extend(r.get())
 
         del radius
-
+        # TODO: one would call the "external" sasa module here again,
+        # no need to duplicate the code
         if self.calculateContactAreaCheckbox.isChecked():
             print("Calculate contact area")
             selection2 = u.select_atoms(seltext2)

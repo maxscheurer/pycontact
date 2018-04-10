@@ -9,6 +9,8 @@ from matplotlib import animation as ani
 from matplotlib.widgets import Slider, Button
 import matplotlib
 
+import seaborn as sns
+
 from ..core.ContactFilters import *
 from ..core.Biochemistry import AccumulationMapIndex
 from matplotlib import pyplot as plt
@@ -19,7 +21,8 @@ font = {'family' : 'normal',
         'size'   : 14}
 
 matplotlib.rc('font', **font)
-
+sns.set()
+sns.set_context("talk")
 
 class MplPlotter(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""

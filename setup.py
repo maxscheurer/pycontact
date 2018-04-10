@@ -40,7 +40,7 @@ setup(
     packages=find_packages(),
 
     setup_requires = ['cython'],
-    install_requires = ['numpy','matplotlib','mdanalysis','cython'],
+    install_requires = ['numpy','matplotlib','mdanalysis','cython','seaborn'],
     cmdclass = {'build_ext': build_ext},
     ext_modules = cythonize(extensions),
 
