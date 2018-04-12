@@ -371,6 +371,7 @@ class BackboneSidechainContactType:
                [BackboneSidechainType.contactsBb, BackboneSidechainType.contactsSc],
                [BackboneSidechainType.contactsSc, BackboneSidechainType.contactsSc]]
     colors = [[0, 200, 200], [200, 200, 0], [0, 200, 0]]
+    # colors = [[120, 180, 202], [215, 193, 104], [108, 165, 110]] # looks sad
 
 
 def mean_score_of_contactArray(contacts):

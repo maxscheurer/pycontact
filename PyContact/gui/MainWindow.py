@@ -2,6 +2,7 @@ from __future__ import print_function
 import multiprocessing
 import warnings
 import copy
+import sys
 
 import PyQt5.QtCore as QtCore
 from PyQt5.QtCore import QRect, pyqtSlot, QObject
@@ -27,7 +28,7 @@ from .ErrorMessages import ErrorMessages
 from ..core.LogPool import *
 from ..core.aroundPatch import AroundSelection
 from . import Preferences
-from ..exampleData.datafiles import DEFAULTSESSION
+from ..exampleData.datafiles import DEFAULTSESSION, DEFAULTSESSION_PY3
 from .VMDControlPanel import VMDControlPanel
 from ..core.DataHandler import DataHandler
 # from TableModels import *
@@ -223,8 +224,11 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
     def loadDefault(self):
         """Loads the default session."""
-        self.contacts, arguments, trajArgs, self.maps, contactResults = \
-            DataHandler.importSessionFromFile(DEFAULTSESSION)
+
+        if (sys.version_info > (3, 0)):
+            self.contacts, arguments, trajArgs, self.maps, contactResults = DataHandler.importSessionFromFile(DEFAULTSESSION_PY3)
+        else:
+            self.contacts, arguments, trajArgs, self.maps, contactResults = DataHandler.importSessionFromFile(DEFAULTSESSION)
         self.analysis = Analyzer(*arguments)
         self.analysis.contactResults = contactResults
         self.analysis.setTrajectoryData(*trajArgs)
