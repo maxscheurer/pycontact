@@ -73,8 +73,8 @@ class Analyzer(QObject):
     def runContactAnalysis(self, map1, map2, nproc):
         """Performs a contadt analysis using nproc threads."""
         finalAccumulatedContacts_np = self.analyze_contactResultsWithMaps_numpy(self.contactResults, map1, map2)
-        for contact in finalAccumulatedContacts_np:
-            print(contact[0])
+        # for contact in finalAccumulatedContacts_np:
+        #     print(contact[0])
         print("#####################################")
         self.finalAccumulatedContacts = self.analyze_contactResultsWithMaps(self.contactResults, map1, map2)
 
@@ -296,6 +296,7 @@ class Analyzer(QObject):
 
         numberOfFrames = len(contactResults)
         contactScores = np.zeros([0, numberOfFrames])
+        hbonds = np.zeros([0, numberOfFrames])
         keys = np.array([])
 
         for frame_id, frame_data in enumerate(contactResults):
@@ -307,11 +308,15 @@ class Analyzer(QObject):
                 if len(searchResult) == 0:
                     keys = np.append(keys, key)
                     contactScores = np.vstack((contactScores, np.zeros(numberOfFrames)))
+                    hbonds = np.vstack((hbonds, np.zeros(numberOfFrames)))
                     contactScores[-1, frame_id] = contact.weight
+                    hbonds[-1, frame_id] = len(contact.hbondinfo)
                 else:
                     contactIndex = searchResult[0]
                     contactScores[contactIndex, frame_id] += contact.weight
+                    hbonds[contactIndex, frame_id] += len(contact.hbondinfo)
 
+        print(np.count_nonzero(hbonds, axis=1)/numberOfFrames)
         return contactScores
 
 

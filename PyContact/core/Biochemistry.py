@@ -28,7 +28,7 @@ def vdwRadius(atomType):
 
 class ContactTrajectory:
     def __init__(keys, contactScores, bbScores, scScores,
-                 hbondPercentages):
+                 hbonds):
         """
         Data container for trajectory contact data
 
@@ -42,14 +42,16 @@ class ContactTrajectory:
             backbone scores
         scScores: tuple of 2 np.ndarrays
             side chain scores
-        hbondPercentages: np.ndarray
-            hydrogen bond percentages, shape(contact,frame)
+        hbonds: np.ndarray
+            hydrogen bonds, shape(contact,frame)
+
         """
         self.keys = keys
         self.contactScores = contactScores
         self.bbScores1, self.bbScores2 = bbScores
         self.scScores1, self.scScores2 = scScores
         self.hbondPercentages = hbondPercentages
+        self.numberOfFrames = len(self.keys)
 
 class AtomHBondType:
     """Defines the type of Atom concerning its hbond behaviour"""

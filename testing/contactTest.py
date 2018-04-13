@@ -8,3 +8,4 @@ job.runJob(2)
 
 for contact in job.analyzer.finalAccumulatedContacts:
     print(contact.scoreArray[0])
+    print(contact.hbond_percentage())
