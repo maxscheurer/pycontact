@@ -295,7 +295,7 @@ class Analyzer(QObject):
     def analyze_contactResultsWithMaps_numpy(self, contactResults, map1, map2):
 
         numberOfFrames = len(contactResults)
-        finalAccumulatedContacts = np.zeros([0, numberOfFrames])
+        contactScores = np.zeros([0, numberOfFrames])
         keys = np.array([])
 
         for frame_id, frame_data in enumerate(contactResults):
@@ -306,13 +306,13 @@ class Analyzer(QObject):
 
                 if len(searchResult) == 0:
                     keys = np.append(keys, key)
-                    finalAccumulatedContacts = np.vstack((finalAccumulatedContacts, np.zeros(numberOfFrames)))
-                    finalAccumulatedContacts[-1, frame_id] = contact.weight
+                    contactScores = np.vstack((contactScores, np.zeros(numberOfFrames)))
+                    contactScores[-1, frame_id] = contact.weight
                 else:
                     contactIndex = searchResult[0]
-                    finalAccumulatedContacts[contactIndex, frame_id] += contact.weight
+                    contactScores[contactIndex, frame_id] += contact.weight
 
-        return finalAccumulatedContacts
+        return contactScores
 
 
     def analyze_contactResultsWithMaps(self, contactResults, map1, map2):
