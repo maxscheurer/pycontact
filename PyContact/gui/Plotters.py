@@ -242,7 +242,8 @@ class MapPlotter(MplPlotter):
                 r2 = int(c.key2[AccumulationMapIndex.resid])-miny
                 data[r2, r1] = c.hbond_percentage()
 
-        cax = self.axes.matshow(data, cmap=cm.Greys, label=attribute)
+        # cax = self.axes.matshow(data, cmap=cm.Greys, label=attribute)
+        cax = self.axes.matshow(data, label=attribute, cmap="YlGnBu")
 
         # TODO: do this automatically
         stridex = 5
