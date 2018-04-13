@@ -16,7 +16,7 @@ import numpy as np
 from . import MainQtGui
 from ..core.Biochemistry import vdwRadius
 from .SasaWidgets import SasaWidget
-from .MoleculeTracker import MoleculeTracker
+# from .MoleculeTracker import MoleculeTracker
 from .Canvas import Canvas
 from .Dialogues import FileLoaderDialog, AnalysisDialog
 from .ExportTabWidget import ExportTabWidget
@@ -64,6 +64,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.scrollArea.setWidget(self.painter)
         self.scrollArea.horizontalScrollBar().valueChanged.connect(self.horizontalScrollBarChanged)
         self.actionExportData.triggered.connect(self.pushExport)
+        self.exportContactDataButton.clicked.connect(self.pushExport)
         self.actionLoad_Data.triggered.connect(self.loadDataPushed)
         self.actionExport_Session.triggered.connect(self.exportSession)
         self.actionImport_Session.triggered.connect(self.importSession)
@@ -100,8 +101,8 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.sasaView = SasaWidget()
         self.statisticsView = None
 
-        self.moleculeTracker = MoleculeTracker()
-        self.actionTrack_Molecule.triggered.connect(self.showMoleculeTracker)
+        # self.moleculeTracker = MoleculeTracker()
+        # self.actionTrack_Molecule.triggered.connect(self.showMoleculeTracker)
 
         self.analysis_state = False
 
@@ -139,9 +140,9 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         """Shows the VMD control panel, to remotely access VMD from PyContact."""
         self.vmdpanel.show()
 
-    def showMoleculeTracker(self):
-        """Shows the VMD control panel, to remotely access VMD from PyContact."""
-        self.moleculeTracker.show()
+    # def showMoleculeTracker(self):
+    #     """Shows the VMD control panel, to remotely access VMD from PyContact."""
+    #     self.moleculeTracker.show()
 
     def showContactAreaView(self):
         """Shows the SASA computation panel."""
@@ -303,7 +304,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.painter.repaint()
         self.painter.update()
         self.sasaView.nsPerFrame = float(self.settingsView.nsPerFrameField.text())
-        self.moleculeTracker.contactAnalyzer = self.analysis
+        # self.moleculeTracker.contactAnalyzer = self.analysis
 
     def updateFilters(self):
         """Updates the chosen filters in MainWindow."""

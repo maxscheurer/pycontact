@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1265</width>
-    <height>710</height>
+    <width>1270</width>
+    <height>714</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -142,8 +142,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>911</width>
-         <height>549</height>
+         <width>916</width>
+         <height>553</height>
         </rect>
        </property>
       </widget>
@@ -818,6 +818,13 @@
       </layout>
      </widget>
     </item>
+    <item row="0" column="9">
+     <widget class="QPushButton" name="exportContactDataButton">
+      <property name="text">
+       <string>Export Contact Data</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -826,7 +833,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1265</width>
+     <width>1270</width>
      <height>22</height>
     </rect>
    </property>
@@ -855,7 +862,6 @@
     <addaction name="actionExportData"/>
     <addaction name="actionContact_Area_Calculations"/>
     <addaction name="actionVMD_Remote_Control"/>
-    <addaction name="actionTrack_Molecule"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
     <property name="title">
