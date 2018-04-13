@@ -349,8 +349,8 @@ class ContactType:
     """
     saltbr, hydrophobic, hbond, other = range(4)
     shortcut = ["saltbr", "hydrophobic", "hbond", "other"]
-    colors = ["rgba(255, 0,0, 50)", "rgba(0, 0,255, 50)", "rgba(255, 0 ,255, 50)", "rgba(255, 255 ,255, 50)"]
-    qcolors = [QColor(255, 0, 0, 50), QColor(0, 0, 255, 50), QColor(255, 0, 255, 50), QColor(255, 255, 255, 50)]
+    colors = ["rgba(212, 66, 54	, 160)", "rgba(76, 9, 152, 90)", "rgba(254, 110, 167, 150)", "rgba(255, 255 ,255, 50)"]
+    # qcolors = [QColor(255, 0, 0, 50), QColor(0, 0, 255, 50), QColor(255, 0, 255, 50), QColor(255, 255, 255, 50)]
 
 
 class SideChainPolarity:
@@ -370,7 +370,8 @@ class BackboneSidechainContactType:
     mapping = [[BackboneSidechainType.contactsBb, BackboneSidechainType.contactsBb],
                [BackboneSidechainType.contactsBb, BackboneSidechainType.contactsSc],
                [BackboneSidechainType.contactsSc, BackboneSidechainType.contactsSc]]
-    colors = [[0, 200, 200], [200, 200, 0], [0, 200, 0]]
+    # colors = [[0, 200, 200], [200, 200, 0], [0, 200, 0]]
+    colors = [[0,137,254	], [245,207,29], [114,199,11	]]
     # colors = [[120, 180, 202], [215, 193, 104], [108, 165, 110]] # looks sad
 
 
