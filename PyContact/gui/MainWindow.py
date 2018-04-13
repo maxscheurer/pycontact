@@ -457,9 +457,9 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         d.setLayout(grid)
 
         info = QLabel("Developers: Maximilian Scheurer and Peter Rodenkirch")
-        info2 = QLabel("Departments: TCBG, University of Illinois at Urbana-Champaign; BZH Heidelberg University")
+        info2 = QLabel("")
         mail = QLabel("Contact: mscheurer@ks.uiuc.edu, rodenkirch@stud.uni-heidelberg.de")
-        copyright = QLabel("Version 1.0, May 2017")
+        copyright = QLabel("Version 1.0.3.dev")
 
         grid.addWidget(info, 0, 0)
         grid.addWidget(info2, 1, 0)
@@ -467,7 +467,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         grid.addWidget(copyright, 3, 0)
 
         d.setWindowTitle("Developer Info")
-        d.resize(150, 80)
+        d.setFixedSize(500,150)
         d.setWindowModality(Qt.ApplicationModal)
         d.exec_()
 
