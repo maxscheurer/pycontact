@@ -74,10 +74,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.applyFilterButton.clicked.connect(self.updateFilters)
         # statistics
         self.statisticsButton.clicked.connect(self.showStatistics)
-        # color picker
-        self.settingsView.pickColorButton.clicked.connect(self.showColorPicker)
-        self.customColor = QColor(230, 50, 0)
-        self.settingsView.pickColorButton.setStyleSheet("QWidget { background-color: %s }" % self.customColor.name())
 
         # frames stride
         posIntValidator = QIntValidator()
@@ -299,15 +295,11 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
     def updateSettings(self):
         """Updates the settings chosen from the settings view."""
-        if self.settingsView.bbscScoreRadioButton.isChecked():
-            self.colorScheme = ColorScheme.bbsc
-        elif self.settingsView.customColorRadioButton.isChecked():
-            self.colorScheme = ColorScheme.custom
         self.painter.nsPerFrame = float(self.settingsView.nsPerFrameField.text())
         self.painter.threshold = float(self.settingsView.thresholdField.text())
         self.painter.rendered = False
         self.painter.colorScheme = self.colorScheme
-        self.painter.customColor = self.customColor
+        # self.painter.customColor = self.customColor
         self.painter.repaint()
         self.painter.update()
         self.sasaView.nsPerFrame = float(self.settingsView.nsPerFrameField.text())
@@ -508,14 +500,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.painter.rendered = False
         self.painter.repaint()
         self.painter.update()
-
-    def showColorPicker(self):
-        """Shows a color picker for the current view."""
-        col = QColorDialog.getColor()
-        self.customColor = col
-        if col.isValid():
-            self.settingsView.pickColorButton.setStyleSheet("QWidget { background-color: %s }" %
-                                                            self.customColor.name())
 
 
 class PreferencesWidget(QTabWidget, Preferences.Ui_PreferencesPanel):
