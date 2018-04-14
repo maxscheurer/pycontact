@@ -334,7 +334,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         sortingActive = self.activeSortingBox.isChecked()
         onlyActive = self.onlyBoxActiveCheckbox.isChecked()
         filterActive = (totalTimeActive or scoreActive or sortingActive or onlyActive)
-        weightActive = False
         # only filter given range
         rangeFilterActive = self.filterRangeCheckbox.isChecked()
         if len(self.contacts) > 0:
@@ -375,28 +374,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             for c in self.filteredContacts:
                 c.setScores()
                 c.setContactType()
-            # weight functions
-            if weightActive:
-                if self.currentFunctionType == FunctionType.sigmoid:
-                    print("sig weight")
-                    x0 = float(self.sigX0Field.text())
-                    L = float(self.sigLField.text())
-                    k = float(self.sigKField.text())
-                    y0 = float(self.sigY0Field.text())
-                    sig = SigmoidWeightFunction("sig", np.arange(0, len(self.contacts[0].scoreArray), 1), x0, L, k, y0)
-                    self.filteredContacts = sig.weightContactFrames(self.filteredContacts)
-                elif self.currentFunctionType == FunctionType.rect:
-                    x0 = float(self.rectX0Field.text())
-                    x1 = float(self.rectX1Field.text())
-                    h = float(self.rectHField.text())
-                    y0 = float(self.rectY0Field.text())
-                    rect = RectangularWeightFunction("rect", np.arange(0, len(self.contacts[0].scoreArray), 1), x0, x1, h, y0)
-                    self.filteredContacts = rect.weightContactFrames(self.filteredContacts)
-                elif self.currentFunctionType == FunctionType.linear:
-                    y0 = float(self.linY0Field.text())
-                    y1 = float(self.linY1Field.text())
-                    lin = LinearWeightFunction("rect", np.arange(0, len(self.contacts[0].scoreArray), 1), y0, y1)
-                    self.filteredContacts = lin.weightContactFrames(self.filteredContacts)
             # other filters
             if filterActive:
                     if totalTimeActive:
