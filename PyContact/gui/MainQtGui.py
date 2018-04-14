@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'MainQtGui.ui'
 #
-# Created by: PyQt5 UI code generator 5.7.1
+# Created by: PyQt5 UI code generator 5.6
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1265, 710)
+        MainWindow.resize(1270, 714)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
@@ -85,7 +85,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 911, 549))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 916, 553))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
         self.gridLayout.addWidget(self.scrollArea, 2, 0, 1, 8)
@@ -354,12 +354,15 @@ class Ui_MainWindow(object):
         spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.gridLayout_3.addItem(spacerItem1, 8, 0, 1, 1)
         self.gridLayout.addWidget(self.filterFrame, 2, 8, 1, 2)
+        self.exportContactDataButton = QtWidgets.QPushButton(self.centralwidget)
+        self.exportContactDataButton.setObjectName("exportContactDataButton")
+        self.gridLayout.addWidget(self.exportContactDataButton, 0, 9, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1265, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1270, 22))
         self.menubar.setDefaultUp(False)
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
@@ -407,7 +410,6 @@ class Ui_MainWindow(object):
         self.menuTools.addAction(self.actionExportData)
         self.menuTools.addAction(self.actionContact_Area_Calculations)
         self.menuTools.addAction(self.actionVMD_Remote_Control)
-        self.menuTools.addAction(self.actionTrack_Molecule)
         self.menuSettings.addAction(self.actionPreferences)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuTools.menuAction())
@@ -487,6 +489,7 @@ class Ui_MainWindow(object):
         self.selectOnlyToolbox.setItemText(3, _translate("MainWindow", "other"))
         self.applyFilterButton.setText(_translate("MainWindow", "Apply"))
         self.frameStrideField.setText(_translate("MainWindow", "1"))
+        self.exportContactDataButton.setText(_translate("MainWindow", "Export Contact Data"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.menuAbout.setTitle(_translate("MainWindow", "About"))
         self.menuTools.setTitle(_translate("MainWindow", "Tools"))

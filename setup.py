@@ -6,6 +6,7 @@ from setuptools.extension import Extension
 from Cython.Distutils import build_ext
 from Cython.Build import cythonize
 
+
 extensions = [Extension("PyContact.cy_modules.cy_gridsearch",
                         ["PyContact/cy_modules/cy_gridsearch.pyx"], language="c++",
                         include_dirs=[".", "PyContact/cy_modules/src"], extra_compile_args=["-std=c++0x"]), ]
@@ -40,7 +41,7 @@ setup(
     packages=find_packages(),
 
     setup_requires = ['cython'],
-    install_requires = ['numpy','matplotlib','mdanalysis','cython','seaborn'],
+    install_requires = ['numpy','matplotlib','mdanalysis','cython','seaborn', 'scipy'],
     cmdclass = {'build_ext': build_ext},
     ext_modules = cythonize(extensions),
 

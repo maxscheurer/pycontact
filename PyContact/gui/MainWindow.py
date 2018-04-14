@@ -16,7 +16,7 @@ import numpy as np
 from . import MainQtGui
 from ..core.Biochemistry import vdwRadius
 from .SasaWidgets import SasaWidget
-from .MoleculeTracker import MoleculeTracker
+# from .MoleculeTracker import MoleculeTracker
 from .Canvas import Canvas
 from .Dialogues import FileLoaderDialog, AnalysisDialog
 from .ExportTabWidget import ExportTabWidget
@@ -64,6 +64,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.scrollArea.setWidget(self.painter)
         self.scrollArea.horizontalScrollBar().valueChanged.connect(self.horizontalScrollBarChanged)
         self.actionExportData.triggered.connect(self.pushExport)
+        self.exportContactDataButton.clicked.connect(self.pushExport)
         self.actionLoad_Data.triggered.connect(self.loadDataPushed)
         self.actionExport_Session.triggered.connect(self.exportSession)
         self.actionImport_Session.triggered.connect(self.importSession)
@@ -74,10 +75,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.applyFilterButton.clicked.connect(self.updateFilters)
         # statistics
         self.statisticsButton.clicked.connect(self.showStatistics)
-        # color picker
-        self.settingsView.pickColorButton.clicked.connect(self.showColorPicker)
-        self.customColor = QColor(230, 50, 0)
-        self.settingsView.pickColorButton.setStyleSheet("QWidget { background-color: %s }" % self.customColor.name())
 
         # frames stride
         posIntValidator = QIntValidator()
@@ -104,8 +101,8 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.sasaView = SasaWidget()
         self.statisticsView = None
 
-        self.moleculeTracker = MoleculeTracker()
-        self.actionTrack_Molecule.triggered.connect(self.showMoleculeTracker)
+        # self.moleculeTracker = MoleculeTracker()
+        # self.actionTrack_Molecule.triggered.connect(self.showMoleculeTracker)
 
         self.analysis_state = False
 
@@ -143,9 +140,9 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         """Shows the VMD control panel, to remotely access VMD from PyContact."""
         self.vmdpanel.show()
 
-    def showMoleculeTracker(self):
-        """Shows the VMD control panel, to remotely access VMD from PyContact."""
-        self.moleculeTracker.show()
+    # def showMoleculeTracker(self):
+    #     """Shows the VMD control panel, to remotely access VMD from PyContact."""
+    #     self.moleculeTracker.show()
 
     def showContactAreaView(self):
         """Shows the SASA computation panel."""
@@ -299,19 +296,15 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
     def updateSettings(self):
         """Updates the settings chosen from the settings view."""
-        if self.settingsView.bbscScoreRadioButton.isChecked():
-            self.colorScheme = ColorScheme.bbsc
-        elif self.settingsView.customColorRadioButton.isChecked():
-            self.colorScheme = ColorScheme.custom
         self.painter.nsPerFrame = float(self.settingsView.nsPerFrameField.text())
         self.painter.threshold = float(self.settingsView.thresholdField.text())
         self.painter.rendered = False
         self.painter.colorScheme = self.colorScheme
-        self.painter.customColor = self.customColor
+        # self.painter.customColor = self.customColor
         self.painter.repaint()
         self.painter.update()
         self.sasaView.nsPerFrame = float(self.settingsView.nsPerFrameField.text())
-        self.moleculeTracker.contactAnalyzer = self.analysis
+        # self.moleculeTracker.contactAnalyzer = self.analysis
 
     def updateFilters(self):
         """Updates the chosen filters in MainWindow."""
@@ -464,9 +457,9 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         d.setLayout(grid)
 
         info = QLabel("Developers: Maximilian Scheurer and Peter Rodenkirch")
-        info2 = QLabel("Departments: TCBG, University of Illinois at Urbana-Champaign; BZH Heidelberg University")
+        info2 = QLabel("")
         mail = QLabel("Contact: mscheurer@ks.uiuc.edu, rodenkirch@stud.uni-heidelberg.de")
-        copyright = QLabel("Version 1.0, May 2017")
+        copyright = QLabel("Version 1.0.3.dev")
 
         grid.addWidget(info, 0, 0)
         grid.addWidget(info2, 1, 0)
@@ -474,7 +467,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         grid.addWidget(copyright, 3, 0)
 
         d.setWindowTitle("Developer Info")
-        d.resize(150, 80)
+        d.setFixedSize(500,150)
         d.setWindowModality(Qt.ApplicationModal)
         d.exec_()
 
@@ -508,14 +501,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.painter.rendered = False
         self.painter.repaint()
         self.painter.update()
-
-    def showColorPicker(self):
-        """Shows a color picker for the current view."""
-        col = QColorDialog.getColor()
-        self.customColor = col
-        if col.isValid():
-            self.settingsView.pickColorButton.setStyleSheet("QWidget { background-color: %s }" %
-                                                            self.customColor.name())
 
 
 class PreferencesWidget(QTabWidget, Preferences.Ui_PreferencesPanel):

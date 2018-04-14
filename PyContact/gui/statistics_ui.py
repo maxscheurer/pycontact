@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'PyContact/gui/statistics.ui'
+# Form implementation generated from reading ui file 'statistics.ui'
 #
-# Created by: PyQt5 UI code generator 5.8
+# Created by: PyQt5 UI code generator 5.6
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -12,7 +12,7 @@ class Ui_Statistics(object):
     def setupUi(self, Statistics):
         Statistics.setObjectName("Statistics")
         Statistics.setWindowModality(QtCore.Qt.WindowModal)
-        Statistics.resize(651, 441)
+        Statistics.resize(930, 642)
         self.gridLayout = QtWidgets.QGridLayout(Statistics)
         self.gridLayout.setObjectName("gridLayout")
         self.savePlotButton = QtWidgets.QPushButton(Statistics)
