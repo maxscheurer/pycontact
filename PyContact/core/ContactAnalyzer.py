@@ -21,6 +21,10 @@ from .aroundPatch import AroundSelection
 from .Biochemistry import (AccumulatedContact, AtomContact, AccumulationMapIndex, AtomType, HydrogenBond, AtomHBondType, TempContactAccumulate, HydrogenBondAtoms)
 from ..cy_modules.cy_gridsearch import cy_find_contacts
 
+from .ContactManager import ContactTrajectory
+
+from numba import jit
+
 MDAnalysis.core.flags['use_periodic_selections'] = False
 MDAnalysis.core.flags['use_KDTree_routines'] = True
 
@@ -72,11 +76,19 @@ class Analyzer(QObject):
 
     def runContactAnalysis(self, map1, map2, nproc):
         """Performs a contadt analysis using nproc threads."""
-        finalAccumulatedContacts_np = self.analyze_contactResultsWithMaps_numpy(self.contactResults, map1, map2)
+
         # for contact in finalAccumulatedContacts_np:
         #     print(contact[0])
         print("#####################################")
+        start = time.time()
         self.finalAccumulatedContacts = self.analyze_contactResultsWithMaps(self.contactResults, map1, map2)
+        stop = time.time()
+        print("old: ", stop-start)
+
+        start = time.time()
+        finalAccumulatedContacts_np = self.analyze_contactResultsWithMaps_numpy(self.contactResults, map1, map2)
+        stop = time.time()
+        print("numpy: ", stop-start)
 
         self.lastMap1 = map1
         self.lastMap2 = map2
@@ -297,6 +309,10 @@ class Analyzer(QObject):
         numberOfFrames = len(contactResults)
         contactScores = np.zeros([0, numberOfFrames])
         hbonds = np.zeros([0, numberOfFrames])
+        bbScores1 = np.zeros([0, numberOfFrames])
+        bbScores2 = np.zeros([0, numberOfFrames])
+        scScores1 = np.zeros([0, numberOfFrames])
+        scScores2 = np.zeros([0, numberOfFrames])
         keys = np.array([])
 
         for frame_id, frame_data in enumerate(contactResults):
@@ -305,18 +321,38 @@ class Analyzer(QObject):
                 key = self.makeKeyFromKeyArrays(key1, key2)
                 searchResult = np.where(keys == key)[0]
 
-                if len(searchResult) == 0:
+                contactIndex = -1
+                if len(searchResult) != 0:
+                    contactIndex = searchResult[0]
+                else:
                     keys = np.append(keys, key)
                     contactScores = np.vstack((contactScores, np.zeros(numberOfFrames)))
                     hbonds = np.vstack((hbonds, np.zeros(numberOfFrames)))
-                    contactScores[-1, frame_id] = contact.weight
-                    hbonds[-1, frame_id] = len(contact.hbondinfo)
-                else:
-                    contactIndex = searchResult[0]
-                    contactScores[contactIndex, frame_id] += contact.weight
-                    hbonds[contactIndex, frame_id] += len(contact.hbondinfo)
+                    bbScores1 = np.vstack((bbScores1, np.zeros(numberOfFrames)))
+                    bbScores2 = np.vstack((bbScores2, np.zeros(numberOfFrames)))
+                    scScores1 = np.vstack((scScores1, np.zeros(numberOfFrames)))
+                    scScores2 = np.vstack((scScores2, np.zeros(numberOfFrames)))
 
-        print(np.count_nonzero(hbonds, axis=1)/numberOfFrames)
+                currentWeight = contact.weight
+                contactScores[contactIndex, frame_id] += currentWeight
+                hbonds[contactIndex, frame_id] += len(contact.hbondinfo)
+                if contact.idx1 in self.backbone:
+                    bbScores1[contactIndex, frame_id] += currentWeight
+                else:
+                    scScores1[contactIndex, frame_id] += currentWeight
+                if contact.idx2 in self.backbone:
+                    bbScores2[contactIndex, frame_id] += currentWeight
+                else:
+                    scScores2[contactIndex, frame_id] += currentWeight
+
+
+        # print(np.count_nonzero(hbonds, axis=1)/numberOfFrames)
+        ct = ContactTrajectory(keys=keys,
+                               contactScores=contactScores,
+                               bbScores=[bbScores1, bbScores2],
+                               scScores=[scScores1, scScores2],
+                               hbonds=hbonds)
+        # return ct
         return contactScores
 
 
@@ -448,7 +484,7 @@ class Analyzer(QObject):
         self.resid_array = []
         self.name_array = []
         self.segids = []
-        self.backbone = []
+        self.backbone = np.array([])
         for atom in all_sel.atoms:
             self.resname_array.append(atom.resname)
             self.resid_array.append(atom.resid)
@@ -456,7 +492,7 @@ class Analyzer(QObject):
             self.bonds.append(atom.bonds)
             self.segids.append(atom.segid)
         for atom in backbone_sel:
-            self.backbone.append(atom.index)
+            self.backbone = np.append(self.backbone, atom.index)
 
         selfInteraction = False
 

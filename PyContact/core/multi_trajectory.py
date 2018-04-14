@@ -380,7 +380,7 @@ def run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1t
     name_array = []
     bonds = []
     segids = []
-    backbone = []
+    backbone = np.array([])
     for atom in all_sel.atoms:
         resname_array.append(atom.resname)
         resid_array.append(atom.resid)
@@ -388,7 +388,7 @@ def run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1t
         bonds.append(ConvBond(atom.bonds))
         segids.append(atom.segid)
     for atom in backbone_sel:
-        backbone.append(atom.index)
+        backbone = np.append(backbone, atom.index)
 
     if (len(sel1.atoms) == 0 or len(sel2.atoms) == 0):
         raise Exception
