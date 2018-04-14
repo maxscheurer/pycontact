@@ -23,8 +23,6 @@ from ..cy_modules.cy_gridsearch import cy_find_contacts
 
 from .ContactManager import ContactTrajectory
 
-from numba import jit
-
 MDAnalysis.core.flags['use_periodic_selections'] = False
 MDAnalysis.core.flags['use_KDTree_routines'] = True
 
@@ -303,9 +301,7 @@ class Analyzer(QObject):
             itemcounter += 1
         return key
 
-
     def analyze_contactResultsWithMaps_numpy(self, contactResults, map1, map2):
-
         numberOfFrames = len(contactResults)
         contactScores = np.zeros([0, numberOfFrames])
         hbonds = np.zeros([0, numberOfFrames])
