@@ -1,3 +1,7 @@
+import numpy as np
+
+from .Biochemistry import BackboneSidechainType, BackboneSidechainContactType
+
 class AtomicContactTrajectory:
     """docstring for [object Object]."""
     def __init__(self, contacts, resname_array, resid_array, name_array,
@@ -37,3 +41,15 @@ class AccumulatedContactTrajectory:
         self.scScores1, self.scScores2 = scScores
         self.hbonds = hbonds
         self.numberOfFrames = len(self.keys)
+        self.backboneSideChainTypes = np.zeros(len(self.contactScores), dtype=np.int8)
+        self.determineBackboneSidechainType()
+
+    def determineBackboneSidechainType(self):
+        """Sets the Backbone-Sidechain type."""
+        atom1 = self.bbScores1 > self.scScores1
+        atom2 = self.bbScores2 > self.scScores2
+        bb = (atom1 == atom2)
+
+        self.backboneSideChainTypes[np.where(bb == False)] = BackboneSidechainContactType.both
+        self.backboneSideChainTypes[np.where((atom1 == True) & (atom2 == True))] = BackboneSidechainContactType.bb_only
+        self.backboneSideChainTypes[np.where((atom1 == False) & (atom2 == False))] = BackboneSidechainContactType.sc_only

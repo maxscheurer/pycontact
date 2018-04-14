@@ -102,10 +102,10 @@ class ContactAnalyzer:
         numberOfFrames = len(self.atomicContacts)
         contactScores = np.zeros([0, numberOfFrames])
         hbonds = np.zeros([0, numberOfFrames])
-        bbScores1 = np.zeros([0, numberOfFrames])
-        bbScores2 = np.zeros([0, numberOfFrames])
-        scScores1 = np.zeros([0, numberOfFrames])
-        scScores2 = np.zeros([0, numberOfFrames])
+        bbScores1 = np.array([])
+        bbScores2 = np.array([])
+        scScores1 = np.array([])
+        scScores2 = np.array([])
         keys = np.array([])
 
         for frame_id, frame_data in enumerate(self.atomicContacts):
@@ -121,24 +121,25 @@ class ContactAnalyzer:
                     contactIndex = searchResult[0]
                 else:
                     keys = np.append(keys, key)
+                    bbScores1 = np.append(bbScores1, 0)
+                    bbScores2 = np.append(bbScores2, 0)
+                    scScores1 = np.append(scScores1, 0)
+                    scScores2 = np.append(scScores2, 0)
                     contactScores = np.vstack((contactScores, np.zeros(numberOfFrames)))
                     hbonds = np.vstack((hbonds, np.zeros(numberOfFrames)))
-                    bbScores1 = np.vstack((bbScores1, np.zeros(numberOfFrames)))
-                    bbScores2 = np.vstack((bbScores2, np.zeros(numberOfFrames)))
-                    scScores1 = np.vstack((scScores1, np.zeros(numberOfFrames)))
-                    scScores2 = np.vstack((scScores2, np.zeros(numberOfFrames)))
 
                 currentWeight = contact.weight
                 contactScores[contactIndex, frame_id] += currentWeight
                 hbonds[contactIndex, frame_id] += len(contact.hbondinfo)
                 if contact.idx1 in self.backbone:
-                    bbScores1[contactIndex, frame_id] += currentWeight
+                    bbScores1[contactIndex] += currentWeight
                 else:
-                    scScores1[contactIndex, frame_id] += currentWeight
+                    scScores1[contactIndex] += currentWeight
                 if contact.idx2 in self.backbone:
-                    bbScores2[contactIndex, frame_id] += currentWeight
+                    bbScores2[contactIndex] += currentWeight
                 else:
-                    scScores2[contactIndex, frame_id] += currentWeight
+                    scScores2[contactIndex] += currentWeight
+
 
 
         # print(np.count_nonzero(hbonds, axis=1)/numberOfFrames)

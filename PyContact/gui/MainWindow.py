@@ -63,9 +63,9 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
         self.contactManager = None
 
-        # painter contains both labels and frame boxes for drawing
-        self.painter = Canvas()
-        self.scrollArea.setWidget(self.painter)
+        # canvas contains both labels and frame boxes for drawing
+        self.canvas = Canvas()
+        self.scrollArea.setWidget(self.canvas)
         self.scrollArea.horizontalScrollBar().valueChanged.connect(self.horizontalScrollBarChanged)
         self.actionExportData.triggered.connect(self.pushExport)
         self.actionLoad_Data.triggered.connect(self.loadDataPushed)
@@ -121,8 +121,8 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.vmdpanel = VMDControlPanel()
         self.actionVMD_Remote_Control.triggered.connect(self.showVMDControlPanel)
 
-        self.painter.clickedRowSignal.connect(self.updateVMDSelections)
-        self.painter.clickedColumnSignal.connect(self.updateVMDFrame)
+        self.canvas.clickedRowSignal.connect(self.updateVMDSelections)
+        self.canvas.clickedColumnSignal.connect(self.updateVMDFrame)
         self.updateSettings()
         self.updateFilters()
 
@@ -130,8 +130,8 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
     def horizontalScrollBarChanged(self):
         x = self.scrollArea.horizontalScrollBar().value()
-        y = self.painter.labelView.y()
-        self.painter.labelView.move(x, y)
+        y = self.canvas.labelView.y()
+        self.canvas.labelView.move(x, y)
 
     def showVMDControlPanel(self):
         """Shows the VMD control panel, to remotely access VMD from PyContact."""
@@ -156,7 +156,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             self.frameStrideField.setText("1")
         else:
             self.vismode = False
-        self.painter.switchToVisMode(self.vismode)
+        self.canvas.switchToVisMode(self.vismode)
         self.updateSettings()
         self.updateFilters()
 
@@ -165,13 +165,13 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         """Updates the selected contact in VMD via the vmd panel."""
         if self.vmdpanel.connected:
             self.vmdpanel.updateSelections(self.analysis.sel1text, self.analysis.sel2text,
-                                           [self.filteredContacts[self.painter.globalClickedRow]])
+                                           [self.filteredContacts[self.canvas.globalClickedRow]])
 
     @pyqtSlot()
     def updateVMDFrame(self):
         """Updates the selected frame in VMD via the vmd panel."""
         if self.vmdpanel.connected:
-            self.vmdpanel.gotoVMDFrame(self.painter.clickedColumn)
+            self.vmdpanel.gotoVMDFrame(self.canvas.clickedColumn)
 
     def updateSelectionLabels(self, sel1, sel2):
         """Updates the current selection in the info labels."""
@@ -291,13 +291,21 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             # self.analysis.frameUpdate.connect(self.updateAnalyzedFrames)
             self.setInfoLabel("Analyzing contacts...")
             self.contactManager.accumulateContacts(*self.maps)
+            self.canvas.setAccumulatedTrajectory(self.contactManager.accumulatedContactTrajectories[0])
+            self.updateCanvas()
             # self.contacts = self.analysis.runContactAnalysis(map1, map2, nproc)
             # self.progressBar.setValue(0)
             # self.setInfoLabel("Updating timeline...")
-            # QApplication.processEvents()
+            QApplication.processEvents()
             # self.updateSettings()
             # self.updateFilters()
             # self.cleanInfoLabel()
+
+    def updateCanvas(self):
+        print("update Canvas")
+        self.canvas.rendered = False
+        self.canvas.repaint()
+        self.canvas.update()
 
     def updateSettings(self):
         """Updates the settings chosen from the settings view."""
@@ -305,13 +313,13 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             self.colorScheme = ColorScheme.bbsc
         elif self.settingsView.customColorRadioButton.isChecked():
             self.colorScheme = ColorScheme.custom
-        self.painter.nsPerFrame = float(self.settingsView.nsPerFrameField.text())
-        self.painter.threshold = float(self.settingsView.thresholdField.text())
-        self.painter.rendered = False
-        self.painter.colorScheme = self.colorScheme
-        self.painter.customColor = self.customColor
-        self.painter.repaint()
-        self.painter.update()
+        self.canvas.nsPerFrame = float(self.settingsView.nsPerFrameField.text())
+        self.canvas.threshold = float(self.settingsView.thresholdField.text())
+        self.canvas.rendered = False
+        self.canvas.colorScheme = self.colorScheme
+        self.canvas.customColor = self.customColor
+        self.canvas.repaint()
+        self.canvas.update()
         self.sasaView.nsPerFrame = float(self.settingsView.nsPerFrameField.text())
         self.moleculeTracker.contactAnalyzer = self.analysis
 
@@ -325,9 +333,9 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             QApplication.processEvents()
             self.frameStrideField.setText(str(stride))
         # print("stride: ", stride)
-        self.painter.merge = stride
-        self.painter.labelView.clean()
-        self.painter.showHbondScores = False
+        self.canvas.merge = stride
+        self.canvas.labelView.clean()
+        self.canvas.showHbondScores = False
         # total time filter
         totalTimeActive = self.activeTotalTimeCheckbox.isChecked()
         scoreActive = self.activeScoreCheckbox.isChecked()
@@ -346,8 +354,8 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
             if lower < 0:
                 lower = 0
-            self.painter.range = [lower, upper]
-            self.painter.rangeFilterActive = False
+            self.canvas.range = [lower, upper]
+            self.canvas.rangeFilterActive = False
             self.filteredContacts = copy.deepcopy(self.contacts)
             # residue range filter
             range_filter = RangeFilter("resrange")
@@ -368,7 +376,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
                                                                      AccumulationMapIndex.name)
             # range filter
             if rangeFilterActive:
-                self.painter.rangeFilterActive = True
+                self.canvas.rangeFilterActive = True
                 frameRangeFilter = FrameFilter("framer")
                 self.filteredContacts = frameRangeFilter.extractFrameRange(self.filteredContacts, [lower, upper])
             for c in self.filteredContacts:
@@ -398,20 +406,20 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
                         only = OnlyFilter("only", key, 0)
                         self.filteredContacts = only.filterContacts(self.filteredContacts)
                         if key == "hbonds":
-                            self.painter.showHbondScores = True
-                    self.painter.contacts = self.filteredContacts
-                    self.painter.rendered = False
-                    self.painter.repaint()
-                    self.painter.update()
+                            self.canvas.showHbondScores = True
+                    self.canvas.contacts = self.filteredContacts
+                    self.canvas.rendered = False
+                    self.canvas.repaint()
+                    self.canvas.update()
                     if len(self.filteredContacts) == 0:
-                        self.painter.labelView.clean()
+                        self.canvas.labelView.clean()
             else:
                 # no weight or filters
-                self.painter.showHbondScores = False
-                self.painter.contacts = self.filteredContacts
-                self.painter.rendered = False
-                self.painter.repaint()
-                self.painter.update()
+                self.canvas.showHbondScores = False
+                self.canvas.contacts = self.filteredContacts
+                self.canvas.rendered = False
+                self.canvas.repaint()
+                self.canvas.update()
 
         # Update data for export
         self.exportWidget.setContacts(self.filteredContacts)
@@ -421,7 +429,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             self.vmdpanel.sel1 = self.analysis.sel1text
             self.vmdpanel.sel2 = self.analysis.sel2text
             self.vmdpanel.filteredContactList = self.filteredContacts
-        self.exportWidget.setThresholdAndNsPerFrame(self.painter.threshold, self.painter.nsPerFrame)
+        self.exportWidget.setThresholdAndNsPerFrame(self.canvas.threshold, self.canvas.nsPerFrame)
 
     def openPrefs(self):
         """Opens the preferences panel."""
@@ -464,7 +472,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         if self.maps is not None:
             self.exportWidget.setMaps(self.maps[0], self.maps[1])
             self.exportWidget.setMapLabels(self.analysis.sel1text, self.analysis.sel2text)
-        self.exportWidget.setThresholdAndNsPerFrame(self.painter.threshold, self.painter.nsPerFrame)
+        self.exportWidget.setThresholdAndNsPerFrame(self.canvas.threshold, self.canvas.nsPerFrame)
         self.exportWidget.show()
 
     @QtCore.Slot(str, str)
@@ -474,19 +482,19 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         if fileType == "PNG":
             if len(fileName) > 0:
                 print("Saving current view to ", fileName)
-                currentView = self.painter.grab()
+                currentView = self.canvas.grab()
                 currentView.save(fileName)
         elif fileType == "SVG":
             if len(fileName) > 0:
                 print("Saving current view to ", fileName)
                 generator = QSvgGenerator()
                 generator.setFileName(fileName)
-                generator.setSize(self.painter.size())
-                generator.setViewBox(self.painter.rect())
-                self.painter.renderContact(generator)
-        self.painter.rendered = False
-        self.painter.repaint()
-        self.painter.update()
+                generator.setSize(self.canvas.size())
+                generator.setViewBox(self.canvas.rect())
+                self.canvas.renderContact(generator)
+        self.canvas.rendered = False
+        self.canvas.repaint()
+        self.canvas.update()
 
     def showColorPicker(self):
         """Shows a color picker for the current view."""

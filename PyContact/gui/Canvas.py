@@ -25,7 +25,7 @@ class Canvas(QWidget, QObject):
         self.clickedRow = 0
         self.clickedColumn = 0
         self.rendered = False
-        self.contacts = 0
+        self.accumulatedTrajectory = None
         self.sizeX = 0
         self.sizeY = 0
         self.rendered = False
@@ -46,6 +46,10 @@ class Canvas(QWidget, QObject):
         self.timeLineXOrigin = 0
         self.rowh = 1
         self.endOfTimeLine = 0
+
+
+    def setAccumulatedTrajectory(self, trajectory):
+        self.accumulatedTrajectory = trajectory
 
     def mousePressEvent(self, event):
         pos = event.pos()
@@ -86,7 +90,7 @@ class Canvas(QWidget, QObject):
         # render pixmap to resolve performance issues
         if self.rendered:
             self.drawRenderedContact(qp)
-        elif self.rendered is False and self.contacts:
+        elif self.rendered is False and self.accumulatedTrajectory:
             self.renderContact(False)
             self.rendered = True
 
@@ -96,6 +100,7 @@ class Canvas(QWidget, QObject):
 
     def renderContact(self, generator):
         """Render the contact with the defined colors."""
+        print("test")
         # startx = 90
         # orig_startx = startx
         start_text = 10
@@ -104,17 +109,17 @@ class Canvas(QWidget, QObject):
         blackColor = QColor(0, 0, 0)
         whiteColor = QColor(255, 255, 255)
 
-        merge = self.merge
         offset = 10
 
         self.labelView.clean()
-        self.labelView = LabelView(self.contacts)
+        self.labelView = LabelView(self.accumulatedTrajectory)
         self.labelView.setParent(self)
         self.labelView.nsPerFrame = self.nsPerFrame
         self.labelView.threshold = self.threshold
         self.labelView.show()
         # startx has to be set according to maximum button length in labelview
-        startx = np.max(self.labelView.buttonWidths) + 15
+        # startx = np.max(self.labelView.buttonWidths) + 15
+        startx = 15
         orig_startx = startx
 
         # probably included in next version...
@@ -124,20 +129,12 @@ class Canvas(QWidget, QObject):
         #     startx += 15
         #     orig_startx += 15
 
-        # print(orig_startx)
         self.timeLineXOrigin = orig_startx
         self.rowh = rowheight
-
-        # self.sizeX = (len(self.contacts[0].scoreArray) + startx) * offset
-        # self.sizeY = len(self.contacts) * rowheight
-        if self.rangeFilterActive:
-            self.sizeX = startx + (len(self.contacts[0].scoreArray) + merge * 2) * offset / merge
-        else:
-            self.sizeX = startx + (len(self.contacts[0].scoreArray[self.range[0]:self.range[1]]) + merge * 2) \
-                                  * offset / merge
+        self.sizeX = startx + len(self.accumulatedTrajectory.contactScores[0]) * offset
 
         # add one row for frame numbers
-        self.sizeY = (len(self.contacts)+1) * rowheight
+        self.sizeY = (len(self.accumulatedTrajectory.contactScores)+1) * rowheight
 
         self.pixmap = QPixmap(QSize(self.sizeX, self.sizeY))
         p = QPainter()
@@ -152,48 +149,41 @@ class Canvas(QWidget, QObject):
         row = 0
         rownumber = 0
         # print("merge value", merge)
-        for c in self.contacts:
+        print(self.accumulatedTrajectory.backboneSideChainTypes)
+        for contactScores, chainType, hbonds in zip(self.accumulatedTrajectory.contactScores,
+                                                     self.accumulatedTrajectory.backboneSideChainTypes,
+                                                     self.accumulatedTrajectory.hbonds):
             self.alphaFactor = 50
-            bbScColor = BackboneSidechainContactType.colors[c.determineBackboneSidechainType()]
+            bbScColor = BackboneSidechainContactType.colors[chainType]
             i = 0
-            if not self.showHbondScores:
-                if self.rangeFilterActive:
-                    rangedScores = c.scoreArray
-                else:
-                    rangedScores = c.scoreArray[self.range[0]:self.range[1]]
-            else:
-                hbarray = c.hbondFramesScan()
+            if self.showHbondScores:
                 self.alphaFactor = 100
                 if self.rangeFilterActive:
-                    rangedScores = hbarray
-                else:
-                    rangedScores = hbarray[self.range[0]:self.range[1]]
+                    scoreArray = hbonds
+
             if rownumber == 0:
                 # show the frame numbers on top
                 p.setFont(QFont('Arial', 8))
                 p.drawText(start_text, row + textoffset + 2.0, "Frame:")
 
                 off = 0
-                if self.range[0] != 0:
-                    off = 1
-                for l in range(self.range[0] + off, self.range[1] + 1, 10)[off:]:
-                    if l == 0:
-                        continue
-                    # print(l)
-                    # TODO: sometimes errors occur!
-                    p.drawText(startx + (l - 1 - self.range[0]) * offset, row + textoffset + 2.0, str(l * merge))
-                self.labelView.move(0, rowheight)
+                # for l in range(off, self.range[1] + 1, 10)[off:]:
+                #     if l == 0:
+                #         continue
+                #     # print(l)
+                #     # TODO: sometimes errors occur!
+                #     p.drawText(startx + (l - 1 - self.range[0]) * offset, row + textoffset + 2.0, str(l * merge))
+                # self.labelView.move(0, rowheight)
                 row += rowheight
-            while i < len(rangedScores):
+            while i < len(contactScores):
                 p.setPen(blackColor)
-                merged_score = 0
-                for j in range(merge):
-                    if (i + j) >= len(rangedScores):
-                        break
-                    x = rangedScores[i + j]
-                    merged_score += x
-                merged_score /= merge
-                alpha = merged_score * self.alphaFactor
+                # score = 0
+                # for j in range(merge):
+                #     if (i + j) >= len(scoreArray):
+                #         break
+                #     x = scoreArray[i + j]
+                #     score += x
+                alpha = contactScores[i] * self.alphaFactor
                 if alpha > 255:
                     alpha = 255
                 if math.isnan(alpha):
@@ -213,7 +203,7 @@ class Canvas(QWidget, QObject):
                     p.setPen(QColor(0, 0, 0))
                 p.drawRect(startx, row, offset, 20)
                 startx += offset
-                i += merge
+                i += 1
             self.offset = offset
             self.endOfTimeLine = startx
             startx = orig_startx
@@ -222,13 +212,15 @@ class Canvas(QWidget, QObject):
 
         if generator:
             row = rowheight
-            for c in self.contacts:
+            for contactScores, chainType in zip(self.accumulatedTrajectory.contactScores,
+                                                self.accumulatedTrajectory.backboneSideChainTypes):
                 p.setPen(0)
                 # print(ContactType.colors[c.contactType])
                 p.setFont(QFont('Arial', 9))
                 # string = c.resA + c.residA + "-" + c.resB + c.residB
-                string = c.title
-                p.setBrush(ContactType.qcolors[c.determine_ctype()])
+                # string = c.title
+                string = "Test"
+                p.setBrush(ContactType.qcolors[chainType])
                 p.drawRect(0, row+3, orig_startx, rowheight-10)
                 p.setPen(1)
                 p.drawText(start_text, row + textoffset, string)
