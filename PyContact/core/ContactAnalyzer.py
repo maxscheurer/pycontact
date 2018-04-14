@@ -50,7 +50,7 @@ class Analyzer(QObject):
         self.resid_array = []
         self.name_array = []
         self.segids = []
-        self.backbone = []
+        self.backbone = np.array([])
         self.finalAccumulatedContacts = []
         self.bonds = []
         self.totalFrameNumber = 0
@@ -353,6 +353,7 @@ class Analyzer(QObject):
                                scScores=[scScores1, scScores2],
                                hbonds=hbonds)
         # return ct
+        print(type(self.backbone))
         return contactScores
 
 
@@ -451,6 +452,7 @@ class Analyzer(QObject):
             # print(len(acc.scoreArray))
         stop = time.time()
         # print(stop - start)
+        print(type(self.backbone))
         return finalAccumulatedContacts
 
     def analysisEventListener(self):
