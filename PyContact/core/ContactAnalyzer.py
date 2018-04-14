@@ -72,6 +72,10 @@ class Analyzer(QObject):
 
     def runContactAnalysis(self, map1, map2, nproc):
         """Performs a contadt analysis using nproc threads."""
+        finalAccumulatedContacts_np = self.analyze_contactResultsWithMaps_numpy(self.contactResults, map1, map2)
+        # for contact in finalAccumulatedContacts_np:
+        #     print(contact[0])
+        print("#####################################")
         self.finalAccumulatedContacts = self.analyze_contactResultsWithMaps(self.contactResults, map1, map2)
 
         self.lastMap1 = map1
@@ -116,6 +120,33 @@ class Analyzer(QObject):
     def weight_function(value):
         """weight function to score contact distances"""
         return 1.0 / (1.0 + np.exp(5.0 * (value - 4.0)))
+
+    @staticmethod
+    def make_single_title(key):
+        """returns the title of the AccumulatedContact to be displayed in contact's label"""
+        titleDict = {}
+        counter = 0
+        for item in key:
+            titleDict[AccumulationMapIndex.mapping[counter]] = (item if item != "none" else "")
+            counter += 1
+        residueString = "%s%s" % (titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.resname]],
+                                  str(titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.resid]]))
+        atomIndexString = ("%s %s" % (AccumulationMapIndex.mapping[AccumulationMapIndex.index],
+                                      str(titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.index]])) if
+                           titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.index]] != "" else "")
+        atomNameString = ("%s %s" % (AccumulationMapIndex.mapping[AccumulationMapIndex.name],
+                                     str(titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.name]])) if
+                          titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.name]] != "" else "")
+        segnameString = ("%s %s" % (AccumulationMapIndex.mapping[AccumulationMapIndex.segid],
+                                    str(titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.segid]])) if
+                         titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.segid]] != "" else "")
+        tempList = [residueString, atomIndexString, atomNameString, segnameString]
+        finishedList = []
+        for string in tempList:
+            if string != "":
+                finishedList.append(string)
+        finishedString = ", ".join(finishedList)
+        return finishedString
 
     def makeKeyArraysFromMaps(self, map1, map2, contact):
         """Creates key Arrays from the chosen accumulation maps.
@@ -234,32 +265,6 @@ class Analyzer(QObject):
                     key2.append(currentValue)
         return [key1, key2]
 
-    @staticmethod
-    def make_single_title(key):
-        """returns the title of the AccumulatedContact to be displayed in contact's label"""
-        titleDict = {}
-        counter = 0
-        for item in key:
-            titleDict[AccumulationMapIndex.mapping[counter]] = (item if item != "none" else "")
-            counter += 1
-        residueString = "%s%s" % (titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.resname]],
-                                  str(titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.resid]]))
-        atomIndexString = ("%s %s" % (AccumulationMapIndex.mapping[AccumulationMapIndex.index],
-                                      str(titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.index]])) if
-                           titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.index]] != "" else "")
-        atomNameString = ("%s %s" % (AccumulationMapIndex.mapping[AccumulationMapIndex.name],
-                                     str(titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.name]])) if
-                          titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.name]] != "" else "")
-        segnameString = ("%s %s" % (AccumulationMapIndex.mapping[AccumulationMapIndex.segid],
-                                    str(titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.segid]])) if
-                         titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.segid]] != "" else "")
-        tempList = [residueString, atomIndexString, atomNameString, segnameString]
-        finishedList = []
-        for string in tempList:
-            if string != "":
-                finishedList.append(string)
-        finishedString = ", ".join(finishedList)
-        return finishedString
 
     @staticmethod
     def makeKeyFromKeyArrays(key1, key2):
@@ -286,6 +291,147 @@ class Analyzer(QObject):
             itemcounter += 1
         return key
 
+
+    def analyze_contactResultsWithMaps_numpy(self, contactResults, map1, map2):
+
+        numberOfFrames = len(contactResults)
+        contactScores = np.zeros([0, numberOfFrames])
+        hbonds = np.zeros([0, numberOfFrames])
+        keys = np.array([])
+
+        for frame_id, frame_data in enumerate(contactResults):
+            for contact in frame_data:
+                key1, key2 = self.makeKeyArraysFromMaps(map1, map2, contact)
+                key = self.makeKeyFromKeyArrays(key1, key2)
+                searchResult = np.where(keys == key)[0]
+
+                if len(searchResult) == 0:
+                    keys = np.append(keys, key)
+                    contactScores = np.vstack((contactScores, np.zeros(numberOfFrames)))
+                    hbonds = np.vstack((hbonds, np.zeros(numberOfFrames)))
+                    contactScores[-1, frame_id] = contact.weight
+                    hbonds[-1, frame_id] = len(contact.hbondinfo)
+                else:
+                    contactIndex = searchResult[0]
+                    contactScores[contactIndex, frame_id] += contact.weight
+                    hbonds[contactIndex, frame_id] += len(contact.hbondinfo)
+
+        print(np.count_nonzero(hbonds, axis=1)/numberOfFrames)
+        return contactScores
+
+
+    def analyze_contactResultsWithMaps(self, contactResults, map1, map2):
+        """Analyzes contactsResults with the given maps."""
+
+        #################################################
+        # contactResults evaluation
+        # only depending on map1, map2
+        # part can be run without running the contact analysis algorithm again,
+        # as it just prepares the results for displaying
+        #################################################
+
+        # Data structure to process:
+        # contactResults (list of frames)
+        # ---> frame (list of AtomContacts)
+        # --------> AtomContact
+
+        frame_contacts_accumulated = []
+        # frame_contacts_accumulated (list of frames)
+        # ---> frame_dict (dict)
+        # --------> key vs. TempContactAccumulate
+
+        # list of all contacts keys (= unique identifiers, determined by the given maps)
+        start = time.time()
+        allkeys = []
+        total = len(contactResults)
+        counter = 1
+        for frame in contactResults:
+            currentFrameAcc = {}
+            for cont in frame:
+                key1, key2 = self.makeKeyArraysFromMaps(map1, map2, cont)
+                key = self.makeKeyFromKeyArrays(key1, key2)
+                if key in currentFrameAcc:
+                    currentFrameAcc[key].fscore += cont.weight
+                    currentFrameAcc[key].contributingAtomContacts.append(cont)
+                    if cont.idx1 in self.backbone:
+                        currentFrameAcc[key].bb1score += cont.weight
+                    else:
+                        currentFrameAcc[key].sc1score += cont.weight
+                    if cont.idx2 in self.backbone:
+                        currentFrameAcc[key].bb2score += cont.weight
+                    else:
+                        currentFrameAcc[key].sc2score += cont.weight
+                else:
+                    currentFrameAcc[key] = TempContactAccumulate(key1, key2)
+                    currentFrameAcc[key].fscore += cont.weight
+                    currentFrameAcc[key].contributingAtomContacts.append(cont)
+                    if cont.idx1 in self.backbone:
+                        currentFrameAcc[key].bb1score += cont.weight
+                    else:
+                        currentFrameAcc[key].sc1score += cont.weight
+                    if cont.idx2 in self.backbone:
+                        currentFrameAcc[key].bb2score += cont.weight
+                    else:
+                        currentFrameAcc[key].sc2score += cont.weight
+                if key not in allkeys:
+                    allkeys.append(key)
+            frame_contacts_accumulated.append(currentFrameAcc)
+            self.frameUpdate.emit(float(counter) / float(total))
+            counter += 1
+        accumulatedContactsDict = {}
+        stop = time.time()
+        # print(stop - start)
+        # accumulatedContactsDict (dict)
+        # ---> key vs. list of TempContactAccumulated
+        #
+        # loop fills gaps with zero-score TempContactAccumulate of key if key is not occuring in a frame
+        # provides clean data!
+        start = time.time()
+        for key in allkeys:
+            accumulatedContactsDict[key] = []
+            for frame_dict in frame_contacts_accumulated:
+                if key not in frame_dict:  # puts empty score TempContactAccumulate in dict
+                    key1, key2 = self.makeKeyArraysFromKey(key)
+                    emptyCont = TempContactAccumulate(key1, key2)
+                    emptyCont.fscore = 0
+                    frame_dict[key] = emptyCont
+                accumulatedContactsDict[key].append(frame_dict[key])
+
+                # make a list of AccumulatedContacts from accumulatedContactsDict
+        # probably, there is a much easier way to do that, but I am too tired at the moment and it works (M)
+        finalAccumulatedContacts = []  # list of AccumulatedContacts
+        for key in accumulatedContactsDict:
+            key1, key2 = self.makeKeyArraysFromKey(key)
+            acc = AccumulatedContact(key1, key2)
+            for tempContact in accumulatedContactsDict[key]:
+                acc.addScore(tempContact.fscore)
+                acc.addContributingAtoms(tempContact.contributingAtomContacts)
+                acc.bb1 += tempContact.bb1score
+                acc.bb2 += tempContact.bb2score
+                acc.sc1 += tempContact.sc1score
+                acc.sc2 += tempContact.sc2score
+            finalAccumulatedContacts.append(acc)
+            # print(key, acc.bb1, acc.bb2, acc.sc1, acc.sc2)
+            # print(len(acc.scoreArray))
+        stop = time.time()
+        # print(stop - start)
+        return finalAccumulatedContacts
+
+    def analysisEventListener(self):
+        """Event listener for the progress bar in MainWindow."""
+        while self.analysis_state:
+            progress = 0
+            for each in analysisProgressDict.keys():
+                progress += analysisProgressDict[each]
+            progress = float(progress) / float(self.totalFramesToProcess)
+            if progress > 0:
+                self.frameUpdate.emit(progress)
+
+            if progress == 1.0:
+                for each in analysisProgressDict.keys():
+                    analysisProgressDict[each] = 0
+                progress = 0
+                self.analysis_state = False
 
     # newer version, uses gridsearch to find contacts, much faster and less memory-intense
     def analyze_psf_dcd_grid(self, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1text, sel2text):
@@ -535,117 +681,3 @@ class Analyzer(QObject):
             sorted_frame_contacts = sorted(currentFrameAcc.items(), key=operator.itemgetter(1), reverse=1)
             allSortedFrameContacts.append(sorted_frame_contacts)
         return allSortedFrameContacts
-
-
-    def analyze_contactResultsWithMaps(self, contactResults, map1, map2):
-        """Analyzes contactsResults with the given maps."""
-
-        #################################################
-        # contactResults evaluation
-        # only depending on map1, map2
-        # part can be run without running the contact analysis algorithm again,
-        # as it just prepares the results for displaying
-        #################################################
-
-        # Data structure to process:
-        # contactResults (list of frames)
-        # ---> frame (list of AtomContacts)
-        # --------> AtomContact
-
-        frame_contacts_accumulated = []
-        # frame_contacts_accumulated (list of frames)
-        # ---> frame_dict (dict)
-        # --------> key vs. TempContactAccumulate
-
-        # list of all contacts keys (= unique identifiers, determined by the given maps)
-        start = time.time()
-        allkeys = []
-        total = len(contactResults)
-        counter = 1
-        for frame in contactResults:
-            currentFrameAcc = {}
-            for cont in frame:
-                key1, key2 = self.makeKeyArraysFromMaps(map1, map2, cont)
-                key = self.makeKeyFromKeyArrays(key1, key2)
-                if key in currentFrameAcc:
-                    currentFrameAcc[key].fscore += cont.weight
-                    currentFrameAcc[key].contributingAtomContacts.append(cont)
-                    if cont.idx1 in self.backbone:
-                        currentFrameAcc[key].bb1score += cont.weight
-                    else:
-                        currentFrameAcc[key].sc1score += cont.weight
-                    if cont.idx2 in self.backbone:
-                        currentFrameAcc[key].bb2score += cont.weight
-                    else:
-                        currentFrameAcc[key].sc2score += cont.weight
-                else:
-                    currentFrameAcc[key] = TempContactAccumulate(key1, key2)
-                    currentFrameAcc[key].fscore += cont.weight
-                    currentFrameAcc[key].contributingAtomContacts.append(cont)
-                    if cont.idx1 in self.backbone:
-                        currentFrameAcc[key].bb1score += cont.weight
-                    else:
-                        currentFrameAcc[key].sc1score += cont.weight
-                    if cont.idx2 in self.backbone:
-                        currentFrameAcc[key].bb2score += cont.weight
-                    else:
-                        currentFrameAcc[key].sc2score += cont.weight
-                if key not in allkeys:
-                    allkeys.append(key)
-            frame_contacts_accumulated.append(currentFrameAcc)
-            self.frameUpdate.emit(float(counter) / float(total))
-            counter += 1
-        accumulatedContactsDict = {}
-        stop = time.time()
-        # print(stop - start)
-        # accumulatedContactsDict (dict)
-        # ---> key vs. list of TempContactAccumulated
-        #
-        # loop fills gaps with zero-score TempContactAccumulate of key if key is not occuring in a frame
-        # provides clean data!
-        start = time.time()
-        for key in allkeys:
-            accumulatedContactsDict[key] = []
-            for frame_dict in frame_contacts_accumulated:
-                if key not in frame_dict:  # puts empty score TempContactAccumulate in dict
-                    key1, key2 = self.makeKeyArraysFromKey(key)
-                    emptyCont = TempContactAccumulate(key1, key2)
-                    emptyCont.fscore = 0
-                    frame_dict[key] = emptyCont
-                accumulatedContactsDict[key].append(frame_dict[key])
-
-                # make a list of AccumulatedContacts from accumulatedContactsDict
-        # probably, there is a much easier way to do that, but I am too tired at the moment and it works (M)
-        finalAccumulatedContacts = []  # list of AccumulatedContacts
-        for key in accumulatedContactsDict:
-            key1, key2 = self.makeKeyArraysFromKey(key)
-            acc = AccumulatedContact(key1, key2)
-            for tempContact in accumulatedContactsDict[key]:
-                acc.addScore(tempContact.fscore)
-                acc.addContributingAtoms(tempContact.contributingAtomContacts)
-                acc.bb1 += tempContact.bb1score
-                acc.bb2 += tempContact.bb2score
-                acc.sc1 += tempContact.sc1score
-                acc.sc2 += tempContact.sc2score
-            finalAccumulatedContacts.append(acc)
-            # print(key, acc.bb1, acc.bb2, acc.sc1, acc.sc2)
-            # print(len(acc.scoreArray))
-        stop = time.time()
-        # print(stop - start)
-        return finalAccumulatedContacts
-
-    def analysisEventListener(self):
-        """Event listener for the progress bar in MainWindow."""
-        while self.analysis_state:
-            progress = 0
-            for each in analysisProgressDict.keys():
-                progress += analysisProgressDict[each]
-            progress = float(progress) / float(self.totalFramesToProcess)
-            if progress > 0:
-                self.frameUpdate.emit(progress)
-
-            if progress == 1.0:
-                for each in analysisProgressDict.keys():
-                    analysisProgressDict[each] = 0
-                progress = 0
-                self.analysis_state = False

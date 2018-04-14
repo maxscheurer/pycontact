@@ -57,3 +57,5 @@ pycontact.egg-info/
 
 #pytest
 .pytest_cache/
+
+doc/_build
