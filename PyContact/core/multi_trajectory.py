@@ -12,6 +12,10 @@ import numpy as np
 from .Biochemistry import *
 from .LogPool import *
 from ..cy_modules.cy_gridsearch import cy_find_contacts
+from .aroundPatch import AroundSelection
+
+MDAnalysis.core.flags['use_periodic_selections'] = False
+MDAnalysis.core.flags['use_KDTree_routines'] = True
 
 def weight_function(value):
     """weight function to score contact distances"""

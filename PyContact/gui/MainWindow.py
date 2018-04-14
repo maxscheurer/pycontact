@@ -20,6 +20,7 @@ from .SasaWidgets import SasaWidget
 from .MoleculeTracker import MoleculeTracker
 from .Canvas import Canvas
 from .Dialogues import FileLoaderDialog, AnalysisDialog
+from .LoadDataDialog import LoadDataDialog
 from .ExportTabWidget import ExportTabWidget
 from .Statistics import Statistics
 from .Plotters import *
@@ -238,15 +239,15 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
     def loadDataPushed(self):
         """Loads the trajectory data with the chosen initial parameters."""
-        self.config, result = FileLoaderDialog.getConfig()
+        self.config, result = LoadDataDialog.getConfig()
         if result == 1:
             QApplication.processEvents()
             self.setInfoLabel("Loading trajectory and running atomic contact analysis...")
             nproc = int(self.settingsView.coreBox.value())
             #self.analysis = Analyzer(self.config.psf, self.config.dcd, self.config.cutoff, self.config.hbondcutoff,
                                      # self.config.hbondcutangle, self.config.sel1text, self.config.sel2text)
-            self.contactManager = ContactManager(self.config.psf,
-                                                [self.config.dcd],
+            self.contactManager = ContactManager(self.config.topology,
+                                                 self.config.trajectories,
                                                  self.config.cutoff,
                                                  self.config.hbondcutoff,
                                                  self.config.hbondcutangle,

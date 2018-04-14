@@ -282,6 +282,7 @@ class AccumulatedContact(object):
             return ContactType.other
 
 
+# TODO: remove
 # many TempContactAccumulated objects are later converted to AccumulatedContact
 class TempContactAccumulate(object):
     """Stores the frame's score as well as the key."""
