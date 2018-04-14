@@ -22,7 +22,7 @@ from .Dialogues import FileLoaderDialog, AnalysisDialog
 from .ExportTabWidget import ExportTabWidget
 from .Statistics import Statistics
 from .Plotters import *
-from ..core.ContactAnalyzer import *
+from ..core.ContactAnalyzer_old import *
 from .ErrorBox import ErrorBox
 from .ErrorMessages import ErrorMessages
 from ..core.LogPool import *
@@ -31,6 +31,7 @@ from . import Preferences
 from ..exampleData.datafiles import DEFAULTSESSION, DEFAULTSESSION_PY3
 from .VMDControlPanel import VMDControlPanel
 from ..core.DataHandler import DataHandler
+from ..core.ContactManager import ContactManager
 # from TableModels import *
 
 multiprocessing.log_to_stderr()
@@ -58,6 +59,9 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.setupUi(self)
 
         self.setWindowTitle("PyContact")
+
+
+        self.contactManager = None
 
         # painter contains both labels and frame boxes for drawing
         self.painter = Canvas()
@@ -236,19 +240,28 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             QApplication.processEvents()
             self.setInfoLabel("Loading trajectory and running atomic contact analysis...")
             nproc = int(self.settingsView.coreBox.value())
-            self.analysis = Analyzer(self.config.psf, self.config.dcd, self.config.cutoff, self.config.hbondcutoff,
-                                     self.config.hbondcutangle, self.config.sel1text, self.config.sel2text)
+            #self.analysis = Analyzer(self.config.psf, self.config.dcd, self.config.cutoff, self.config.hbondcutoff,
+                                     # self.config.hbondcutangle, self.config.sel1text, self.config.sel2text)
+            self.contactManager = ContactManager(self.config.psf,
+                                                [self.config.dcd],
+                                                 self.config.cutoff,
+                                                 self.config.hbondcutoff,
+                                                 self.config.hbondcutangle,
+                                                 self.config.sel1text,
+                                                 self.config.sel2text)
             QApplication.processEvents()
-            try:
-                self.analysis.runFrameScan(nproc)
-            except:
-                box = ErrorBox("Error while loading data: Probably you specified an atom selection with 0 atoms or invalid input files.")
-                box.exec_()
-                self.loadDataPushed()
-            self.setInfoLabel("%d frames loaded." % len(self.analysis.contactResults))
+            # try:
+                # self.analysis.runFrameScan(nproc)
+            self.contactManager.readTrajectories(nproc)
+            # except:
+            #     box = ErrorBox("Error while loading data: Probably you specified an atom selection with 0 atoms or invalid input files.")
+            #     box.exec_()
+            #     self.loadDataPushed()
+
+            # self.setInfoLabel("%d frames loaded." % len(self.analysis.contactResults))
             self.updateSelectionLabels(self.config.sel1text, self.config.sel2text)
-            self.sasaView.setFilePaths(*self.analysis.getFilePaths())
-            self.exportWidget.setFilePaths(*self.analysis.getFilePaths())
+            # self.sasaView.setFilePaths(*self.analysis.getFilePaths())
+            # self.exportWidget.setFilePaths(*self.analysis.getFilePaths())
 
     @pyqtSlot(float)
     def updateAnalyzedFrames(self, value):
@@ -266,26 +279,25 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.setInfoLabel("-")
 
     def analyzeDataPushed(self):
+        # TODO: refactor
         """Handles the Analyzer after the Accumulation maps have been set."""
-        if self.analysis is None:
-            box = ErrorBox(ErrorMessages.NODATA_PROMPTLOAD)
-            box.exec_()
-            return
+        # if self.analysis is None:
+        #     box = ErrorBox(ErrorMessages.NODATA_PROMPTLOAD)
+        #     box.exec_()
+        #     return
 
         self.maps, result = AnalysisDialog.getMapping()
         if result == 1:
-            self.analysis.frameUpdate.connect(self.updateAnalyzedFrames)
+            # self.analysis.frameUpdate.connect(self.updateAnalyzedFrames)
             self.setInfoLabel("Analyzing contacts...")
-            map1 = self.maps[0]
-            map2 = self.maps[1]
-            nproc = int(self.settingsView.coreBox.value())
-            self.contacts = self.analysis.runContactAnalysis(map1, map2, nproc)
-            self.progressBar.setValue(0)
-            self.setInfoLabel("Updating timeline...")
-            QApplication.processEvents()
-            self.updateSettings()
-            self.updateFilters()
-            self.cleanInfoLabel()
+            self.contactManager.accumulateContacts(*self.maps)
+            # self.contacts = self.analysis.runContactAnalysis(map1, map2, nproc)
+            # self.progressBar.setValue(0)
+            # self.setInfoLabel("Updating timeline...")
+            # QApplication.processEvents()
+            # self.updateSettings()
+            # self.updateFilters()
+            # self.cleanInfoLabel()
 
     def updateSettings(self):
         """Updates the settings chosen from the settings view."""

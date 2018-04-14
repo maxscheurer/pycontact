@@ -5,8 +5,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QDoubleValidator
 
 from ..core.LoadConfiguration import Configuration
-from PyContact.core.ContactAnalyzer import Analyzer
 from .HelpButton import HelpButton
+from ..exampleData.datafiles import DCD, PSF
 
 
 class TopoTrajLoaderDialog(QDialog):
@@ -70,9 +70,14 @@ class FileLoaderDialog(QDialog):
     def __init__(self, parent=None):
         super(FileLoaderDialog, self).__init__(parent)
         self.setWindowTitle("Load Data")
-        self.psf = ""
-        self.dcd = ""
-        production = 1
+        production = 0
+        if production:
+            self.psf = ""
+            self.dcd = ""
+        else:
+            self.psf = PSF
+            self.dcd = DCD
+
 
         grid = QGridLayout(self)
 

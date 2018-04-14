@@ -21,7 +21,7 @@ from .aroundPatch import AroundSelection
 from .Biochemistry import (AccumulatedContact, AtomContact, AccumulationMapIndex, AtomType, HydrogenBond, AtomHBondType, TempContactAccumulate, HydrogenBondAtoms)
 from ..cy_modules.cy_gridsearch import cy_find_contacts
 
-from .ContactManager import ContactTrajectory
+# from .ContactManager import ContactTrajectory
 
 MDAnalysis.core.flags['use_periodic_selections'] = False
 MDAnalysis.core.flags['use_KDTree_routines'] = True
@@ -42,7 +42,6 @@ class Analyzer(QObject):
         self.sel2text = sel2text
         self.lastMap1 = []
         self.lastMap2 = []
-        self.contactResults = []
         self.contactResults = []
         self.resname_array = []
         self.resid_array = []
@@ -343,13 +342,13 @@ class Analyzer(QObject):
 
 
         # print(np.count_nonzero(hbonds, axis=1)/numberOfFrames)
-        ct = ContactTrajectory(keys=keys,
-                               contactScores=contactScores,
-                               bbScores=[bbScores1, bbScores2],
-                               scScores=[scScores1, scScores2],
-                               hbonds=hbonds)
+        # ct = ContactTrajectory(keys=keys,
+        #                        contactScores=contactScores,
+        #                        bbScores=[bbScores1, bbScores2],
+        #                        scScores=[scScores1, scScores2],
+        #                        hbonds=hbonds)
         # return ct
-        print(type(self.backbone))
+        #print(type(self.backbone))
         return contactScores
 
 

@@ -1,38 +1,46 @@
+import multiprocessing
 
-class ContactManager(object):
+from .ContactAnalyzer import ContactAnalyzer
+from .ContactTrajectories import *
+
+class ContactManager:
     """
     Main manager for all contact data and trajectories
 
 
     """
-    def __init__(self):
-        trajectories = []
+    def __init__(self, topology, trajectories, cutoff, hbondcutoff,
+                 hbondcutangle, sel1text, sel2text):
+        self.topology = topology
+        if not isinstance(trajectories, list):
+            raise TypeError("Trajectories must be list.")
+        self.trajectories = trajectories
+        self.trajectoryScanParameters = TrajectoryScanParameters(cutoff,
+                                                                 hbondcutoff,
+                                                                 hbondcutangle,
+                                                                 sel1text,
+                                                                 sel2text)
 
+        self.atomicContactTrajectories = []
+        self.accumulatedContactTrajectories = []
 
+    def readTrajectories(self, nproc):
+        for trajectory in self.trajectories:
+            atomicContactTrajectory = ContactAnalyzer.runFrameScan(self.topology,
+                                                                   trajectory,
+                                                                   self.trajectoryScanParameters,
+                                                                   nproc)
+            self.atomicContactTrajectories.append(atomicContactTrajectory)
 
-class ContactTrajectory:
-    def __init__(self, keys, contactScores, bbScores, scScores,
-                 hbonds):
-        """
-        Data container for trajectory contact data
+    def accumulateContacts(self, map1, map2):
+        for atomicTrajectory in self.atomicContactTrajectories:
+            ct = ContactAnalyzer(atomicTrajectory, map1, map2).accumulateContacts()
+            self.accumulatedContactTrajectories.append(ct)
 
-        Parameters
-        ----------
-        keys: np.ndarray
-            array of contact keys
-        contactScores: np.ndarray
-            accumulated contact scores per frame, shape(contact,frame)
-        bbScores: tuple of 2 np.ndarrays
-            backbone scores
-        scScores: tuple of 2 np.ndarrays
-            side chain scores
-        hbonds: np.ndarray
-            hydrogen bonds, shape(contact,frame)
-
-        """
-        self.keys = keys
-        self.contactScores = contactScores
-        self.bbScores1, self.bbScores2 = bbScores
-        self.scScores1, self.scScores2 = scScores
-        self.hbonds = hbonds
-        self.numberOfFrames = len(self.keys)
+class TrajectoryScanParameters:
+    def __init__(self, cutoff, hbondcutoff, hbondcutangle, sel1text, sel2text):
+        self.cutoff = cutoff
+        self.hbondcutoff = hbondcutoff
+        self.hbondcutangle = hbondcutangle
+        self.sel1text = sel1text
+        self.sel2text = sel2text
