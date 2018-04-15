@@ -15,7 +15,6 @@ import numpy as np
 
 from . import MainQtGui
 from ..core.Biochemistry import vdwRadius
-from .WebView import WebView
 from .SasaWidgets import SasaWidget
 from .MoleculeTracker import MoleculeTracker
 from .Canvas import Canvas
@@ -61,7 +60,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.contactManager = None
 
 
-        self.webView = WebView()
         # canvas contains both labels and frame boxes for drawing
         self.canvas = Canvas()
         self.scrollArea.setWidget(self.canvas)
@@ -299,9 +297,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             self.contactManager.accumulateContacts(*self.maps)
             self.canvas.setAccumulatedTrajectory(self.contactManager.accumulatedContactTrajectories[0])
             self.updateCanvas()
-            self.webView.setAccumulatedTrajectory(self.contactManager.accumulatedContactTrajectories[0])
-            self.webView.plotBokeh()
-            self.webView.show()
             # self.contacts = self.analysis.runContactAnalysis(map1, map2, nproc)
             # self.progressBar.setValue(0)
             # self.setInfoLabel("Updating timeline...")
