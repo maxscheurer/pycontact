@@ -30,4 +30,4 @@ class WebView(QWidget, Ui_WebView):
         self.trajectory = trajectory
 
     def plotBokeh(self):
-        
+        pass
