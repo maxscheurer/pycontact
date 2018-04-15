@@ -7,6 +7,7 @@ from .Biochemistry import (AccumulatedContact, AtomContact,
                            HydrogenBondAtoms)
 from .ContactTrajectories import (AtomicContactTrajectory,
                                   AccumulatedContactTrajectory)
+from .KeyManager import KeyManager
 
 class ContactAnalyzer:
 
@@ -29,12 +30,17 @@ class ContactAnalyzer:
         scScores2 = np.array([])
         keys = np.array([])
 
+        keyManager = KeyManager(self.name_array,
+                                self.resid_array,
+                                self.resname_array,
+                                self.segids)
+
         for frame_id, frame_data in enumerate(self.atomicContacts):
             for contact in frame_data:
-                key1, key2 = self.makeKeyArraysFromMaps(self.map1,
-                                                        self.map2,
-                                                        contact)
-                key = self.makeKeyFromKeyArrays(key1, key2)
+                key1, key2 = keyManager.makeKeyArraysFromMaps(self.map1,
+                                                              self.map2,
+                                                              contact)
+                key = KeyManager.makeKeyFromKeyArrays(key1, key2)
                 searchResult = np.where(keys == key)[0]
 
                 contactIndex = -1
@@ -64,8 +70,6 @@ class ContactAnalyzer:
 
 
         # print(np.count_nonzero(hbonds, axis=1)/numberOfFrames)
-        np.save("keys.np", keys)
-        np.save("contactScores.np", contactScores)
         ct = AccumulatedContactTrajectory(keys=keys,
                                contactScores=contactScores,
                                bbScores=[bbScores1, bbScores2],
@@ -73,89 +77,12 @@ class ContactAnalyzer:
                                hbonds=hbonds)
         return ct
 
-    def makeKeyArraysFromMaps(self, map1, map2, contact):
-        """Creates key Arrays from the chosen accumulation maps.
-
-            maps contain information whether to consider an atom's property for contact accumulation
-            map1 and map2 contain 5 boolean values each, cf. AccumulationMapIndex
-            for a given contact, the corresponding value to a property is written to keys1 and keys2, respectively
-            example input:
-            map1 = [0,0,1,1,0]
-            map2 = [0,0,1,1,0], meaning that residue and resname should be used for contact accumulation
-            contact: idx1,idx2
-            results: (example!)
-            keys1=["none","none","none","14", "VAL", "none"]
-            keys2=["none","none","none","22", "ILE, "none"]
-
-        """
-        idx1 = contact.idx1
-        idx2 = contact.idx2
-        counter = 0
-        keys1 = []
-        for val in map1:
-            if val == 1:
-                if counter == AccumulationMapIndex.index:
-                    keys1.append(idx1)
-                elif counter == AccumulationMapIndex.name:
-                    keys1.append(self.name_array[idx1])
-                elif counter == AccumulationMapIndex.resid:
-                    keys1.append(self.resid_array[idx1])
-                elif counter == AccumulationMapIndex.resname:
-                    keys1.append(self.resname_array[idx1])
-                elif counter == AccumulationMapIndex.segid:
-                    keys1.append(self.segids[idx1])
-            else:
-                keys1.append("none")
-            counter += 1
-        counter = 0
-        keys2 = []
-        for val in map2:
-            if val == 1:
-                if counter == AccumulationMapIndex.index:
-                    keys2.append(idx2)
-                elif counter == AccumulationMapIndex.name:
-                    keys2.append(self.name_array[idx2])
-                elif counter == AccumulationMapIndex.resid:
-                    keys2.append(self.resid_array[idx2])
-                elif counter == AccumulationMapIndex.resname:
-                    keys2.append(self.resname_array[idx2])
-                elif counter == AccumulationMapIndex.segid:
-                    keys2.append(self.segids[idx2])
-            else:
-                keys2.append("none")
-            counter += 1
-        return [keys1, keys2]
-
-    @staticmethod
-    def makeKeyFromKeyArrays(key1, key2):
-        """Returns a human readable key from two key arrays.
-            example:
-            keys1=["none","none","14", "VAL", "none"]
-            keys2=["none","none","22", "ILE", "none"]
-            returns a human readable key with the mapping identifiers in AccumulationMapIndex
-            in the given example data:
-            key="r.14rn.VAL-r.22rn.ILE"
-            key is used to accumulated contacts in a dictionary (= a contact's unique identifier)
-        """
-        key = ""
-        itemcounter = 0
-        for item in key1:
-            if item != "none":
-                key += AccumulationMapIndex.mapping[itemcounter] + str(item)
-            itemcounter += 1
-        key += "-"
-        itemcounter = 0
-        for item in key2:
-            if item != "none":
-                key += AccumulationMapIndex.mapping[itemcounter] + str(item)
-            itemcounter += 1
-        return key
-
 
     @staticmethod
     def runFrameScan(topology, trajectory, trajectoryScanParameters, nproc):
         return AtomicContactTrajectory(*run_load_parallel(nproc, topology,
-                                                         trajectory, trajectoryScanParameters.cutoff,
+                                                         trajectory,
+                                                         trajectoryScanParameters.cutoff,
                                                          trajectoryScanParameters.hbondcutoff,
                                                          trajectoryScanParameters.hbondcutangle,
                                                          trajectoryScanParameters.sel1text,

@@ -2,8 +2,8 @@ import numpy as np
 
 from .Biochemistry import (BackboneSidechainType,
                            BackboneSidechainContactType,
-                           makeHumanReadableTitle,
-                           makeKeyArraysFromKey)
+                           makeHumanReadableTitle)
+from .KeyManager import KeyManager
 
 class AtomicContactTrajectory:
     """docstring for [object Object]."""
@@ -62,6 +62,6 @@ class AccumulatedContactTrajectory:
     def makeTitles(self):
         self.titles = np.array([])
         for k in self.keys:
-            key_array = makeKeyArraysFromKey(k)
+            key_array = KeyManager.makeKeyArraysFromKey(k)
             self.titles = np.append(self.titles,
                                     makeHumanReadableTitle(*key_array))
