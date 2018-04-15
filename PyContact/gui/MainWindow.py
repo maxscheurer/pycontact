@@ -52,22 +52,18 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         QApplication.quit()
 
     def __init__(self, parent=None):
-        self.config = None
-        self.analysis = None
-        self.maps = None
         super(MainWindow, self).__init__(parent)
-        self.contacts = []
-        self.filteredContacts = []
         self.setupUi(self)
-
         self.setWindowTitle("PyContact")
 
-
+        self.config = None
+        self.maps = None
         self.contactManager = None
 
         # canvas contains both labels and frame boxes for drawing
         self.webView = WebView()
         self.webView.show()
+
         self.canvas = Canvas()
         self.scrollArea.setWidget(self.canvas)
         self.scrollArea.horizontalScrollBar().valueChanged.connect(self.horizontalScrollBarChanged)
@@ -115,8 +111,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.moleculeTracker = MoleculeTracker()
         self.actionTrack_Molecule.triggered.connect(self.showMoleculeTracker)
 
-        self.analysis_state = False
-
         self.vismode = False
         self.visModeButton.setCheckable(True)
         self.visModeButton.setChecked(False)
@@ -128,7 +122,8 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.canvas.clickedRowSignal.connect(self.updateVMDSelections)
         self.canvas.clickedColumnSignal.connect(self.updateVMDFrame)
         self.updateSettings()
-        self.updateFilters()
+        # TODO: enable
+        # self.updateFilters()
 
         self.actionDefault.setText("Load sample data")
 
@@ -149,8 +144,9 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         """Shows the SASA computation panel."""
         self.sasaView.nsPerFrame = float(self.settingsView.nsPerFrameField.text())
         self.sasaView.show()
-        if self.analysis:
-            self.sasaView.setFilePaths(self.analysis.getFilePaths())
+        # TODO: ask user which trajectory should be used for SASA
+        # if self.contactManager:
+        #     self.sasaView.setFilePaths(self.contactManager.getFilePaths())
 
     def switchedToVisMode(self):
         """Switch to vis mode, to show selected contacts directly in VMD."""
@@ -167,9 +163,12 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
     @pyqtSlot()
     def updateVMDSelections(self):
         """Updates the selected contact in VMD via the vmd panel."""
+        # TODO: refactor for contactManager
         if self.vmdpanel.connected:
-            self.vmdpanel.updateSelections(self.analysis.sel1text, self.analysis.sel2text,
-                                           [self.filteredContacts[self.canvas.globalClickedRow]])
+            self.vmdpanel.updateSelections(
+                self.contactManager.trajectoryScanParameters.sel1text,
+                self.contactManager.trajectoryScanParameters.sel2text,
+                [])
 
     @pyqtSlot()
     def updateVMDFrame(self):
@@ -194,16 +193,17 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         if importfile == "" or len(fnames) == 0:
             return
 
-        self.contacts, arguments, trajArgs, self.maps, contactResults = DataHandler.importSessionFromFile(importfile)
-        self.analysis = Analyzer(*arguments)
-        self.analysis.contactResults = contactResults
-        self.analysis.setTrajectoryData(*trajArgs)
-        self.analysis.finalAccumulatedContacts = self.contacts
-        self.sasaView.setFilePaths(*self.analysis.getFilePaths())
-        self.exportWidget.setFilePaths(*self.analysis.getFilePaths())
-        self.updateSelectionLabels(arguments[5], arguments[6])
-        self.updateSettings()
-        self.updateFilters()
+        # TODO: refactor with contactManager
+        # self.contacts, arguments, trajArgs, self.maps, contactResults = DataHandler.importSessionFromFile(importfile)
+        # self.analysis = Analyzer(*arguments)
+        # self.analysis.contactResults = contactResults
+        # self.analysis.setTrajectoryData(*trajArgs)
+        # self.analysis.finalAccumulatedContacts = self.contacts
+        # self.sasaView.setFilePaths(*self.analysis.getFilePaths())
+        # self.exportWidget.setFilePaths(*self.analysis.getFilePaths())
+        # self.updateSelectionLabels(arguments[5], arguments[6])
+        # self.updateSettings()
+        # self.updateFilters()
 
     def exportSession(self):
         """Exports the current session to file."""
@@ -211,31 +211,33 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         filestring = fileName[0]
         if filestring == "":
             return
-        if self.contacts is not None and self.analysis is not None:
-            self.setInfoLabel("Exporting current session...")
-            DataHandler.writeSessionToFile(filestring, self.analysis)
-            self.cleanInfoLabel()
-        else:
-            box = ErrorBox(ErrorMessages.NOEXPDATA)
-            box.exec_()
-            return
+        # TODO: refactor with contactManager
+        # if self.contacts is not None and self.analysis is not None:
+        #     self.setInfoLabel("Exporting current session...")
+        #     DataHandler.writeSessionToFile(filestring, self.analysis)
+        #     self.cleanInfoLabel()
+        # else:
+        #     box = ErrorBox(ErrorMessages.NOEXPDATA)
+        #     box.exec_()
+        #     return
 
     def loadDefault(self):
         """Loads the default session."""
 
-        if (sys.version_info > (3, 0)):
-            self.contacts, arguments, trajArgs, self.maps, contactResults = DataHandler.importSessionFromFile(DEFAULTSESSION_PY3)
-        else:
-            self.contacts, arguments, trajArgs, self.maps, contactResults = DataHandler.importSessionFromFile(DEFAULTSESSION)
-        self.analysis = Analyzer(*arguments)
-        self.analysis.contactResults = contactResults
-        self.analysis.setTrajectoryData(*trajArgs)
-        self.analysis.finalAccumulatedContacts = self.contacts
-        self.sasaView.setFilePaths(*self.analysis.getFilePaths())
-        self.exportWidget.setFilePaths(*self.analysis.getFilePaths())
-        self.updateSelectionLabels(arguments[5], arguments[6])
-        self.updateSettings()
-        self.updateFilters()
+        # TODO: refactor with contactManager
+        # if (sys.version_info > (3, 0)):
+        #     self.contacts, arguments, trajArgs, self.maps, contactResults = DataHandler.importSessionFromFile(DEFAULTSESSION_PY3)
+        # else:
+        #     self.contacts, arguments, trajArgs, self.maps, contactResults = DataHandler.importSessionFromFile(DEFAULTSESSION)
+        # self.analysis = Analyzer(*arguments)
+        # self.analysis.contactResults = contactResults
+        # self.analysis.setTrajectoryData(*trajArgs)
+        # self.analysis.finalAccumulatedContacts = self.contacts
+        # self.sasaView.setFilePaths(*self.analysis.getFilePaths())
+        # self.exportWidget.setFilePaths(*self.analysis.getFilePaths())
+        # self.updateSelectionLabels(arguments[5], arguments[6])
+        # self.updateSettings()
+        # self.updateFilters()
 
     def loadDataPushed(self):
         """Loads the trajectory data with the chosen initial parameters."""
@@ -254,6 +256,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
                                                  self.config.sel1text,
                                                  self.config.sel2text)
             QApplication.processEvents()
+            # TODO: enable
             # try:
                 # self.analysis.runFrameScan(nproc)
             self.contactManager.readTrajectories(nproc)
@@ -313,10 +316,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
     def updateSettings(self):
         """Updates the settings chosen from the settings view."""
-        if self.settingsView.bbscScoreRadioButton.isChecked():
-            self.colorScheme = ColorScheme.bbsc
-        elif self.settingsView.customColorRadioButton.isChecked():
-            self.colorScheme = ColorScheme.custom
         self.canvas.nsPerFrame = float(self.settingsView.nsPerFrameField.text())
         self.canvas.threshold = float(self.settingsView.thresholdField.text())
         self.canvas.rendered = False
@@ -325,7 +324,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.canvas.repaint()
         self.canvas.update()
         self.sasaView.nsPerFrame = float(self.settingsView.nsPerFrameField.text())
-        self.moleculeTracker.contactAnalyzer = self.analysis
 
     def updateFilters(self):
         """Updates the chosen filters in MainWindow."""
@@ -441,12 +439,13 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
     def showStatistics(self):
         """Shows general statistics of the analyzed data over all frames."""
-        if len(self.contacts) == 0 or self.contacts is None:
-            box = ErrorBox(ErrorMessages.NOSCORES_PROMPTANALYSIS)
-            box.exec_()
-            return
-        self.statisticsView = Statistics(self.contacts, float(self.settingsView.nsPerFrameField.text()))
-        self.statisticsView.showNormal()
+        # TODO: refactor with contactManager
+        # if len(self.contacts) == 0 or self.contacts is None:
+        #     box = ErrorBox(ErrorMessages.NOSCORES_PROMPTANALYSIS)
+        #     box.exec_()
+        #     return
+        # self.statisticsView = Statistics(self.contacts, float(self.settingsView.nsPerFrameField.text()))
+        # self.statisticsView.showNormal()
 
     def showDeveloperInfo(self):
         """Shows information about the contributing authors."""
@@ -471,13 +470,14 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
     def pushExport(self):
         """Opens the export panel."""
-        self.exportWidget.valueUpdated.connect(self.handleExportUpdate)
-        self.exportWidget.setContacts(self.filteredContacts)
-        if self.maps is not None:
-            self.exportWidget.setMaps(self.maps[0], self.maps[1])
-            self.exportWidget.setMapLabels(self.analysis.sel1text, self.analysis.sel2text)
-        self.exportWidget.setThresholdAndNsPerFrame(self.canvas.threshold, self.canvas.nsPerFrame)
-        self.exportWidget.show()
+        # TODO: refactor with contactManager
+        # self.exportWidget.valueUpdated.connect(self.handleExportUpdate)
+        # self.exportWidget.setContacts(self.filteredContacts)
+        # if self.maps is not None:
+        #     self.exportWidget.setMaps(self.maps[0], self.maps[1])
+        #     self.exportWidget.setMapLabels(self.analysis.sel1text, self.analysis.sel2text)
+        # self.exportWidget.setThresholdAndNsPerFrame(self.canvas.threshold, self.canvas.nsPerFrame)
+        # self.exportWidget.show()
 
     @QtCore.Slot(str, str)
     def handleExportUpdate(self, fileName, fileType):
