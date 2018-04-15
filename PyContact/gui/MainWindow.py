@@ -5,7 +5,7 @@ import copy
 import sys
 
 import PyQt5.QtCore as QtCore
-from PyQt5.QtCore import QRect, pyqtSlot, QObject
+from PyQt5.QtCore import QRect, pyqtSlot, QObject, QUrl
 from PyQt5.QtWidgets import (QMainWindow, QTabWidget, QLabel, QDialog, QProgressBar,
                              QApplication, QGridLayout, QFileDialog, QColorDialog, QWidget)
 from PyQt5.Qt import Qt, QColor
@@ -15,6 +15,7 @@ import numpy as np
 
 from . import MainQtGui
 from ..core.Biochemistry import vdwRadius
+from .WebView import WebView
 from .SasaWidgets import SasaWidget
 from .MoleculeTracker import MoleculeTracker
 from .Canvas import Canvas
@@ -64,6 +65,8 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.contactManager = None
 
         # canvas contains both labels and frame boxes for drawing
+        self.webView = WebView()
+        self.webView.show()
         self.canvas = Canvas()
         self.scrollArea.setWidget(self.canvas)
         self.scrollArea.horizontalScrollBar().valueChanged.connect(self.horizontalScrollBarChanged)
