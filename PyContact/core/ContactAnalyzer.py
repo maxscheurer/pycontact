@@ -5,7 +5,8 @@ from .Biochemistry import (AccumulatedContact, AtomContact,
                            AccumulationMapIndex, AtomType, HydrogenBond,
                            AtomHBondType, TempContactAccumulate,
                            HydrogenBondAtoms)
-from .ContactTrajectories import *
+from .ContactTrajectories import (AtomicContactTrajectory,
+                                  AccumulatedContactTrajectory)
 
 class ContactAnalyzer:
 
@@ -18,6 +19,59 @@ class ContactAnalyzer:
         self.atomicContacts = atomicTrajectory.contacts
         self.map1, self.map2 = map1, map2
 
+    def accumulateContacts(self):
+        numberOfFrames = len(self.atomicContacts)
+        contactScores = np.zeros([0, numberOfFrames])
+        hbonds = np.zeros([0, numberOfFrames])
+        bbScores1 = np.array([])
+        bbScores2 = np.array([])
+        scScores1 = np.array([])
+        scScores2 = np.array([])
+        keys = np.array([])
+
+        for frame_id, frame_data in enumerate(self.atomicContacts):
+            for contact in frame_data:
+                key1, key2 = self.makeKeyArraysFromMaps(self.map1,
+                                                        self.map2,
+                                                        contact)
+                key = self.makeKeyFromKeyArrays(key1, key2)
+                searchResult = np.where(keys == key)[0]
+
+                contactIndex = -1
+                if len(searchResult) != 0:
+                    contactIndex = searchResult[0]
+                else:
+                    keys = np.append(keys, key)
+                    bbScores1 = np.append(bbScores1, 0)
+                    bbScores2 = np.append(bbScores2, 0)
+                    scScores1 = np.append(scScores1, 0)
+                    scScores2 = np.append(scScores2, 0)
+                    contactScores = np.vstack((contactScores, np.zeros(numberOfFrames)))
+                    hbonds = np.vstack((hbonds, np.zeros(numberOfFrames)))
+
+                currentWeight = contact.weight
+                contactScores[contactIndex, frame_id] += currentWeight
+                hbonds[contactIndex, frame_id] += len(contact.hbondinfo)
+                if contact.idx1 in self.backbone:
+                    bbScores1[contactIndex] += currentWeight
+                else:
+                    scScores1[contactIndex] += currentWeight
+                if contact.idx2 in self.backbone:
+                    bbScores2[contactIndex] += currentWeight
+                else:
+                    scScores2[contactIndex] += currentWeight
+
+
+
+        # print(np.count_nonzero(hbonds, axis=1)/numberOfFrames)
+        np.save("keys.np", keys)
+        np.save("contactScores.np", contactScores)
+        ct = AccumulatedContactTrajectory(keys=keys,
+                               contactScores=contactScores,
+                               bbScores=[bbScores1, bbScores2],
+                               scScores=[scScores1, scScores2],
+                               hbonds=hbonds)
+        return ct
 
     def makeKeyArraysFromMaps(self, map1, map2, contact):
         """Creates key Arrays from the chosen accumulation maps.
@@ -96,61 +150,6 @@ class ContactAnalyzer:
                 key += AccumulationMapIndex.mapping[itemcounter] + str(item)
             itemcounter += 1
         return key
-
-
-    def accumulateContacts(self):
-        numberOfFrames = len(self.atomicContacts)
-        contactScores = np.zeros([0, numberOfFrames])
-        hbonds = np.zeros([0, numberOfFrames])
-        bbScores1 = np.array([])
-        bbScores2 = np.array([])
-        scScores1 = np.array([])
-        scScores2 = np.array([])
-        keys = np.array([])
-
-        for frame_id, frame_data in enumerate(self.atomicContacts):
-            for contact in frame_data:
-                key1, key2 = self.makeKeyArraysFromMaps(self.map1,
-                                                        self.map2,
-                                                        contact)
-                key = self.makeKeyFromKeyArrays(key1, key2)
-                searchResult = np.where(keys == key)[0]
-
-                contactIndex = -1
-                if len(searchResult) != 0:
-                    contactIndex = searchResult[0]
-                else:
-                    keys = np.append(keys, key)
-                    bbScores1 = np.append(bbScores1, 0)
-                    bbScores2 = np.append(bbScores2, 0)
-                    scScores1 = np.append(scScores1, 0)
-                    scScores2 = np.append(scScores2, 0)
-                    contactScores = np.vstack((contactScores, np.zeros(numberOfFrames)))
-                    hbonds = np.vstack((hbonds, np.zeros(numberOfFrames)))
-
-                currentWeight = contact.weight
-                contactScores[contactIndex, frame_id] += currentWeight
-                hbonds[contactIndex, frame_id] += len(contact.hbondinfo)
-                if contact.idx1 in self.backbone:
-                    bbScores1[contactIndex] += currentWeight
-                else:
-                    scScores1[contactIndex] += currentWeight
-                if contact.idx2 in self.backbone:
-                    bbScores2[contactIndex] += currentWeight
-                else:
-                    scScores2[contactIndex] += currentWeight
-
-
-
-        # print(np.count_nonzero(hbonds, axis=1)/numberOfFrames)
-        np.save("keys.np", keys)
-        np.save("contactScores.np", contactScores)
-        ct = AccumulatedContactTrajectory(keys=keys,
-                               contactScores=contactScores,
-                               bbScores=[bbScores1, bbScores2],
-                               scScores=[scScores1, scScores2],
-                               hbonds=hbonds)
-        return ct
 
 
     @staticmethod
