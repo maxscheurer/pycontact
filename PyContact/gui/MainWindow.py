@@ -60,10 +60,9 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.maps = None
         self.contactManager = None
 
-        # canvas contains both labels and frame boxes for drawing
-        self.webView = WebView()
-        self.webView.show()
 
+        self.webView = WebView()
+        # canvas contains both labels and frame boxes for drawing
         self.canvas = Canvas()
         self.scrollArea.setWidget(self.canvas)
         self.scrollArea.horizontalScrollBar().valueChanged.connect(self.horizontalScrollBarChanged)
@@ -300,6 +299,8 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             self.contactManager.accumulateContacts(*self.maps)
             self.canvas.setAccumulatedTrajectory(self.contactManager.accumulatedContactTrajectories[0])
             self.updateCanvas()
+            self.webView.plotBokeh()
+            self.webView.show()
             # self.contacts = self.analysis.runContactAnalysis(map1, map2, nproc)
             # self.progressBar.setValue(0)
             # self.setInfoLabel("Updating timeline...")
