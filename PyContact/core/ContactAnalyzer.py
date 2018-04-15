@@ -143,6 +143,8 @@ class ContactAnalyzer:
 
 
         # print(np.count_nonzero(hbonds, axis=1)/numberOfFrames)
+        np.save("keys.np", keys)
+        np.save("contactScores.np", contactScores)
         ct = AccumulatedContactTrajectory(keys=keys,
                                contactScores=contactScores,
                                bbScores=[bbScores1, bbScores2],

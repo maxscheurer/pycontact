@@ -389,3 +389,105 @@ def median_score_of_contactArray(contacts):
     for c in contacts:
         medianList = np.concatenate((medianList, c.scoreArray), axis=0)
     return np.median(medianList)
+
+def makeHumanReadableTitle(key1, key2):
+    """returns the title of the AccumulatedContact to be displayed in contact's label"""
+    total = []
+    for key in [key1, key2]:
+        titleDict = {}
+        counter = 0
+        for item in key:
+            titleDict[AccumulationMapIndex.mapping[counter]] = (item if item != "none" else "")
+            counter += 1
+        residueString = "%s%s" % (titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.resname]],
+                                  str(titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.resid]]))
+        atomIndexString = ("%s %s" % (AccumulationMapIndex.mapping[AccumulationMapIndex.index],
+                                      str(titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.index]])) if
+                           titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.index]] != "" else "")
+        atomNameString = ("%s %s" % (AccumulationMapIndex.mapping[AccumulationMapIndex.name],
+                                     str(titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.name]])) if
+                          titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.name]] != "" else "")
+        segnameString = ("%s %s" % (AccumulationMapIndex.mapping[AccumulationMapIndex.segid],
+                                    str(titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.segid]])) if
+                         titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.segid]] != "" else "")
+        tempList = [residueString, atomIndexString, atomNameString, segnameString]
+        finishedList = []
+        for string in tempList:
+            if string != "":
+                finishedList.append(string)
+        finishedString = " , ".join(finishedList)
+        total.append(finishedString)
+    return " - ".join(total)
+
+
+def find_between(s, first, last):
+    try:
+        start = s.index(first) + len(first)
+        end = s.index(last, start)
+        return s[start:end]
+    except ValueError:
+        return ""
+
+def makeKeyArraysFromKey(key):
+    """Converts a key to two key arrays.
+        "inverse" function of makeKeyFromKeyArrays
+    """
+    keystring1, keystring2 = key.split("-")
+    mapping = AccumulationMapIndex.mapping
+    maximal = len(mapping)
+    key1 = []
+    for i in range(0, maximal):
+        current = mapping[i]
+        if current not in keystring1:
+            key1.append("none")
+            continue
+        if i == (maximal - 1):
+            key1.append(keystring1[keystring1.index(current) + len(current):])
+            break
+        nextCurrent = mapping[i + 1]
+        if nextCurrent not in keystring1:
+            nxt = ""
+            for k in mapping[i + 1:]:
+                if k in keystring1[keystring1.index(current) + len(current):]:
+                    nxt = k
+                    break
+            if nxt != "":
+                key1.append(keystring1[keystring1.index(current) + len(current):keystring1.index(nxt)])
+            else:
+                key1.append(keystring1[keystring1.index(current) + len(current):])
+            continue
+        else:
+            currentValue = find_between(keystring1, current, nextCurrent)
+            if currentValue == "":
+                key1.append("none")
+            else:
+                key1.append(currentValue)
+
+    key2 = []
+    for i in range(0, maximal):
+        current = mapping[i]
+        if current not in keystring2:
+            key2.append("none")
+            continue
+        if i == (maximal - 1):
+            key2.append(keystring2[keystring2.index(current) + len(current):])
+            break
+        nextCurrent = mapping[i + 1]
+        if nextCurrent not in keystring2:
+            nxt = ""
+            for k in mapping[i + 1:]:
+                if k in keystring2[keystring2.index(current) + len(current):]:
+                    nxt = k
+                    break
+            if nxt != "":
+                key2.append(keystring2[keystring2.index(current) + len(current):keystring2.index(nxt)])
+            else:
+                key2.append(keystring2[keystring2.index(current) + len(current):])
+            continue
+        else:
+            currentValue = find_between(keystring2, current, nextCurrent)
+            if currentValue == "":
+                key2.append("none")
+            else:
+                key2.append(currentValue)
+    return [key1, key2]

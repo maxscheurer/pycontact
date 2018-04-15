@@ -1,6 +1,9 @@
 import numpy as np
 
-from .Biochemistry import BackboneSidechainType, BackboneSidechainContactType
+from .Biochemistry import (BackboneSidechainType,
+                           BackboneSidechainContactType,
+                           makeHumanReadableTitle,
+                           makeKeyArraysFromKey)
 
 class AtomicContactTrajectory:
     """docstring for [object Object]."""
@@ -42,7 +45,9 @@ class AccumulatedContactTrajectory:
         self.hbonds = hbonds
         self.numberOfFrames = len(self.keys)
         self.backboneSideChainTypes = np.zeros(len(self.contactScores), dtype=np.int8)
+        self.titles = np.array([])
         self.determineBackboneSidechainType()
+        self.makeTitles()
 
     def determineBackboneSidechainType(self):
         """Sets the Backbone-Sidechain type."""
@@ -53,3 +58,10 @@ class AccumulatedContactTrajectory:
         self.backboneSideChainTypes[np.where(bb == False)] = BackboneSidechainContactType.both
         self.backboneSideChainTypes[np.where((atom1 == True) & (atom2 == True))] = BackboneSidechainContactType.bb_only
         self.backboneSideChainTypes[np.where((atom1 == False) & (atom2 == False))] = BackboneSidechainContactType.sc_only
+
+    def makeTitles(self):
+        self.titles = np.array([])
+        for k in self.keys:
+            key_array = makeKeyArraysFromKey(k)
+            self.titles = np.append(self.titles,
+                                    makeHumanReadableTitle(*key_array))

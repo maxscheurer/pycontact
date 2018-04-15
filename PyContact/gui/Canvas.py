@@ -31,7 +31,7 @@ class Canvas(QWidget, QObject):
         self.rendered = False
         self.pixmap = 0
         self.merge = 1
-        self.labelView = LabelView([])
+        self.labelView = LabelView(self.accumulatedTrajectory)
         self.alphaFactor = 50
         self.contacts = []
         self.range = [0, 0]
@@ -100,7 +100,6 @@ class Canvas(QWidget, QObject):
 
     def renderContact(self, generator):
         """Render the contact with the defined colors."""
-        print("test")
         # startx = 90
         # orig_startx = startx
         start_text = 10
@@ -118,8 +117,7 @@ class Canvas(QWidget, QObject):
         self.labelView.threshold = self.threshold
         self.labelView.show()
         # startx has to be set according to maximum button length in labelview
-        # startx = np.max(self.labelView.buttonWidths) + 15
-        startx = 15
+        startx = np.max(self.labelView.buttonWidths) + 15
         orig_startx = startx
 
         # probably included in next version...
@@ -131,7 +129,7 @@ class Canvas(QWidget, QObject):
 
         self.timeLineXOrigin = orig_startx
         self.rowh = rowheight
-        self.sizeX = startx + len(self.accumulatedTrajectory.contactScores[0]) * offset
+        self.sizeX = startx + len(self.accumulatedTrajectory.contactScores[0]) * offset + 25
 
         # add one row for frame numbers
         self.sizeY = (len(self.accumulatedTrajectory.contactScores)+1) * rowheight
@@ -158,22 +156,20 @@ class Canvas(QWidget, QObject):
             i = 0
             if self.showHbondScores:
                 self.alphaFactor = 100
-                if self.rangeFilterActive:
-                    scoreArray = hbonds
 
             if rownumber == 0:
                 # show the frame numbers on top
                 p.setFont(QFont('Arial', 8))
                 p.drawText(start_text, row + textoffset + 2.0, "Frame:")
 
-                off = 0
+                # off = 0
                 # for l in range(off, self.range[1] + 1, 10)[off:]:
                 #     if l == 0:
                 #         continue
                 #     # print(l)
                 #     # TODO: sometimes errors occur!
                 #     p.drawText(startx + (l - 1 - self.range[0]) * offset, row + textoffset + 2.0, str(l * merge))
-                # self.labelView.move(0, rowheight)
+                self.labelView.move(0, rowheight)
                 row += rowheight
             while i < len(contactScores):
                 p.setPen(blackColor)
@@ -183,19 +179,14 @@ class Canvas(QWidget, QObject):
                 #         break
                 #     x = scoreArray[i + j]
                 #     score += x
-                alpha = contactScores[i] * self.alphaFactor
+                if self.showHbondScores:
+                    alpha = hbonds[i] * self.alphaFactor
+                else:
+                    alpha = contactScores[i] * self.alphaFactor
                 if alpha > 255:
                     alpha = 255
-                if math.isnan(alpha):
-                    alpha = 255
-                if self.colorScheme == ColorScheme.bbsc:
-                    # pass
-                    p.setBrush(QColor(bbScColor[0], bbScColor[1], bbScColor[2],
-                                      alpha))
-                elif self.colorScheme == ColorScheme.custom:
-                    color = QColor(self.customColor)
-                    color.setAlpha(alpha)
-                    p.setBrush(color)
+                p.setBrush(QColor(bbScColor[0], bbScColor[1], bbScColor[2],
+                                  alpha))
 
                 if rownumber == self.clickedRow:
                     p.setPen(QColor(250, 50, 50))
