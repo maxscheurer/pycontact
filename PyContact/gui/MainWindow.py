@@ -285,16 +285,19 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
     def analyzeDataPushed(self):
         # TODO: refactor
         """Handles the Analyzer after the Accumulation maps have been set."""
-        # if self.analysis is None:
-        #     box = ErrorBox(ErrorMessages.NODATA_PROMPTLOAD)
-        #     box.exec_()
-        #     return
+        if self.contactManager is None:
+            box = ErrorBox(ErrorMessages.NODATA_PROMPTLOAD)
+            box.exec_()
+            return
 
         self.maps, result = AnalysisDialog.getMapping()
         if result == 1:
             # self.analysis.frameUpdate.connect(self.updateAnalyzedFrames)
             self.setInfoLabel("Analyzing contacts...")
+            start = time.time()
             self.contactManager.accumulateContacts(*self.maps)
+            stop = time.time()
+            print("Accumulation time: ", stop-start)
             self.canvas.setAccumulatedTrajectory(self.contactManager.accumulatedContactTrajectories[0])
             self.updateCanvas()
             # self.contacts = self.analysis.runContactAnalysis(map1, map2, nproc)
