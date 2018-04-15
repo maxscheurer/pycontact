@@ -36,6 +36,9 @@ class LoadDataDialog(QDialog, Ui_Dialog):
         if not production:
             self.selection1Field.setText("segid RN11")
             self.selection2Field.setText("segid UBQ")
+            self.topology = PSF
+            self.trajectories.append(DCD)
+            self.tableModel.update(self.trajectories)
 
     def pick_topology(self):
         """Pick topology file."""
