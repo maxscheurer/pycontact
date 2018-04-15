@@ -33,6 +33,7 @@ class ContactManager:
             self.atomicContactTrajectories.append(atomicContactTrajectory)
 
     def accumulateContacts(self, map1, map2):
+        self.accumulatedContactTrajectories = []
         for atomicTrajectory in self.atomicContactTrajectories:
             ct = ContactAnalyzer(atomicTrajectory, map1, map2).accumulateContacts()
             self.accumulatedContactTrajectories.append(ct)

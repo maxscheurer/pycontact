@@ -3,9 +3,9 @@ class ErrorMessages():
 
     NOEXPDATA = "No data to export."
 
-    NODATA_PROMPTLOAD = "No data loaded. Click on \"Files -> Import Trajectory Data\" and load your MD trajectory."
+    NODATA_PROMPTLOAD = "No data loaded. Click on \"Files -> Load Trajectory Data\" and load your MD trajectory."
 
-    NOSCORES_PROMPTANALYSIS = "No data loaded. Click on \"Files -> Import Trajectory Data\" " \
+    NOSCORES_PROMPTANALYSIS = "No data loaded. Click on \"Files -> Load Trajectory Data\" " \
                               "and load your MD trajectory."
 
     CHOOSEFILE = "Please choose a topology and trajectory file!"

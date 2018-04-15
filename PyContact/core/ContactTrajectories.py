@@ -1,3 +1,5 @@
+import time
+
 import numpy as np
 
 from .Biochemistry import (BackboneSidechainType,
@@ -51,9 +53,12 @@ class AccumulatedContactTrajectory:
         self.backboneSideChainTypes = np.zeros(len(self.contactScores), dtype=np.int8)
         self.contactTypes = np.zeros_like(self.backboneSideChainTypes)
         self.titles = np.array([])
+        start = time.time()
         self.determineBackboneSidechainTypes()
         self.determineContactTypes()
         self.makeTitles()
+        stop = time.time()
+        print("constructor: ", stop-start)
 
     def determineBackboneSidechainTypes(self):
         """Sets the Backbone-Sidechain type."""
@@ -74,11 +79,11 @@ class AccumulatedContactTrajectory:
 
             try:
                 scpol1 = AminoAcids.scProperties[resname1]
-            except IndexError:
+            except:
                 scpol1 = SideChainPolarity.other
             try:
                 scpol2 = AminoAcids.scProperties[resname2]
-            except IndexError:
+            except:
                 scpol2 = SideChainPolarity.other
 
             ishbond = np.any(hb > 0.0)
