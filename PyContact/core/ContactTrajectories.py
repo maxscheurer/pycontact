@@ -2,7 +2,11 @@ import numpy as np
 
 from .Biochemistry import (BackboneSidechainType,
                            BackboneSidechainContactType,
-                           makeHumanReadableTitle)
+                           makeHumanReadableTitle,
+                           AccumulationMapIndex,
+                           AminoAcids,
+                           SideChainPolarity,
+                           ContactType)
 from .KeyManager import KeyManager
 
 class AtomicContactTrajectory:
@@ -45,11 +49,13 @@ class AccumulatedContactTrajectory:
         self.hbonds = hbonds
         self.numberOfFrames = len(self.keys)
         self.backboneSideChainTypes = np.zeros(len(self.contactScores), dtype=np.int8)
+        self.contactTypes = np.zeros_like(self.backboneSideChainTypes)
         self.titles = np.array([])
-        self.determineBackboneSidechainType()
+        self.determineBackboneSidechainTypes()
+        self.determineContactTypes()
         self.makeTitles()
 
-    def determineBackboneSidechainType(self):
+    def determineBackboneSidechainTypes(self):
         """Sets the Backbone-Sidechain type."""
         atom1 = self.bbScores1 > self.scScores1
         atom2 = self.bbScores2 > self.scScores2
@@ -58,6 +64,30 @@ class AccumulatedContactTrajectory:
         self.backboneSideChainTypes[np.where(bb == False)] = BackboneSidechainContactType.both
         self.backboneSideChainTypes[np.where((atom1 == True) & (atom2 == True))] = BackboneSidechainContactType.bb_only
         self.backboneSideChainTypes[np.where((atom1 == False) & (atom2 == False))] = BackboneSidechainContactType.sc_only
+
+    def determineContactTypes(self):
+        idx = 0
+        for k, hb in zip(self.keys, self.hbonds):
+            key1, key2 = KeyManager.makeKeyArraysFromKey(k)
+            resname1 = key1[AccumulationMapIndex.resname].lower()
+            resname2 = key2[AccumulationMapIndex.resname].lower()
+
+            try:
+                scpol1 = AminoAcids.scProperties[resname1]
+            except IndexError:
+                scpol1 = SideChainPolarity.other
+            try:
+                scpol2 = AminoAcids.scProperties[resname2]
+            except IndexError:
+                scpol2 = SideChainPolarity.other
+
+            ishbond = np.any(hb > 0.0)
+            if ishbond:
+                self.contactTypes[idx] = ContactType.hbond
+            else:
+                self.contactTypes[idx] = ContactType.other
+            idx += 1
+
 
     def makeTitles(self):
         self.titles = np.array([])

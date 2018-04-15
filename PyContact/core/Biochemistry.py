@@ -5,6 +5,8 @@ import numpy as np
 from PyQt5.QtGui import QColor
 
 # from ..db.DbReader import dict_factory, read_residue_db
+
+# TODO: can be deleted
 from ..db.DbReader import read_residue_db
 
 
@@ -374,6 +376,32 @@ class BackboneSidechainContactType:
     colors = [[0, 200, 200], [200, 200, 0], [0, 200, 0]]
     # colors = [[120, 180, 202], [215, 193, 104], [108, 165, 110]] # looks sad
 
+class AminoAcids:
+    scProperties = {
+        "gly":SideChainPolarity.nonpolar,
+        "ala":SideChainPolarity.nonpolar,
+        "leu":SideChainPolarity.nonpolar,
+        "ile":SideChainPolarity.nonpolar,
+        "val":SideChainPolarity.nonpolar,
+        "phe":SideChainPolarity.nonpolar,
+        "met":SideChainPolarity.nonpolar,
+        "pro":SideChainPolarity.nonpolar,
+        "asp":SideChainPolarity.negative,
+        "glu":SideChainPolarity.negative,
+        "lys":SideChainPolarity.positive,
+        "arg":SideChainPolarity.positive,
+        "hsp":SideChainPolarity.positive,
+        "asn":SideChainPolarity.polar,
+        "gln":SideChainPolarity.polar,
+        "his":SideChainPolarity.polar,
+        "hsd":SideChainPolarity.polar,
+        "hse":SideChainPolarity.polar,
+        "cys":SideChainPolarity.polar,
+        "ser":SideChainPolarity.polar,
+        "thr":SideChainPolarity.polar,
+        "tyr":SideChainPolarity.nonpolar,
+        "trp":SideChainPolarity.nonpolar,
+    }
 
 def mean_score_of_contactArray(contacts):
     """Computes the mean score using the contacts array."""

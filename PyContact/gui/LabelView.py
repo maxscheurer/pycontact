@@ -51,11 +51,9 @@ class LabelView(QWidget):
             return
 
         cindex = 0
-        for title in self.trajectory.titles:
+        for title, ctype in zip(self.trajectory.titles, self.trajectory.contactTypes):
             self.buttons.append(QPushButton(title))
-            # stylesheet = "border: 0px solid #222222; background-color: " + ContactType.colors[c.determine_ctype()] \
-            #              + " ;"
-            stylesheet = "border: 0px solid #222222; background-color: rgba(255,255,255,50);"
+            stylesheet = "border: 0px solid #222222; background-color: " + ContactType.colors[ctype] + ";"
             self.buttons[-1].setStyleSheet(stylesheet)
             self.buttons[-1].clicked.connect(partial(self.handleButton, data=cindex))
             self.buttons[-1].setParent(self)
