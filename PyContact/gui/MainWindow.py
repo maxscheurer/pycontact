@@ -299,6 +299,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             self.contactManager.accumulateContacts(*self.maps)
             self.canvas.setAccumulatedTrajectory(self.contactManager.accumulatedContactTrajectories[0])
             self.updateCanvas()
+            self.webView.setAccumulatedTrajectory(self.contactManager.accumulatedContactTrajectories[0])
             self.webView.plotBokeh()
             self.webView.show()
             # self.contacts = self.analysis.runContactAnalysis(map1, map2, nproc)

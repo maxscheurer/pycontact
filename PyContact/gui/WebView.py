@@ -18,6 +18,7 @@ class WebView(QWidget, Ui_WebView):
         super(QtWidgets.QWidget, self).__init__(parent)
         self.setupUi(self)
         self.gasButton.clicked.connect(self.setUrl)
+        self.trajectory = None
 
     def setUrl(self):
         self.webEngineView.setUrl(QUrl("https://youtube.com/"))
@@ -25,23 +26,8 @@ class WebView(QWidget, Ui_WebView):
     def setData(self, data):
         self.webEngineView.setHtml(data, QUrl("./"))
 
+    def setAccumulatedTrajectory(self, trajectory):
+        self.trajectory = trajectory
+
     def plotBokeh(self):
-        n = 500
-        x = 2 + 2*np.random.standard_normal(n)
-        y = 2 + 2*np.random.standard_normal(n)
-
-        p = figure(title="Hexbin for 500 points", match_aspect=True,
-                   tools="wheel_zoom,reset", background_fill_color='#440154')
-        p.grid.visible = False
-
-        r, bins = p.hexbin(x, y, size=0.5, hover_color="pink", hover_alpha=0.8)
-
-        p.circle(x, y, color="white", size=1)
-
-        hover = HoverTool(tooltips=[("count", "@c"), ("(q,r)", "(@q, @r)")],
-                          mode="mouse", point_policy="follow_mouse", renderers=[r])
-
-        p.add_tools(hover)
-
-        html = file_html(p, CDN, "Test Plot")
-        self.setData(html)
+        
