@@ -59,3 +59,4 @@ pycontact.egg-info/
 .pytest_cache/
 
 doc/_build
+.ipynb_checkpoints/
