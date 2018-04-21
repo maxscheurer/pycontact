@@ -401,6 +401,7 @@ class AminoAcids:
         "thr":SideChainPolarity.polar,
         "tyr":SideChainPolarity.nonpolar,
         "trp":SideChainPolarity.nonpolar,
+        "none":SideChainPolarity.other,
     }
 
 def mean_score_of_contactArray(contacts):
@@ -417,32 +418,3 @@ def median_score_of_contactArray(contacts):
     for c in contacts:
         medianList = np.concatenate((medianList, c.scoreArray), axis=0)
     return np.median(medianList)
-
-def makeHumanReadableTitle(key1, key2):
-    """returns the title of the AccumulatedContact to be displayed in contact's label"""
-    total = []
-    for key in [key1, key2]:
-        titleDict = {}
-        counter = 0
-        for item in key:
-            titleDict[AccumulationMapIndex.mapping[counter]] = (item if item != "none" else "")
-            counter += 1
-        residueString = "%s%s" % (titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.resname]],
-                                  str(titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.resid]]))
-        atomIndexString = ("%s %s" % (AccumulationMapIndex.mapping[AccumulationMapIndex.index],
-                                      str(titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.index]])) if
-                           titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.index]] != "" else "")
-        atomNameString = ("%s %s" % (AccumulationMapIndex.mapping[AccumulationMapIndex.name],
-                                     str(titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.name]])) if
-                          titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.name]] != "" else "")
-        segnameString = ("%s %s" % (AccumulationMapIndex.mapping[AccumulationMapIndex.segid],
-                                    str(titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.segid]])) if
-                         titleDict[AccumulationMapIndex.mapping[AccumulationMapIndex.segid]] != "" else "")
-        tempList = [residueString, atomIndexString, atomNameString, segnameString]
-        finishedList = []
-        for string in tempList:
-            if string != "":
-                finishedList.append(string)
-        finishedString = " , ".join(finishedList)
-        total.append(finishedString)
-    return " - ".join(total)

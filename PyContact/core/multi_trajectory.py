@@ -303,8 +303,6 @@ def run_load_parallel(nproc, psf, dcd, cutoff, hbondcutoff, hbondcutangle, sel1t
     # print(len(sel1ind), len(sel2ind))
     # show trajectory information and selection information
     # print("trajectory with %d frames loaded" % len(u.trajectory))
-
-    print("Running on %d cores" % nproc)
     results = []
     rank = 0
     for c in zip(sel1c, sel2c, sel1ind, sel2ind):

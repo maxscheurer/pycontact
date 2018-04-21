@@ -28,7 +28,7 @@ class ContactAnalyzer:
         bbScores2 = np.array([])
         scScores1 = np.array([])
         scScores2 = np.array([])
-        keys = np.array([])
+        keys = np.array([], dtype=object)
 
         keyManager = KeyManager(self.name_array,
                                 self.resid_array,
