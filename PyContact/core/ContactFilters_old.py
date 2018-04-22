@@ -4,37 +4,8 @@ from __future__ import print_function
 
 import numpy as np
 
-from .Biochemistry import ContactType
+from .Biochemistry import *
 
-def get_subrange(nparray, frameRange):
-    return nparray[:, frameRange[0]:frameRange[1]]
-
-def get_contacts_of_type(contactTypes, ctype):
-    """
-    Filters contact types
-
-    Parameters
-    ----------
-    contactTypes: np.array
-        list with integers of ContactType
-    ctype: ContactType
-        ContactType being extracted
-
-    Returns
-    -------
-    np.array
-        mask to list of contacts
-    """
-    mask = True
-    if ctype == "hbonds":
-        mask = np.where(contactTypes == ContactType.hbond)
-    elif ctype == "hydrophobic":
-        mask = np.where(contactTypes == ContactType.hydrophobic)
-    elif ctype == "saltbridges":
-        mask = np.where(contactTypes ==ContactType.saltbr)
-    elif ctype == "other":
-        mask = np.where(contactTypes == ContactType.other)
-    return mask
 
 class Operator(object):
     """Defines a comparison operator for contact filtering."""
@@ -50,6 +21,23 @@ class Operator(object):
             return value1 == value2
         elif operator == self.nequal:
             return value1 != value2
+
+
+class FrameFilter(object):
+    """Filters contact with a given frame range."""
+    def __init__(self, name):
+        self.name = name
+
+    @staticmethod
+    def extractFrameRange(contacts, frameRange):
+        lower = frameRange[0]
+        upper = frameRange[1]
+        for c in contacts:
+            newScores = c.scoreArray[lower:upper]
+            newAtoms = c.contributingAtoms[lower:upper]
+            c.contributingAtoms = newAtoms
+            c.scoreArray = newScores
+        return contacts
 
 
 class NameFilter(object):
@@ -157,6 +145,7 @@ class RangeFilter(object):
                 filtered.append(c)
         return filtered
 
+
 class BinaryFilter(object):
     """Implements a binary filter with a given operator."""
     def __init__(self, name, operator, value):
@@ -166,6 +155,38 @@ class BinaryFilter(object):
 
     def filterContacts(self, contacts):
         pass
+
+
+class OnlyFilter(object):
+    """Implements a filter, that only selects contacts with specific properties, e.g.: hydrophobic."""
+    def __init__(self, name, operator, value):
+        self.name = name
+        self.operator = operator
+        self.value = value
+
+    def filterContacts(self, contacts):
+        filtered = []
+        if self.operator == "hbonds":
+            for c in contacts:
+                hb = c.hbondFramesScan()
+                for bla in hb:
+                    if bla > 0:
+                        filtered.append(c)
+                        break
+        elif self.operator == "hydrophobic":
+            for c in contacts:
+                if c.determine_ctype() == ContactType.hydrophobic:
+                    filtered.append(c)
+        elif self.operator == "saltbridges":
+            for c in contacts:
+                if c.determine_ctype() == ContactType.saltbr:
+                    filtered.append(c)
+        elif self.operator == "other":
+            for c in contacts:
+                if c.determine_ctype() == ContactType.other:
+                    filtered.append(c)
+        return filtered
+
 
 class TotalTimeFilter(BinaryFilter):
     """Binary filter concerning the total contact time."""
