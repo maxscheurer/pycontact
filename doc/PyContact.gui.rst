@@ -68,6 +68,22 @@ PyContact.gui.LabelView module
     :undoc-members:
     :show-inheritance:
 
+PyContact.gui.LoadData module
+-----------------------------
+
+.. automodule:: PyContact.gui.LoadData
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+PyContact.gui.LoadDataDialog module
+-----------------------------------
+
+.. automodule:: PyContact.gui.LoadDataDialog
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 PyContact.gui.MainQtGui module
 ------------------------------
 

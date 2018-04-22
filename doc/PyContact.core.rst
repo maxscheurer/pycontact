@@ -20,6 +20,14 @@ PyContact.core.ContactAnalyzer module
     :undoc-members:
     :show-inheritance:
 
+PyContact.core.ContactAnalyzer\_old module
+------------------------------------------
+
+.. automodule:: PyContact.core.ContactAnalyzer_old
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 PyContact.core.ContactFilters module
 ------------------------------------
 
@@ -28,10 +36,50 @@ PyContact.core.ContactFilters module
     :undoc-members:
     :show-inheritance:
 
+PyContact.core.ContactFilters\_old module
+-----------------------------------------
+
+.. automodule:: PyContact.core.ContactFilters_old
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+PyContact.core.ContactManager module
+------------------------------------
+
+.. automodule:: PyContact.core.ContactManager
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+PyContact.core.ContactTrajectories module
+-----------------------------------------
+
+.. automodule:: PyContact.core.ContactTrajectories
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+PyContact.core.ContactUtils module
+----------------------------------
+
+.. automodule:: PyContact.core.ContactUtils
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 PyContact.core.DataHandler module
 ---------------------------------
 
 .. automodule:: PyContact.core.DataHandler
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+PyContact.core.KeyManager module
+--------------------------------
+
+.. automodule:: PyContact.core.KeyManager
     :members:
     :undoc-members:
     :show-inheritance:

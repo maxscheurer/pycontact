@@ -36,6 +36,16 @@ def get_contacts_of_type(contactTypes, ctype):
         mask = np.where(contactTypes == ContactType.other)
     return mask
 
+def get_sorted_contact_scores(contactScores, key):
+    mask = True
+    if key == u"mean":
+        mask = np.argsort(np.mean(contactScores, axis=1))
+    elif key == u"median":
+        mask = np.argsort(np.median(contactScores, axis=1))
+    # TODO: add life times, etc.
+    return mask
+
+
 class Operator(object):
     """Defines a comparison operator for contact filtering."""
     greater, smaller, equal, nequal = range(4)
