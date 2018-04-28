@@ -6,6 +6,7 @@ import numpy as np
 import math
 
 from ..core.ContactFilters import *
+from ..core.Biochemistry import BackboneSidechainContactType
 from .LabelView import LabelView
 
 

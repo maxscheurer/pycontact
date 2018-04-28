@@ -1,7 +1,59 @@
 from PyQt5.QtCore import QAbstractTableModel, QModelIndex, QVariant
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QTableView, QWidget, QVBoxLayout
+from PyQt5.QtWidgets import QTableView, QWidget, QVBoxLayout, QCheckBox
 import pandas as pd
+
+class CheckTrajectoryTableModel(QAbstractTableModel):
+    def __init__(self, parent=None, *args):
+        super(CheckTrajectoryTableModel, self).__init__()
+        self.trajs = []
+        self.checkboxes = []
+
+    def update(self, trajs):
+        self.layoutAboutToBeChanged.emit()
+        self.trajs = trajs
+        self.checkboxes = []
+        for i in range(len(trajs)):
+            bx = QCheckBox("bla")
+            bx.setChecked(True)
+            bx.setCheckable(True)
+            self.checkboxes.append(bx)
+        self.layoutChanged.emit()
+
+    def get_check_states(self):
+        return [x.isChecked() for x in self.checkboxes]
+
+    def rowCount(self, parent):
+        return len(self.trajs)
+
+    def columnCount(self, parent):
+        return 2
+
+    def data(self, index, role):
+        value = None
+        if index.column() == 0:
+            value = self.trajs[index.row()].split("/")[-1]
+        if role == Qt.DisplayRole:
+            return value
+        elif role == Qt.CheckStateRole:
+            if index.column() == 1:
+                if self.checkboxes[index.row()].isChecked():
+                    return QVariant(Qt.Checked)
+                else:
+                    return QVariant(Qt.Unchecked)
+
+    def setData(self, index, value, role):
+        if index.column() == 1 and role == Qt.CheckStateRole:
+            self.checkboxes[index.row()].setChecked(value)
+        self.dataChanged.emit(index, index)
+        print(self.get_check_states())
+        return True
+
+    def flags(self, index):
+        if index.column() == 0:
+            return Qt.ItemIsEnabled
+        elif index.column() == 1:
+            return Qt.ItemIsEnabled | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable
 
 class Widget(QWidget):
     """

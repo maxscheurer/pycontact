@@ -19,6 +19,7 @@ from .SasaWidgets import SasaWidget
 from .MoleculeTracker import MoleculeTracker
 from .Canvas import Canvas
 from .Dialogues import FileLoaderDialog, AnalysisDialog
+from .TableModels import CheckTrajectoryTableModel
 from .LoadDataDialog import LoadDataDialog
 from .ExportTabWidget import ExportTabWidget
 from .Statistics import Statistics
@@ -119,6 +120,9 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.canvas.clickedRowSignal.connect(self.updateVMDSelections)
         self.canvas.clickedColumnSignal.connect(self.updateVMDFrame)
         self.updateSettings()
+
+        self.trajTableModel = CheckTrajectoryTableModel()
+        self.trajectoryTableView.setModel(self.trajTableModel)
         # TODO: enable
         # self.updateFilters()
 
@@ -264,6 +268,8 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
             # self.setInfoLabel("%d frames loaded." % len(self.analysis.contactResults))
             self.updateSelectionLabels(self.config.sel1text, self.config.sel2text)
+
+            self.trajTableModel.update(self.config.trajectories)
             # self.sasaView.setFilePaths(*self.analysis.getFilePaths())
             # self.exportWidget.setFilePaths(*self.analysis.getFilePaths())
 
