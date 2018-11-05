@@ -23,11 +23,10 @@ def loop_trajectory_grid(s1, s2, indices1, indices2, config, suppl,
         resid_array = suppl[2]
         segids = suppl[3]
 
-    # start = time.time()
     currentFrameContacts = []
     natoms1 = len(s1)
     natoms2 = len(s2)
-    # TODO:  why so many conversion?
+    # TODO:  why so many conversion/copies?!
     pos1 = np.array(np.reshape(s1, (1, natoms1 * 3)), dtype=np.float64)
     pos2 = np.array(np.reshape(s2, (1, natoms2 * 3)), dtype=np.float64)
     xyz1 = np.array(pos1, dtype=np.float32)
@@ -55,58 +54,38 @@ def loop_trajectory_grid(s1, s2, indices1, indices2, config, suppl,
 
             # HydrogenBondAlgorithm
             hydrogenBonds = []
-            # FF independent hydrogen bonds
             if (name_array[convindex1][0] in HydrogenBondAtoms.atoms and name_array[convindex2][0] in HydrogenBondAtoms.atoms):
-                    # print("hbond? %s - %s" % (type_array[convindex1], type_array[convindex2]))
-                    # search for hatom, check numbering in bond!!!!!!!!!!
                     b1 = bonds[convindex1]
                     b2 = bonds[convindex2]
 
-                    # b1 = all_sel[convindex1].bonds
-                    # b2 = all_sel[convindex2].bonds
-                    # search for hydrogen atoms bound to atom 1
                     bondcount1 = 0
                     hydrogenAtomsBoundToAtom1 = []
-
                     for b in b1.types:
                         hydrogen = next((x for x in b if x.startswith("H")), 0)
-                        # print(b)
                         if hydrogen != 0:
-                            # print("h bond to atom1")
                             bondindices1 = b1.to_indices()[bondcount1]
-                            # print bondindices1
-                            # for j in bondindices1:
-                            #     print(type_array[j+1])
                             hydrogenidx = next(
                                 (j for j in bondindices1 if name_array[j].startswith("H")), -1)
                             if hydrogenidx != -1:
                                 hydrogenAtomsBoundToAtom1.append(hydrogenidx)
                         bondcount1 += 1
+
                     # search for hydrogen atoms bound to atom 2
                     bondcount2 = 0
                     hydrogenAtomsBoundToAtom2 = []
-                    # print(b2)
                     for b in b2.types:
                         hydrogen = next((x for x in b if x.startswith("H")), 0)
-                        # print(b)
                         if hydrogen != 0:
-                            # print("h bond to atom2")
                             bondindices2 = b2.to_indices()[bondcount2]
                             hydrogenidx = next(
                                 (k for k in bondindices2 if name_array[k].startswith("H")), -1)
                             if hydrogenidx != -1:
-                                # print(type_array[hydrogenidx])
                                 hydrogenAtomsBoundToAtom2.append(hydrogenidx)
                         bondcount2 += 1
+
                     # check hbond criteria for hydrogen atoms bound to first atom
                     for global_hatom in hydrogenAtomsBoundToAtom1:
-                        conv_hatom = np.where(indices1[frame] == global_hatom)[0][0]
-                        # print(typeHeavy)
-                        #
-                        # TODO: FF independent version
-                        # if (typeHeavy == AtomHBondType.acc or typeHeavy == AtomHBondType.both) and (distarray[conv_hatom, idx2] <= hbondcutoff):
-                        # dist = distarray[conv_hatom, idx2]
-                        # dist = np.linalg.norm(sel1.positions[conv_hatom] - sel2.positions[idx2])
+                        conv_hatom = np.where(indices1 == global_hatom)[0][0]
                         dist = np.linalg.norm(pos1[0][3*conv_hatom:3*conv_hatom+3] - pos2[0][3*idx2:3*idx2+3])
                         if (dist <= hbondcutoff):
                             donorPosition = s1[idx1]
@@ -120,9 +99,7 @@ def loop_trajectory_grid(s1, s2, indices1, indices2, config, suppl,
                             v2norm = np.linalg.norm(v2)
                             dot = np.dot(v1, v2)
                             angle = np.degrees(np.arccos(dot / (v1norm * v2norm)))
-                            # print(angle)
                             if angle >= hbondcutangle:
-                                # print("new hbond")
                                 new_hbond = HydrogenBond(convindex1,
                                                          convindex2,
                                                          global_hatom, dist,
@@ -132,7 +109,7 @@ def loop_trajectory_grid(s1, s2, indices1, indices2, config, suppl,
                                 hydrogenBonds.append(new_hbond)
 
                     for global_hatom in hydrogenAtomsBoundToAtom2:
-                        conv_hatom = np.where(indices2[frame] == global_hatom)[0][0]
+                        conv_hatom = np.where(indices2 == global_hatom)[0][0]
                         dist = np.linalg.norm(pos1[0][3*idx1:3*idx1+3] - pos2[0][3*conv_hatom:3*conv_hatom+3])
                         if (dist <= hbondcutoff):
                             donorPosition = s2[idx2]
@@ -145,12 +122,15 @@ def loop_trajectory_grid(s1, s2, indices1, indices2, config, suppl,
                             dot = np.dot(v1, v2)
                             angle = np.degrees(np.arccos(dot / (v1norm * v2norm)))
                             if angle >= hbondcutangle:
-                                new_hbond = HydrogenBond(convindex2, convindex1, global_hatom, dist, angle,
+                                new_hbond = HydrogenBond(convindex2,
+                                                         convindex1,
+                                                         global_hatom, dist,
+                                                         angle,
                                                          hbondcutoff,
                                                          hbondcutangle)
                                 hydrogenBonds.append(new_hbond)
-
-            newAtomContact = AtomContact(int(frame), float(distance), float(weight), int(convindex1),
+            # TODO: adjust frame number
+            newAtomContact = AtomContact(0, float(distance), float(weight), int(convindex1),
                                          int(convindex2),
                                          hydrogenBonds)
             currentFrameContacts.append(newAtomContact)
