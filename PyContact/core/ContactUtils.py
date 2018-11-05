@@ -16,8 +16,8 @@ def determineContactTypes(keys, hbonds, atom1by, atom2by):
         resname1 = key1[AccumulationMapIndex.resname].lower()
         resname2 = key2[AccumulationMapIndex.resname].lower()
 
-        scpol1 = AminoAcids.scProperties[resname1]
-        scpol2 = AminoAcids.scProperties[resname2]
+        scpol1 = AminoAcids.scProperties.get(resname1, SideChainPolarity.other)
+        scpol2 = AminoAcids.scProperties.get(resname2, SideChainPolarity.other)
 
         ishbond = np.any(hb > 0.0)
 
