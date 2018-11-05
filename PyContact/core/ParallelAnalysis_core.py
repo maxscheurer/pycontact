@@ -12,7 +12,9 @@ def weight_function(value):
 
 
 def loop_trajectory_grid(s1, s2, indices1, indices2, config, suppl,
-                         do_self_interaction=False):
+                         do_self_interaction=False, ts=0):
+    initial_size = 1000
+    currentFrameContacts = np.empty((initial_size, 5), dtype=np.float)
     cutoff, hbondcutoff, hbondcutangle = config
     bonds = suppl[0]
     name_array = suppl[1]
@@ -23,7 +25,6 @@ def loop_trajectory_grid(s1, s2, indices1, indices2, config, suppl,
         resid_array = suppl[2]
         segids = suppl[3]
 
-    currentFrameContacts = []
     natoms1 = len(s1)
     natoms2 = len(s2)
     # TODO:  why so many conversion/copies?!
@@ -35,8 +36,10 @@ def loop_trajectory_grid(s1, s2, indices1, indices2, config, suppl,
     # individual lists contain atom2 indices
     nbList1 = cy_find_contacts(xyz1, natoms1, xyz2, natoms2, cutoff)
     idx1 = 0
+    contact_count = 0
     for atom1sNeighbors in nbList1:
         for idx2 in atom1sNeighbors:
+            hbond_count = 0
             convindex1 = indices1[idx1]  # idx1 converted to global atom indexing
             convindex2 = indices2[idx2]  # idx2 converted to global atom indexing
             # jump out of loop if hydrogen contacts are found, only contacts between heavy atoms are considered,
@@ -107,6 +110,7 @@ def loop_trajectory_grid(s1, s2, indices1, indices2, config, suppl,
                                                          hbondcutoff,
                                                          hbondcutangle)
                                 hydrogenBonds.append(new_hbond)
+                                hbond_count += 1
 
                     for global_hatom in hydrogenAtomsBoundToAtom2:
                         conv_hatom = np.where(indices2 == global_hatom)[0][0]
@@ -129,10 +133,20 @@ def loop_trajectory_grid(s1, s2, indices1, indices2, config, suppl,
                                                          hbondcutoff,
                                                          hbondcutangle)
                                 hydrogenBonds.append(new_hbond)
-            # TODO: adjust frame number
-            newAtomContact = AtomContact(0, float(distance), float(weight), int(convindex1),
-                                         int(convindex2),
-                                         hydrogenBonds)
-            currentFrameContacts.append(newAtomContact)
+                                hbond_count += 1
 
-    return currentFrameContacts
+            currentFrameContacts[contact_count] = np.array([ts,
+                                                            convindex1,
+                                                            convindex2,
+                                                            weight,
+                                                            hbond_count])
+            contact_count += 1
+            if contact_count % initial_size == 0 and contact_count > 0:
+                currentFrameContacts = np.vstack((currentFrameContacts, np.empty((initial_size, 5))))
+            # newAtomContact = AtomContact(0, float(distance), float(weight), int(convindex1),
+            #                              int(convindex2),
+            #                              hydrogenBonds)
+            # currentFrameContacts.append(newAtomContact)
+        idx1 += 1
+    # print(res)
+    return currentFrameContacts[:contact_count, :]

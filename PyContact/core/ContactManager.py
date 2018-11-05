@@ -24,12 +24,12 @@ class ContactManager:
         self.atomicContactTrajectories = []
         self.accumulatedContactTrajectories = []
 
-    def readTrajectories(self, nproc):
+    def readTrajectories(self, nproc, use_pmda=True):
         for trajectory in self.trajectories:
             atomicContactTrajectory = ContactAnalyzer.runFrameScan(self.topology,
                                                                    trajectory,
                                                                    self.trajectoryScanParameters,
-                                                                   nproc)
+                                                                   nproc, use_pmda)
             self.atomicContactTrajectories.append(atomicContactTrajectory)
 
     def accumulateContacts(self, map1, map2):

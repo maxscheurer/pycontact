@@ -79,11 +79,27 @@ class ContactAnalyzer:
 
 
     @staticmethod
-    def runFrameScan(topology, trajectory, trajectoryScanParameters, nproc):
-        return AtomicContactTrajectory(*run_load_parallel(nproc, topology,
-                                                         trajectory,
-                                                         trajectoryScanParameters.cutoff,
-                                                         trajectoryScanParameters.hbondcutoff,
-                                                         trajectoryScanParameters.hbondcutangle,
-                                                         trajectoryScanParameters.sel1text,
-                                                         trajectoryScanParameters.sel2text))
+    def runFrameScan(topology, trajectory, trajectoryScanParameters, nproc, use_pmda=True):
+        if use_pmda:
+            # TODO: refactor
+            import MDAnalysis as mda
+            from .ParallelAnalysis import AtomicContacts
+            u = mda.Universe(topology, trajectory)
+            print("starting analysis with pmda")
+            ac = AtomicContacts(u,
+                                trajectoryScanParameters.sel1text,
+                                trajectoryScanParameters.sel2text,
+                                [trajectoryScanParameters.cutoff,
+                                trajectoryScanParameters.hbondcutoff,
+                                trajectoryScanParameters.hbondcutangle])
+            ac.run(n_blocks=nproc)
+            return AtomicContactTrajectory(*ac.result)
+        else:
+            print("starting analysis with multiprocessing")
+            return AtomicContactTrajectory(*run_load_parallel(nproc, topology,
+                                                             trajectory,
+                                                             trajectoryScanParameters.cutoff,
+                                                             trajectoryScanParameters.hbondcutoff,
+                                                             trajectoryScanParameters.hbondcutangle,
+                                                             trajectoryScanParameters.sel1text,
+                                                             trajectoryScanParameters.sel2text))
