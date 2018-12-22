@@ -289,7 +289,7 @@ class VMDControlPanel(QWidget):
     def pushStartVMD(self):
         self.startButton.setEnabled(False)
         self.stopButton.setEnabled(True)
-        self.commandButton.setEnabled(True)
+        # self.commandButton.setEnabled(True)
         response = self.vmd.start()
         if response == -1:
             self.connectButton.setEnabled(True)
@@ -305,7 +305,7 @@ class VMDControlPanel(QWidget):
         self.connectButton.setEnabled(False)
         self.startButton.setEnabled(True)
         self.stopButton.setEnabled(False)
-        self.commandButton.setEnabled(False)
+        # self.commandButton.setEnabled(False)
         self.loadTopoTrajButton.setEnabled(False)
         self.vmd.stop()
         self.connected = False
