@@ -31,7 +31,7 @@ class MplPlotter(FigureCanvas):
         self.fig = Figure(figsize=(width, height), dpi=dpi)
         self.axes = self.fig.add_subplot(111)
         # We want the axes cleared every time plot() is called
-        self.axes.hold(False)
+        # self.axes.hold(False)
 
         self.compute_initial_figure()
 
