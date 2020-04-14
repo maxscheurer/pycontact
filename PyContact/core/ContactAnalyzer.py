@@ -17,7 +17,7 @@ import numpy as np
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject
 
 # TODO: fix aroundPatch with gridsearch in C code using cython
-from .aroundPatch import AroundSelection
+# from .aroundPatch import AroundSelection
 from .Biochemistry import (AccumulatedContact, AtomContact, AccumulationMapIndex, AtomType, HydrogenBond, AtomHBondType, TempContactAccumulate, HydrogenBondAtoms)
 from ..cy_modules.cy_gridsearch import cy_find_contacts
 
@@ -315,12 +315,12 @@ class Analyzer(QObject):
         selfInteraction = False
 
         if sel2text == "self":
-            sel1 = u.select_atoms(sel1text)
-            sel2 = u.select_atoms(sel1text)
+            sel1 = u.select_atoms(sel1text, updating=True)
+            sel2 = u.select_atoms(sel1text, updating=True)
             selfInteraction = True
         else:
-            sel1 = u.select_atoms(sel1text)
-            sel2 = u.select_atoms(sel2text)
+            sel1 = u.select_atoms(sel1text, updating=True)
+            sel2 = u.select_atoms(sel2text, updating=True)
 
         if (len(sel1.atoms) == 0 or len(sel2.atoms) == 0):
             raise Exception
@@ -331,10 +331,14 @@ class Analyzer(QObject):
         start = time.time()
         for ts in u.trajectory:
             # define selections according to sel1text and sel2text
-            if "around" in sel1text:
-                sel1 = u.select_atoms(sel1text)
-            if "around" in sel2text:
-                sel2 = u.select_atoms(sel2text)
+            # if "around" in sel1text:
+            #     sel1 = u.select_atoms(sel1text)
+            # if "around" in sel2text:
+            #     sel2 = u.select_atoms(sel2text)
+
+            # FIXME: how about
+            # indices1 = sel1.indices
+            # indices2 = sel2.indices
             # write atomindices for each selection to list
             indices1 = []
             for at in sel1.atoms:

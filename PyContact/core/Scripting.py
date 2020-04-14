@@ -1,6 +1,6 @@
 """contains classes in order to faciliate scripting the PyContact package."""
 from PyContact.core.ContactAnalyzer import *
-from PyContact.core.aroundPatch import AroundSelection
+# from PyContact.core.aroundPatch import AroundSelection
 from PyContact.core.DataHandler import DataHandler
 
 

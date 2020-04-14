@@ -30,8 +30,6 @@ setup(
 
         # Pick your license as you wish (should match "license" above)
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
-
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.6',
     ],
 
@@ -41,7 +39,7 @@ setup(
     packages=find_packages(),
 
     setup_requires = ['cython'],
-    install_requires = ['numpy','matplotlib','mdanalysis','cython','seaborn', 'scipy'],
+    install_requires = ['numpy','matplotlib','mdanalysis>=0.20.0','cython','seaborn', 'scipy'],
     cmdclass = {'build_ext': build_ext},
     ext_modules = cythonize(extensions),
 
@@ -51,5 +49,4 @@ setup(
             'pycontact=PyContact.pycontact:main',
         ],
     },
-
 )

@@ -26,7 +26,7 @@ from ..core.ContactAnalyzer import *
 from .ErrorBox import ErrorBox
 from .ErrorMessages import ErrorMessages
 from ..core.LogPool import *
-from ..core.aroundPatch import AroundSelection
+# from ..core.aroundPatch import AroundSelection
 from . import Preferences
 from ..exampleData.datafiles import DEFAULTSESSION, DEFAULTSESSION_PY3
 from .VMDControlPanel import VMDControlPanel

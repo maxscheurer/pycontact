@@ -1,7 +1,7 @@
 #python2 -m cProfile -o pycontact.profile -s cumtime profiling.py
 #visualize output with snakeviz
 from PyContact.core.ContactAnalyzer import *
-from PyContact.core.aroundPatch import AroundSelection
+# from PyContact.core.aroundPatch import AroundSelection
 from PyContact.exampleData.datafiles import DCD, PSF
 import MDAnalysis as mda
 dcdfile = DCD
