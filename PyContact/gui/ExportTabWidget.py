@@ -228,12 +228,19 @@ class ExportTabWidget(QTabWidget):
             f.write("\n")
 
             for c in self.contacts:
+                row_format = " {:>20} "
                 currentContactProperties = []
                 for p in requestedParameters:
-                    exec("propertyToAdd = c." + p + "()")
+                    if not hasattr(c, p):
+                        continue
+                    propertyToAdd = getattr(c, p)()
                     if isinstance(propertyToAdd, float):
                         propertyToAdd = "{0:.3f}".format(propertyToAdd)
                     currentContactProperties.append(propertyToAdd)
+                    if isinstance(propertyToAdd, list):
+                        row_format += " {} "
+                    else:
+                        row_format += " {:>20} "
                 f.write(row_format.format(c.human_readable_title(), *currentContactProperties))
                 f.write("\n")
             f.close()
