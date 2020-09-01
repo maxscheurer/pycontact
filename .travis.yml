@@ -1,9 +1,12 @@
-os:
-  - linux
-  - osx
 language: python
+jobs:
+  include:
+    - os: linux
+      dist: bionic
+    - os: osx
+      osx_image: xcode10.2
 python:
-  - "3.6"
+  - "3.7"
 install:
     - pip install cython
     - python setup.py build_ext -i
