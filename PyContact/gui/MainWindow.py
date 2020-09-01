@@ -1,22 +1,19 @@
-from __future__ import print_function
 import multiprocessing
 import warnings
 import copy
 import sys
 
 import PyQt5.QtCore as QtCore
-from PyQt5.QtCore import QRect, pyqtSlot, QObject
-from PyQt5.QtWidgets import (QMainWindow, QTabWidget, QLabel, QDialog, QProgressBar,
-                             QApplication, QGridLayout, QFileDialog, QColorDialog, QWidget)
-from PyQt5.Qt import Qt, QColor
+from PyQt5.QtCore import pyqtSlot, QObject
+from PyQt5.QtWidgets import (QMainWindow, QTabWidget, QLabel, QDialog,
+                             QApplication, QGridLayout, QFileDialog, QWidget)
+from PyQt5.Qt import Qt
 from PyQt5.QtGui import QIntValidator
 from PyQt5.QtSvg import QSvgGenerator
 import numpy as np
 
 from . import MainQtGui
-from ..core.Biochemistry import vdwRadius
 from .SasaWidgets import SasaWidget
-# from .MoleculeTracker import MoleculeTracker
 from .Canvas import Canvas
 from .Dialogues import FileLoaderDialog, AnalysisDialog
 from .ExportTabWidget import ExportTabWidget
@@ -26,12 +23,10 @@ from ..core.ContactAnalyzer import *
 from .ErrorBox import ErrorBox
 from .ErrorMessages import ErrorMessages
 from ..core.LogPool import *
-from ..core.aroundPatch import AroundSelection
 from . import Preferences
 from ..exampleData.datafiles import DEFAULTSESSION, DEFAULTSESSION_PY3
 from .VMDControlPanel import VMDControlPanel
 from ..core.DataHandler import DataHandler
-# from TableModels import *
 
 multiprocessing.log_to_stderr()
 np.set_printoptions(threshold=np.inf)
@@ -44,7 +39,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
     def closeEvent(self, event):
         """Closing application when Exit on MainWindow is clicked."""
-        print("Closing Application")
         event.accept()
         QApplication.quit()
 
@@ -101,9 +95,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.sasaView = SasaWidget()
         self.statisticsView = None
 
-        # self.moleculeTracker = MoleculeTracker()
-        # self.actionTrack_Molecule.triggered.connect(self.showMoleculeTracker)
-
         self.analysis_state = False
 
         self.vismode = False
@@ -139,10 +130,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
     def showVMDControlPanel(self):
         """Shows the VMD control panel, to remotely access VMD from PyContact."""
         self.vmdpanel.show()
-
-    # def showMoleculeTracker(self):
-    #     """Shows the VMD control panel, to remotely access VMD from PyContact."""
-    #     self.moleculeTracker.show()
 
     def showContactAreaView(self):
         """Shows the SASA computation panel."""
@@ -260,7 +247,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
     @pyqtSlot(float)
     def updateAnalyzedFrames(self, value):
         """Handles the progress bar update."""
-        # print("Updating frames", value)
         self.progressBar.setValue(100 * value)
         QApplication.processEvents()
 
@@ -304,7 +290,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.painter.repaint()
         self.painter.update()
         self.sasaView.nsPerFrame = float(self.settingsView.nsPerFrameField.text())
-        # self.moleculeTracker.contactAnalyzer = self.analysis
 
     def updateFilters(self):
         """Updates the chosen filters in MainWindow."""
@@ -315,7 +300,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             stride = 1
             QApplication.processEvents()
             self.frameStrideField.setText(str(stride))
-        # print("stride: ", stride)
         self.painter.merge = stride
         self.painter.labelView.clean()
         self.painter.showHbondScores = False
@@ -369,7 +353,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             # weight functions
             if weightActive:
                 if self.currentFunctionType == FunctionType.sigmoid:
-                    print("sig weight")
                     x0 = float(self.sigX0Field.text())
                     L = float(self.sigLField.text())
                     k = float(self.sigKField.text())
@@ -484,15 +467,12 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
     @QtCore.Slot(str, str)
     def handleExportUpdate(self, fileName, fileType):
         """Handles the paint event after the export of the current view has been initiated."""
-        print("test")
         if fileType == "PNG":
             if len(fileName) > 0:
-                print("Saving current view to ", fileName)
                 currentView = self.painter.grab()
                 currentView.save(fileName)
         elif fileType == "SVG":
             if len(fileName) > 0:
-                print("Saving current view to ", fileName)
                 generator = QSvgGenerator()
                 generator.setFileName(fileName)
                 generator.setSize(self.painter.size())

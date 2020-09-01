@@ -8,7 +8,6 @@ import multiprocessing
 multiprocessing.log_to_stderr()
 
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-# from PyContact.core.multi_trajectory import run_load_parallel
 
 
 class PsfDcdReadingTest(TestCase):
@@ -43,11 +42,6 @@ class PsfDcdReadingTest(TestCase):
             hbond_sum += c.hbond_percentage()
         self.assertEqual(hbond_sum, 676.0)
 
-    def test_trackMolecule(self):
-        analyzer = Analyzer(self.psffile, self.dcdfile, 5.0, 2.5, 120, "segid RN11 and resid 85", "segid UBQ")
-        analyzer.runFrameScan(1)
-        analyzer.runMoleculeTracking(1, [0, 0, 1, 1, 0])
-
     def test_selfInteraction_analysis(self):
         analyzer = Analyzer(self.psffile, self.dcdfile, 5.0, 2.5, 120, "segid RN11", "self")
         analyzer.runFrameScan(1)
@@ -55,11 +49,6 @@ class PsfDcdReadingTest(TestCase):
         map1 = [0, 0, 1, 1, 0]
         map2 = [0, 0, 1, 1, 0]
         analyzer.runContactAnalysis(map1, map2, 1)
-        # self.assertEqual(len(analyzer.finalAccumulatedContacts), 148)
-        # hbond_sum = 0
-        # for c in analyzer.finalAccumulatedContacts:
-            # hbond_sum += c.hbond_percentage()
-        # self.assertEqual(hbond_sum, 676.0)
 
     def test_zero_atomselection(self):
         analyzer = Analyzer(self.psffile, self.dcdfile, 5.0, 2.5, 120, "segid A", "resid 100")

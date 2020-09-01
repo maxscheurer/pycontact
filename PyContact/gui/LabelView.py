@@ -25,7 +25,6 @@ class LabelView(QWidget):
         self.nsPerFrame = 0
         self.threshold = 0
         self.initUI()
-        print(self.geometry())
 
     def clean(self):
         """Delete all labels."""

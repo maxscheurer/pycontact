@@ -6,7 +6,6 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg \
 from matplotlib.figure import Figure
 from matplotlib import cm
 from matplotlib import animation as ani
-from matplotlib.widgets import Slider, Button
 import matplotlib
 
 import seaborn as sns
@@ -332,7 +331,6 @@ class AnimateMapPlotter(MplPlotter):
     def initFig(self):
         data = np.zeros((len(self.y), len(self.x)))
         frame = 0
-        print("frame: ", frame)
         attribute = "Mean Score"
         if attribute == "Mean Score":
             for c in self.contacts:
@@ -350,7 +348,6 @@ class AnimateMapPlotter(MplPlotter):
         return self.cax,
 
     def updateMap(self, frame):
-        print(frame)
         data = np.zeros((len(self.y), len(self.x)))
         attribute = "Mean Score"
         if attribute == "Mean Score":

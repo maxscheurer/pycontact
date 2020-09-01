@@ -1,5 +1,3 @@
-from __future__ import print_function
-import os
 import re
 import time
 from copy import deepcopy
@@ -12,6 +10,7 @@ import numpy as np
 from .Biochemistry import *
 from .LogPool import *
 from ..cy_modules.cy_gridsearch import cy_find_contacts
+
 
 def weight_function(value):
     """weight function to score contact distances"""

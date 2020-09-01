@@ -1,27 +1,19 @@
-from __future__ import print_function
 import sip
 import os
 
-from PyQt5.QtWidgets import QWidget, QApplication, QFileDialog
+from PyQt5.QtWidgets import QWidget, QFileDialog
 from PyQt5.QtGui import QIntValidator
-import MDAnalysis
-import numpy as np
 
 from .Plotters import ContactPlotter
 from .statistics_ui import *
-from ..core.multi_trajectory import chunks
-from ..core.Biochemistry import vdwRadius
 from ..core.LogPool import *
-from ..cy_modules import cy_gridsearch
-from .Dialogues import TopoTrajLoaderDialog
 from .ErrorBox import ErrorBox
-from .ErrorMessages import ErrorMessages
 from ..core.Biochemistry import mean_score_of_contactArray, median_score_of_contactArray
 
 
 class Statistics(QWidget, Ui_Statistics):
     def __init__(self, data, nspf, parent=None):
-        super(QtWidgets.QWidget, self).__init__(parent)
+        super(QWidget, self).__init__(parent)
         self.setupUi(self)
         self.contacts = data
         self.nsPerFrame = nspf

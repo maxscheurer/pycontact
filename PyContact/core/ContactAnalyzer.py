@@ -1,28 +1,20 @@
-from __future__ import print_function
-import itertools
 import re
-import os
 import time
-import multiprocessing
 from .multi_trajectory import run_load_parallel
 from .LogPool import *
 from copy import deepcopy
 import operator
 
-import pickle
-
 import MDAnalysis
-from MDAnalysis.analysis import distances
 import numpy as np
-from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject
+from PyQt5.QtCore import pyqtSignal, QObject
 
 # TODO: fix aroundPatch with gridsearch in C code using cython
-from .aroundPatch import AroundSelection
-from .Biochemistry import (AccumulatedContact, AtomContact, AccumulationMapIndex, AtomType, HydrogenBond, AtomHBondType, TempContactAccumulate, HydrogenBondAtoms)
+from .Biochemistry import (AccumulatedContact, AtomContact, AccumulationMapIndex, HydrogenBond, TempContactAccumulate, HydrogenBondAtoms)
 from ..cy_modules.cy_gridsearch import cy_find_contacts
 
-MDAnalysis.core.flags['use_periodic_selections'] = False
-MDAnalysis.core.flags['use_KDTree_routines'] = True
+# MDAnalysis.core.flags['use_periodic_selections'] = False
+# MDAnalysis.core.flags['use_KDTree_routines'] = True
 
 
 class Analyzer(QObject):
@@ -77,10 +69,6 @@ class Analyzer(QObject):
         self.lastMap1 = map1
         self.lastMap2 = map2
         return deepcopy(self.finalAccumulatedContacts)
-
-    def runMoleculeTracking(self, selIndex, map):
-        print("Running tracking")
-        return self.analyze_trackMolecule(self.contactResults, selIndex, map)
 
     def setTrajectoryData(
             self, resname_array, resid_array, name_array,
@@ -511,31 +499,6 @@ class Analyzer(QObject):
         stop = time.time()
         print("grid:",stop-start)
         return contactResults
-
-
-    def analyze_trackMolecule(self, contactResults, selindex, map):
-        total = len(contactResults)
-        counter = 1
-
-        # list with list of tuples with contacts sorted by frame
-        allSortedFrameContacts = []
-        for frame in contactResults:
-            currentFrameAcc = {}
-            for cont in frame:
-                if selindex == 1:
-                    key1, key2 = self.makeKeyArraysFromMaps([], map, cont)
-                    tit = Analyzer.make_single_title(key2)
-                elif selindex == 2:
-                    key1, key2 = self.makeKeyArraysFromMaps(map, [], cont)
-                    tit = Analyzer.make_single_title(key1)
-                if tit in currentFrameAcc:
-                    currentFrameAcc[tit] += cont.weight
-                else:
-                    currentFrameAcc[tit] = 0
-            sorted_frame_contacts = sorted(currentFrameAcc.items(), key=operator.itemgetter(1), reverse=1)
-            allSortedFrameContacts.append(sorted_frame_contacts)
-        return allSortedFrameContacts
-
 
     def analyze_contactResultsWithMaps(self, contactResults, map1, map2):
         """Analyzes contactsResults with the given maps."""

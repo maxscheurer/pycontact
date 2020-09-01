@@ -1,4 +1,3 @@
-from __future__ import print_function
 import sip
 import time
 import os
@@ -7,6 +6,7 @@ import os
 from PyQt5.QtWidgets import QWidget, QProgressBar, QApplication, QFileDialog
 import MDAnalysis
 import numpy as np
+import multiprocessing
 
 from .Plotters import SimplePlotter
 from .sasa_gui import *
@@ -19,9 +19,9 @@ from .ErrorBox import ErrorBox
 from .ErrorMessages import ErrorMessages
 
 # manage processes for SASA
-sasaProgressManager = multiprocessing.Manager()
-sasaProgressDict = sasaProgressManager.dict()
-np.set_printoptions(threshold=np.inf)
+# sasaProgressManager = multiprocessing.Manager()
+# sasaProgressDict = sasaProgressManager.dict()
+# np.set_printoptions(threshold=np.inf)
 
 
 def calculate_sasa_parallel(input_coords, natoms, pairdist, nprad,
@@ -31,7 +31,7 @@ def calculate_sasa_parallel(input_coords, natoms, pairdist, nprad,
 
     temp_sasa = []
     frames_processed = 0
-    sasaProgressDict[rank] = frames_processed
+    # sasaProgressDict[rank] = frames_processed
     # print(len(input_coords))
     for c in input_coords:
         coords = np.reshape(c, (1, natoms * 3))
@@ -45,7 +45,7 @@ def calculate_sasa_parallel(input_coords, natoms, pairdist, nprad,
         # print("asa:", asa)
         temp_sasa.append(asa)
         frames_processed += 1
-        sasaProgressDict[rank] = frames_processed
+        # sasaProgressDict[rank] = frames_processed
     return temp_sasa
 
 
@@ -135,8 +135,6 @@ class SasaWidget(QWidget, Ui_SasaWidget):
     # TODO: move this somewhere else, e.g., core modules
     def calculateSasa(self):
         """Computes the SASA of the given selections."""
-        print("calculate SASA")
-
         self.allSasas = []
 
         # load psf and trajectory, make lists with radii and coordinates
@@ -213,7 +211,6 @@ class SasaWidget(QWidget, Ui_SasaWidget):
                                                                            surfacePoints, probeRadius, pointstyle,
                                                                            restricted, restrictedList, rank)))
             rank += 1
-        print("ranks", rank)
         self.state = True
         self.sasaEventListener()
         pool.close()
@@ -227,7 +224,6 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         # TODO: one would call the "external" sasa module here again,
         # no need to duplicate the code
         if self.calculateContactAreaCheckbox.isChecked():
-            print("Calculate contact area")
             selection2 = u.select_atoms(seltext2)
 
             # natoms2 = len(selection2.atoms)
@@ -264,7 +260,6 @@ class SasaWidget(QWidget, Ui_SasaWidget):
                                                                                pointstyle, restricted, restrictedList2,
                                                                                rank)))
                 rank += 1
-            print("ranks", rank)
             self.state = True
             self.sasaEventListener()
             pool.close()
@@ -305,7 +300,6 @@ class SasaWidget(QWidget, Ui_SasaWidget):
                 self.sasaProgressBar.setValue(progress)
 
             if int(progress) == 100:
-                # print("finished")
                 for each in sasaProgressDict.keys():
                     sasaProgressDict[each] = 0
                 # progress = 0

@@ -1,11 +1,8 @@
-from __future__ import print_function
-
 from PyQt5.QtWidgets import QDialog, QGridLayout, QPushButton, QLabel, QLineEdit, QDialogButtonBox, QFileDialog, QCheckBox
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QDoubleValidator
 
 from ..core.LoadConfiguration import Configuration
-from PyContact.core.ContactAnalyzer import Analyzer
 from .HelpButton import HelpButton
 
 
@@ -236,7 +233,6 @@ class AnalysisDialog(QDialog):
                 self.resname1Checkbox.isChecked(), self.segid1Checkbox.isChecked()]
         map2 = [self.index2Checkbox.isChecked(), self.name2Checkbox.isChecked(), self.resid2Checkbox.isChecked(),
                 self.resname2Checkbox.isChecked(), self.segid2Checkbox.isChecked()]
-        print("Accumulation maps: ", map1, map2)
         return [map1, map2]
 
     @staticmethod
@@ -258,7 +254,6 @@ class AnalysisSingleDialog(AnalysisDialog):
         self.segid2Checkbox.setHidden(True)
         self.title2.setHidden(True)
         self.title1.setText("selection")
-        self.setWindowTitle("Molecule Tracking Selection")
 
     @staticmethod
     def getMapping(parent=None):

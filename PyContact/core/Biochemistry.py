@@ -1,10 +1,7 @@
-from __future__ import print_function
 import collections
 
 import numpy as np
-from PyQt5.QtGui import QColor
 
-# from ..db.DbReader import dict_factory, read_residue_db
 from ..db.DbReader import read_residue_db
 
 

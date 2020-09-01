@@ -1,6 +1,5 @@
 """ Authors: Maximilian Scheurer, Peter Rodenkirch
     Date created: May 2016
-    Python Version: 2.7
 """
 
 import warnings

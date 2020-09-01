@@ -1,4 +1,3 @@
-from __future__ import print_function
 from PyContact.core.Scripting import (PyContactJob, JobConfig)
 from PyContact.core.ContactFilters import ScoreFilter
 import numpy as np

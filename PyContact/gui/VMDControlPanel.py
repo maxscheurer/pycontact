@@ -213,13 +213,10 @@ class VMDControlPanel(QWidget):
         sel1 = sel1[:-3] + ")"
         sel2 = sel2[:-3] + ")"
 
-        # print(self.vmd.commands.addSelection(sel1, 3))
         sel1command, self.representations = self.vmd.commands.addSelection(sel1, self.representations, 3)
         self.vmd.send_command(sel1command)
         sel2command, self.representations = self.vmd.commands.addSelection(sel2, self.representations, 4)
         self.vmd.send_command(sel2command)
-        # self.vmd.send_command(self.vmd.commands.styleBackbone())
-        # self.vmd.send_command(self.vmd.commands.resetView())
 
     def updateInfoLabel(self, txt):
         self.infoLabel.setText(txt)
@@ -254,7 +251,6 @@ class VMDControlPanel(QWidget):
                     index += 1
                 currentSel2String = " and ".join(currentSel2)
                 sel2 += " and " + currentSel2String
-                # print(sel1, sel2)
                 self.vmd.send_command("set ::remote_ctl::sel [atomselect top {(%s) or (%s)}]; $::remote_ctl::sel global" % (sel1, sel2))
                 self.vmd.send_command("$::remote_ctl::sel set beta 20")
                 for e in c.scoreArray:
@@ -268,7 +264,6 @@ class VMDControlPanel(QWidget):
             sel1 = self.vmd.commands.translateSelections(self.sel1)
             sel2 = self.vmd.commands.translateSelections(self.sel2)
             s = "noh and user > 0 and (("+ sel1 + ") or (" + sel2 + "))"
-            #print(s)
             sel1command, self.representations = self.vmd.commands.addUserFieldSelection(s, self.representations)
             self.vmd.send_command(sel1command)
             self.vmd.send_command("color scale method BGR")
