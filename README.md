@@ -7,11 +7,13 @@
 PyContact requires **at least Python 3.6** installed on your system.
 A recent version can be installed from `pip` via:
 ```Python
-pip install pycontact
+pip install cython
+pip install pycontact PyQt5
 ```
 
 Alternatively, clone the repository and run:
 ```
+pip install cython PyQt5
 python setup.py build_ext -i
 python setup.py install
 ```
@@ -28,6 +30,3 @@ DOI: https://doi.org/10.1016/j.bpj.2017.12.003
 
 [Link to Full Text Article](http://www.cell.com/biophysj/fulltext/S0006-3495(17)35051-8)
 
-## About
-Main Developers: Maximilian Scheurer and Peter Rodenkirch
-Support: Open an Issue on Github or [email us](mailto:mscheurer@ks.uiuc.edu).
