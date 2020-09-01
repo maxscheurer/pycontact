@@ -12,7 +12,7 @@ extensions = [Extension("PyContact.cy_modules.cy_gridsearch",
                         include_dirs=[".", "PyContact/cy_modules/src"], extra_compile_args=["-std=c++0x"]), ]
 setup(
     name='pycontact',
-    version='1.0.3',
+    version='1.0.4',
     description='PyContact',
     long_description='Tool for analysis of non-covalent interactions in MD trajectories',
     url='https://github.com/maxscheurer/pycontact',
