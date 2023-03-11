@@ -139,6 +139,8 @@ class Canvas(QWidget, QObject):
         # add one row for frame numbers
         self.sizeY = (len(self.contacts)+1) * rowheight
 
+        self.sizeX = int(self.sizeX)
+        self.sizeY = int(self.sizeY)
         self.pixmap = QPixmap(QSize(self.sizeX, self.sizeY))
         p = QPainter()
 
@@ -171,7 +173,7 @@ class Canvas(QWidget, QObject):
             if rownumber == 0:
                 # show the frame numbers on top
                 p.setFont(QFont('Arial', 8))
-                p.drawText(start_text, row + textoffset + 2.0, "Frame:")
+                p.drawText(start_text, row + textoffset + 2, "Frame:")
 
                 off = 0
                 if self.range[0] != 0:
@@ -181,7 +183,7 @@ class Canvas(QWidget, QObject):
                         continue
                     # print(l)
                     # TODO: sometimes errors occur!
-                    p.drawText(startx + (l - 1 - self.range[0]) * offset, row + textoffset + 2.0, str(l * merge))
+                    p.drawText(startx + (l - 1 - self.range[0]) * offset, row + textoffset + 2, str(l * merge))
                 self.labelView.move(0, rowheight)
                 row += rowheight
             while i < len(rangedScores):
@@ -193,7 +195,7 @@ class Canvas(QWidget, QObject):
                     x = rangedScores[i + j]
                     merged_score += x
                 merged_score /= merge
-                alpha = merged_score * self.alphaFactor
+                alpha = int(merged_score * self.alphaFactor)
                 if alpha > 255:
                     alpha = 255
                 if math.isnan(alpha):

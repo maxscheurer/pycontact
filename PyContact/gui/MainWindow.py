@@ -247,7 +247,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
     @pyqtSlot(float)
     def updateAnalyzedFrames(self, value):
         """Handles the progress bar update."""
-        self.progressBar.setValue(100 * value)
+        self.progressBar.setValue(int(100 * value))
         QApplication.processEvents()
 
     def setInfoLabel(self, txt):

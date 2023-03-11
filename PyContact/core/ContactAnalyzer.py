@@ -3,7 +3,6 @@ import time
 from .multi_trajectory import run_load_parallel
 from .LogPool import *
 from copy import deepcopy
-import operator
 
 import MDAnalysis
 import numpy as np
