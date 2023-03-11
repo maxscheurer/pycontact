@@ -6,7 +6,7 @@ import os
 from PyQt5.QtWidgets import QWidget, QProgressBar, QApplication, QFileDialog
 import MDAnalysis
 import numpy as np
-import multiprocessing
+# import multiprocessing
 
 from .Plotters import SimplePlotter
 from .sasa_gui import *
@@ -290,9 +290,9 @@ class SasaWidget(QWidget, Ui_SasaWidget):
         while self.state:
             QApplication.processEvents()
             progress = 0
-            for each in sasaProgressDict.keys():
-                progress += sasaProgressDict[each]
-                # sasaProgressDict[each] = 0
+            # for each in sasaProgressDict.keys():
+            #     progress += sasaProgressDict[each]
+            #     # sasaProgressDict[each] = 0
             progress = float(progress) / float(self.totalFramesToProcess) * 100
             # if (101 - self.sasaProgressBar.value()) < progress:
             #     self.sasaProgressBar.update_bar(101 - self.sasaProgressBar.value())
@@ -300,8 +300,8 @@ class SasaWidget(QWidget, Ui_SasaWidget):
                 self.sasaProgressBar.setValue(progress)
 
             if int(progress) == 100:
-                for each in sasaProgressDict.keys():
-                    sasaProgressDict[each] = 0
+                # for each in sasaProgressDict.keys():
+                #     sasaProgressDict[each] = 0
                 # progress = 0
                 self.state = False
 
