@@ -6,10 +6,9 @@ from .LogPool import *
 import MDAnalysis
 import numpy as np
 from PyQt5.QtCore import pyqtSignal, QObject
+from scipy.spatial import KDTree
 
-# TODO: fix aroundPatch with gridsearch in C code using cython
 from .Biochemistry import (AccumulatedContact, AtomContact, AccumulationMapIndex, HydrogenBond, TempContactAccumulate, HydrogenBondAtoms)
-from ..cy_modules.cy_gridsearch import cy_find_contacts
 
 
 class Analyzer(QObject):
@@ -309,25 +308,8 @@ class Analyzer(QObject):
             frame = ts.frame
             self.currentFrameNumber = ts.frame
 
-            # pass positions and distance to cython
-            natoms1 = len(sel1.atoms)
-            natoms2 = len(sel2.atoms)
-            pos1 = np.array(np.reshape(sel1.positions, (1, natoms1 * 3)), dtype=np.float64)
-            pos2 = np.array(np.reshape(sel2.positions, (1, natoms2 * 3)), dtype=np.float64)
-            xyz1 = np.array(pos1, dtype=np.float32)
-            xyz2 = np.array(pos2, dtype=np.float32)
-            # 2d array with index of atom1 being the index of the first dimension
-            # individual lists contain atom2 indices
-            nbList1 = cy_find_contacts(xyz1, natoms1, xyz2, natoms2, cutoff)
-
-            from scipy.spatial import KDTree
             tree = KDTree(sel2.positions)
             nbList1 = tree.query_ball_point(sel1.positions, r=cutoff)
-
-            # we only need the 1st list
-            # nbList1 = res[:natoms1]
-            # nbList2 = res[natoms1:]
-
 
             idx1 = 0
             for atom1sNeighbors in nbList1:
@@ -345,7 +327,8 @@ class Analyzer(QObject):
                             continue
                     # distance = distarray[idx1, idx2]
                     # weight = self.weight_function(distance)
-                    dvec = pos1[0][3*idx1:3*idx1+3] - pos2[0][3*idx2:3*idx2+3]
+                    # dvec = pos1[0][3*idx1:3*idx1+3] - pos2[0][3*idx2:3*idx2+3]
+                    dvec = sel1.positions[idx1] - sel2.positions[idx2]
                     distance = np.sqrt(dvec.dot(dvec))
                     # print(dvec, distance, dvec.dtype)
                     # if (distance - distarray[idx1, idx2]) > 0.001:
@@ -415,7 +398,9 @@ class Analyzer(QObject):
                                 # if (typeHeavy == AtomHBondType.acc or typeHeavy == AtomHBondType.both) and (distarray[conv_hatom, idx2] <= hbondcutoff):
                                 # dist = distarray[conv_hatom, idx2]
                                 # dist = np.linalg.norm(sel1.positions[conv_hatom] - sel2.positions[idx2])
-                                dist = np.linalg.norm(pos1[0][3*conv_hatom:3*conv_hatom+3] - pos2[0][3*idx2:3*idx2+3])
+                                dist = np.linalg.norm(
+                                    sel1.positions[conv_hatom] - sel2.positions[idx2]
+                                )
                                 if (dist <= hbondcutoff):
                                     donorPosition = sel1.positions[idx1]
                                     hydrogenPosition = np.array(sel1.positions[conv_hatom], dtype=np.float64)
@@ -444,7 +429,10 @@ class Analyzer(QObject):
                                 # if (distarray[conv_hatom, idx2] <= hbondcutoff):
                                 # dist = distarray[idx1, conv_hatom]
                                 # dist = np.linalg.norm(sel1.positions[idx1] - sel2.positions[conv_hatom])
-                                dist = np.linalg.norm(pos1[0][3*idx1:3*idx1+3] - pos2[0][3*conv_hatom:3*conv_hatom+3])
+                                # dist = np.linalg.norm(pos1[0][3*idx1:3*idx1+3] - pos2[0][3*conv_hatom:3*conv_hatom+3])
+                                dist = np.linalg.norm(
+                                    sel1.positions[idx1] - sel2.positions[conv_hatom]
+                                )
                                 if (dist <= hbondcutoff):
                                     donorPosition = sel2.positions[idx2]
                                     hydrogenPosition = np.array(sel2.positions[conv_hatom], dtype=np.float64)

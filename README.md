@@ -4,18 +4,15 @@
 
 ## Installation
 
-PyContact requires **at least Python 3.6** installed on your system.
+PyContact requires **at least Python 3.7** installed on your system.
 A recent version can be installed from `pip` via:
 ```Python
-pip install cython
-pip install pycontact PyQt5
+pip install pycontact
 ```
 
 Alternatively, clone the repository and run:
 ```
-pip install cython PyQt5
-python setup.py build_ext -i
-python setup.py install
+pip install .
 ```
 
 ## Citation
