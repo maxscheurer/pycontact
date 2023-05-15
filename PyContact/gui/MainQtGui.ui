@@ -15,13 +15,13 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="3" colspan="2">
+    <!-- <item row="0" column="3" colspan="2">
      <widget class="QPushButton" name="visModeButton">
       <property name="text">
        <string>Vismode</string>
       </property>
      </widget>
-    </item>
+    </item> -->
     <item row="3" column="0" colspan="10">
      <widget class="QWidget" name="infoWidget" native="true">
       <property name="sizePolicy">

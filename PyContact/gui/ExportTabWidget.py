@@ -22,7 +22,6 @@ class ExportTabWidget(QTabWidget):
         self.tab1 = QWidget()
         self.tab2 = QWidget()
         self.tab3 = QWidget()
-        self.tab4 = QWidget()
         self.tab5 = QWidget()
         self.grid1 = QGridLayout()
         self.grid2 = QGridLayout()
@@ -32,12 +31,10 @@ class ExportTabWidget(QTabWidget):
         self.addTab(self.tab1, "View")
         self.addTab(self.tab2, "Histogram")
         self.addTab(self.tab3, "Contact Map")
-        self.addTab(self.tab4, "VMD")
         self.addTab(self.tab5, "Plain Text")
         self.tab1UI()
         self.tab2UI()
         self.tab3UI()
-        self.tab4UI()
         self.tab5UI()
         self.setWindowTitle("Export")
         self.contacts = []
@@ -154,29 +151,6 @@ class ExportTabWidget(QTabWidget):
         self.tab3.attributeBox.addItem("Hbond percentage")
 
         self.grid2.addWidget(self.tab3.attributeBox, 0, 1)
-
-    def tab4UI(self):
-        """Tab where selected data can be visualized in VMD via a Tcl script generation."""
-        self.tab4.setLayout(self.grid3)
-
-        label = QLabel("Split selections for each contact")
-        self.tab4.splitVisCheckbox = QCheckBox()
-        self.grid3.addWidget(label, 0, 0)
-        self.grid3.addWidget(self.tab4.splitVisCheckbox, 0, 1)
-
-        self.tab4.additionalText1 = QLineEdit()
-        self.tab4.additionalText2 = QLineEdit()
-        additionalTextLabel1 = QLabel("Additional seltext for selection 1")
-        additionalTextLabel2 = QLabel("Additional seltext for selection 2")
-
-        self.tab4.button = QPushButton("Create tcl script")
-        self.tab4.button.clicked.connect(self.createTclScriptVis)
-        self.grid3.addWidget(self.tab4.button, 3, 0, 1, 2)
-
-        self.grid3.addWidget(additionalTextLabel1, 1, 0)
-        self.grid3.addWidget(additionalTextLabel2, 2, 0)
-        self.grid3.addWidget(self.tab4.additionalText1, 1, 1)
-        self.grid3.addWidget(self.tab4.additionalText2, 2, 1)
 
     def tab5UI(self):
         """Tab where the raw data can be exported to a text file."""
@@ -329,78 +303,3 @@ class ExportTabWidget(QTabWidget):
     def setMapLabels(self, label1, label2):
         self.label1 = label1
         self.label2 = label2
-
-    def createTclScriptVis(self):
-        """Creates the Tcl script for VMD visualization of the selections."""
-        if len(self.contacts) == 0:
-            box = ErrorBox(ErrorMessages.NOCONTACTS)
-            box.exec_()
-            return
-
-        fileName = QFileDialog.getSaveFileName(self, 'Save Path')
-        if len(fileName[0]) > 0:
-            path, file_extension = os.path.splitext(fileName[0])
-            if file_extension != ".tcl":
-                file_extension = ".tcl"
-
-            path += file_extension
-
-            f = open(path, 'w')
-            f.write('mol new %s \n' % self.psf)
-            f.write('mol addfile %s \n' % self.dcd)
-            f.write('mol delrep 0 top \n')
-            f.write('mol representation NewCartoon \n')
-            f.write('mol Color ColorID 3 \n')
-            f.write('mol selection {all} \n')
-            f.write('mol addrep top \n')
-
-            if self.tab4.splitVisCheckbox.isChecked():
-                for cont in self.contacts:
-                    currentSel1 = []
-                    index = 0
-                    for item in cont.key1:
-                        if item != "none":
-                            currentSel1.append(AccumulationMapIndex.vmdsel[index] + " " + item)
-                        index += 1
-                    currentSel1String = " and ".join(currentSel1)
-                    currentSel2 = []
-                    index = 0
-                    for item in cont.key2:
-                        if item != "none":
-                            currentSel2.append(AccumulationMapIndex.vmdsel[index] + " " + item)
-                        index += 1
-                    currentSel2String = " and ".join(currentSel2)
-                    add1 = ("" if self.tab4.additionalText1.text() == "" else (" and " + self.tab4.additionalText1.text()))
-                    add2 = ("" if self.tab4.additionalText2.text() == "" else (" and " + self.tab4.additionalText2.text()))
-                    sel = "("+currentSel1String + add1 + ") or (" + currentSel2String + add2 + ")"
-                    f.write('mol representation Licorice \n')
-                    f.write('mol Color Name \n')
-                    f.write('mol selection {%s} \n' % sel)
-                    f.write('mol addrep top \n')
-            else:
-                total = []
-                for cont in self.contacts:
-                    currentSel1 = []
-                    index = 0
-                    for item in cont.key1:
-                        if item != "none":
-                            currentSel1.append(AccumulationMapIndex.vmdsel[index] + " " + item)
-                        index += 1
-                    currentSel1String = " and ".join(currentSel1)
-                    currentSel2 = []
-                    index = 0
-                    for item in cont.key2:
-                        if item != "none":
-                            currentSel2.append(AccumulationMapIndex.vmdsel[index] + " " + item)
-                        index += 1
-                    currentSel2String = " and ".join(currentSel2)
-                    add1 = ("" if self.tab4.additionalText1.text() == "" else (" and " + self.tab4.additionalText1.text()))
-                    add2 = ("" if self.tab4.additionalText2.text() == "" else (" and " + self.tab4.additionalText2.text()))
-                    sel = "(" + currentSel1String + add1 + ") or (" + currentSel2String + add2 + ")"
-                    total.append(sel)
-                seltext = " or ".join(total)
-                f.write('mol representation Licorice \n')
-                f.write('mol Color Name \n')
-                f.write('mol selection {%s} \n' % seltext)
-                f.write('mol addrep top \n')
-            f.close()

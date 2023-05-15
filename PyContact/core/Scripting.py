@@ -27,10 +27,11 @@ class PyContactJob:
 
     def runJob(self, ncores=1):
         """Runs contact analysis and accumulation with ncores threads."""
+        ncores = 1
         print("Running job: " + self.name + " on " + str(ncores) + " cores.")
         self.analyzer = Analyzer(self.topo,self.traj, self.configuration.cutoff, self.configuration.hbondcutoff, self.configuration.hbondcutangle, self.configuration.sel1, self.configuration.sel2)
         self.analyzer.runFrameScan(ncores)
-        self.analyzer.runContactAnalysis(self.configuration.map1, self.configuration.map2, ncores)
+        self.analyzer.runContactAnalysis(self.configuration.map1, self.configuration.map2)
 
     def writeSessionToFile(self, fname=""):
         """Writes the current analysis session to a file with either self.name + .session or fname as output filename"""

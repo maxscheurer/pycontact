@@ -2,8 +2,31 @@ import collections
 
 import numpy as np
 
-from ..db.DbReader import read_residue_db
-
+residue_infos = {
+    'gly': {'name': 'gly', 'scpolarity': 'nonpolar', 'hbondtype': 'none'},
+ 'ala': {'name': 'ala', 'scpolarity': 'nonpolar', 'hbondtype': 'none'},
+ 'leu': {'name': 'leu', 'scpolarity': 'nonpolar', 'hbondtype': 'none'},
+ 'ile': {'name': 'ile', 'scpolarity': 'nonpolar', 'hbondtype': 'none'},
+ 'val': {'name': 'val', 'scpolarity': 'nonpolar', 'hbondtype': 'none'},
+ 'phe': {'name': 'phe', 'scpolarity': 'nonpolar', 'hbondtype': 'none'},
+ 'met': {'name': 'met', 'scpolarity': 'nonpolar', 'hbondtype': 'none'},
+ 'pro': {'name': 'pro', 'scpolarity': 'nonpolar', 'hbondtype': 'none'},
+ 'asp': {'name': 'asp', 'scpolarity': 'negative', 'hbondtype': 'acc'},
+ 'glu': {'name': 'glu', 'scpolarity': 'negative', 'hbondtype': 'acc'},
+ 'lys': {'name': 'lys', 'scpolarity': 'positive', 'hbondtype': 'don'},
+ 'arg': {'name': 'arg', 'scpolarity': 'positive', 'hbondtype': 'don'},
+ 'hsp': {'name': 'hsp', 'scpolarity': 'positive', 'hbondtype': 'don'},
+ 'asn': {'name': 'asn', 'scpolarity': 'polar', 'hbondtype': 'both'},
+ 'gln': {'name': 'gln', 'scpolarity': 'polar', 'hbondtype': 'both'},
+ 'his': {'name': 'his', 'scpolarity': 'polar', 'hbondtype': 'both'},
+ 'hsd': {'name': 'hsd', 'scpolarity': 'polar', 'hbondtype': 'both'},
+ 'hse': {'name': 'hse', 'scpolarity': 'polar', 'hbondtype': 'both'},
+ 'cys': {'name': 'cys', 'scpolarity': 'polar', 'hbondtype': 'don'},
+ 'ser': {'name': 'ser', 'scpolarity': 'polar', 'hbondtype': 'both'},
+ 'thr': {'name': 'thr', 'scpolarity': 'polar', 'hbondtype': 'both'},
+ 'tyr': {'name': 'tyr', 'scpolarity': 'nonpolar', 'hbondtype': 'don'},
+ 'trp': {'name': 'trp', 'scpolarity': 'nonpolar', 'hbondtype': 'don'},
+ }
 
 compare = lambda x, y: collections.Counter(x) == collections.Counter(y)
 
@@ -159,10 +182,13 @@ class AccumulatedContact(object):
 
     def total_time(self, ns_per_frame, threshold):
         """Returns the total time, the contact score is above the given threshold value."""
-        time = 0
-        for score in self.scoreArray:
-            if score > threshold:
-                time += ns_per_frame
+        # time = 0
+        # for score in self.scoreArray:
+        #     if score > threshold:
+        #         time += ns_per_frame
+        sa = np.array(self.scoreArray)
+        time = np.sum(np.where(sa > threshold, ns_per_frame, 0))
+        # assert time == time2
         self.ttime = time
         return self.ttime
 
@@ -178,18 +204,13 @@ class AccumulatedContact(object):
 
     def mean_score(self):
         """Returns the mean score of the scoreArray."""
-        mean = 0
-        for score in self.scoreArray:
-            mean += score
-        mean /= len(self.scoreArray)
-        self.meanScore = mean
-        return mean
+        self.meanScore = np.mean(self.scoreArray)
+        return self.meanScore
 
     def median_score(self):
         """Returns the median score of the scoreArray."""
-        med = np.median(self.scoreArray)
-        self.medianScore = med
-        return med
+        self.medianScore = np.median(self.scoreArray)
+        return self.medianScore
 
     def life_time(self, ns_per_frame, threshold):
         """Computes the life time of a contact in ns, with the given threshold."""
@@ -239,15 +260,15 @@ class AccumulatedContact(object):
         #     return ContactType.other
         self.determineBackboneSidechainType()
         try:
-            sc1 = str(read_residue_db("scpolarity", "name", r1)[0]["scpolarity"])
+            sc1 = residue_infos[r1]["scpolarity"]
             scpol1 = SideChainPolarity.mapping[sc1]
-        except IndexError:
+        except (IndexError, KeyError):
             scpol1 = SideChainPolarity.other
 
         try:
-            sc2 = str(read_residue_db("scpolarity", "name", r2)[0]["scpolarity"])
+            sc2 = residue_infos[r2]["scpolarity"]
             scpol2 = SideChainPolarity.mapping[sc2]
-        except IndexError:
+        except (IndexError, KeyError):
             scpol2 = SideChainPolarity.other
 
         # hydrogen bonds: donor, acceptor, both

@@ -427,7 +427,7 @@ int nAtoms1, int nAtoms2, double cutoff) {
 }
 
 
-static double sasa_grid(const float *pos,int natoms, float pairdist, int allow_double_counting, int maxpairs, const float *radius,const int npts, double srad, int pointstyle, int restricted, const int* restrictedList) {
+static double sasa_grid(const float *pos,int natoms, float pairdist, int allow_double_counting, int maxpairs, const float *radius,const int npts, double srad, int pointstyle, int restricted, const int* restrictedList, const float* spherepoints) {
   int on[natoms];
   fill_n(on,natoms,1);
   // printf("natoms %d\n", natoms);
@@ -483,8 +483,17 @@ static double sasa_grid(const float *pos,int natoms, float pairdist, int allow_d
     }
   }
 
-  const float prefac = (float) (4 * M_PI / npts);
-  float totarea = 0.0f;
+  if (spherepoints) {
+    for (int k=0; k<npts; k++) {
+      spherepts[3*k  ] = spherepoints[3*k  ];
+      spherepts[3*k+1] = spherepoints[3*k+1];
+      spherepts[3*k+2] = spherepoints[3*k+2];
+    }
+  }
+
+  const double prefac = (double) (4 * M_PI / npts);
+  // printf("prefac: %.15f\n", prefac);
+  double totarea = 0.0f;
   // compute area for each atom based on its pairlist
   for (int i = 0; i<natoms; i++) {
     // if (on[i]) {
@@ -492,7 +501,9 @@ static double sasa_grid(const float *pos,int natoms, float pairdist, int allow_d
       // printf("i: %d\n", restrictedList[i]);
       if (restricted && !restrictedList[i]) continue;
       const float *loc = pos+3*i;
-      float rad = radius[i]+srad;
+      // printf("loc: %f %f %f\n", loc[0], loc[1], loc[2]);
+      double rad = radius[i]+srad;
+      // printf("rad: %f\n", rad);
       float surfpos[3];
       int surfpts = npts;
       const ResizeArray<int> &nbrs = pairlist[i];
@@ -518,7 +529,10 @@ static double sasa_grid(const float *pos,int natoms, float pairdist, int allow_d
           surfpts--;
         }
       }
-      float atomarea = prefac * rad * rad * surfpts;
+      // printf("left points: %d\n", surfpts);
+      double atomarea = prefac * rad * rad * surfpts;
+      // printf("rad: %.15f\n", rad);
+      printf("atomarea: %.15f\n", atomarea);
       totarea += atomarea;
     // }
   }
