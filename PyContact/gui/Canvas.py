@@ -37,7 +37,6 @@ class Canvas(QWidget, QObject):
         self.range = [0, 0]
         self.rangeFilterActive = False
         self.showHbondScores = False
-        self.vismode = False
         self.timeLineXOrigin = 0
         self.clickedRow = -1
         self.clickedColumn = -1
@@ -51,14 +50,6 @@ class Canvas(QWidget, QObject):
         pos = event.pos()
         x, y = pos.x(), pos.y()
         self.clickedRow = -1
-        if self.vismode and self.timeLineXOrigin < x < self.endOfTimeLine:
-            self.clickedRow = int(y / self.rowh - 1)  # -1 because of frame number line
-            self.clickedColumn = int((x - self.timeLineXOrigin) / self.offset)
-            # print("clickedRow: " + str(self.clickedRow))
-            self.rendered = False
-            self.clickedRowSignal.emit()
-            self.repaint()
-            self.update()
 
     def mouseReleaseEvent(self, event):
         pass
@@ -68,15 +59,6 @@ class Canvas(QWidget, QObject):
         pos = event.pos()
         x, y = pos.x(), pos.y()
         self.clickedColumn = -1
-        if self.vismode and self.timeLineXOrigin < x < self.endOfTimeLine:
-            self.clickedColumn = int((x - self.timeLineXOrigin) / self.offset)
-            # print("clicked on frame %d",self.clickedColumn)
-            self.clickedColumnSignal.emit()
-
-    def switchToVisMode(self, vismode):
-        """Visualize contacts directly in VMD by selecting a specific row."""
-        self.vismode = vismode
-        # self.labelView.vismode = vismode
 
     def paintEvent(self, event):
 
@@ -117,14 +99,6 @@ class Canvas(QWidget, QObject):
         startx = np.max(self.labelView.buttonWidths) + 15
         orig_startx = startx
 
-        # probably included in next version...
-        # if self.vismode:
-        #     textoffset += 15
-        #     start_text += 15
-        #     startx += 15
-        #     orig_startx += 15
-
-        # print(orig_startx)
         self.timeLineXOrigin = orig_startx
         self.rowh = rowheight
 

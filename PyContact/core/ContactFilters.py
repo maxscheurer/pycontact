@@ -107,7 +107,7 @@ class RangeFilter(object):
             bRanges = []
             for ran in splitB:
                 r = ran.split(u"-")
-                print(r)
+                # print(r)
                 if len(r) == 1:
                     bRanges.append(range(int(r[0]), int(r[0])+1))
                 else:
@@ -148,7 +148,7 @@ class BinaryFilter(object):
         self.value = value
 
     def filterContacts(self, contacts):
-        pass
+        raise NotImplementedError
 
 
 class OnlyFilter(object):
@@ -193,7 +193,7 @@ class TotalTimeFilter(BinaryFilter):
         for c in contacts:
             if op.compare(c.total_time(1, 0), self.value, self.operator):
                 filtered.append(c)
-        print(unicode(len(filtered)))
+        # print(unicode(len(filtered)))
         return filtered
 
 
@@ -219,7 +219,7 @@ class ScoreFilter(BinaryFilter):
         elif self.ftype == u"HB %":
             for c in contacts:
                 med = c.hbond_percentage()
-                print(med)
+                # print(med)
                 if op.compare(med, self.value, self.operator):
                     filtered.append(c)
         return filtered

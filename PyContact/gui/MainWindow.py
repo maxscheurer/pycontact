@@ -13,7 +13,6 @@ from PyQt5.QtSvg import QSvgGenerator
 import numpy as np
 
 from . import MainQtGui
-from .SasaWidgets import SasaWidget
 from .Canvas import Canvas
 from .Dialogues import FileLoaderDialog, AnalysisDialog
 from .ExportTabWidget import ExportTabWidget
@@ -25,7 +24,6 @@ from .ErrorMessages import ErrorMessages
 from ..core.LogPool import *
 from . import Preferences
 from ..exampleData.datafiles import DEFAULTSESSION, DEFAULTSESSION_PY3
-from .VMDControlPanel import VMDControlPanel
 from ..core.DataHandler import DataHandler
 
 multiprocessing.log_to_stderr()
@@ -77,8 +75,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
         # analysis button
         self.analysisButton.clicked.connect(self.analyzeDataPushed)
-        # contact area button
-        self.actionContact_Area_Calculations.triggered.connect(self.showContactAreaView)
         # preferences
         self.actionPreferences.triggered.connect(self.openPrefs)
 
@@ -92,21 +88,10 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
 
         # setup of extra widgets
         self.exportWidget = ExportTabWidget()
-        self.sasaView = SasaWidget()
         self.statisticsView = None
 
         self.analysis_state = False
 
-        self.vismode = False
-        self.visModeButton.setCheckable(True)
-        self.visModeButton.setChecked(False)
-        self.visModeButton.clicked.connect(self.switchedToVisMode)
-
-        self.vmdpanel = VMDControlPanel()
-        self.actionVMD_Remote_Control.triggered.connect(self.showVMDControlPanel)
-
-        self.painter.clickedRowSignal.connect(self.updateVMDSelections)
-        self.painter.clickedColumnSignal.connect(self.updateVMDFrame)
         self.updateSettings()
         self.updateFilters()
 
@@ -114,54 +99,12 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         # self.tableTest.setGeometry(100, 100, 400, 400)
         # self.tableTest.show()
 
-        # from ..db.DbReader import read_residue_db_all
-        # res = read_residue_db_all()
-        # residueList = []    # 1st: name, 2nd scpolarity
-        # for k in res:
-        #     residueList.appen([k["name"], k["scpolarity"]])
-
         self.actionDefault.setText("Load sample data")
 
     def horizontalScrollBarChanged(self):
         x = self.scrollArea.horizontalScrollBar().value()
         y = self.painter.labelView.y()
         self.painter.labelView.move(x, y)
-
-    def showVMDControlPanel(self):
-        """Shows the VMD control panel, to remotely access VMD from PyContact."""
-        self.vmdpanel.show()
-
-    def showContactAreaView(self):
-        """Shows the SASA computation panel."""
-        self.sasaView.nsPerFrame = float(self.settingsView.nsPerFrameField.text())
-        self.sasaView.show()
-        if self.analysis:
-            self.sasaView.setFilePaths(self.analysis.getFilePaths())
-
-    def switchedToVisMode(self):
-        """Switch to vis mode, to show selected contacts directly in VMD."""
-        if self.visModeButton.isChecked():
-            self.vismode = True
-            # conversions with clicked frames are not allowed
-            self.frameStrideField.setText("1")
-        else:
-            self.vismode = False
-        self.painter.switchToVisMode(self.vismode)
-        self.updateSettings()
-        self.updateFilters()
-
-    @pyqtSlot()
-    def updateVMDSelections(self):
-        """Updates the selected contact in VMD via the vmd panel."""
-        if self.vmdpanel.connected:
-            self.vmdpanel.updateSelections(self.analysis.sel1text, self.analysis.sel2text,
-                                           [self.filteredContacts[self.painter.globalClickedRow]])
-
-    @pyqtSlot()
-    def updateVMDFrame(self):
-        """Updates the selected frame in VMD via the vmd panel."""
-        if self.vmdpanel.connected:
-            self.vmdpanel.gotoVMDFrame(self.painter.clickedColumn)
 
     def updateSelectionLabels(self, sel1, sel2):
         """Updates the current selection in the info labels."""
@@ -185,7 +128,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.analysis.contactResults = contactResults
         self.analysis.setTrajectoryData(*trajArgs)
         self.analysis.finalAccumulatedContacts = self.contacts
-        self.sasaView.setFilePaths(*self.analysis.getFilePaths())
         self.exportWidget.setFilePaths(*self.analysis.getFilePaths())
         self.updateSelectionLabels(arguments[5], arguments[6])
         self.updateSettings()
@@ -217,7 +159,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         self.analysis.contactResults = contactResults
         self.analysis.setTrajectoryData(*trajArgs)
         self.analysis.finalAccumulatedContacts = self.contacts
-        self.sasaView.setFilePaths(*self.analysis.getFilePaths())
         self.exportWidget.setFilePaths(*self.analysis.getFilePaths())
         self.updateSelectionLabels(arguments[5], arguments[6])
         self.updateSettings()
@@ -241,7 +182,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
                 self.loadDataPushed()
             self.setInfoLabel("%d frames loaded." % len(self.analysis.contactResults))
             self.updateSelectionLabels(self.config.sel1text, self.config.sel2text)
-            self.sasaView.setFilePaths(*self.analysis.getFilePaths())
             self.exportWidget.setFilePaths(*self.analysis.getFilePaths())
 
     @pyqtSlot(float)
@@ -272,7 +212,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
             map1 = self.maps[0]
             map2 = self.maps[1]
             nproc = int(self.settingsView.coreBox.value())
-            self.contacts = self.analysis.runContactAnalysis(map1, map2, nproc)
+            self.contacts = self.analysis.runContactAnalysis(map1, map2)
             self.progressBar.setValue(0)
             self.setInfoLabel("Updating timeline...")
             QApplication.processEvents()
@@ -289,12 +229,9 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         # self.painter.customColor = self.customColor
         self.painter.repaint()
         self.painter.update()
-        self.sasaView.nsPerFrame = float(self.settingsView.nsPerFrameField.text())
 
     def updateFilters(self):
         """Updates the chosen filters in MainWindow."""
-        if self.vismode is True:
-            self.frameStrideField.setText("1")
         stride = int(self.frameStrideField.text())
         if stride < 1:
             stride = 1
@@ -415,9 +352,6 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
         if self.maps is not None:
             self.exportWidget.setMaps(self.maps[0], self.maps[1])
             self.exportWidget.setMapLabels(self.analysis.sel1text, self.analysis.sel2text)
-            self.vmdpanel.sel1 = self.analysis.sel1text
-            self.vmdpanel.sel2 = self.analysis.sel2text
-            self.vmdpanel.filteredContactList = self.filteredContacts
         self.exportWidget.setThresholdAndNsPerFrame(self.painter.threshold, self.painter.nsPerFrame)
 
     def openPrefs(self):

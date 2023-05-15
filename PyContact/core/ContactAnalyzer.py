@@ -2,18 +2,13 @@ import re
 import time
 from .multi_trajectory import run_load_parallel
 from .LogPool import *
-from copy import deepcopy
 
 import MDAnalysis
 import numpy as np
 from PyQt5.QtCore import pyqtSignal, QObject
+from scipy.spatial import KDTree
 
-# TODO: fix aroundPatch with gridsearch in C code using cython
 from .Biochemistry import (AccumulatedContact, AtomContact, AccumulationMapIndex, HydrogenBond, TempContactAccumulate, HydrogenBondAtoms)
-from ..cy_modules.cy_gridsearch import cy_find_contacts
-
-# MDAnalysis.core.flags['use_periodic_selections'] = False
-# MDAnalysis.core.flags['use_KDTree_routines'] = True
 
 
 class Analyzer(QObject):
@@ -61,13 +56,13 @@ class Analyzer(QObject):
         except:
             raise Exception
 
-    def runContactAnalysis(self, map1, map2, nproc):
+    def runContactAnalysis(self, map1, map2):
         """Performs a contadt analysis using nproc threads."""
         self.finalAccumulatedContacts = self.analyze_contactResultsWithMaps(self.contactResults, map1, map2)
 
         self.lastMap1 = map1
         self.lastMap2 = map2
-        return deepcopy(self.finalAccumulatedContacts)
+        return self.finalAccumulatedContacts.copy()
 
     def setTrajectoryData(
             self, resname_array, resid_array, name_array,
@@ -119,42 +114,21 @@ class Analyzer(QObject):
             keys2=["none","none","none","22", "ILE, "none"]
 
         """
+        properties = [
+            lambda x: x,
+            lambda x: self.name_array[x],
+            lambda x: self.resid_array[x],
+            lambda x: self.resname_array[x],
+            lambda x: self.segids[x],
+        ]
         idx1 = contact.idx1
         idx2 = contact.idx2
-        counter = 0
-        keys1 = []
-        for val in map1:
-            if val == 1:
-                if counter == AccumulationMapIndex.index:
-                    keys1.append(idx1)
-                elif counter == AccumulationMapIndex.name:
-                    keys1.append(self.name_array[idx1])
-                elif counter == AccumulationMapIndex.resid:
-                    keys1.append(self.resid_array[idx1])
-                elif counter == AccumulationMapIndex.resname:
-                    keys1.append(self.resname_array[idx1])
-                elif counter == AccumulationMapIndex.segid:
-                    keys1.append(self.segids[idx1])
-            else:
-                keys1.append("none")
-            counter += 1
-        counter = 0
-        keys2 = []
-        for val in map2:
-            if val == 1:
-                if counter == AccumulationMapIndex.index:
-                    keys2.append(idx2)
-                elif counter == AccumulationMapIndex.name:
-                    keys2.append(self.name_array[idx2])
-                elif counter == AccumulationMapIndex.resid:
-                    keys2.append(self.resid_array[idx2])
-                elif counter == AccumulationMapIndex.resname:
-                    keys2.append(self.resname_array[idx2])
-                elif counter == AccumulationMapIndex.segid:
-                    keys2.append(self.segids[idx2])
-            else:
-                keys2.append("none")
-            counter += 1
+        keys1 = [
+            properties[ii](idx1) if x == 1 else "none" for ii, x in enumerate(map1)
+        ]
+        keys2 = [
+            properties[ii](idx2) if x == 1 else "none" for ii, x in enumerate(map2)
+        ]
         return [keys1, keys2]
 
     def makeKeyArraysFromKey(self, key):
@@ -334,21 +308,8 @@ class Analyzer(QObject):
             frame = ts.frame
             self.currentFrameNumber = ts.frame
 
-            # pass positions and distance to cython
-            natoms1 = len(sel1.atoms)
-            natoms2 = len(sel2.atoms)
-            pos1 = np.array(np.reshape(sel1.positions, (1, natoms1 * 3)), dtype=np.float64)
-            pos2 = np.array(np.reshape(sel2.positions, (1, natoms2 * 3)), dtype=np.float64)
-            xyz1 = np.array(pos1, dtype=np.float32)
-            xyz2 = np.array(pos2, dtype=np.float32)
-            # 2d array with index of atom1 being the index of the first dimension
-            # individual lists contain atom2 indices
-            nbList1 = cy_find_contacts(xyz1, natoms1, xyz2, natoms2, cutoff)
-
-            # we only need the 1st list
-            # nbList1 = res[:natoms1]
-            # nbList2 = res[natoms1:]
-
+            tree = KDTree(sel2.positions)
+            nbList1 = tree.query_ball_point(sel1.positions, r=cutoff)
 
             idx1 = 0
             for atom1sNeighbors in nbList1:
@@ -366,7 +327,8 @@ class Analyzer(QObject):
                             continue
                     # distance = distarray[idx1, idx2]
                     # weight = self.weight_function(distance)
-                    dvec = pos1[0][3*idx1:3*idx1+3] - pos2[0][3*idx2:3*idx2+3]
+                    # dvec = pos1[0][3*idx1:3*idx1+3] - pos2[0][3*idx2:3*idx2+3]
+                    dvec = sel1.positions[idx1] - sel2.positions[idx2]
                     distance = np.sqrt(dvec.dot(dvec))
                     # print(dvec, distance, dvec.dtype)
                     # if (distance - distarray[idx1, idx2]) > 0.001:
@@ -436,7 +398,9 @@ class Analyzer(QObject):
                                 # if (typeHeavy == AtomHBondType.acc or typeHeavy == AtomHBondType.both) and (distarray[conv_hatom, idx2] <= hbondcutoff):
                                 # dist = distarray[conv_hatom, idx2]
                                 # dist = np.linalg.norm(sel1.positions[conv_hatom] - sel2.positions[idx2])
-                                dist = np.linalg.norm(pos1[0][3*conv_hatom:3*conv_hatom+3] - pos2[0][3*idx2:3*idx2+3])
+                                dist = np.linalg.norm(
+                                    sel1.positions[conv_hatom] - sel2.positions[idx2]
+                                )
                                 if (dist <= hbondcutoff):
                                     donorPosition = sel1.positions[idx1]
                                     hydrogenPosition = np.array(sel1.positions[conv_hatom], dtype=np.float64)
@@ -465,7 +429,10 @@ class Analyzer(QObject):
                                 # if (distarray[conv_hatom, idx2] <= hbondcutoff):
                                 # dist = distarray[idx1, conv_hatom]
                                 # dist = np.linalg.norm(sel1.positions[idx1] - sel2.positions[conv_hatom])
-                                dist = np.linalg.norm(pos1[0][3*idx1:3*idx1+3] - pos2[0][3*conv_hatom:3*conv_hatom+3])
+                                # dist = np.linalg.norm(pos1[0][3*idx1:3*idx1+3] - pos2[0][3*conv_hatom:3*conv_hatom+3])
+                                dist = np.linalg.norm(
+                                    sel1.positions[idx1] - sel2.positions[conv_hatom]
+                                )
                                 if (dist <= hbondcutoff):
                                     donorPosition = sel2.positions[idx2]
                                     hydrogenPosition = np.array(sel2.positions[conv_hatom], dtype=np.float64)
@@ -498,7 +465,7 @@ class Analyzer(QObject):
         stop = time.time()
         print("grid:",stop-start)
         return contactResults
-
+    
     def analyze_contactResultsWithMaps(self, contactResults, map1, map2):
         """Analyzes contactsResults with the given maps."""
 
@@ -529,29 +496,18 @@ class Analyzer(QObject):
             for cont in frame:
                 key1, key2 = self.makeKeyArraysFromMaps(map1, map2, cont)
                 key = self.makeKeyFromKeyArrays(key1, key2)
-                if key in currentFrameAcc:
-                    currentFrameAcc[key].fscore += cont.weight
-                    currentFrameAcc[key].contributingAtomContacts.append(cont)
-                    if cont.idx1 in self.backbone:
-                        currentFrameAcc[key].bb1score += cont.weight
-                    else:
-                        currentFrameAcc[key].sc1score += cont.weight
-                    if cont.idx2 in self.backbone:
-                        currentFrameAcc[key].bb2score += cont.weight
-                    else:
-                        currentFrameAcc[key].sc2score += cont.weight
-                else:
+                if key not in currentFrameAcc:
                     currentFrameAcc[key] = TempContactAccumulate(key1, key2)
-                    currentFrameAcc[key].fscore += cont.weight
-                    currentFrameAcc[key].contributingAtomContacts.append(cont)
-                    if cont.idx1 in self.backbone:
-                        currentFrameAcc[key].bb1score += cont.weight
-                    else:
-                        currentFrameAcc[key].sc1score += cont.weight
-                    if cont.idx2 in self.backbone:
-                        currentFrameAcc[key].bb2score += cont.weight
-                    else:
-                        currentFrameAcc[key].sc2score += cont.weight
+                currentFrameAcc[key].fscore += cont.weight
+                currentFrameAcc[key].contributingAtomContacts.append(cont)
+                if cont.idx1 in self.backbone:
+                    currentFrameAcc[key].bb1score += cont.weight
+                else:
+                    currentFrameAcc[key].sc1score += cont.weight
+                if cont.idx2 in self.backbone:
+                    currentFrameAcc[key].bb2score += cont.weight
+                else:
+                    currentFrameAcc[key].sc2score += cont.weight
                 if key not in allkeys:
                     allkeys.append(key)
             frame_contacts_accumulated.append(currentFrameAcc)
@@ -559,7 +515,7 @@ class Analyzer(QObject):
             counter += 1
         accumulatedContactsDict = {}
         stop = time.time()
-        # print(stop - start)
+        # print("time", stop - start)
         # accumulatedContactsDict (dict)
         # ---> key vs. list of TempContactAccumulated
         #

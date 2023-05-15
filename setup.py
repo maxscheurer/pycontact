@@ -2,16 +2,7 @@
 by Maximilian Scheurer, Peter Rodenkirch
 """
 from setuptools import setup, find_packages
-from setuptools.extension import Extension
-from Cython.Distutils import build_ext
-from Cython.Build import cythonize
 
-
-extensions = [Extension("PyContact.cy_modules.cy_gridsearch",
-                        ["PyContact/cy_modules/cy_gridsearch.pyx"],
-                        language="c++",
-                        include_dirs=[".", "PyContact/cy_modules/src"],
-                        extra_compile_args=["-std=c++0x"]), ]
 setup(
     name='pycontact',
     version='1.0.5',
@@ -26,28 +17,24 @@ setup(
         'Intended Audience :: Science/Research',
         'Topic :: Scientific/Engineering',
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
-        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
     keywords='computational biophysics simulation biology bioinformatics visualization protein biomolecules dna',
     package_dir={'PyContact': 'PyContact'},
     packages=find_packages(),
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     setup_requires=['cython'],
     install_requires=['numpy >= 1.16',
                       'matplotlib',
-                      'mdanalysis >= 0.20.0',
-                      'cython',
+                      'mdanalysis >= 2.0.0',
                       'seaborn',
                       'scipy',
                       'PyQt5'],
-    cmdclass={'build_ext': build_ext},
-    ext_modules=cythonize(extensions),
     package_data={'PyContact': ['exampleData/defaultsession',
                                 'exampleData/*.psf', 'exampleData/*.pdb',
                                 'exampleData/*.dcd', 'exampleData/*.tpr',
-                                'exampleData/*.xtc', 'gui/*.tcl',
-                                'db/aa.db', 'cy_modules/*.pyx',
-                                'cy_modules/src/*']},
+                                'exampleData/*.xtc',
+                                ]},
     entry_points={
         'console_scripts': [
             'pycontact=PyContact.pycontact:main',
