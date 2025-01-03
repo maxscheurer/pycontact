@@ -23,7 +23,7 @@ from .ErrorBox import ErrorBox
 from .ErrorMessages import ErrorMessages
 from ..core.LogPool import *
 from . import Preferences
-from ..exampleData.datafiles import DEFAULTSESSION, DEFAULTSESSION_PY3
+from ..exampleData.datafiles import DEFAULTSESSION
 from ..core.DataHandler import DataHandler
 
 multiprocessing.log_to_stderr()
@@ -151,10 +151,7 @@ class MainWindow(QMainWindow, MainQtGui.Ui_MainWindow, QObject):
     def loadDefault(self):
         """Loads the default session."""
 
-        if (sys.version_info > (3, 0)):
-            self.contacts, arguments, trajArgs, self.maps, contactResults = DataHandler.importSessionFromFile(DEFAULTSESSION_PY3)
-        else:
-            self.contacts, arguments, trajArgs, self.maps, contactResults = DataHandler.importSessionFromFile(DEFAULTSESSION)
+        self.contacts, arguments, trajArgs, self.maps, contactResults = DataHandler.importSessionFromFile(DEFAULTSESSION)
         self.analysis = Analyzer(*arguments)
         self.analysis.contactResults = contactResults
         self.analysis.setTrajectoryData(*trajArgs)

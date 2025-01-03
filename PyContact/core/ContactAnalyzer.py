@@ -309,7 +309,9 @@ class Analyzer(QObject):
             self.currentFrameNumber = ts.frame
 
             tree = KDTree(sel2.positions)
-            nbList1 = tree.query_ball_point(sel1.positions, r=cutoff)
+            nbList1 = tree.query_ball_point(
+                sel1.positions, r=cutoff, workers=-1
+            )
 
             idx1 = 0
             for atom1sNeighbors in nbList1:

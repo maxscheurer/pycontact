@@ -186,10 +186,8 @@ class HistPlotter(MplPlotter):
         # h = self.axes.bar(x, valuesNp, color="red")
         h = self.axes.bar(x, valuesNp)
         xticks_pos = [0.7071 * patch.get_width() + patch.get_xy()[0] for patch in h]
-        self.axes.set_xticklabels(titlesNp, ha='right', size=8, rotation=45)
+        self.axes.set_xticklabels(titlesNp, ha='right', size=xticksfontsize, rotation=45)
         self.axes.set_xticks(xticks_pos)
-        for tick in self.axes.xaxis.get_major_ticks():
-            tick.label.set_fontsize(xticksfontsize)
         self.axes.set_ylabel(attribute)
         self.fig.subplots_adjust(bottom=0.2, top=0.95, left=0.1, right=0.9)
 
