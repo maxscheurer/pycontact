@@ -1,0 +1,14 @@
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python
+  - numpy
+  - scipy
+  #
+  - pyqt
+  #
+  - mdanalysis
+  #
+  - matplotlib
+  - seaborn

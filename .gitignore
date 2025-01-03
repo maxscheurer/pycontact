@@ -57,3 +57,6 @@ pycontact.egg-info/
 
 #pytest
 .pytest_cache/
+
+*.lock
+.vscode/

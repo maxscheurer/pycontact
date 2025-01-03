@@ -6,7 +6,6 @@ DCD = res(__name__, './rpn11_ubq.dcd')
 PSF = res(__name__, './rpn11_ubq.psf')
 XTC = res(__name__, './md_noPBC.xtc')
 TPR = res(__name__, './md.tpr')
-DEFAULTSESSION = res(__name__, './defaultsession')
-DEFAULTSESSION_PY3 = res(__name__, './defaultsession_py3')
+DEFAULTSESSION = res(__name__, './defaultsession_py3')
 
 del res

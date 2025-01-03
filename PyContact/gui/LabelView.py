@@ -12,7 +12,7 @@ from .DetailWidget import Detail
 
 
 class LabelView(QWidget):
-    """Proviedes more detailed statistics of the clicked contact in MainWindow."""
+    """Provides more detailed statistics of the clicked contact in MainWindow."""
 
     def __init__(self, contacts):
         super(QWidget, self).__init__()
@@ -49,7 +49,7 @@ class LabelView(QWidget):
         for c in self.contacts:
             cindex = self.contacts.index(c)
             self.buttons.append(QPushButton(c.title))
-            stylesheet = "border: 0px solid #222222; background-color: " + ContactType.colors[c.determine_ctype()] \
+            stylesheet = "color: black; border: 0px solid #222222; background-color: " + ContactType.colors[c.determine_ctype()] \
                          + " ;"
             # stylesheet = "border: 0px solid #222222; background-color: " + ContactType.colors[3] + " ;"
             self.buttons[-1].setStyleSheet(stylesheet)

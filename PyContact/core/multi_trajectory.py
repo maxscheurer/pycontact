@@ -6,10 +6,10 @@ import itertools
 import MDAnalysis
 from MDAnalysis.analysis import distances
 import numpy as np
+from scipy.spatial import KDTree
 
 from .Biochemistry import *
 from .LogPool import *
-from ..cy_modules.cy_gridsearch import cy_find_contacts
 
 
 def weight_function(value):
@@ -68,17 +68,8 @@ def loop_trajectory_grid(sel1c, sel2c, indices1, indices2, config, suppl, selfIn
     for s1, s2 in zip(sel1c, sel2c):
         frame = 0
         currentFrameContacts = []
-        natoms1 = len(s1)
-        natoms2 = len(s2)
-        pos1 = np.array(np.reshape(s1, (1, natoms1 * 3)), dtype=np.float64)
-        pos2 = np.array(np.reshape(s2, (1, natoms2 * 3)), dtype=np.float64)
-        xyz1 = np.array(pos1, dtype=np.float32)
-        xyz2 = np.array(pos2, dtype=np.float32)
-        # 2d array with index of atom1 being the index of the first dimension
-        # individual lists contain atom2 indices
-        nbList1 = cy_find_contacts(xyz1, natoms1, xyz2, natoms2, cutoff)
-        # nbList1 = res[:natoms1]
-        # nbList2 = res[natoms1:]
+        tree = KDTree(s2)
+        nbList1 = tree.query_ball_point(s1, r=cutoff, workers=1)
         idx1 = 0
         for atom1sNeighbors in nbList1:
             for idx2 in atom1sNeighbors:
@@ -93,17 +84,10 @@ def loop_trajectory_grid(sel1c, sel2c, indices1, indices2, config, suppl, selfIn
                 if selfInteraction:
                     if (resid_array[convindex1] - resid_array[convindex2]) < 5 and segids[convindex1] == segids[convindex2]:
                         continue
-                # distance = distarray[idx1, idx2]
-                # weight = weight_function(distance)
-                dvec = pos1[0][3*idx1:3*idx1+3] - pos2[0][3*idx2:3*idx2+3]
+
+                dvec = s1[idx1] - s2[idx2]
                 distance = np.sqrt(dvec.dot(dvec))
-                # if (distance - distarray[idx1, idx2]) > 0.001:
-                #     print("Error in distance calculations!")
-                #     return
-                # # print(convindex1, convindex2, distance, distarray[idx1, idx2])
-                # if (distance > cutoff):
-                #     print("Distances must be smaller/equal cutoff!")
-                #     return
+
                 weight = weight_function(distance)
 
                 # HydrogenBondAlgorithm
@@ -162,7 +146,10 @@ def loop_trajectory_grid(sel1c, sel2c, indices1, indices2, config, suppl, selfIn
                             # if (typeHeavy == AtomHBondType.acc or typeHeavy == AtomHBondType.both) and (distarray[conv_hatom, idx2] <= hbondcutoff):
                             # dist = distarray[conv_hatom, idx2]
                             # dist = np.linalg.norm(sel1.positions[conv_hatom] - sel2.positions[idx2])
-                            dist = np.linalg.norm(pos1[0][3*conv_hatom:3*conv_hatom+3] - pos2[0][3*idx2:3*idx2+3])
+                            # dist = np.linalg.norm(pos1[0][3*conv_hatom:3*conv_hatom+3] - pos2[0][3*idx2:3*idx2+3])
+                            dist = np.linalg.norm(
+                                s1[conv_hatom] - s2[idx2]
+                            )
                             if (dist <= hbondcutoff):
                                 donorPosition = s1[idx1]
                                 hydrogenPosition = np.array(s1[conv_hatom], dtype=np.float64)
@@ -191,7 +178,10 @@ def loop_trajectory_grid(sel1c, sel2c, indices1, indices2, config, suppl, selfIn
                             # if (distarray[conv_hatom, idx2] <= hbondcutoff):
                             # dist = distarray[idx1, conv_hatom]
                             # dist = np.linalg.norm(sel1.positions[idx1] - sel2.positions[conv_hatom])
-                            dist = np.linalg.norm(pos1[0][3*idx1:3*idx1+3] - pos2[0][3*conv_hatom:3*conv_hatom+3])
+                            # dist = np.linalg.norm(pos1[0][3*idx1:3*idx1+3] - pos2[0][3*conv_hatom:3*conv_hatom+3])
+                            dist = np.linalg.norm(
+                                s1[idx1] - s2[conv_hatom]
+                            )
                             if (dist <= hbondcutoff):
                                 donorPosition = s2[idx2]
                                 hydrogenPosition = np.array(s2[conv_hatom], dtype=np.float64)
